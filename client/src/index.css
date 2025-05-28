@@ -1,30 +1,30 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --background: 0 0% 100%;
-  --foreground: 20 14.3% 4.1%;
-  --muted: 60 4.8% 95.9%;
-  --muted-foreground: 25 5.3% 44.7%;
+  --background: 0 0% 98%;
+  --foreground: 0 0% 10%;
+  --muted: 0 0% 92%;
+  --muted-foreground: 0 0% 45%;
   --popover: 0 0% 100%;
-  --popover-foreground: 20 14.3% 4.1%;
+  --popover-foreground: 0 0% 10%;
   --card: 0 0% 100%;
-  --card-foreground: 20 14.3% 4.1%;
-  --border: 20 5.9% 90%;
-  --input: 20 5.9% 90%;
-  --primary: 238 75% 65%; /* Indigo-600 */
+  --card-foreground: 0 0% 10%;
+  --border: 0 0% 88%;
+  --input: 0 0% 88%;
+  --primary: 240 100% 60%; /* Bright blue accent */
   --primary-foreground: 0 0% 100%;
-  --secondary: 60 4.8% 95.9%;
-  --secondary-foreground: 24 9.8% 10%;
-  --accent: 60 4.8% 95.9%;
-  --accent-foreground: 24 9.8% 10%;
+  --secondary: 0 0% 92%;
+  --secondary-foreground: 0 0% 10%;
+  --accent: 0 0% 92%;
+  --accent-foreground: 0 0% 10%;
   --destructive: 0 84.2% 60.2%;
   --destructive-foreground: 60 9.1% 97.8%;
-  --ring: 238 75% 65%;
-  --radius: 0.5rem;
+  --ring: 240 100% 60%;
+  --radius: 0.75rem;
 }
 
 .dark {
@@ -77,30 +77,19 @@
     animation-name: slideInFromBottom;
   }
 
-  .font-display {
-    font-family: 'Playfair Display', serif;
-  }
-
   .font-sans {
     font-family: 'Inter', sans-serif;
   }
 
-  .gradient-mesh {
-    background: 
-      radial-gradient(at 40% 20%, hsla(240, 100%, 70%, 0.3) 0px, transparent 50%),
-      radial-gradient(at 80% 0%, hsla(280, 100%, 70%, 0.25) 0px, transparent 50%),
-      radial-gradient(at 0% 50%, hsla(320, 100%, 70%, 0.2) 0px, transparent 50%),
-      radial-gradient(at 80% 50%, hsla(200, 100%, 70%, 0.25) 0px, transparent 50%),
-      radial-gradient(at 0% 100%, hsla(260, 100%, 70%, 0.2) 0px, transparent 50%),
-      radial-gradient(at 80% 100%, hsla(340, 100%, 70%, 0.3) 0px, transparent 50%),
-      radial-gradient(at 0% 0%, hsla(220, 100%, 70%, 0.2) 0px, transparent 50%);
+  .modern-gradient {
+    background: linear-gradient(to bottom right, #1a1a1a, #444444);
   }
 
-  .noise-bg {
+  .grain-texture {
     position: relative;
   }
 
-  .noise-bg::before {
+  .grain-texture::before {
     content: '';
     position: absolute;
     top: 0;
@@ -108,10 +97,30 @@
     width: 100%;
     height: 100%;
     background-image: 
-      radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 0);
-    background-size: 20px 20px;
-    opacity: 0.5;
+      radial-gradient(circle at 1px 1px, rgba(255,255,255,0.08) 1px, transparent 0);
+    background-size: 4px 4px;
+    opacity: 0.6;
     pointer-events: none;
+    z-index: 1;
+  }
+
+  .grain-light {
+    position: relative;
+  }
+
+  .grain-light::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+      radial-gradient(circle at 1px 1px, rgba(0,0,0,0.05) 1px, transparent 0);
+    background-size: 3px 3px;
+    opacity: 0.4;
+    pointer-events: none;
+    z-index: 1;
   }
 
   @keyframes fadeIn {

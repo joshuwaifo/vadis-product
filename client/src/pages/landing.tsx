@@ -80,43 +80,43 @@ export default function Landing() {
   ];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen modern-gradient grain-texture">
       {/* Header Navigation */}
-      <header className="fixed top-0 w-full z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100 noise-bg">
-        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <header className="fixed top-0 w-full z-50 bg-black/20 backdrop-blur-lg border-b border-white/10">
+        <nav className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
           <div className="flex justify-between items-center h-24">
             {/* Logo */}
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center relative z-10">
               <img 
-                src={vadisLogoDark} 
+                src={vadisLogoLight} 
                 alt="VadisMedia" 
-                className="h-24 w-auto"
+                className="h-20 w-auto"
               />
             </div>
             
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-8">
-              <a href="#" className="text-gray-700 hover:bg-gradient-to-r hover:from-indigo-600 hover:to-purple-600 hover:bg-clip-text hover:text-transparent font-semibold transition-all duration-300 font-sans">Products</a>
-              <a href="#" className="text-gray-700 hover:bg-gradient-to-r hover:from-indigo-600 hover:to-purple-600 hover:bg-clip-text hover:text-transparent font-semibold transition-all duration-300 font-sans">Solutions</a>
-              <a href="#" className="text-gray-700 hover:bg-gradient-to-r hover:from-indigo-600 hover:to-purple-600 hover:bg-clip-text hover:text-transparent font-semibold transition-all duration-300 font-sans">Learn</a>
-              <a href="#" className="text-gray-700 hover:bg-gradient-to-r hover:from-indigo-600 hover:to-purple-600 hover:bg-clip-text hover:text-transparent font-semibold transition-all duration-300 font-sans">Company</a>
-              <a href="#" className="text-gray-700 hover:bg-gradient-to-r hover:from-indigo-600 hover:to-purple-600 hover:bg-clip-text hover:text-transparent font-semibold transition-all duration-300 font-sans">Pricing</a>
+            <div className="hidden md:flex items-center space-x-10 relative z-10">
+              <a href="#" className="text-white/90 hover:text-blue-400 font-bold text-lg transition-all duration-300 font-sans">Products</a>
+              <a href="#" className="text-white/90 hover:text-blue-400 font-bold text-lg transition-all duration-300 font-sans">Solutions</a>
+              <a href="#" className="text-white/90 hover:text-blue-400 font-bold text-lg transition-all duration-300 font-sans">Learn</a>
+              <a href="#" className="text-white/90 hover:text-blue-400 font-bold text-lg transition-all duration-300 font-sans">Company</a>
+              <a href="#" className="text-white/90 hover:text-blue-400 font-bold text-lg transition-all duration-300 font-sans">Pricing</a>
             </div>
 
             {/* Auth Buttons */}
-            <div className="hidden md:flex items-center space-x-4">
-              <Button variant="ghost" className="text-gray-700 hover:bg-gradient-to-r hover:from-indigo-600 hover:to-purple-600 hover:bg-clip-text hover:text-transparent font-semibold font-sans">
-                <LogIn className="w-4 h-4 mr-2" />
+            <div className="hidden md:flex items-center space-x-6 relative z-10">
+              <Button variant="ghost" className="text-white hover:text-blue-400 font-bold text-lg font-sans border-none">
+                <LogIn className="w-5 h-5 mr-3" />
                 Login
               </Button>
-              <Button className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-105 font-sans">
+              <Button className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-8 py-3 text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 font-sans rounded-xl">
                 Request a demo
               </Button>
             </div>
 
             {/* Mobile menu button */}
-            <div className="md:hidden">
-              <Button variant="ghost" size="sm">
+            <div className="md:hidden relative z-10">
+              <Button variant="ghost" size="sm" className="text-white">
                 <Menu className="w-6 h-6" />
               </Button>
             </div>
@@ -126,36 +126,29 @@ export default function Landing() {
 
       <main className="pt-24">
         {/* Hero Section */}
-        <section className="relative overflow-hidden gradient-mesh noise-bg min-h-screen flex items-center">
-          {/* Enhanced Background decorative elements */}
-          <div className="absolute inset-0 overflow-hidden">
-            <div className="absolute -top-40 -right-40 w-96 h-96 bg-gradient-to-r from-indigo-400 to-purple-500 rounded-full mix-blend-multiply filter blur-2xl opacity-60 animate-pulse"></div>
-            <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full mix-blend-multiply filter blur-2xl opacity-60 animate-pulse"></div>
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-pulse"></div>
-          </div>
-
-          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-            <div className="text-center">
+        <section className="relative overflow-hidden min-h-screen flex items-center">
+          <div className="relative max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-32">
+            <div className="text-center relative z-10">
               {/* Main heading */}
-              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-gray-900 mb-8 animate-in fade-in slide-in-from-bottom-4 duration-1000 font-display leading-tight">
+              <h1 className="text-6xl sm:text-7xl lg:text-8xl font-black text-white mb-12 animate-in fade-in slide-in-from-bottom-4 duration-1000 font-sans leading-tight tracking-tight">
                 Make good
                 <br />
-                <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent font-extrabold">
+                <span className="text-blue-400">
                   data-driven choices
                 </span>
               </h1>
               
               {/* Subheading */}
-              <p className="text-xl sm:text-2xl lg:text-3xl text-gray-700 mb-16 max-w-5xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-200 font-sans font-medium leading-relaxed">
+              <p className="text-xl sm:text-2xl lg:text-3xl text-white/80 mb-20 max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-200 font-sans font-medium leading-relaxed">
                 Transform insights into growth. Harness production data and
                 hit your creative goals with the #1 AI-powered platform.
               </p>
 
               {/* Role Selection */}
-              <div className="mb-16 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-400">
-                <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-12 font-display">Select your role:</h2>
+              <div className="mb-20 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-400">
+                <h2 className="text-4xl lg:text-5xl font-black text-white mb-16 font-sans">Select your role:</h2>
                 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 max-w-6xl mx-auto">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-10 max-w-6xl mx-auto">
                   {roles.map((role) => {
                     const IconComponent = role.icon;
                     const isSelected = selectedRole === role.id;
@@ -163,18 +156,18 @@ export default function Landing() {
                     return (
                       <Card 
                         key={role.id}
-                        className={`cursor-pointer p-8 transition-all duration-500 transform hover:scale-110 hover:shadow-2xl border-3 backdrop-blur-sm ${
+                        className={`cursor-pointer p-10 transition-all duration-500 transform hover:scale-110 backdrop-blur-sm grain-light relative z-10 ${
                           isSelected 
-                            ? 'border-indigo-600 bg-gradient-to-br from-indigo-50 to-purple-50 shadow-2xl scale-105' 
-                            : 'border-gray-300 hover:border-indigo-400 shadow-lg hover:shadow-2xl bg-white/80'
-                        }`}
+                            ? 'border-2 border-blue-400 bg-white/95 shadow-2xl scale-105' 
+                            : 'border border-white/20 hover:border-blue-400/50 shadow-xl hover:shadow-2xl bg-white/10 hover:bg-white/20'
+                        } rounded-2xl`}
                         onClick={() => setSelectedRole(role.id)}
                       >
-                        <div className="text-center">
-                          <div className={`w-20 h-20 bg-gradient-to-br ${role.color} rounded-3xl flex items-center justify-center mx-auto mb-6 transition-all duration-500 hover:scale-125 shadow-lg`}>
-                            <IconComponent className="w-10 h-10 text-white" />
+                        <div className="text-center relative z-10">
+                          <div className={`w-24 h-24 ${isSelected ? 'bg-blue-600' : 'bg-white/20'} rounded-2xl flex items-center justify-center mx-auto mb-8 transition-all duration-500 hover:scale-110 shadow-lg`}>
+                            <IconComponent className={`w-12 h-12 ${isSelected ? 'text-white' : 'text-white/90'}`} />
                           </div>
-                          <h3 className={`text-xl font-bold text-gray-900 transition-colors font-sans ${role.hoverColor}`}>
+                          <h3 className={`text-xl font-bold transition-colors font-sans ${isSelected ? 'text-gray-900' : 'text-white'}`}>
                             {role.name}
                           </h3>
                         </div>
@@ -185,17 +178,17 @@ export default function Landing() {
               </div>
 
               {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row gap-6 justify-center animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-600">
+              <div className="flex flex-col sm:flex-row gap-8 justify-center animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-600 relative z-10">
                 <Button 
                   size="lg"
-                  className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:via-purple-700 hover:to-pink-700 text-white px-12 py-6 text-xl font-bold transition-all duration-500 transform hover:scale-110 shadow-2xl hover:shadow-3xl font-sans"
+                  className="bg-blue-600 hover:bg-blue-500 text-white px-16 py-6 text-xl font-black transition-all duration-500 transform hover:scale-110 shadow-2xl hover:shadow-3xl font-sans rounded-xl"
                 >
                   Request a demo
                 </Button>
                 <Button 
                   variant="outline" 
                   size="lg"
-                  className="text-transparent bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text border-2 border-indigo-300 hover:border-purple-400 px-12 py-6 text-xl font-bold transition-all duration-500 hover:scale-105 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 font-sans"
+                  className="text-white border-2 border-white/30 hover:border-blue-400 hover:bg-white/10 px-16 py-6 text-xl font-black transition-all duration-500 hover:scale-105 font-sans rounded-xl backdrop-blur-sm"
                 >
                   Sign Up Now <ArrowRight className="w-6 h-6 ml-3" />
                 </Button>
@@ -205,16 +198,16 @@ export default function Landing() {
         </section>
 
         {/* Trust Indicators */}
-        <section className="py-16 bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12">
-              <p className="text-lg text-gray-600 font-medium">Trusted by industry leaders</p>
+        <section className="py-24 bg-white grain-light">
+          <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+            <div className="text-center mb-16">
+              <p className="text-2xl text-gray-800 font-bold font-sans">Trusted by industry leaders</p>
             </div>
             
-            <div className="grid grid-cols-3 md:grid-cols-7 gap-8 items-center justify-items-center opacity-60 hover:opacity-80 transition-opacity duration-300">
+            <div className="grid grid-cols-3 md:grid-cols-7 gap-12 items-center justify-items-center opacity-40 hover:opacity-60 transition-opacity duration-300">
               {partners.map((partner, index) => (
-                <div key={index} className="flex items-center justify-center h-12">
-                  <span className="text-2xl font-bold text-gray-400">{partner}</span>
+                <div key={index} className="flex items-center justify-center h-16">
+                  <span className="text-3xl font-black text-gray-600 font-sans">{partner}</span>
                 </div>
               ))}
             </div>
