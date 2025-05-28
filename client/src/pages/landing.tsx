@@ -288,94 +288,89 @@ export default function Landing() {
         </section>
 
         {/* Power Features Section */}
-        <section className="py-32 bg-gradient-to-br from-gray-900 via-black to-purple-900 relative overflow-hidden">
-          {/* Animated Background */}
-          <div className="absolute inset-0">
-            <div className="absolute top-0 left-1/4 w-96 h-96 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-full blur-3xl animate-pulse"></div>
-            <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-green-500/10 to-blue-500/10 rounded-full blur-3xl animate-pulse delay-500"></div>
-          </div>
+        <section className="py-32 modern-gradient grain-texture relative overflow-hidden">
+          {/* Floating Orbs - matching hero section */}
+          <div className="floating-orb w-80 h-80 bg-gradient-to-r from-blue-500/30 to-purple-500/30 top-10 right-10"></div>
+          <div className="floating-orb w-64 h-64 bg-gradient-to-r from-purple-500/20 to-pink-500/20 bottom-20 left-10"></div>
+          <div className="floating-orb w-96 h-96 bg-gradient-to-r from-pink-500/15 to-blue-500/15 top-1/3 left-1/3"></div>
+          <div className="floating-orb w-48 h-48 bg-gradient-to-r from-green-500/20 to-blue-500/20 bottom-10 right-1/3"></div>
           
-          <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 relative z-10">
-            <div className="text-center mb-20">
-              <div className="inline-block px-6 py-2 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-full border border-blue-500/30 mb-8">
-                <span className="text-blue-300 font-semibold text-sm">REVOLUTIONARY PLATFORM</span>
+          <div className="relative max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-16">
+            <div className="text-center mb-20 relative z-10">
+              <div className="inline-block px-6 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/30 mb-8">
+                <span className="text-white font-semibold text-sm tracking-wide">REVOLUTIONARY PLATFORM</span>
               </div>
-              <h2 className="text-5xl md:text-6xl lg:text-7xl font-black text-white mb-8 font-sans leading-tight">
+              <h2 className="text-5xl md:text-6xl lg:text-7xl font-black text-white mb-8 font-sans leading-tight glow-text">
                 Turn ideas into 
                 <br />
                 <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent animate-pulse">
                   billion-dollar hits
                 </span>
               </h2>
-              <p className="text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
+              <p className="text-2xl text-white/90 max-w-4xl mx-auto leading-relaxed font-medium">
                 Stop chasing connections. Start creating empires. VadisMedia's AI matches your vision 
                 with the exact partners, funding, and talent to make box office magic happen.
               </p>
             </div>
 
-            <div className="grid lg:grid-cols-3 gap-8 lg:gap-12">
+            <div className="grid lg:grid-cols-3 gap-8 lg:gap-12 relative z-10">
               {powerFeatures.map((feature, index) => {
                 const IconComponent = feature.icon;
                 return (
                   <div 
                     key={index} 
-                    className="group relative bg-white/5 backdrop-blur-lg rounded-3xl p-8 hover:bg-white/10 transition-all duration-700 hover:scale-105 hover:rotate-1 border border-white/10"
+                    className="cursor-pointer p-8 transition-all duration-700 transform hover:scale-105 hover:rotate-1 backdrop-blur-lg relative z-10 card-glow overflow-hidden bg-gradient-to-br from-white/10 via-white/5 to-white/10 hover:from-white/20 hover:via-white/15 hover:to-white/20 border border-white/30 hover:border-white/50 rounded-3xl group"
                   >
-                    {/* Glowing Border Effect */}
-                    <div className={`absolute inset-0 rounded-3xl bg-gradient-to-r ${feature.color} opacity-0 group-hover:opacity-20 transition-opacity duration-500 blur-sm`}></div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl"></div>
                     
                     {/* Badge */}
-                    <div className="flex items-center justify-between mb-6">
-                      <div className={`inline-block px-3 py-1 ${feature.bgColor} rounded-full`}>
-                        <span className={`text-xs font-bold bg-gradient-to-r ${feature.color} bg-clip-text text-transparent`}>
+                    <div className="flex items-center justify-between mb-6 relative z-10">
+                      <div className="inline-block px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full border border-white/30">
+                        <span className="text-white text-xs font-bold tracking-wide">
                           {feature.badge}
                         </span>
                       </div>
-                      <div className={`w-12 h-12 bg-gradient-to-r ${feature.color} rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
-                        <IconComponent className="w-6 h-6 text-white" />
+                      <div className={`w-14 h-14 bg-gradient-to-r ${feature.color} rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-xl`}>
+                        <IconComponent className="w-7 h-7 text-white" />
                       </div>
                     </div>
                     
                     <div className="relative z-10">
-                      <h3 className="text-2xl font-black text-white mb-4 font-sans group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:via-purple-500 group-hover:to-pink-500 group-hover:bg-clip-text transition-all duration-300">
+                      <h3 className="text-2xl font-black text-white mb-4 font-sans group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:via-purple-500 group-hover:to-pink-500 group-hover:bg-clip-text group-hover:text-transparent transition-all duration-300" style={{textShadow: '0 0 10px rgba(255,255,255,0.8)'}}>
                         {feature.title}
                       </h3>
-                      <p className="text-gray-300 leading-relaxed mb-6 text-lg">
+                      <p className="text-white/80 leading-relaxed mb-6 text-lg font-medium">
                         {feature.description}
                       </p>
                       
                       {/* Metric */}
                       <div className="flex items-center">
-                        <div className="w-3 h-3 bg-green-500 rounded-full mr-2 animate-pulse"></div>
-                        <span className="text-green-400 font-bold text-sm uppercase tracking-wide">
+                        <div className="w-3 h-3 bg-green-400 rounded-full mr-2 animate-pulse shadow-lg"></div>
+                        <span className="text-green-300 font-bold text-sm uppercase tracking-wide">
                           {feature.metric}
                         </span>
                       </div>
                     </div>
-                    
-                    {/* Corner Accent */}
-                    <div className={`absolute -top-1 -right-1 w-8 h-8 bg-gradient-to-r ${feature.color} rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-bounce`}></div>
                   </div>
                 );
               })}
             </div>
             
             {/* Success Stories Ticker */}
-            <div className="mt-20 text-center">
-              <div className="bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20">
+            <div className="mt-20 text-center relative z-10">
+              <div className="bg-gradient-to-br from-white/10 via-white/5 to-white/10 backdrop-blur-lg rounded-3xl p-8 border border-white/30 card-glow">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                   <div>
-                    <div className="text-4xl font-black text-white mb-2">$2.3B</div>
-                    <div className="text-gray-400">Projects funded through partnerships</div>
+                    <div className="text-4xl font-black text-white mb-2 glow-text">$2.3B</div>
+                    <div className="text-white/70 font-medium">Projects funded through partnerships</div>
                   </div>
                   <div>
-                    <div className="text-4xl font-black text-white mb-2">847</div>
-                    <div className="text-gray-400">Successful collaborations launched</div>
+                    <div className="text-4xl font-black text-white mb-2 glow-text">847</div>
+                    <div className="text-white/70 font-medium">Successful collaborations launched</div>
                   </div>
                   <div>
-                    <div className="text-4xl font-black text-white mb-2">99.2%</div>
-                    <div className="text-gray-400">Partner satisfaction rate</div>
+                    <div className="text-4xl font-black text-white mb-2 glow-text">99.2%</div>
+                    <div className="text-white/70 font-medium">Partner satisfaction rate</div>
                   </div>
                 </div>
               </div>
