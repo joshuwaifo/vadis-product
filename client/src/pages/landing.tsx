@@ -17,6 +17,8 @@ import {
   Calendar,
   ChartBar
 } from "lucide-react";
+import vadisLogoLight from "@assets/Vadis FINAL LOGO large size Without Background.png";
+import vadisLogoDark from "@assets/Vadis_logo_dark.png";
 
 export default function Landing() {
   const [selectedRole, setSelectedRole] = useState<string>("");
@@ -85,8 +87,11 @@ export default function Landing() {
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
             <div className="flex items-center space-x-2">
-              <Film className="w-8 h-8 text-indigo-600" />
-              <span className="text-2xl font-bold text-gray-900">VadisMedia</span>
+              <img 
+                src={vadisLogoDark} 
+                alt="VadisMedia" 
+                className="h-8 w-auto"
+              />
             </div>
             
             {/* Desktop Navigation */}
@@ -308,8 +313,11 @@ export default function Landing() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div className="col-span-2 md:col-span-1">
               <div className="flex items-center mb-4">
-                <Film className="w-8 h-8 text-indigo-500 mr-3" />
-                <span className="text-2xl font-bold text-white">VadisMedia</span>
+                <img 
+                  src={vadisLogoLight} 
+                  alt="VadisMedia" 
+                  className="h-8 w-auto"
+                />
               </div>
               <p className="text-gray-400 mb-4">
                 AI-powered platform for modern film and media production.
