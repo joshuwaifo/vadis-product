@@ -205,7 +205,7 @@ export default function Landing() {
                 <Button 
                   size="lg"
                   className={`bg-gradient-to-r from-blue-500 via-purple-600 to-pink-600 hover:from-blue-600 hover:via-purple-700 hover:to-pink-700 text-white px-20 py-8 text-2xl font-black transition-all duration-700 transform hover:scale-110 hover:rotate-1 shadow-2xl hover:shadow-3xl font-sans rounded-2xl relative overflow-hidden group ${
-                    selectedRole ? 'animate-bounce' : ''
+                    selectedRole ? 'animate-double-bounce' : ''
                   }`}
                 >
                   <span className="relative z-10">Request a demo</span>
