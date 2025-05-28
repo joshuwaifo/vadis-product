@@ -321,7 +321,6 @@ export default function Landing() {
                     key={index} 
                     className="cursor-pointer p-8 transition-all duration-700 transform hover:scale-105 hover:rotate-1 backdrop-blur-lg relative z-10 card-glow overflow-hidden bg-gradient-to-br from-white/10 via-white/5 to-white/10 hover:from-white/20 hover:via-white/15 hover:to-white/20 border border-white/30 hover:border-white/50 rounded-3xl group"
                   >
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl"></div>
                     
                     {/* Badge */}
                     <div className="flex items-center justify-between mb-6 relative z-10">
