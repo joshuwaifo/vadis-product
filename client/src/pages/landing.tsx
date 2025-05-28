@@ -90,7 +90,7 @@ export default function Landing() {
               <img 
                 src={vadisLogoDark} 
                 alt="VadisMedia" 
-                className="h-8 w-auto"
+                className="h-12 w-auto"
               />
             </div>
             
@@ -316,7 +316,7 @@ export default function Landing() {
                 <img 
                   src={vadisLogoLight} 
                   alt="VadisMedia" 
-                  className="h-8 w-auto"
+                  className="h-12 w-auto"
                 />
               </div>
               <p className="text-gray-400 mb-4">
