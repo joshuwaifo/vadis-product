@@ -319,7 +319,7 @@ export default function Landing() {
                 return (
                   <div 
                     key={index} 
-                    className="cursor-pointer p-8 transition-all duration-700 transform hover:scale-105 hover:rotate-1 backdrop-blur-lg relative z-10 card-glow overflow-hidden bg-gradient-to-br from-white/10 via-white/5 to-white/10 hover:from-white/20 hover:via-white/15 hover:to-white/20 border border-white/30 hover:border-white/50 rounded-3xl group"
+                    className="cursor-pointer p-8 transition-all duration-500 transform hover:scale-105 backdrop-blur-lg relative z-10 overflow-hidden bg-white/10 hover:bg-white/15 border border-white/30 hover:border-white/50 rounded-3xl group"
                   >
                     
                     {/* Badge */}
