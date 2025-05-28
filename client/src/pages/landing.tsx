@@ -82,15 +82,15 @@ export default function Landing() {
   return (
     <div className="min-h-screen modern-gradient grain-texture">
       {/* Header Navigation */}
-      <header className="fixed top-0 w-full z-50 bg-black/20 backdrop-blur-lg border-b border-white/10">
+      <header className="fixed top-0 w-full z-50 bg-black/30 backdrop-blur-xl border-b border-white/20 shadow-2xl">
         <nav className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-          <div className="flex justify-between items-center h-24">
+          <div className="flex justify-between items-center h-28">
             {/* Logo */}
             <div className="flex items-center relative z-10">
               <img 
                 src={vadisLogoLight} 
                 alt="VadisMedia" 
-                className="h-20 w-auto"
+                className="h-24 w-auto drop-shadow-2xl"
               />
             </div>
             
@@ -124,22 +124,27 @@ export default function Landing() {
         </nav>
       </header>
 
-      <main className="pt-24">
+      <main className="pt-28">
         {/* Hero Section */}
         <section className="relative overflow-hidden min-h-screen flex items-center">
+          {/* Floating Orbs */}
+          <div className="floating-orb w-96 h-96 bg-gradient-to-r from-blue-500/20 to-purple-600/20 top-20 -left-48"></div>
+          <div className="floating-orb w-80 h-80 bg-gradient-to-r from-purple-500/20 to-pink-500/20 top-1/2 -right-40"></div>
+          <div className="floating-orb w-64 h-64 bg-gradient-to-r from-pink-500/20 to-blue-500/20 bottom-20 left-1/4"></div>
+          
           <div className="relative max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-32">
             <div className="text-center relative z-10">
               {/* Main heading */}
-              <h1 className="text-6xl sm:text-7xl lg:text-8xl font-black text-white mb-12 animate-in fade-in slide-in-from-bottom-4 duration-1000 font-sans leading-tight tracking-tight">
+              <h1 className="text-7xl sm:text-8xl lg:text-9xl font-black text-white mb-16 animate-in fade-in slide-in-from-bottom-4 duration-1000 font-sans leading-tight tracking-tight glow-text">
                 Make good
                 <br />
-                <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent animate-pulse">
                   data-driven choices
                 </span>
               </h1>
               
               {/* Subheading */}
-              <p className="text-xl sm:text-2xl lg:text-3xl text-white/80 mb-20 max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-200 font-sans font-medium leading-relaxed">
+              <p className="text-2xl sm:text-3xl lg:text-4xl text-white/90 mb-24 max-w-5xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-200 font-sans font-medium leading-relaxed">
                 Transform insights into growth. Harness production data and
                 hit your creative goals with the #1 AI-powered platform.
               </p>
@@ -156,18 +161,19 @@ export default function Landing() {
                     return (
                       <Card 
                         key={role.id}
-                        className={`cursor-pointer p-10 transition-all duration-500 transform hover:scale-110 backdrop-blur-sm grain-light relative z-10 ${
+                        className={`cursor-pointer p-12 transition-all duration-700 transform hover:scale-105 hover:rotate-1 backdrop-blur-lg relative z-10 card-glow overflow-hidden ${
                           isSelected 
-                            ? 'border-2 border-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-white/95 shadow-2xl scale-105' 
-                            : 'border border-white/20 hover:border-2 hover:border-gradient-to-r hover:from-blue-400 hover:via-purple-500 hover:to-pink-500 shadow-xl hover:shadow-2xl bg-white/10 hover:bg-white/20'
-                        } rounded-2xl`}
+                            ? 'bg-gradient-to-br from-white/95 via-white/90 to-white/95 shadow-2xl scale-105 border-2 border-white/50' 
+                            : 'bg-gradient-to-br from-white/10 via-white/5 to-white/10 hover:from-white/20 hover:via-white/15 hover:to-white/20 border border-white/30 hover:border-white/50'
+                        } rounded-3xl group`}
                         onClick={() => setSelectedRole(role.id)}
                       >
+                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl"></div>
                         <div className="text-center relative z-10">
-                          <div className={`w-24 h-24 ${isSelected ? 'bg-gradient-to-r from-blue-500 via-purple-600 to-pink-600' : 'bg-white/20'} rounded-2xl flex items-center justify-center mx-auto mb-8 transition-all duration-500 hover:scale-110 shadow-lg`}>
-                            <IconComponent className={`w-12 h-12 ${isSelected ? 'text-white' : 'text-white/90'}`} />
+                          <div className={`w-28 h-28 ${isSelected ? 'bg-gradient-to-br from-blue-500 via-purple-600 to-pink-600 shadow-2xl' : 'bg-gradient-to-br from-white/30 to-white/10 group-hover:from-blue-500/30 group-hover:via-purple-500/30 group-hover:to-pink-500/30'} rounded-3xl flex items-center justify-center mx-auto mb-10 transition-all duration-700 hover:scale-110 hover:rotate-12 shadow-xl`}>
+                            <IconComponent className={`w-14 h-14 ${isSelected ? 'text-white drop-shadow-lg' : 'text-white/90'} transition-all duration-500`} />
                           </div>
-                          <h3 className={`text-xl font-bold transition-colors font-sans ${isSelected ? 'text-gray-900' : 'text-white'}`}>
+                          <h3 className={`text-2xl font-black transition-colors font-sans ${isSelected ? 'text-gray-900' : 'text-white group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:via-purple-500 group-hover:to-pink-500 group-hover:bg-clip-text group-hover:text-transparent'}`}>
                             {role.name}
                           </h3>
                         </div>
@@ -178,22 +184,27 @@ export default function Landing() {
               </div>
 
               {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row gap-8 justify-center animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-600 relative z-10">
+              <div className="flex flex-col sm:flex-row gap-10 justify-center animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-600 relative z-10">
                 <Button 
                   size="lg"
-                  className="bg-gradient-to-r from-blue-500 via-purple-600 to-pink-600 hover:from-blue-600 hover:via-purple-700 hover:to-pink-700 text-white px-16 py-6 text-xl font-black transition-all duration-500 transform hover:scale-110 shadow-2xl hover:shadow-3xl font-sans rounded-xl"
+                  className="bg-gradient-to-r from-blue-500 via-purple-600 to-pink-600 hover:from-blue-600 hover:via-purple-700 hover:to-pink-700 text-white px-20 py-8 text-2xl font-black transition-all duration-700 transform hover:scale-110 hover:rotate-1 shadow-2xl hover:shadow-3xl font-sans rounded-2xl relative overflow-hidden group"
                 >
-                  Request a demo
+                  <span className="relative z-10">Request a demo</span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 </Button>
                 <Button 
                   variant="outline" 
                   size="lg"
-                  className="text-transparent bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text border-2 border-transparent bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 hover:shadow-lg px-16 py-6 text-xl font-black transition-all duration-500 hover:scale-105 font-sans rounded-xl backdrop-blur-sm relative overflow-hidden before:absolute before:inset-0 before:p-[2px] before:bg-gradient-to-r before:from-blue-400 before:via-purple-500 before:to-pink-500 before:rounded-xl before:-z-10"
+                  className="relative px-20 py-8 text-2xl font-black transition-all duration-700 hover:scale-105 hover:-rotate-1 font-sans rounded-2xl backdrop-blur-sm overflow-hidden group border-2 border-transparent"
                   style={{
-                    background: 'linear-gradient(white, white) padding-box, linear-gradient(to right, #60a5fa, #a855f7, #ec4899) border-box'
+                    background: 'linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05)) padding-box, linear-gradient(135deg, #60a5fa, #a855f7, #ec4899) border-box'
                   }}
                 >
-                  Sign Up Now <ArrowRight className="w-6 h-6 ml-3" />
+                  <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+                    Sign Up Now
+                  </span>
+                  <ArrowRight className="w-7 h-7 ml-4 text-pink-400 group-hover:translate-x-2 transition-transform duration-300" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 </Button>
               </div>
             </div>
