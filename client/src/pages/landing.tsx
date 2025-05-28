@@ -32,15 +32,15 @@ export default function Landing() {
       hoverColor: "hover:text-indigo-600"
     },
     {
-      id: "agency", 
-      name: "Brand/Agency",
+      id: "brand", 
+      name: "Brand",
       icon: Briefcase,
       color: "from-purple-500 to-purple-600",
       hoverColor: "hover:text-purple-600"
     },
     {
-      id: "investor",
-      name: "Investor", 
+      id: "financier",
+      name: "Financier", 
       icon: DollarSign,
       color: "from-amber-500 to-amber-600",
       hoverColor: "hover:text-amber-600"
