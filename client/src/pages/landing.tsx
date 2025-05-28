@@ -204,10 +204,15 @@ export default function Landing() {
               <div className="flex flex-col sm:flex-row gap-10 justify-center animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-600 relative z-10">
                 <Button 
                   size="lg"
-                  className="bg-gradient-to-r from-blue-500 via-purple-600 to-pink-600 hover:from-blue-600 hover:via-purple-700 hover:to-pink-700 text-white px-20 py-8 text-2xl font-black transition-all duration-700 transform hover:scale-110 hover:rotate-1 shadow-2xl hover:shadow-3xl font-sans rounded-2xl relative overflow-hidden group"
+                  className={`bg-gradient-to-r from-blue-500 via-purple-600 to-pink-600 hover:from-blue-600 hover:via-purple-700 hover:to-pink-700 text-white px-20 py-8 text-2xl font-black transition-all duration-700 transform hover:scale-110 hover:rotate-1 shadow-2xl hover:shadow-3xl font-sans rounded-2xl relative overflow-hidden group ${
+                    selectedRole ? 'animate-bounce' : ''
+                  }`}
                 >
                   <span className="relative z-10">Request a demo</span>
                   <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  {selectedRole && (
+                    <div className="absolute -inset-2 bg-gradient-to-r from-yellow-400/30 via-orange-400/30 to-pink-400/30 rounded-3xl animate-ping"></div>
+                  )}
                 </Button>
                 <Button 
                   variant="outline" 
