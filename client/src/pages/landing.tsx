@@ -151,7 +151,7 @@ export default function Landing() {
 
               {/* Role Selection */}
               <div className="mb-20 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-400">
-                <h2 className="text-4xl lg:text-5xl font-black text-white mb-16 font-sans">Select your role:</h2>
+                <h2 className="text-4xl lg:text-5xl font-black text-white mb-16 font-sans">Are you a...</h2>
                 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-10 max-w-6xl mx-auto">
                   {roles.map((role) => {
