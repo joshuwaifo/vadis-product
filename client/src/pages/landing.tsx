@@ -66,24 +66,33 @@ export default function Landing() {
     { name: "Sony", icon: SiSony, category: "Entertainment", color: "text-black" }
   ];
 
-  const features = [
+  const powerFeatures = [
     {
       icon: Users,
-      title: "Smart Matchmaking",
-      description: "AI-powered connections between productions and the perfect investors, brands, and talent to bring projects to life.",
-      color: "bg-indigo-100 text-indigo-600"
+      title: "Instant Project-Partner Matching",
+      description: "Your $50M sci-fi project meets the perfect VFX studio, streaming platform, and luxury car brand sponsor in under 24 hours. Our AI analyzes 10,000+ industry connections daily.",
+      metric: "97% faster partnerships",
+      color: "from-blue-500 to-blue-600",
+      bgColor: "bg-blue-50",
+      badge: "AI-Powered"
     },
     {
       icon: TrendingUp,
-      title: "Goal Alignment", 
-      description: "Align production milestones with investor returns and brand objectives for guaranteed mutual success.",
-      color: "bg-purple-100 text-purple-600"
+      title: "ROI-Guaranteed Collaborations", 
+      description: "Every partnership is structured for mutual wins. Productions get funding + brand visibility, investors see measurable returns, brands reach target audiences authentically.",
+      metric: "avg 340% ROI increase",
+      color: "from-purple-500 to-purple-600",
+      bgColor: "bg-purple-50",
+      badge: "Profit-Driven"
     },
     {
       icon: ShieldCheck,
-      title: "Secure Collaboration",
-      description: "Protected workspace where teams, investors, and brands collaborate transparently on every project phase.",
-      color: "bg-amber-100 text-amber-600"
+      title: "Hollywood-Grade Security",
+      description: "Bank-level encryption protects your scripts, financials, and strategic plans. Share confidently knowing your IP is safer than Fort Knox.",
+      metric: "zero data breaches",
+      color: "from-green-500 to-green-600",
+      bgColor: "bg-green-50",
+      badge: "Enterprise Security"
     }
   ];
 
@@ -278,53 +287,96 @@ export default function Landing() {
           </div>
         </section>
 
-        {/* Features Section */}
-        <section className="py-20 bg-gray-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                Where <span className="text-indigo-600">collaboration meets success</span>
+        {/* Power Features Section */}
+        <section className="py-32 bg-gradient-to-br from-gray-900 via-black to-purple-900 relative overflow-hidden">
+          {/* Animated Background */}
+          <div className="absolute inset-0">
+            <div className="absolute top-0 left-1/4 w-96 h-96 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-full blur-3xl animate-pulse"></div>
+            <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-green-500/10 to-blue-500/10 rounded-full blur-3xl animate-pulse delay-500"></div>
+          </div>
+          
+          <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 relative z-10">
+            <div className="text-center mb-20">
+              <div className="inline-block px-6 py-2 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-full border border-blue-500/30 mb-8">
+                <span className="text-blue-300 font-semibold text-sm">REVOLUTIONARY PLATFORM</span>
+              </div>
+              <h2 className="text-5xl md:text-6xl lg:text-7xl font-black text-white mb-8 font-sans leading-tight">
+                Turn ideas into 
+                <br />
+                <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent animate-pulse">
+                  billion-dollar hits
+                </span>
               </h2>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                VadisMedia connects production teams with investors, brands, and creators, 
-                ensuring every project achieves its goals through intelligent partnerships.
+              <p className="text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
+                Stop chasing connections. Start creating empires. VadisMedia's AI matches your vision 
+                with the exact partners, funding, and talent to make box office magic happen.
               </p>
             </div>
 
-            <div className="grid lg:grid-cols-2 gap-16 items-center">
-              {/* Features List */}
-              <div className="space-y-8">
-                {features.map((feature, index) => {
-                  const IconComponent = feature.icon;
-                  return (
-                    <div key={index} className="flex items-start space-x-4">
-                      <div className={`flex-shrink-0 w-12 h-12 ${feature.color} rounded-xl flex items-center justify-center`}>
-                        <IconComponent className="w-6 h-6" />
+            <div className="grid lg:grid-cols-3 gap-8 lg:gap-12">
+              {powerFeatures.map((feature, index) => {
+                const IconComponent = feature.icon;
+                return (
+                  <div 
+                    key={index} 
+                    className="group relative bg-white/5 backdrop-blur-lg rounded-3xl p-8 hover:bg-white/10 transition-all duration-700 hover:scale-105 hover:rotate-1 border border-white/10"
+                  >
+                    {/* Glowing Border Effect */}
+                    <div className={`absolute inset-0 rounded-3xl bg-gradient-to-r ${feature.color} opacity-0 group-hover:opacity-20 transition-opacity duration-500 blur-sm`}></div>
+                    
+                    {/* Badge */}
+                    <div className="flex items-center justify-between mb-6">
+                      <div className={`inline-block px-3 py-1 ${feature.bgColor} rounded-full`}>
+                        <span className={`text-xs font-bold bg-gradient-to-r ${feature.color} bg-clip-text text-transparent`}>
+                          {feature.badge}
+                        </span>
                       </div>
-                      <div>
-                        <h3 className="text-xl font-semibold text-gray-900 mb-2">{feature.title}</h3>
-                        <p className="text-gray-600">{feature.description}</p>
+                      <div className={`w-12 h-12 bg-gradient-to-r ${feature.color} rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
+                        <IconComponent className="w-6 h-6 text-white" />
                       </div>
                     </div>
-                  );
-                })}
-              </div>
-              
-              {/* Hero Image */}
-              <div className="relative">
-                <img 
-                  src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&h=600"
-                  alt="Professional team analyzing film production data" 
-                  className="rounded-2xl shadow-2xl w-full h-auto"
-                />
-                
-                {/* Floating analytics card */}
-                <div className="absolute top-4 right-4 bg-white rounded-xl shadow-lg p-4 animate-pulse">
-                  <div className="flex items-center space-x-2 text-sm">
-                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                    <span className="text-gray-700 font-medium">Production On Track</span>
+                    
+                    <div className="relative z-10">
+                      <h3 className="text-2xl font-black text-white mb-4 font-sans group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:via-purple-500 group-hover:to-pink-500 group-hover:bg-clip-text transition-all duration-300">
+                        {feature.title}
+                      </h3>
+                      <p className="text-gray-300 leading-relaxed mb-6 text-lg">
+                        {feature.description}
+                      </p>
+                      
+                      {/* Metric */}
+                      <div className="flex items-center">
+                        <div className="w-3 h-3 bg-green-500 rounded-full mr-2 animate-pulse"></div>
+                        <span className="text-green-400 font-bold text-sm uppercase tracking-wide">
+                          {feature.metric}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    {/* Corner Accent */}
+                    <div className={`absolute -top-1 -right-1 w-8 h-8 bg-gradient-to-r ${feature.color} rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-bounce`}></div>
                   </div>
-                  <div className="mt-2 text-xs text-gray-500">94% budget efficiency</div>
+                );
+              })}
+            </div>
+            
+            {/* Success Stories Ticker */}
+            <div className="mt-20 text-center">
+              <div className="bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                  <div>
+                    <div className="text-4xl font-black text-white mb-2">$2.3B</div>
+                    <div className="text-gray-400">Projects funded through partnerships</div>
+                  </div>
+                  <div>
+                    <div className="text-4xl font-black text-white mb-2">847</div>
+                    <div className="text-gray-400">Successful collaborations launched</div>
+                  </div>
+                  <div>
+                    <div className="text-4xl font-black text-white mb-2">99.2%</div>
+                    <div className="text-gray-400">Partner satisfaction rate</div>
+                  </div>
                 </div>
               </div>
             </div>
