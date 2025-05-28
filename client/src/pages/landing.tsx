@@ -173,7 +173,7 @@ export default function Landing() {
                           <div className={`w-28 h-28 ${isSelected ? 'bg-gradient-to-br from-blue-500 via-purple-600 to-pink-600 shadow-2xl' : 'bg-gradient-to-br from-white/80 to-white/60 group-hover:from-blue-500/80 group-hover:via-purple-500/80 group-hover:to-pink-500/80'} rounded-3xl flex items-center justify-center mx-auto mb-10 transition-all duration-700 hover:scale-110 hover:rotate-12 shadow-xl`}>
                             <IconComponent className={`w-14 h-14 ${isSelected ? 'text-white drop-shadow-lg' : 'text-gray-800 group-hover:text-white'} transition-all duration-500 drop-shadow-lg`} />
                           </div>
-                          <h3 className={`text-2xl font-black transition-colors font-sans drop-shadow-lg ${isSelected ? 'text-gray-900' : 'text-white group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:via-purple-500 group-hover:to-pink-500 group-hover:bg-clip-text group-hover:text-transparent'}`}>
+                          <h3 className={`text-2xl font-black transition-colors font-sans ${isSelected ? 'text-gray-900' : 'text-gray-900 group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:via-purple-500 group-hover:to-pink-500 group-hover:bg-clip-text group-hover:text-transparent'}`} style={{textShadow: '0 0 10px rgba(255,255,255,0.8)'}}>
                             {role.name}
                           </h3>
                         </div>
