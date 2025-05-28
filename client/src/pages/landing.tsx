@@ -60,21 +60,21 @@ export default function Landing() {
 
   const features = [
     {
-      icon: Brain,
-      title: "AI Script Analysis",
-      description: "Get instant insights on character development, pacing, and audience appeal with our advanced AI script analysis engine.",
+      icon: Users,
+      title: "Smart Matchmaking",
+      description: "AI-powered connections between productions and the perfect investors, brands, and talent to bring projects to life.",
       color: "bg-indigo-100 text-indigo-600"
     },
     {
-      icon: Calendar,
-      title: "Smart Scheduling", 
-      description: "Optimize shooting schedules, manage resources, and predict potential delays with intelligent production planning.",
+      icon: TrendingUp,
+      title: "Goal Alignment", 
+      description: "Align production milestones with investor returns and brand objectives for guaranteed mutual success.",
       color: "bg-purple-100 text-purple-600"
     },
     {
-      icon: ChartBar,
-      title: "Performance Analytics",
-      description: "Track project progress, budget utilization, and team performance with comprehensive real-time analytics.",
+      icon: ShieldCheck,
+      title: "Secure Collaboration",
+      description: "Protected workspace where teams, investors, and brands collaborate transparently on every project phase.",
       color: "bg-amber-100 text-amber-600"
     }
   ];
@@ -136,17 +136,17 @@ export default function Landing() {
             <div className="text-center relative z-10">
               {/* Main heading */}
               <h1 className="text-7xl sm:text-8xl lg:text-9xl font-black text-white mb-16 animate-in fade-in slide-in-from-bottom-4 duration-1000 font-sans leading-tight tracking-tight glow-text">
-                Make good
+                Unite vision
                 <br />
                 <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent animate-pulse">
-                  data-driven choices
+                  with success
                 </span>
               </h1>
               
               {/* Subheading */}
               <p className="text-2xl sm:text-3xl lg:text-4xl text-white/90 mb-24 max-w-5xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-200 font-sans font-medium leading-relaxed">
-                Transform insights into growth. Harness production data and
-                hit your creative goals with the #1 AI-powered platform.
+                Connect productions, investors, brands, and creators on one AI-powered platform.
+                Where every project finds its perfect partners and every goal becomes achievable.
               </p>
 
               {/* Role Selection */}
@@ -233,11 +233,11 @@ export default function Landing() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                Accelerate your <span className="text-indigo-600">creative process</span>
+                Where <span className="text-indigo-600">collaboration meets success</span>
               </h2>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                From script analysis to post-production optimization, VadisMedia's AI-powered platform 
-                streamlines every aspect of film and media production.
+                VadisMedia connects production teams with investors, brands, and creators, 
+                ensuring every project achieves its goals through intelligent partnerships.
               </p>
             </div>
 
@@ -285,11 +285,11 @@ export default function Landing() {
         <section className="py-20 bg-gradient-to-r from-indigo-600 to-purple-600">
           <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
-              Ready to revolutionize your production?
+              Ready to connect your next big project?
             </h2>
             <p className="text-xl text-indigo-100 mb-8 max-w-2xl mx-auto">
-              Join thousands of creators, producers, and studios who trust VadisMedia 
-              to bring their vision to life efficiently and effectively.
+              Join productions, investors, brands, and creators who use VadisMedia 
+              to turn ambitious projects into profitable partnerships.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
