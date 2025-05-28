@@ -17,6 +17,7 @@ import {
   Calendar,
   ChartBar
 } from "lucide-react";
+import { SiNetflix, SiApple, SiAmazon, SiNike, SiCocacola, SiMercedes, SiSony } from 'react-icons/si';
 import vadisLogoLight from "@assets/Vadis FINAL LOGO large size Without Background.png";
 import vadisLogoDark from "@assets/Vadis_logo_dark.png";
 
@@ -54,8 +55,15 @@ export default function Landing() {
     }
   ];
 
-  const partners = [
-    "Walmart", "Grab", "TikTok", "adidas", "udemy", "👑", "McDonald's"
+  const industryPartners = [
+    { name: "Netflix", icon: SiNetflix, category: "Streaming", color: "text-red-500" },
+    { name: "Warner Bros", icon: Film, category: "Studios", color: "text-blue-600" },
+    { name: "Apple", icon: SiApple, category: "Tech & Streaming", color: "text-gray-700" },
+    { name: "Amazon", icon: SiAmazon, category: "Streaming & Production", color: "text-orange-500" },
+    { name: "Nike", icon: SiNike, category: "Brand Partnership", color: "text-black" },
+    { name: "Coca-Cola", icon: SiCocacola, category: "Brand Marketing", color: "text-red-600" },
+    { name: "Mercedes", icon: SiMercedes, category: "Luxury Brands", color: "text-gray-800" },
+    { name: "Sony", icon: SiSony, category: "Entertainment", color: "text-black" }
   ];
 
   const features = [
@@ -212,19 +220,60 @@ export default function Landing() {
           </div>
         </section>
 
-        {/* Trust Indicators */}
-        <section className="py-24 bg-white grain-light">
-          <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-            <div className="text-center mb-16">
-              <p className="text-2xl text-gray-800 font-bold font-sans">Trusted by industry leaders</p>
+        {/* Industry Showcase */}
+        <section className="py-24 bg-gradient-to-br from-gray-50 via-white to-purple-50 relative overflow-hidden">
+          {/* Background Pattern */}
+          <div className="absolute inset-0 opacity-5">
+            <div className="absolute top-20 left-20 w-96 h-96 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full blur-3xl"></div>
+            <div className="absolute bottom-20 right-20 w-96 h-96 bg-gradient-to-r from-pink-500 to-blue-500 rounded-full blur-3xl"></div>
+          </div>
+          
+          <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 relative z-10">
+            <div className="text-center mb-20">
+              <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-6 font-sans">
+                Where <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">industry leaders</span> connect
+              </h2>
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                The kind of companies already transforming media production through strategic partnerships
+              </p>
             </div>
             
-            <div className="grid grid-cols-3 md:grid-cols-7 gap-12 items-center justify-items-center opacity-40 hover:opacity-60 transition-opacity duration-300">
-              {partners.map((partner, index) => (
-                <div key={index} className="flex items-center justify-center h-16">
-                  <span className="text-3xl font-black text-gray-600 font-sans">{partner}</span>
-                </div>
-              ))}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
+              {industryPartners.map((company, index) => {
+                const IconComponent = company.icon;
+                return (
+                  <div 
+                    key={index} 
+                    className="group relative bg-white/80 backdrop-blur-sm rounded-3xl p-8 transition-all duration-500 hover:scale-105 hover:rotate-1 shadow-lg hover:shadow-2xl border border-white/50"
+                  >
+                    {/* Gradient Border Effect */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    
+                    <div className="relative z-10 text-center">
+                      <div className="flex items-center justify-center mb-4">
+                        <IconComponent className={`w-12 h-12 ${company.color} group-hover:scale-110 transition-transform duration-300`} />
+                      </div>
+                      <h3 className="text-lg font-bold text-gray-900 mb-2 font-sans">{company.name}</h3>
+                      <p className="text-sm text-gray-600 font-medium">{company.category}</p>
+                    </div>
+                    
+                    {/* Floating Orb */}
+                    <div className="absolute -top-2 -right-2 w-4 h-4 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-pulse"></div>
+                  </div>
+                );
+              })}
+            </div>
+            
+            {/* Call to Action */}
+            <div className="text-center mt-16">
+              <p className="text-lg text-gray-700 font-medium mb-6">
+                Ready to join the next generation of media collaboration?
+              </p>
+              <div className="inline-flex px-8 py-3 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 rounded-full border border-purple-200">
+                <span className="text-sm font-semibold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+                  ✨ VadisMedia connects your vision with the right partners
+                </span>
+              </div>
             </div>
           </div>
         </section>
