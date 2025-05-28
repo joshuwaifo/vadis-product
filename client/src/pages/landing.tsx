@@ -383,104 +383,36 @@ export default function Landing() {
           </div>
         </section>
 
-        {/* Ultimate Call to Action */}
-        <section className="py-32 bg-gradient-to-br from-black via-purple-900 to-blue-900 relative overflow-hidden">
-          {/* Cinematic Background Effects */}
-          <div className="absolute inset-0">
-            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-blue-500/10 via-purple-500/20 to-pink-500/10 animate-pulse"></div>
-            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-blue-500/30 to-purple-500/30 rounded-full blur-3xl animate-pulse delay-1000"></div>
-            <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-gradient-to-r from-purple-500/30 to-pink-500/30 rounded-full blur-3xl animate-pulse delay-500"></div>
-            
-            {/* Floating Particles */}
-            <div className="absolute top-20 left-20 w-4 h-4 bg-blue-400 rounded-full animate-bounce delay-300"></div>
-            <div className="absolute top-40 right-32 w-3 h-3 bg-purple-400 rounded-full animate-bounce delay-700"></div>
-            <div className="absolute bottom-32 left-1/3 w-2 h-2 bg-pink-400 rounded-full animate-bounce delay-1000"></div>
-            <div className="absolute bottom-20 right-20 w-4 h-4 bg-blue-300 rounded-full animate-bounce delay-200"></div>
-          </div>
-          
-          <div className="max-w-6xl mx-auto text-center px-6 sm:px-8 lg:px-12 relative z-10">
-            {/* Attention-Grabbing Badge */}
-            <div className="inline-block px-8 py-3 bg-gradient-to-r from-yellow-400/20 to-orange-500/20 rounded-full border border-yellow-400/50 mb-12 animate-pulse">
-              <span className="text-yellow-300 font-black text-lg tracking-wide">⚡ LIMITED TIME: EARLY ACCESS AVAILABLE ⚡</span>
-            </div>
-            
-            <h2 className="text-6xl md:text-7xl lg:text-8xl font-black text-white mb-8 font-sans leading-tight">
-              Your billion-dollar
-              <br />
-              <span className="bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-500 bg-clip-text text-transparent animate-pulse">
-                breakthrough
-              </span>
-              <br />
-              starts here
+        {/* Call to Action */}
+        <section className="py-20 bg-gradient-to-r from-indigo-600 to-purple-600">
+          <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
+              Ready to connect your next big project?
             </h2>
-            
-            <p className="text-2xl md:text-3xl text-gray-200 mb-12 max-w-4xl mx-auto leading-relaxed font-medium">
-              Stop waiting for "someday." Your next project could be the one that changes everything. 
-              <span className="text-transparent bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text font-bold">
-                The only question is: will you be ready?
-              </span>
+            <p className="text-xl text-indigo-100 mb-8 max-w-2xl mx-auto">
+              Join productions, investors, brands, and creators who use VadisMedia 
+              to turn ambitious projects into profitable partnerships.
             </p>
             
-            {/* Epic Button Section */}
-            <div className="flex flex-col lg:flex-row gap-8 justify-center items-center mb-16">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
                 size="lg"
-                className="relative group bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 hover:from-yellow-300 hover:via-orange-400 hover:to-red-400 text-black px-16 py-8 text-2xl font-black transition-all duration-500 transform hover:scale-110 hover:rotate-1 shadow-2xl hover:shadow-3xl rounded-2xl overflow-hidden"
+                className="bg-white text-indigo-600 hover:bg-gray-100 px-8 py-4 text-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg"
               >
-                <span className="relative z-10 flex items-center">
-                  🚀 Start Your Empire Now
-                </span>
-                <div className="absolute inset-0 bg-gradient-to-r from-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full animate-ping"></div>
+                Start free trial
               </Button>
-              
-              <div className="text-gray-400 text-xl font-bold">OR</div>
-              
               <Button 
                 variant="outline" 
                 size="lg"
-                className="relative group px-16 py-8 text-2xl font-black transition-all duration-500 hover:scale-105 hover:-rotate-1 rounded-2xl backdrop-blur-sm overflow-hidden border-2"
-                style={{
-                  background: 'linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05)) padding-box, linear-gradient(135deg, #60a5fa, #a855f7, #ec4899) border-box',
-                  border: '2px solid transparent'
-                }}
+                className="border-2 border-white text-white hover:bg-white hover:text-indigo-600 px-8 py-4 text-lg font-semibold transition-all duration-300"
               >
-                <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-                  💼 Get VIP Demo
-                </span>
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
+                Contact sales
               </Button>
             </div>
             
-            {/* Trust Signals */}
-            <div className="bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-lg rounded-3xl p-8 border border-white/20 mb-12">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-                <div>
-                  <div className="text-green-400 text-2xl font-black mb-2">✅ FREE FOREVER PLAN</div>
-                  <div className="text-gray-300">No hidden fees, ever</div>
-                </div>
-                <div>
-                  <div className="text-blue-400 text-2xl font-black mb-2">⚡ INSTANT ACCESS</div>
-                  <div className="text-gray-300">Start connecting in 60 seconds</div>
-                </div>
-                <div>
-                  <div className="text-purple-400 text-2xl font-black mb-2">🛡️ BANK-LEVEL SECURITY</div>
-                  <div className="text-gray-300">Your IP is fortress-protected</div>
-                </div>
-              </div>
-            </div>
-            
-            {/* Urgency Text */}
-            <div className="text-center">
-              <p className="text-yellow-400 text-lg font-bold mb-4 animate-pulse">
-                ⏰ Join 10,000+ creators already building their empires
-              </p>
-              <p className="text-gray-400 text-lg">
-                The entertainment industry moves fast. Your competitors are already here.
-                <br />
-                <span className="text-white font-semibold">Will you lead, or will you follow?</span>
-              </p>
-            </div>
+            <p className="text-indigo-200 text-sm mt-6">
+              No credit card required • 14-day free trial • Cancel anytime
+            </p>
           </div>
         </section>
       </main>
