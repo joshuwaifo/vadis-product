@@ -96,20 +96,20 @@ export default function Landing() {
             
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-10 relative z-10">
-              <a href="#" className="text-white/90 hover:text-blue-400 font-bold text-lg transition-all duration-300 font-sans">Products</a>
-              <a href="#" className="text-white/90 hover:text-blue-400 font-bold text-lg transition-all duration-300 font-sans">Solutions</a>
-              <a href="#" className="text-white/90 hover:text-blue-400 font-bold text-lg transition-all duration-300 font-sans">Learn</a>
-              <a href="#" className="text-white/90 hover:text-blue-400 font-bold text-lg transition-all duration-300 font-sans">Company</a>
-              <a href="#" className="text-white/90 hover:text-blue-400 font-bold text-lg transition-all duration-300 font-sans">Pricing</a>
+              <a href="#" className="text-white/90 hover:bg-gradient-to-r hover:from-blue-400 hover:via-purple-500 hover:to-pink-500 hover:bg-clip-text hover:text-transparent font-bold text-lg transition-all duration-300 font-sans">Products</a>
+              <a href="#" className="text-white/90 hover:bg-gradient-to-r hover:from-blue-400 hover:via-purple-500 hover:to-pink-500 hover:bg-clip-text hover:text-transparent font-bold text-lg transition-all duration-300 font-sans">Solutions</a>
+              <a href="#" className="text-white/90 hover:bg-gradient-to-r hover:from-blue-400 hover:via-purple-500 hover:to-pink-500 hover:bg-clip-text hover:text-transparent font-bold text-lg transition-all duration-300 font-sans">Learn</a>
+              <a href="#" className="text-white/90 hover:bg-gradient-to-r hover:from-blue-400 hover:via-purple-500 hover:to-pink-500 hover:bg-clip-text hover:text-transparent font-bold text-lg transition-all duration-300 font-sans">Company</a>
+              <a href="#" className="text-white/90 hover:bg-gradient-to-r hover:from-blue-400 hover:via-purple-500 hover:to-pink-500 hover:bg-clip-text hover:text-transparent font-bold text-lg transition-all duration-300 font-sans">Pricing</a>
             </div>
 
             {/* Auth Buttons */}
             <div className="hidden md:flex items-center space-x-6 relative z-10">
-              <Button variant="ghost" className="text-white hover:text-blue-400 font-bold text-lg font-sans border-none">
+              <Button variant="ghost" className="text-white hover:bg-gradient-to-r hover:from-blue-400 hover:via-purple-500 hover:to-pink-500 hover:bg-clip-text hover:text-transparent font-bold text-lg font-sans border-none">
                 <LogIn className="w-5 h-5 mr-3" />
                 Login
               </Button>
-              <Button className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-8 py-3 text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 font-sans rounded-xl">
+              <Button className="bg-gradient-to-r from-blue-500 via-purple-600 to-pink-600 hover:from-blue-600 hover:via-purple-700 hover:to-pink-700 text-white font-bold px-8 py-3 text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 font-sans rounded-xl">
                 Request a demo
               </Button>
             </div>
@@ -133,7 +133,7 @@ export default function Landing() {
               <h1 className="text-6xl sm:text-7xl lg:text-8xl font-black text-white mb-12 animate-in fade-in slide-in-from-bottom-4 duration-1000 font-sans leading-tight tracking-tight">
                 Make good
                 <br />
-                <span className="text-blue-400">
+                <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
                   data-driven choices
                 </span>
               </h1>
@@ -158,13 +158,13 @@ export default function Landing() {
                         key={role.id}
                         className={`cursor-pointer p-10 transition-all duration-500 transform hover:scale-110 backdrop-blur-sm grain-light relative z-10 ${
                           isSelected 
-                            ? 'border-2 border-blue-400 bg-white/95 shadow-2xl scale-105' 
-                            : 'border border-white/20 hover:border-blue-400/50 shadow-xl hover:shadow-2xl bg-white/10 hover:bg-white/20'
+                            ? 'border-2 border-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-white/95 shadow-2xl scale-105' 
+                            : 'border border-white/20 hover:border-2 hover:border-gradient-to-r hover:from-blue-400 hover:via-purple-500 hover:to-pink-500 shadow-xl hover:shadow-2xl bg-white/10 hover:bg-white/20'
                         } rounded-2xl`}
                         onClick={() => setSelectedRole(role.id)}
                       >
                         <div className="text-center relative z-10">
-                          <div className={`w-24 h-24 ${isSelected ? 'bg-blue-600' : 'bg-white/20'} rounded-2xl flex items-center justify-center mx-auto mb-8 transition-all duration-500 hover:scale-110 shadow-lg`}>
+                          <div className={`w-24 h-24 ${isSelected ? 'bg-gradient-to-r from-blue-500 via-purple-600 to-pink-600' : 'bg-white/20'} rounded-2xl flex items-center justify-center mx-auto mb-8 transition-all duration-500 hover:scale-110 shadow-lg`}>
                             <IconComponent className={`w-12 h-12 ${isSelected ? 'text-white' : 'text-white/90'}`} />
                           </div>
                           <h3 className={`text-xl font-bold transition-colors font-sans ${isSelected ? 'text-gray-900' : 'text-white'}`}>
@@ -181,14 +181,17 @@ export default function Landing() {
               <div className="flex flex-col sm:flex-row gap-8 justify-center animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-600 relative z-10">
                 <Button 
                   size="lg"
-                  className="bg-blue-600 hover:bg-blue-500 text-white px-16 py-6 text-xl font-black transition-all duration-500 transform hover:scale-110 shadow-2xl hover:shadow-3xl font-sans rounded-xl"
+                  className="bg-gradient-to-r from-blue-500 via-purple-600 to-pink-600 hover:from-blue-600 hover:via-purple-700 hover:to-pink-700 text-white px-16 py-6 text-xl font-black transition-all duration-500 transform hover:scale-110 shadow-2xl hover:shadow-3xl font-sans rounded-xl"
                 >
                   Request a demo
                 </Button>
                 <Button 
                   variant="outline" 
                   size="lg"
-                  className="text-white border-2 border-white/30 hover:border-blue-400 hover:bg-white/10 px-16 py-6 text-xl font-black transition-all duration-500 hover:scale-105 font-sans rounded-xl backdrop-blur-sm"
+                  className="text-transparent bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text border-2 border-transparent bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 hover:shadow-lg px-16 py-6 text-xl font-black transition-all duration-500 hover:scale-105 font-sans rounded-xl backdrop-blur-sm relative overflow-hidden before:absolute before:inset-0 before:p-[2px] before:bg-gradient-to-r before:from-blue-400 before:via-purple-500 before:to-pink-500 before:rounded-xl before:-z-10"
+                  style={{
+                    background: 'linear-gradient(white, white) padding-box, linear-gradient(to right, #60a5fa, #a855f7, #ec4899) border-box'
+                  }}
                 >
                   Sign Up Now <ArrowRight className="w-6 h-6 ml-3" />
                 </Button>
