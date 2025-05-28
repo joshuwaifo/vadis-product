@@ -335,7 +335,7 @@ export default function Landing() {
                     </div>
                     
                     <div className="relative z-10">
-                      <h3 className="text-2xl font-black text-white mb-4 font-sans group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:via-purple-500 group-hover:to-pink-500 group-hover:bg-clip-text group-hover:text-transparent transition-all duration-300" style={{textShadow: '0 0 10px rgba(255,255,255,0.8)'}}>
+                      <h3 className="text-2xl font-black text-white mb-4 font-sans transition-all duration-300" style={{textShadow: '0 0 10px rgba(255,255,255,0.8)'}}>
                         {feature.title}
                       </h3>
                       <p className="text-white/80 leading-relaxed mb-6 text-lg font-medium">
@@ -344,7 +344,7 @@ export default function Landing() {
                       
                       {/* Metric */}
                       <div className="flex items-center">
-                        <div className="w-3 h-3 bg-green-400 rounded-full mr-2 animate-pulse shadow-lg"></div>
+                        <div className="w-3 h-3 bg-green-400 rounded-full mr-2 shadow-lg"></div>
                         <span className="text-green-300 font-bold text-sm uppercase tracking-wide">
                           {feature.metric}
                         </span>
