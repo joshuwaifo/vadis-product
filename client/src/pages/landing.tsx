@@ -84,13 +84,13 @@ export default function Landing() {
       {/* Header Navigation */}
       <header className="fixed top-0 w-full z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100">
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-20">
+          <div className="flex justify-between items-center h-24">
             {/* Logo */}
             <div className="flex items-center space-x-2">
               <img 
                 src={vadisLogoDark} 
                 alt="VadisMedia" 
-                className="h-16 w-auto"
+                className="h-20 w-auto"
               />
             </div>
             
@@ -124,7 +124,7 @@ export default function Landing() {
         </nav>
       </header>
 
-      <main className="pt-20">
+      <main className="pt-24">
         {/* Hero Section */}
         <section className="relative overflow-hidden bg-gradient-to-br from-indigo-50 via-white to-purple-50 min-h-screen flex items-center">
           {/* Background decorative elements */}
