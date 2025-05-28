@@ -82,7 +82,7 @@ export default function Landing() {
   return (
     <div className="min-h-screen bg-white">
       {/* Header Navigation */}
-      <header className="fixed top-0 w-full z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100">
+      <header className="fixed top-0 w-full z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100 noise-bg">
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-24">
             {/* Logo */}
@@ -96,20 +96,20 @@ export default function Landing() {
             
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-8">
-              <a href="#" className="text-gray-600 hover:text-indigo-600 font-medium transition-colors">Products</a>
-              <a href="#" className="text-gray-600 hover:text-indigo-600 font-medium transition-colors">Solutions</a>
-              <a href="#" className="text-gray-600 hover:text-indigo-600 font-medium transition-colors">Learn</a>
-              <a href="#" className="text-gray-600 hover:text-indigo-600 font-medium transition-colors">Company</a>
-              <a href="#" className="text-gray-600 hover:text-indigo-600 font-medium transition-colors">Pricing</a>
+              <a href="#" className="text-gray-700 hover:bg-gradient-to-r hover:from-indigo-600 hover:to-purple-600 hover:bg-clip-text hover:text-transparent font-semibold transition-all duration-300 font-sans">Products</a>
+              <a href="#" className="text-gray-700 hover:bg-gradient-to-r hover:from-indigo-600 hover:to-purple-600 hover:bg-clip-text hover:text-transparent font-semibold transition-all duration-300 font-sans">Solutions</a>
+              <a href="#" className="text-gray-700 hover:bg-gradient-to-r hover:from-indigo-600 hover:to-purple-600 hover:bg-clip-text hover:text-transparent font-semibold transition-all duration-300 font-sans">Learn</a>
+              <a href="#" className="text-gray-700 hover:bg-gradient-to-r hover:from-indigo-600 hover:to-purple-600 hover:bg-clip-text hover:text-transparent font-semibold transition-all duration-300 font-sans">Company</a>
+              <a href="#" className="text-gray-700 hover:bg-gradient-to-r hover:from-indigo-600 hover:to-purple-600 hover:bg-clip-text hover:text-transparent font-semibold transition-all duration-300 font-sans">Pricing</a>
             </div>
 
             {/* Auth Buttons */}
             <div className="hidden md:flex items-center space-x-4">
-              <Button variant="ghost" className="text-gray-600 hover:text-indigo-600">
+              <Button variant="ghost" className="text-gray-700 hover:bg-gradient-to-r hover:from-indigo-600 hover:to-purple-600 hover:bg-clip-text hover:text-transparent font-semibold font-sans">
                 <LogIn className="w-4 h-4 mr-2" />
                 Login
               </Button>
-              <Button className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+              <Button className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-105 font-sans">
                 Request a demo
               </Button>
             </div>
@@ -126,35 +126,36 @@ export default function Landing() {
 
       <main className="pt-24">
         {/* Hero Section */}
-        <section className="relative overflow-hidden bg-gradient-to-br from-indigo-50 via-white to-purple-50 min-h-screen flex items-center">
-          {/* Background decorative elements */}
+        <section className="relative overflow-hidden gradient-mesh noise-bg min-h-screen flex items-center">
+          {/* Enhanced Background decorative elements */}
           <div className="absolute inset-0 overflow-hidden">
-            <div className="absolute -top-40 -right-40 w-80 h-80 bg-indigo-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse"></div>
-            <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse"></div>
+            <div className="absolute -top-40 -right-40 w-96 h-96 bg-gradient-to-r from-indigo-400 to-purple-500 rounded-full mix-blend-multiply filter blur-2xl opacity-60 animate-pulse"></div>
+            <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full mix-blend-multiply filter blur-2xl opacity-60 animate-pulse"></div>
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-pulse"></div>
           </div>
 
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
             <div className="text-center">
               {/* Main heading */}
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-gray-900 mb-8 animate-in fade-in slide-in-from-bottom-4 duration-1000 font-display leading-tight">
                 Make good
                 <br />
-                <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent font-extrabold">
                   data-driven choices
                 </span>
               </h1>
               
               {/* Subheading */}
-              <p className="text-xl sm:text-2xl text-gray-600 mb-12 max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-200">
-                Transform insights into growth. Harness app results and
-                hit your LTV goals with the #1 measurement partner.
+              <p className="text-xl sm:text-2xl lg:text-3xl text-gray-700 mb-16 max-w-5xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-200 font-sans font-medium leading-relaxed">
+                Transform insights into growth. Harness production data and
+                hit your creative goals with the #1 AI-powered platform.
               </p>
 
               {/* Role Selection */}
-              <div className="mb-12 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-400">
-                <h2 className="text-2xl font-semibold text-gray-900 mb-8">Select your role:</h2>
+              <div className="mb-16 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-400">
+                <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-12 font-display">Select your role:</h2>
                 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 max-w-4xl mx-auto">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 max-w-6xl mx-auto">
                   {roles.map((role) => {
                     const IconComponent = role.icon;
                     const isSelected = selectedRole === role.id;
@@ -162,18 +163,18 @@ export default function Landing() {
                     return (
                       <Card 
                         key={role.id}
-                        className={`cursor-pointer p-6 transition-all duration-300 transform hover:scale-105 hover:shadow-xl border-2 ${
+                        className={`cursor-pointer p-8 transition-all duration-500 transform hover:scale-110 hover:shadow-2xl border-3 backdrop-blur-sm ${
                           isSelected 
-                            ? 'border-indigo-500 bg-indigo-50 shadow-lg' 
-                            : 'border-gray-200 hover:border-indigo-300 shadow-md hover:shadow-lg'
+                            ? 'border-indigo-600 bg-gradient-to-br from-indigo-50 to-purple-50 shadow-2xl scale-105' 
+                            : 'border-gray-300 hover:border-indigo-400 shadow-lg hover:shadow-2xl bg-white/80'
                         }`}
                         onClick={() => setSelectedRole(role.id)}
                       >
                         <div className="text-center">
-                          <div className={`w-16 h-16 bg-gradient-to-br ${role.color} rounded-2xl flex items-center justify-center mx-auto mb-4 transition-transform duration-300 hover:scale-110`}>
-                            <IconComponent className="w-8 h-8 text-white" />
+                          <div className={`w-20 h-20 bg-gradient-to-br ${role.color} rounded-3xl flex items-center justify-center mx-auto mb-6 transition-all duration-500 hover:scale-125 shadow-lg`}>
+                            <IconComponent className="w-10 h-10 text-white" />
                           </div>
-                          <h3 className={`text-lg font-semibold text-gray-900 transition-colors ${role.hoverColor}`}>
+                          <h3 className={`text-xl font-bold text-gray-900 transition-colors font-sans ${role.hoverColor}`}>
                             {role.name}
                           </h3>
                         </div>
@@ -184,19 +185,19 @@ export default function Landing() {
               </div>
 
               {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4 justify-center animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-600">
+              <div className="flex flex-col sm:flex-row gap-6 justify-center animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-600">
                 <Button 
                   size="lg"
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 text-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+                  className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:via-purple-700 hover:to-pink-700 text-white px-12 py-6 text-xl font-bold transition-all duration-500 transform hover:scale-110 shadow-2xl hover:shadow-3xl font-sans"
                 >
                   Request a demo
                 </Button>
                 <Button 
                   variant="outline" 
                   size="lg"
-                  className="text-indigo-600 hover:text-indigo-700 px-8 py-4 text-lg font-semibold border-2 border-indigo-200 hover:border-indigo-300 transition-all duration-300 hover:bg-indigo-50"
+                  className="text-transparent bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text border-2 border-indigo-300 hover:border-purple-400 px-12 py-6 text-xl font-bold transition-all duration-500 hover:scale-105 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 font-sans"
                 >
-                  Sign Up Now <ArrowRight className="w-5 h-5 ml-2" />
+                  Sign Up Now <ArrowRight className="w-6 h-6 ml-3" />
                 </Button>
               </div>
             </div>
