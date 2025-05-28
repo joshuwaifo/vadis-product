@@ -195,17 +195,17 @@ export default function Landing() {
                 <Button 
                   variant="outline" 
                   size="lg"
-                  className="relative px-20 py-8 text-2xl font-black transition-all duration-700 hover:scale-105 hover:-rotate-1 font-sans rounded-2xl overflow-hidden group border-4"
+                  className="relative px-20 py-8 text-2xl font-black transition-all duration-700 hover:scale-105 hover:-rotate-1 font-sans rounded-2xl overflow-hidden group border-0"
                   style={{
-                    background: 'white',
-                    borderImage: 'linear-gradient(135deg, #60a5fa, #a855f7, #ec4899) 1'
+                    background: 'linear-gradient(white, white) padding-box, linear-gradient(135deg, #60a5fa, #a855f7, #ec4899) border-box',
+                    border: '4px solid transparent'
                   }}
                 >
                   <span className="bg-gradient-to-r from-blue-500 via-purple-600 to-pink-600 bg-clip-text text-transparent font-black">
                     Sign Up Now
                   </span>
                   <ArrowRight className="w-7 h-7 ml-4 text-pink-500 group-hover:translate-x-2 transition-transform duration-300" />
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-purple-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-purple-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
                 </Button>
               </div>
             </div>
