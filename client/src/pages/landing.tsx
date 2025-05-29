@@ -493,9 +493,7 @@ export default function Landing() {
             
             {/* Call to Action */}
             <div className="text-center mt-16">
-              <p className="text-lg text-gray-700 font-medium mb-6">
-                Ready to join the next generation of media collaboration?
-              </p>
+              <p className="text-lg text-gray-700 font-medium mb-6">Ready to join the future of media and entertainment?</p>
               <div className="inline-flex px-8 py-3 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 rounded-full border border-purple-200">
                 <span className="text-sm font-semibold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
                   ✨ VadisMedia connects your vision with the right partners
@@ -653,15 +651,15 @@ export default function Landing() {
               {/* Trust Badges */}
               <div className="flex flex-wrap justify-center items-center gap-6">
                 <div className="flex items-center space-x-2 bg-gradient-to-r from-blue-50 to-purple-50 rounded-full px-4 py-2 border border-blue-200/50">
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                   <span className="text-gray-700 text-xs font-medium">Instant Setup</span>
                 </div>
                 <div className="flex items-center space-x-2 bg-gradient-to-r from-purple-50 to-pink-50 rounded-full px-4 py-2 border border-purple-200/50">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse delay-200"></div>
+                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                   <span className="text-gray-700 text-xs font-medium">AI-Powered Matching</span>
                 </div>
                 <div className="flex items-center space-x-2 bg-gradient-to-r from-pink-50 to-blue-50 rounded-full px-4 py-2 border border-pink-200/50">
-                  <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse delay-400"></div>
+                  <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
                   <span className="text-gray-700 text-xs font-medium">Enterprise Security</span>
                 </div>
               </div>
