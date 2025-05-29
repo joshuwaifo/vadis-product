@@ -458,7 +458,7 @@ export default function Landing() {
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 relative z-10">
             <div className="text-center mb-20">
               <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-6 font-sans">
-                Where <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">industry leaders</span> connect
+                <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">Trusted by industry leaders</span>
               </h2>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto">
                 The kind of companies already transforming media production through strategic partnerships
