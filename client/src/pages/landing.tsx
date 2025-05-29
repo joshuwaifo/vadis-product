@@ -622,8 +622,7 @@ export default function Landing() {
             
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6 animate-in fade-in slide-in-from-bottom-4 duration-1000">Ready to join the future of media and entertainment?</h2>
             <p className="text-xl text-gray-600 mb-12 max-w-2xl mx-auto leading-relaxed animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-200">
-              Join productions, investors, brands, and creators who use VadisMedia 
-              to turn ambitious projects into profitable partnerships.
+              Join Production Companies, Brands/Agencies, Financiers, and Individual Creators who use VadisAI to accelerate their new big idea.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-6 justify-center animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-400">
