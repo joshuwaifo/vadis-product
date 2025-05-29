@@ -170,31 +170,40 @@ export default function Landing() {
 
   const powerFeatures = [
     {
-      icon: Users,
-      title: "Instant Project-Partner Matching",
-      description: "Your $50M sci-fi project meets the perfect VFX studio, streaming platform, and luxury car brand sponsor in under 24 hours. Our AI analyzes 10,000+ industry connections daily.",
-      metric: "97% faster partnerships",
+      icon: Heart,
+      title: "Brand Marketplace",
+      description: "Unlock new revenue streams from Brand Sponsorship opportunities in-scene with the Vadis Brand Marketplace. Analyze brandable scenes and generate static and dynamic assets in-realtime to showcase to partners and key stakeholders.",
+      metric: "New revenue streams",
       color: "from-blue-500 to-blue-600",
       bgColor: "bg-blue-50",
-      badge: "AI-Powered"
+      badge: "Brand Partnerships"
     },
     {
       icon: TrendingUp,
-      title: "ROI-Guaranteed Collaborations", 
-      description: "Every partnership is structured for mutual wins. Productions get funding + brand visibility, investors see measurable returns, brands reach target audiences authentically.",
-      metric: "avg 340% ROI increase",
+      title: "Location Incentives", 
+      description: "Maximize film location incentives globally with VadisAI's Location Suggestor and Partner Program for in-market legal and auditing teams.",
+      metric: "Global incentives",
       color: "from-purple-500 to-purple-600",
       bgColor: "bg-purple-50",
-      badge: "Profit-Driven"
+      badge: "Cost Optimization"
     },
     {
-      icon: ShieldCheck,
-      title: "Hollywood-Grade Security",
-      description: "Bank-level encryption protects your scripts, financials, and strategic plans. Share confidently knowing your IP is safer than Fort Knox.",
-      metric: "zero data breaches",
+      icon: Play,
+      title: "VFX Visualization",
+      description: "Visualize VFX treatments for scenes in minutes with VadisFX, creating live estimates for VFX projects with our sister company, Volucap-Vadis Limited Company.",
+      metric: "Instant estimates",
       color: "from-green-500 to-green-600",
       bgColor: "bg-green-50",
-      badge: "Enterprise Security"
+      badge: "VFX Solutions"
+    },
+    {
+      icon: Users,
+      title: "Character Analysis & Casting",
+      description: "Understand the nuances and full interrelationship schemes of characters and let VadisAI help you with casting options for your project.",
+      metric: "Smart casting",
+      color: "from-orange-500 to-red-600",
+      bgColor: "bg-orange-50",
+      badge: "AI Casting"
     }
   ];
 
@@ -531,7 +540,7 @@ export default function Landing() {
               </p>
             </div>
 
-            <div className="grid lg:grid-cols-3 gap-8 lg:gap-12 relative z-10">
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12 relative z-10">
               {powerFeatures.map((feature, index) => {
                 const IconComponent = feature.icon;
                 return (
