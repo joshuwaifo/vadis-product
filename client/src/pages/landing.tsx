@@ -620,9 +620,7 @@ export default function Landing() {
               <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent font-semibold text-sm tracking-wide">✨ TRANSFORM YOUR VISION</span>
             </div>
             
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6 animate-in fade-in slide-in-from-bottom-4 duration-1000">
-              Ready to connect your next big project?
-            </h2>
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6 animate-in fade-in slide-in-from-bottom-4 duration-1000">Ready to join the future of media and entertainment?</h2>
             <p className="text-xl text-gray-600 mb-12 max-w-2xl mx-auto leading-relaxed animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-200">
               Join productions, investors, brands, and creators who use VadisMedia 
               to turn ambitious projects into profitable partnerships.
