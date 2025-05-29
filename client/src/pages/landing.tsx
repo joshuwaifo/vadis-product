@@ -666,7 +666,10 @@ export default function Landing() {
                 />
               </div>
               <p className="text-gray-400 mb-4">
-                AI-powered platform for modern film and media production.
+                VadisAI empowers the future of film and media.
+              </p>
+              <p className="text-gray-400 mb-4 text-sm">
+                Address: Gartenstrasse 6, 6300 Zug, Switzerland
               </p>
               <div className="flex space-x-4">
                 <div className="w-6 h-6 text-gray-400 hover:text-indigo-500 cursor-pointer transition-colors">📱</div>
@@ -708,7 +711,7 @@ export default function Landing() {
           
           <div className="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-400 text-sm">
-              © 2024 VadisMedia. All rights reserved.
+              © 2025 Vadis Media AG. All rights reserved.
             </p>
             <div className="flex space-x-6 mt-4 md:mt-0 text-sm">
               <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
