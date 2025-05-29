@@ -11,6 +11,7 @@ import { ArrowLeft, CheckCircle, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
 import { z } from "zod";
+import { SiNetflix, SiApple, SiAmazon, SiSony, SiMercedes } from 'react-icons/si';
 import vadisLogoLight from "@assets/Vadis FINAL LOGO large size Without Background.png";
 
 // Simple form schema with only essential fields
@@ -109,25 +110,34 @@ export default function DemoRequest() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className="min-h-screen bg-white relative overflow-hidden">
+      {/* Dynamic Background Gradient */}
+      <div className="absolute inset-0">
+        <div className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute top-20 right-0 w-80 h-80 bg-gradient-to-r from-purple-400/20 to-pink-400/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute bottom-20 left-20 w-72 h-72 bg-gradient-to-r from-pink-400/20 to-blue-400/20 rounded-full blur-3xl animate-pulse delay-2000"></div>
+      </div>
+
       {/* Header */}
-      <div className="bg-white/80 backdrop-blur-sm shadow-sm border-b">
+      <div className="bg-white/90 backdrop-blur-sm shadow-sm border-b relative z-10">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center text-gray-600 hover:text-gray-900 transition-colors">
               <ArrowLeft className="w-5 h-5 mr-2" />
               Back to Homepage
             </Link>
-            <img 
-              src={vadisLogoLight} 
-              alt="VadisMedia" 
-              className="h-12 w-auto"
-            />
+            <div className="flex items-center">
+              <img 
+                src={vadisLogoLight} 
+                alt="VadisMedia" 
+                className="h-16 w-auto object-contain filter drop-shadow-sm"
+              />
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-12">
+      <div className="max-w-7xl mx-auto px-6 py-12 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
           {/* Left Side - Value Proposition */}
           <div className="lg:pr-8">
@@ -170,12 +180,12 @@ export default function DemoRequest() {
             {/* Trust Indicators */}
             <div>
               <p className="text-sm text-gray-600 mb-4">The world's leading brands trust VadisAI as their growth partner</p>
-              <div className="flex items-center space-x-6 opacity-70">
-                <div className="text-gray-500 font-bold text-sm">NETFLIX</div>
-                <div className="text-gray-500 font-bold text-sm">APPLE</div>
-                <div className="text-gray-500 font-bold text-sm">AMAZON</div>
-                <div className="text-gray-500 font-bold text-sm">SONY</div>
-                <div className="text-gray-500 font-bold text-sm">MERCEDES</div>
+              <div className="flex items-center space-x-8 opacity-60">
+                <SiNetflix className="w-8 h-8 text-gray-400 hover:text-red-500 transition-colors" />
+                <SiApple className="w-8 h-8 text-gray-400 hover:text-gray-700 transition-colors" />
+                <SiAmazon className="w-8 h-8 text-gray-400 hover:text-orange-500 transition-colors" />
+                <SiSony className="w-8 h-8 text-gray-400 hover:text-blue-600 transition-colors" />
+                <SiMercedes className="w-8 h-8 text-gray-400 hover:text-gray-800 transition-colors" />
               </div>
             </div>
           </div>
