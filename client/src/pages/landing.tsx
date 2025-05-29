@@ -129,14 +129,14 @@ export default function Landing() {
   const roles = [
     {
       id: "production",
-      name: "Production",
+      name: "Production Company",
       icon: Film,
       color: "from-indigo-500 to-indigo-600",
       hoverColor: "hover:text-indigo-600"
     },
     {
       id: "brand", 
-      name: "Brand",
+      name: "Brand/Agency",
       icon: Briefcase,
       color: "from-purple-500 to-purple-600",
       hoverColor: "hover:text-purple-600"
@@ -150,7 +150,7 @@ export default function Landing() {
     },
     {
       id: "creator",
-      name: "Creator",
+      name: "Individual Creator",
       icon: Video,
       color: "from-green-500 to-green-600", 
       hoverColor: "hover:text-green-600"
