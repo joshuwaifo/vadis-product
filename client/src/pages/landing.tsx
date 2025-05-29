@@ -519,10 +519,10 @@ export default function Landing() {
             <div className="text-center mb-20 relative z-10">
 
               <h2 className="text-5xl md:text-6xl lg:text-7xl font-black text-white mb-8 font-sans leading-tight glow-text">
-                Turn ideas into 
+                Grow your ideas into the 
                 <br />
                 <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent animate-pulse">
-                  billion-dollar hits
+                  next big hit
                 </span>
               </h2>
               <p className="text-2xl text-white/90 max-w-4xl mx-auto leading-relaxed font-medium">
