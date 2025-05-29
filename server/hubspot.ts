@@ -35,7 +35,7 @@ export class HubSpotService {
     return response.json();
   }
 
-  async createContact(demoRequest: any): Promise<HubSpotContact> {
+  async createOrUpdateContact(demoRequest: any): Promise<HubSpotContact> {
     const contactData = {
       properties: {
         email: demoRequest.email,
@@ -46,10 +46,34 @@ export class HubSpotService {
         jobtitle: demoRequest.jobTitle || "",
         // Only include properties that exist in the form
         ...(demoRequest.useCase && { hs_content_membership_notes: demoRequest.useCase }),
+        // Add lifecycle stage for demo requests
+        lifecyclestage: "lead",
       },
     };
 
-    return this.makeRequest("/crm/v3/objects/contacts", "POST", contactData);
+    try {
+      // Try to create the contact
+      return await this.makeRequest("/crm/v3/objects/contacts", "POST", contactData);
+    } catch (error: any) {
+      if (error.message.includes("409")) {
+        // Contact exists, update instead
+        const searchResponse = await this.makeRequest(`/crm/v3/objects/contacts/search`, "POST", {
+          filterGroups: [{
+            filters: [{
+              propertyName: "email",
+              operator: "EQ",
+              value: demoRequest.email
+            }]
+          }]
+        });
+        
+        if (searchResponse.results && searchResponse.results.length > 0) {
+          const contactId = searchResponse.results[0].id;
+          return await this.makeRequest(`/crm/v3/objects/contacts/${contactId}`, "PATCH", contactData);
+        }
+      }
+      throw error;
+    }
   }
 
   async createDeal(contactId: string, demoRequest: any): Promise<HubSpotDeal> {
@@ -77,20 +101,103 @@ export class HubSpotService {
     return this.makeRequest("/crm/v3/objects/deals", "POST", dealData);
   }
 
+  async sendConfirmationEmail(contactId: string, demoRequest: any): Promise<void> {
+    // Create an email engagement for the contact
+    const emailData = {
+      engagement: {
+        active: true,
+        type: "EMAIL",
+        timestamp: Date.now()
+      },
+      associations: {
+        contactIds: [contactId]
+      },
+      metadata: {
+        subject: "Demo Request Confirmation - VadisAI",
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #333;">Thank you for your demo request!</h2>
+            <p>Hi ${demoRequest.firstName},</p>
+            <p>We've received your demo request for VadisAI. Our team will be in touch within 24 hours to schedule your personalized demo.</p>
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+              <h3 style="margin-top: 0;">Your Request Details:</h3>
+              <p><strong>Name:</strong> ${demoRequest.firstName} ${demoRequest.lastName}</p>
+              <p><strong>Company:</strong> ${demoRequest.companyName}</p>
+              <p><strong>Email:</strong> ${demoRequest.email}</p>
+              ${demoRequest.jobTitle ? `<p><strong>Role:</strong> ${demoRequest.jobTitle}</p>` : ''}
+              ${demoRequest.useCase ? `<p><strong>Use Case:</strong> ${demoRequest.useCase}</p>` : ''}
+            </div>
+            <p>In the meantime, feel free to explore our resources or contact us directly if you have any questions.</p>
+            <p>Best regards,<br>The VadisAI Team</p>
+          </div>
+        `,
+        text: `Hi ${demoRequest.firstName}, thank you for your demo request for VadisAI. Our team will be in touch within 24 hours to schedule your personalized demo.`
+      }
+    };
+
+    await this.makeRequest("/engagements/v1/engagements", "POST", emailData);
+  }
+
+  async createMeetingLink(contactId: string, demoRequest: any): Promise<string> {
+    // Create a meeting using HubSpot's scheduling API
+    const meetingData = {
+      properties: {
+        hs_meeting_title: `Demo Call - ${demoRequest.companyName}`,
+        hs_meeting_body: `Demo call with ${demoRequest.firstName} ${demoRequest.lastName} from ${demoRequest.companyName}`,
+        hs_meeting_start_time: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // Tomorrow
+        hs_meeting_end_time: new Date(Date.now() + 24 * 60 * 60 * 1000 + 30 * 60 * 1000).toISOString(), // 30 minutes later
+        hs_meeting_outcome: "SCHEDULED"
+      },
+      associations: [
+        {
+          to: { id: contactId },
+          types: [
+            {
+              associationCategory: "HUBSPOT_DEFINED",
+              associationTypeId: 199 // Contact to Meeting association
+            }
+          ]
+        }
+      ]
+    };
+
+    const meeting = await this.makeRequest("/crm/v3/objects/meetings", "POST", meetingData);
+    return `https://app.hubspot.com/meetings/your-account/meeting/${meeting.id}`;
+  }
+
   async submitDemoRequest(demoRequest: any): Promise<{
     contactId: string;
     dealId: string;
+    meetingLink?: string;
   }> {
     try {
       // First, create or update the contact
-      const contact = await this.createContact(demoRequest);
+      const contact = await this.createOrUpdateContact(demoRequest);
       
       // Then, create a deal associated with the contact
       const deal = await this.createDeal(contact.id, demoRequest);
 
+      // Send confirmation email
+      try {
+        await this.sendConfirmationEmail(contact.id, demoRequest);
+      } catch (emailError) {
+        console.error("Failed to send confirmation email:", emailError);
+        // Continue even if email fails
+      }
+
+      // Create meeting link
+      let meetingLink;
+      try {
+        meetingLink = await this.createMeetingLink(contact.id, demoRequest);
+      } catch (meetingError) {
+        console.error("Failed to create meeting link:", meetingError);
+        // Continue even if meeting creation fails
+      }
+
       return {
         contactId: contact.id,
         dealId: deal.id,
+        meetingLink
       };
     } catch (error) {
       console.error("HubSpot submission error:", error);

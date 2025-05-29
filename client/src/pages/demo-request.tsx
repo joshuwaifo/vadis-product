@@ -29,6 +29,7 @@ type FormData = z.infer<typeof formSchema>;
 
 export default function DemoRequest() {
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [meetingLink, setMeetingLink] = useState<string | null>(null);
   const { toast } = useToast();
 
   const form = useForm<FormData>({
@@ -110,94 +111,99 @@ export default function DemoRequest() {
   }
 
   return (
-    <div className="min-h-screen bg-white relative overflow-hidden">
-      {/* Dynamic Background Gradient */}
-      <div className="absolute inset-0">
-        <div className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute top-20 right-0 w-80 h-80 bg-gradient-to-r from-purple-400/20 to-pink-400/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        <div className="absolute bottom-20 left-20 w-72 h-72 bg-gradient-to-r from-pink-400/20 to-blue-400/20 rounded-full blur-3xl animate-pulse delay-2000"></div>
-      </div>
-
-      {/* Header */}
-      <div className="bg-white/90 backdrop-blur-sm shadow-sm border-b relative z-10">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center text-gray-600 hover:text-gray-900 transition-colors">
-              <ArrowLeft className="w-5 h-5 mr-2" />
-              Back to Homepage
-            </Link>
-            <div className="flex items-center">
+    <div className="min-h-screen modern-gradient grain-texture">
+      {/* Header Navigation */}
+      <header className="fixed top-0 w-full z-50 bg-black/30 backdrop-blur-xl border-b border-white/20 shadow-2xl">
+        <nav className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+          <div className="flex justify-between items-center h-28">
+            {/* Logo */}
+            <div className="flex items-center relative z-10">
               <img 
                 src={vadisLogoLight} 
                 alt="VadisMedia" 
-                className="h-16 w-auto object-contain filter drop-shadow-sm"
+                className="h-24 w-auto drop-shadow-2xl"
               />
             </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-6 py-12 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-          {/* Left Side - Value Proposition */}
-          <div className="lg:pr-8">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
-              Take your content from good to <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">great.</span>
-            </h1>
             
-            <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-              Submit your request to see how VadisAI can help you achieve predictable and efficient creative growth.
-            </p>
-
-            <div className="mb-8">
-              <p className="text-lg font-semibold text-gray-900 mb-4">
-                <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">250,000+</span> content creators use VadisAI to:
-              </p>
-              <ul className="space-y-3">
-                <li className="flex items-center text-gray-700">
-                  <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
-                  Accelerate content production
-                </li>
-                <li className="flex items-center text-gray-700">
-                  <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
-                  Increase brand partnership ROI
-                </li>
-                <li className="flex items-center text-gray-700">
-                  <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
-                  Scale creative workflows
-                </li>
-                <li className="flex items-center text-gray-700">
-                  <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
-                  Measure performance with AI insights
-                </li>
-                <li className="flex items-center text-gray-700">
-                  <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
-                  Boost efficiency with AI-powered tools
-                </li>
-              </ul>
-            </div>
-
-            {/* Trust Indicators */}
-            <div>
-              <p className="text-sm text-gray-600 mb-4">The world's leading brands trust VadisAI as their growth partner</p>
-              <div className="flex items-center space-x-8 opacity-60">
-                <SiNetflix className="w-8 h-8 text-gray-400 hover:text-red-500 transition-colors" />
-                <SiApple className="w-8 h-8 text-gray-400 hover:text-gray-700 transition-colors" />
-                <SiAmazon className="w-8 h-8 text-gray-400 hover:text-orange-500 transition-colors" />
-                <SiSony className="w-8 h-8 text-gray-400 hover:text-blue-600 transition-colors" />
-                <SiMercedes className="w-8 h-8 text-gray-400 hover:text-gray-800 transition-colors" />
-              </div>
+            {/* Back Button */}
+            <div className="flex items-center relative z-10">
+              <Link href="/" className="flex items-center text-white/90 hover:bg-gradient-to-r hover:from-blue-400 hover:via-purple-500 hover:to-pink-500 hover:bg-clip-text hover:text-transparent font-bold text-lg transition-all duration-300 font-sans">
+                <ArrowLeft className="w-5 h-5 mr-2" />
+                Back to Homepage
+              </Link>
             </div>
           </div>
+        </nav>
+      </header>
 
-          {/* Right Side - Form */}
-          <div className="lg:pl-8">
-            <Card className="shadow-xl border-0 bg-white/95 backdrop-blur-sm">
-              <CardHeader className="pb-6">
-                <div className="flex items-center justify-between mb-2">
-                  <CardTitle className="text-2xl font-bold">Request a demo</CardTitle>
+      <main className="pt-28">
+        {/* Floating Orbs */}
+        <div className="floating-orb w-96 h-96 bg-gradient-to-r from-blue-500/20 to-purple-600/20 top-20 -left-48"></div>
+        <div className="floating-orb w-80 h-80 bg-gradient-to-r from-purple-500/20 to-pink-600/20 top-40 -right-40"></div>
+        <div className="floating-orb w-72 h-72 bg-gradient-to-r from-pink-500/20 to-blue-500/20 bottom-32 left-1/4"></div>
+
+        <section className="relative overflow-hidden min-h-screen flex items-center">
+          <div className="max-w-7xl mx-auto px-6 py-12 relative z-10">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+              {/* Left Side - Value Proposition */}
+              <div className="lg:pr-8">
+                <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight glow-text">
+                  Take your content from good to <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">great.</span>
+                </h1>
+                
+                <p className="text-xl text-white/80 mb-8 leading-relaxed">
+                  Submit your request to see how VadisAI can help you achieve predictable and efficient creative growth.
+                </p>
+
+                <div className="mb-8">
+                  <p className="text-lg font-semibold text-white mb-4">
+                    <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent glow-text">250,000+</span> content creators use VadisAI to:
+                  </p>
+                  <ul className="space-y-3">
+                    <li className="flex items-center text-white/80">
+                      <CheckCircle className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" />
+                      Accelerate content production
+                    </li>
+                    <li className="flex items-center text-white/80">
+                      <CheckCircle className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" />
+                      Increase brand partnership ROI
+                    </li>
+                    <li className="flex items-center text-white/80">
+                      <CheckCircle className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" />
+                      Scale creative workflows
+                    </li>
+                    <li className="flex items-center text-white/80">
+                      <CheckCircle className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" />
+                      Measure performance with AI insights
+                    </li>
+                    <li className="flex items-center text-white/80">
+                      <CheckCircle className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" />
+                      Boost efficiency with AI-powered tools
+                    </li>
+                  </ul>
                 </div>
-              </CardHeader>
+
+                {/* Trust Indicators */}
+                <div>
+                  <p className="text-sm text-white/60 mb-4">The world's leading brands trust VadisAI as their growth partner</p>
+                  <div className="flex items-center space-x-8 opacity-60">
+                    <SiNetflix className="w-8 h-8 text-white/40 hover:text-red-400 transition-colors" />
+                    <SiApple className="w-8 h-8 text-white/40 hover:text-white/80 transition-colors" />
+                    <SiAmazon className="w-8 h-8 text-white/40 hover:text-orange-400 transition-colors" />
+                    <SiSony className="w-8 h-8 text-white/40 hover:text-blue-400 transition-colors" />
+                    <SiMercedes className="w-8 h-8 text-white/40 hover:text-white/70 transition-colors" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Side - Form */}
+              <div className="lg:pl-8">
+                <Card className="shadow-2xl border-0 bg-white/10 backdrop-blur-xl border-white/20">
+                  <CardHeader className="pb-6">
+                    <div className="flex items-center justify-between mb-2">
+                      <CardTitle className="text-2xl font-bold text-white glow-text">Request a demo</CardTitle>
+                    </div>
+                  </CardHeader>
               <CardContent className="space-y-4">
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -338,8 +344,8 @@ export default function DemoRequest() {
                       )}
                     </Button>
 
-                    <p className="text-center text-xs text-gray-500 leading-relaxed">
-                      By clicking "Book a call", you agree to Vadis's <a href="#" className="text-blue-600 hover:underline">Terms of Service</a> and <a href="#" className="text-blue-600 hover:underline">Privacy Policy</a>. We'll contact you within 24 hours.
+                    <p className="text-center text-xs text-white/60 leading-relaxed">
+                      By clicking "Book a call", you agree to Vadis's <a href="#" className="text-blue-400 hover:underline">Terms of Service</a> and <a href="#" className="text-blue-400 hover:underline">Privacy Policy</a>. We'll contact you within 24 hours.
                     </p>
                   </form>
                 </Form>
@@ -348,6 +354,8 @@ export default function DemoRequest() {
           </div>
         </div>
       </div>
-    </div>
+    </section>
+  </main>
+</div>
   );
 }
