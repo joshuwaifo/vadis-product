@@ -649,25 +649,7 @@ export default function Landing() {
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-purple-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
               </Button>
             </div>
-            
-            {/* Enhanced Trust Indicators */}
-            <div className="mt-12 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-600">
-              {/* Trust Badges */}
-              <div className="flex flex-wrap justify-center items-center gap-6">
-                <div className="flex items-center space-x-2 bg-gradient-to-r from-blue-50 to-purple-50 rounded-full px-4 py-2 border border-blue-200/50">
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                  <span className="text-gray-700 text-xs font-medium">Instant Setup</span>
-                </div>
-                <div className="flex items-center space-x-2 bg-gradient-to-r from-purple-50 to-pink-50 rounded-full px-4 py-2 border border-purple-200/50">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse delay-200"></div>
-                  <span className="text-gray-700 text-xs font-medium">AI-Powered Matching</span>
-                </div>
-                <div className="flex items-center space-x-2 bg-gradient-to-r from-pink-50 to-blue-50 rounded-full px-4 py-2 border border-pink-200/50">
-                  <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse delay-400"></div>
-                  <span className="text-gray-700 text-xs font-medium">Enterprise Security</span>
-                </div>
-              </div>
-            </div>
+
           </div>
         </section>
       </main>
