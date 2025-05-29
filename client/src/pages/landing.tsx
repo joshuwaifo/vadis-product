@@ -666,9 +666,11 @@ export default function Landing() {
                 />
               </div>
 
-              <p className="text-gray-400 text-sm leading-relaxed">
-                Address: Gartenstrasse 6, 6300 Zug, Switzerland
-              </p>
+              <div className="text-gray-400 text-sm leading-relaxed">
+                <p>Gartenstrasse 6,</p>
+                <p>6300 Zug,</p>
+                <p>Switzerland</p>
+              </div>
             </div>
             
             <div className="flex flex-col">
