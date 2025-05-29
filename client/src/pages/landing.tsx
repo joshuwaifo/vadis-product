@@ -495,11 +495,14 @@ export default function Landing() {
               <p className="text-lg text-gray-700 font-medium mb-6">
                 Ready to join the next generation of media collaboration?
               </p>
-              <div className="inline-flex px-8 py-3 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 rounded-full border border-purple-200">
-                <span className="text-sm font-semibold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-                  ✨ VadisMedia connects your vision with the right partners
-                </span>
-              </div>
+              <Button 
+                size="lg"
+                className="group relative bg-gradient-to-r from-blue-500 via-purple-600 to-pink-600 hover:from-blue-600 hover:via-purple-700 hover:to-pink-700 text-white px-8 py-4 text-lg font-bold transition-all duration-500 transform hover:scale-110 hover:rotate-1 shadow-2xl hover:shadow-3xl rounded-2xl overflow-hidden"
+              >
+                <span className="relative z-10">✨ Schedule a demo</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl blur opacity-30 group-hover:opacity-50 transition-opacity duration-500"></div>
+              </Button>
             </div>
           </div>
         </section>
