@@ -356,7 +356,6 @@ export default function Landing() {
           </div>
         </nav>
       </header>
-
       <main className="pt-28">
         {/* Hero Section */}
         <section className="relative overflow-hidden min-h-screen flex items-center">
@@ -374,13 +373,12 @@ export default function Landing() {
               
               {/* Subheading */}
               <p className="text-2xl sm:text-3xl lg:text-4xl text-white/90 mb-24 max-w-5xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-200 font-sans font-medium leading-relaxed">
-                Connect productions, investors, brands, and creators on one AI-powered platform.
-                Where every project finds its perfect partners and every goal becomes achievable.
+                VadisAI delivers global opportunities for production companies, financiers, brands/agencies, and individual creators with our vertically integrated AI-driven platform.
               </p>
 
               {/* Role Selection */}
               <div className="mb-20 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-400">
-                <h2 className="text-4xl lg:text-5xl font-black text-white mb-16 font-sans">Are you a...</h2>
+                <h2 className="text-4xl lg:text-5xl font-black text-white mb-16 font-sans">Select your role:</h2>
                 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-10 max-w-6xl mx-auto">
                   {roles.map((role) => {
@@ -669,7 +667,6 @@ export default function Landing() {
           </div>
         </section>
       </main>
-
       {/* Footer */}
       <footer className="bg-gray-900 text-gray-300 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
