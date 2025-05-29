@@ -27,27 +27,32 @@ import vadisLogoDark from "@assets/Vadis_logo_dark.png";
 export default function Landing() {
   const [selectedRole, setSelectedRole] = useState<string>("");
   const [showPlatformDropdown, setShowPlatformDropdown] = useState(false);
+  const [selectedPlatformOption, setSelectedPlatformOption] = useState<string>("");
 
   const platformOptions = [
     {
+      id: "create",
       name: "Create",
       icon: Play,
       description: "Production tools and creative workflows",
       color: "from-blue-500 to-purple-600"
     },
     {
+      id: "analyze",
       name: "Analyze", 
       icon: BarChart3,
       description: "AI-powered insights and analytics",
       color: "from-purple-500 to-pink-600"
     },
     {
+      id: "brand",
       name: "Brand",
       icon: Heart,
       description: "Brand partnerships and collaborations", 
       color: "from-pink-500 to-red-500"
     },
     {
+      id: "fund",
       name: "Fund",
       icon: Banknote,
       description: "Investment and financing solutions",
@@ -160,24 +165,38 @@ export default function Landing() {
                       <div className="grid gap-4">
                         {platformOptions.map((option, index) => {
                           const IconComponent = option.icon;
+                          const isSelected = selectedPlatformOption === option.id;
                           return (
-                            <a
+                            <div
                               key={index}
-                              href="#"
-                              className="group flex items-center p-4 rounded-2xl hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 transition-all duration-300 border border-transparent hover:border-blue-200/50"
+                              onClick={() => {
+                                setSelectedPlatformOption(option.id);
+                                setShowPlatformDropdown(false);
+                              }}
+                              className={`group flex items-center p-4 rounded-2xl cursor-pointer transition-all duration-300 border ${
+                                isSelected 
+                                  ? 'bg-gradient-to-r from-blue-50 to-purple-50 border-blue-300 shadow-lg' 
+                                  : 'border-transparent hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 hover:border-blue-200/50'
+                              }`}
                             >
-                              <div className={`w-12 h-12 bg-gradient-to-r ${option.color} rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
+                              <div className={`w-12 h-12 bg-gradient-to-r ${option.color} rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform duration-300 shadow-lg ${
+                                isSelected ? 'scale-110' : ''
+                              }`}>
                                 <IconComponent className="w-6 h-6 text-white" />
                               </div>
                               <div>
-                                <h4 className="font-bold text-gray-900 group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-purple-600 group-hover:bg-clip-text group-hover:text-transparent transition-all duration-300">
+                                <h4 className={`font-bold transition-all duration-300 ${
+                                  isSelected 
+                                    ? 'bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent' 
+                                    : 'text-gray-900 group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-purple-600 group-hover:bg-clip-text group-hover:text-transparent'
+                                }`}>
                                   {option.name}
                                 </h4>
                                 <p className="text-sm text-gray-600 group-hover:text-gray-700">
                                   {option.description}
                                 </p>
                               </div>
-                            </a>
+                            </div>
                           );
                         })}
                       </div>
