@@ -15,7 +15,10 @@ import {
   ShieldCheck,
   Brain,
   Calendar,
-  ChartBar
+  ChartBar,
+  Play,
+  Heart,
+  Banknote
 } from "lucide-react";
 import { SiNetflix, SiApple, SiAmazon, SiNike, SiCocacola, SiMercedes, SiSony } from 'react-icons/si';
 import vadisLogoLight from "@assets/Vadis FINAL LOGO large size Without Background.png";
@@ -23,6 +26,34 @@ import vadisLogoDark from "@assets/Vadis_logo_dark.png";
 
 export default function Landing() {
   const [selectedRole, setSelectedRole] = useState<string>("");
+  const [showPlatformDropdown, setShowPlatformDropdown] = useState(false);
+
+  const platformOptions = [
+    {
+      name: "Create",
+      icon: Play,
+      description: "Production tools and creative workflows",
+      color: "from-blue-500 to-purple-600"
+    },
+    {
+      name: "Analyze", 
+      icon: BarChart3,
+      description: "AI-powered insights and analytics",
+      color: "from-purple-500 to-pink-600"
+    },
+    {
+      name: "Brand",
+      icon: Heart,
+      description: "Brand partnerships and collaborations", 
+      color: "from-pink-500 to-red-500"
+    },
+    {
+      name: "Fund",
+      icon: Banknote,
+      description: "Investment and financing solutions",
+      color: "from-green-500 to-blue-500"
+    }
+  ];
 
   const roles = [
     {
@@ -113,7 +144,47 @@ export default function Landing() {
             
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-10 relative z-10">
-              <a href="#" className="text-white/90 hover:bg-gradient-to-r hover:from-blue-400 hover:via-purple-500 hover:to-pink-500 hover:bg-clip-text hover:text-transparent font-bold text-lg transition-all duration-300 font-sans">Platform</a>
+              <div 
+                className="relative"
+                onMouseEnter={() => setShowPlatformDropdown(true)}
+                onMouseLeave={() => setShowPlatformDropdown(false)}
+              >
+                <a href="#" className="text-white/90 hover:bg-gradient-to-r hover:from-blue-400 hover:via-purple-500 hover:to-pink-500 hover:bg-clip-text hover:text-transparent font-bold text-lg transition-all duration-300 font-sans">
+                  Platform
+                </a>
+                
+                {/* Platform Dropdown */}
+                {showPlatformDropdown && (
+                  <div className="absolute top-full left-0 mt-4 w-80 bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/30 overflow-hidden z-50">
+                    <div className="p-6">
+                      <div className="grid gap-4">
+                        {platformOptions.map((option, index) => {
+                          const IconComponent = option.icon;
+                          return (
+                            <a
+                              key={index}
+                              href="#"
+                              className="group flex items-center p-4 rounded-2xl hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 transition-all duration-300 border border-transparent hover:border-blue-200/50"
+                            >
+                              <div className={`w-12 h-12 bg-gradient-to-r ${option.color} rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
+                                <IconComponent className="w-6 h-6 text-white" />
+                              </div>
+                              <div>
+                                <h4 className="font-bold text-gray-900 group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-purple-600 group-hover:bg-clip-text group-hover:text-transparent transition-all duration-300">
+                                  {option.name}
+                                </h4>
+                                <p className="text-sm text-gray-600 group-hover:text-gray-700">
+                                  {option.description}
+                                </p>
+                              </div>
+                            </a>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
               <a href="#" className="text-white/90 hover:bg-gradient-to-r hover:from-blue-400 hover:via-purple-500 hover:to-pink-500 hover:bg-clip-text hover:text-transparent font-bold text-lg transition-all duration-300 font-sans">Solutions</a>
               <a href="#" className="text-white/90 hover:bg-gradient-to-r hover:from-blue-400 hover:via-purple-500 hover:to-pink-500 hover:bg-clip-text hover:text-transparent font-bold text-lg transition-all duration-300 font-sans">Company</a>
             </div>
