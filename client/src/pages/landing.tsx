@@ -656,50 +656,49 @@ export default function Landing() {
       {/* Footer */}
       <footer className="bg-gray-900 text-gray-300 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            <div className="col-span-2 md:col-span-1">
-              <div className="flex items-center mb-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+            <div className="lg:col-span-1">
+              <div className="flex items-start mb-6">
                 <img 
                   src={vadisLogoLight} 
                   alt="VadisMedia" 
                   className="h-20 w-auto"
                 />
               </div>
-              <p className="text-gray-400 mb-4">
+              <p className="text-gray-400 mb-4 leading-relaxed">
                 VadisAI empowers the future of film and media.
               </p>
-              <p className="text-gray-400 mb-4 text-sm">
+              <p className="text-gray-400 text-sm leading-relaxed">
                 Address: Gartenstrasse 6, 6300 Zug, Switzerland
               </p>
-
             </div>
             
-            <div>
-              <h4 className="text-white font-semibold mb-4">Platform</h4>
-              <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-white transition-colors">Create</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Analyze</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Brand</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Fund</a></li>
+            <div className="flex flex-col">
+              <h4 className="text-white font-semibold mb-6 text-base">Platform</h4>
+              <ul className="space-y-3 text-sm">
+                <li><a href="#" className="text-gray-400 hover:text-white transition-colors duration-200">Create</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white transition-colors duration-200">Analyze</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white transition-colors duration-200">Brand</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white transition-colors duration-200">Fund</a></li>
               </ul>
             </div>
             
-            <div>
-              <h4 className="text-white font-semibold mb-4">Company</h4>
-              <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-white transition-colors">About</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Careers</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Press</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Contact</a></li>
+            <div className="flex flex-col">
+              <h4 className="text-white font-semibold mb-6 text-base">Company</h4>
+              <ul className="space-y-3 text-sm">
+                <li><a href="#" className="text-gray-400 hover:text-white transition-colors duration-200">About</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white transition-colors duration-200">Careers</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white transition-colors duration-200">Press</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white transition-colors duration-200">Contact</a></li>
               </ul>
             </div>
             
-            <div>
-              <h4 className="text-white font-semibold mb-4">Resources</h4>
-              <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-white transition-colors">Technical Support</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Sales</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">FAQ</a></li>
+            <div className="flex flex-col">
+              <h4 className="text-white font-semibold mb-6 text-base">Resources</h4>
+              <ul className="space-y-3 text-sm">
+                <li><a href="#" className="text-gray-400 hover:text-white transition-colors duration-200">Technical Support</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white transition-colors duration-200">Sales</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white transition-colors duration-200">FAQ</a></li>
               </ul>
             </div>
           </div>
