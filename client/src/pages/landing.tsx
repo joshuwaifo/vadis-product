@@ -484,8 +484,7 @@ export default function Landing() {
                       <p className="text-sm text-gray-600 font-medium">{company.category}</p>
                     </div>
                     
-                    {/* Floating Orb */}
-                    <div className="absolute -top-2 -right-2 w-4 h-4 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-pulse"></div>
+
                   </div>
                 );
               })}
