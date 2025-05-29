@@ -675,12 +675,12 @@ export default function Landing() {
             </div>
             
             <div>
-              <h4 className="text-white font-semibold mb-4">Product</h4>
+              <h4 className="text-white font-semibold mb-4">Platform</h4>
               <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-white transition-colors">Script Analysis</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Production Planning</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Analytics</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Integrations</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Create</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Analyze</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Brand</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Fund</a></li>
               </ul>
             </div>
             
@@ -697,10 +697,9 @@ export default function Landing() {
             <div>
               <h4 className="text-white font-semibold mb-4">Resources</h4>
               <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-white transition-colors">Documentation</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Community</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Blog</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Technical Support</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Sales</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">FAQ</a></li>
               </ul>
             </div>
           </div>
