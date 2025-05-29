@@ -35,7 +35,7 @@ export class HubSpotService {
     return response.json();
   }
 
-  async createContact(demoRequest: InsertDemoRequest): Promise<HubSpotContact> {
+  async createContact(demoRequest: any): Promise<HubSpotContact> {
     const contactData = {
       properties: {
         email: demoRequest.email,
@@ -44,29 +44,22 @@ export class HubSpotService {
         phone: demoRequest.phoneNumber || "",
         company: demoRequest.companyName,
         jobtitle: demoRequest.jobTitle || "",
-        industry: demoRequest.industry || "",
-        // Custom properties for demo request
-        demo_use_case: demoRequest.useCase || "",
-        demo_challenges: demoRequest.challenges || "",
-        demo_timeline: demoRequest.timeline || "",
-        demo_budget: demoRequest.budget || "",
-        demo_hear_about_us: demoRequest.hearAboutUs || "",
-        company_size: demoRequest.companySize || "",
-        department: demoRequest.department || "",
+        // Only include properties that exist in the form
+        ...(demoRequest.useCase && { hs_content_membership_notes: demoRequest.useCase }),
       },
     };
 
     return this.makeRequest("/crm/v3/objects/contacts", "POST", contactData);
   }
 
-  async createDeal(contactId: string, demoRequest: InsertDemoRequest): Promise<HubSpotDeal> {
+  async createDeal(contactId: string, demoRequest: any): Promise<HubSpotDeal> {
     const dealData = {
       properties: {
         dealname: `Demo Request - ${demoRequest.companyName}`,
-        dealstage: "qualifiedtobuy", // You may want to customize this
-        pipeline: "default", // You may want to customize this
-        amount: "0", // Initial amount
-        closedate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now
+        dealstage: "appointmentscheduled",
+        pipeline: "default",
+        amount: "0",
+        closedate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
       },
       associations: [
         {
@@ -74,7 +67,7 @@ export class HubSpotService {
           types: [
             {
               associationCategory: "HUBSPOT_DEFINED",
-              associationTypeId: 3, // Contact to Deal association
+              associationTypeId: 3,
             },
           ],
         },
@@ -84,7 +77,7 @@ export class HubSpotService {
     return this.makeRequest("/crm/v3/objects/deals", "POST", dealData);
   }
 
-  async submitDemoRequest(demoRequest: InsertDemoRequest): Promise<{
+  async submitDemoRequest(demoRequest: any): Promise<{
     contactId: string;
     dealId: string;
   }> {
