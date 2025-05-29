@@ -112,7 +112,7 @@ export default function DemoRequest() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       {/* Header */}
       <div className="bg-white/80 backdrop-blur-sm shadow-sm border-b">
-        <div className="max-w-4xl mx-auto px-6 py-4">
+        <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center text-gray-600 hover:text-gray-900 transition-colors">
               <ArrowLeft className="w-5 h-5 mr-2" />
@@ -127,196 +127,214 @@ export default function DemoRequest() {
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto px-6 py-12">
-        {/* Hero Section */}
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-full border border-blue-500/20 mb-6">
-            <Sparkles className="w-4 h-4 text-blue-600 mr-2" />
-            <span className="text-blue-600 font-medium text-sm">Request a Demo</span>
+      <div className="max-w-7xl mx-auto px-6 py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+          {/* Left Side - Value Proposition */}
+          <div className="lg:pr-8">
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
+              Take your content from good to <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">great.</span>
+            </h1>
+            
+            <p className="text-xl text-gray-600 mb-8 leading-relaxed">
+              Submit your request to see how VadisAI can help you achieve predictable and efficient creative growth.
+            </p>
+
+            <div className="mb-8">
+              <p className="text-lg font-semibold text-gray-900 mb-4">
+                <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">250,000+</span> content creators use VadisAI to:
+              </p>
+              <ul className="space-y-3">
+                <li className="flex items-center text-gray-700">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
+                  Accelerate content production
+                </li>
+                <li className="flex items-center text-gray-700">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
+                  Increase brand partnership ROI
+                </li>
+                <li className="flex items-center text-gray-700">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
+                  Scale creative workflows
+                </li>
+                <li className="flex items-center text-gray-700">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
+                  Measure performance with AI insights
+                </li>
+                <li className="flex items-center text-gray-700">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
+                  Boost efficiency with AI-powered tools
+                </li>
+              </ul>
+            </div>
+
+            {/* Trust Indicators */}
+            <div>
+              <p className="text-sm text-gray-600 mb-4">The world's leading brands trust VadisAI as their growth partner</p>
+              <div className="flex items-center space-x-6 opacity-70">
+                <div className="text-gray-500 font-bold text-sm">NETFLIX</div>
+                <div className="text-gray-500 font-bold text-sm">APPLE</div>
+                <div className="text-gray-500 font-bold text-sm">AMAZON</div>
+                <div className="text-gray-500 font-bold text-sm">SONY</div>
+                <div className="text-gray-500 font-bold text-sm">MERCEDES</div>
+              </div>
+            </div>
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            See VadisAI in <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Action</span>
-          </h1>
-          <p className="text-xl text-gray-600 leading-relaxed">
-            Get a personalized demo tailored to your specific needs and see how VadisAI can transform your creative projects.
-          </p>
-        </div>
 
-        {/* Form */}
-        <Card className="shadow-xl border-0 bg-white/90 backdrop-blur-sm">
-          <CardHeader className="text-center pb-6">
-            <CardTitle className="text-2xl">Let's get started</CardTitle>
-            <CardDescription className="text-gray-600">
-              Fill out the form below and our team will be in touch within 24 hours
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                {/* Contact Information */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <FormField
-                    control={form.control}
-                    name="firstName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-gray-700 font-medium">First Name *</FormLabel>
-                        <FormControl>
-                          <Input 
-                            placeholder="Enter your first name" 
-                            className="border-gray-200 focus:border-blue-500 focus:ring-blue-500/20"
-                            {...field} 
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="lastName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-gray-700 font-medium">Last Name *</FormLabel>
-                        <FormControl>
-                          <Input 
-                            placeholder="Enter your last name" 
-                            className="border-gray-200 focus:border-blue-500 focus:ring-blue-500/20"
-                            {...field} 
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+          {/* Right Side - Form */}
+          <div className="lg:pl-8">
+            <Card className="shadow-xl border-0 bg-white/95 backdrop-blur-sm">
+              <CardHeader className="pb-6">
+                <div className="flex items-center justify-between mb-2">
+                  <CardTitle className="text-2xl font-bold">Request a demo</CardTitle>
                 </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                    <div className="grid grid-cols-2 gap-3">
+                      <FormField
+                        control={form.control}
+                        name="firstName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <Input 
+                                placeholder="First name*" 
+                                className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 h-12"
+                                {...field} 
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="lastName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <Input 
+                                placeholder="Last name*" 
+                                className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 h-12"
+                                {...field} 
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-gray-700 font-medium">Work Email *</FormLabel>
-                        <FormControl>
-                          <Input 
-                            type="email" 
-                            placeholder="you@company.com" 
-                            className="border-gray-200 focus:border-blue-500 focus:ring-blue-500/20"
-                            {...field} 
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="phoneNumber"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-gray-700 font-medium">Phone Number</FormLabel>
-                        <FormControl>
-                          <Input 
-                            placeholder="+1 (555) 000-0000" 
-                            className="border-gray-200 focus:border-blue-500 focus:ring-blue-500/20"
-                            {...field} 
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <Input 
+                              type="email" 
+                              placeholder="Work email*" 
+                              className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 h-12"
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <FormField
-                    control={form.control}
-                    name="companyName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-gray-700 font-medium">Company Name *</FormLabel>
-                        <FormControl>
-                          <Input 
-                            placeholder="Your company name" 
-                            className="border-gray-200 focus:border-blue-500 focus:ring-blue-500/20"
-                            {...field} 
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="jobTitle"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-gray-700 font-medium">Job Title</FormLabel>
-                        <FormControl>
-                          <Input 
-                            placeholder="Your role" 
-                            className="border-gray-200 focus:border-blue-500 focus:ring-blue-500/20"
-                            {...field} 
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <FormField
+                        control={form.control}
+                        name="phoneNumber"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <Input 
+                                placeholder="Phone number" 
+                                className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 h-12"
+                                {...field} 
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="companyName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <Input 
+                                placeholder="Company name*" 
+                                className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 h-12"
+                                {...field} 
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
 
-                <FormField
-                  control={form.control}
-                  name="useCase"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-gray-700 font-medium">Tell us about your project</FormLabel>
-                      <FormControl>
-                        <Textarea 
-                          placeholder="Briefly describe how you plan to use VadisAI or what challenges you're looking to solve..."
-                          className="min-h-[120px] border-gray-200 focus:border-blue-500 focus:ring-blue-500/20 resize-none"
-                          {...field} 
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                    <FormField
+                      control={form.control}
+                      name="jobTitle"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <Input 
+                              placeholder="What's your role at the company?" 
+                              className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 h-12"
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                {/* Submit Button */}
-                <div className="pt-4">
-                  <Button 
-                    type="submit"
-                    disabled={submitMutation.isPending}
-                    className="w-full bg-gradient-to-r from-blue-500 via-purple-600 to-pink-600 hover:from-blue-600 hover:via-purple-700 hover:to-pink-700 text-white py-3 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
-                  >
-                    {submitMutation.isPending ? (
-                      <div className="flex items-center">
-                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
-                        Submitting...
-                      </div>
-                    ) : (
-                      "Request Demo"
-                    )}
-                  </Button>
-                  <p className="text-center text-sm text-gray-500 mt-4">
-                    We'll contact you within 24 hours to schedule your personalized demo
-                  </p>
-                </div>
-              </form>
-            </Form>
-          </CardContent>
-        </Card>
+                    <FormField
+                      control={form.control}
+                      name="useCase"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <Textarea 
+                              placeholder="How can our team help?"
+                              className="min-h-[80px] border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none"
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-        {/* Trust Indicators */}
-        <div className="mt-12 text-center">
-          <p className="text-gray-600 mb-4">Trusted by industry leaders</p>
-          <div className="flex justify-center items-center space-x-8 opacity-60">
-            <div className="text-gray-400 font-bold">NETFLIX</div>
-            <div className="text-gray-400 font-bold">APPLE</div>
-            <div className="text-gray-400 font-bold">AMAZON</div>
-            <div className="text-gray-400 font-bold">SONY</div>
+                    <Button 
+                      type="submit"
+                      disabled={submitMutation.isPending}
+                      className="w-full bg-gradient-to-r from-blue-500 via-purple-600 to-pink-600 hover:from-blue-600 hover:via-purple-700 hover:to-pink-700 text-white py-3 text-base font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 h-12"
+                    >
+                      {submitMutation.isPending ? (
+                        <div className="flex items-center justify-center">
+                          <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
+                          Submitting...
+                        </div>
+                      ) : (
+                        "Book a call"
+                      )}
+                    </Button>
+
+                    <p className="text-center text-xs text-gray-500 leading-relaxed">
+                      By clicking "Book a call", you agree to Vadis's <a href="#" className="text-blue-600 hover:underline">Terms of Service</a> and <a href="#" className="text-blue-600 hover:underline">Privacy Policy</a>. We'll contact you within 24 hours.
+                    </p>
+                  </form>
+                </Form>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
