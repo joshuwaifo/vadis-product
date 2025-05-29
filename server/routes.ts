@@ -13,11 +13,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       let hubspotContactId = null;
       let hubspotDealId = null;
+      let hubspotResult = null;
 
       // Try to submit to HubSpot first (primary database)
       if (hubspotService) {
         try {
-          const hubspotResult = await hubspotService.submitDemoRequest(validatedData);
+          hubspotResult = await hubspotService.submitDemoRequest(validatedData);
           hubspotContactId = hubspotResult.contactId;
           hubspotDealId = hubspotResult.dealId;
         } catch (hubspotError) {

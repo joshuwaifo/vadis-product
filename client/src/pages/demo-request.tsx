@@ -61,11 +61,16 @@ export default function DemoRequest() {
       
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       setIsSubmitted(true);
+      if (data.meetingLink) {
+        setMeetingLink(data.meetingLink);
+      }
       toast({
         title: "Demo request submitted!",
-        description: "We'll be in touch within 24 hours to schedule your demo.",
+        description: data.hubspotSynced 
+          ? "Confirmation email sent! We'll be in touch within 24 hours."
+          : "We'll be in touch within 24 hours to schedule your demo.",
       });
     },
     onError: (error) => {
@@ -91,8 +96,21 @@ export default function DemoRequest() {
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Thank you!</h2>
             <p className="text-gray-600 mb-8 leading-relaxed">
-              Your demo request has been submitted successfully. Our team will contact you within 24 hours to schedule your personalized demo.
+              Your demo request has been submitted successfully. {meetingLink ? "A confirmation email has been sent to you." : "Our team will contact you within 24 hours to schedule your personalized demo."}
             </p>
+            
+            {meetingLink && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                <h3 className="font-semibold text-blue-900 mb-2">Schedule Your Demo</h3>
+                <p className="text-blue-700 text-sm mb-3">Use the link below to schedule your demo at a time that works for you:</p>
+                <Button asChild className="w-full bg-blue-600 hover:bg-blue-700 text-white">
+                  <a href={meetingLink} target="_blank" rel="noopener noreferrer">
+                    Schedule Demo Meeting
+                  </a>
+                </Button>
+              </div>
+            )}
+            
             <div className="space-y-4">
               <Button asChild className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
                 <Link href="/">Return to Homepage</Link>
