@@ -28,20 +28,39 @@ export default function Landing() {
   const [selectedRole, setSelectedRole] = useState<string>("");
   const [showPlatformDropdown, setShowPlatformDropdown] = useState(false);
   const [selectedPlatformOption, setSelectedPlatformOption] = useState<string>("");
+  const [showSolutionsDropdown, setShowSolutionsDropdown] = useState(false);
+  const [selectedSolutionOption, setSelectedSolutionOption] = useState<string>("");
   const [dropdownTimeout, setDropdownTimeout] = useState<NodeJS.Timeout | null>(null);
 
-  const handleMouseEnter = () => {
+  const handlePlatformMouseEnter = () => {
     if (dropdownTimeout) {
       clearTimeout(dropdownTimeout);
       setDropdownTimeout(null);
     }
     setShowPlatformDropdown(true);
+    setShowSolutionsDropdown(false);
   };
 
-  const handleMouseLeave = () => {
+  const handlePlatformMouseLeave = () => {
     const timeout = setTimeout(() => {
       setShowPlatformDropdown(false);
-    }, 300); // 300ms delay
+    }, 300);
+    setDropdownTimeout(timeout);
+  };
+
+  const handleSolutionsMouseEnter = () => {
+    if (dropdownTimeout) {
+      clearTimeout(dropdownTimeout);
+      setDropdownTimeout(null);
+    }
+    setShowSolutionsDropdown(true);
+    setShowPlatformDropdown(false);
+  };
+
+  const handleSolutionsMouseLeave = () => {
+    const timeout = setTimeout(() => {
+      setShowSolutionsDropdown(false);
+    }, 300);
     setDropdownTimeout(timeout);
   };
 
@@ -73,6 +92,37 @@ export default function Landing() {
       icon: Banknote,
       description: "Investment and financing solutions",
       color: "from-green-500 to-blue-500"
+    }
+  ];
+
+  const solutionOptions = [
+    {
+      id: "production-companies",
+      name: "Production Companies",
+      icon: Film,
+      description: "End-to-end production management solutions",
+      color: "from-blue-500 to-purple-600"
+    },
+    {
+      id: "brands-agencies",
+      name: "Brands/Agencies",
+      icon: Heart,
+      description: "Brand partnership and campaign solutions",
+      color: "from-purple-500 to-pink-600"
+    },
+    {
+      id: "financiers",
+      name: "Financiers",
+      icon: DollarSign,
+      description: "Investment and funding solutions",
+      color: "from-green-500 to-blue-500"
+    },
+    {
+      id: "individual-creators",
+      name: "Individual Creators",
+      icon: Users,
+      description: "Tools for independent content creators",
+      color: "from-pink-500 to-red-500"
     }
   ];
 
@@ -167,8 +217,8 @@ export default function Landing() {
             <div className="hidden md:flex items-center space-x-10 relative z-10">
               <div 
                 className="relative"
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}
+                onMouseEnter={handlePlatformMouseEnter}
+                onMouseLeave={handlePlatformMouseLeave}
               >
                 <a href="#" className="text-white/90 hover:bg-gradient-to-r hover:from-blue-400 hover:via-purple-500 hover:to-pink-500 hover:bg-clip-text hover:text-transparent font-bold text-lg transition-all duration-300 font-sans">
                   Platform
@@ -178,8 +228,8 @@ export default function Landing() {
                 {showPlatformDropdown && (
                   <div 
                     className="absolute top-full left-0 mt-4 w-80 bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/30 overflow-hidden z-50"
-                    onMouseEnter={handleMouseEnter}
-                    onMouseLeave={handleMouseLeave}
+                    onMouseEnter={handlePlatformMouseEnter}
+                    onMouseLeave={handlePlatformMouseLeave}
                   >
                     <div className="p-6">
                       <div className="grid gap-4">
@@ -224,7 +274,65 @@ export default function Landing() {
                   </div>
                 )}
               </div>
-              <a href="#" className="text-white/90 hover:bg-gradient-to-r hover:from-blue-400 hover:via-purple-500 hover:to-pink-500 hover:bg-clip-text hover:text-transparent font-bold text-lg transition-all duration-300 font-sans">Solutions</a>
+              <div 
+                className="relative"
+                onMouseEnter={handleSolutionsMouseEnter}
+                onMouseLeave={handleSolutionsMouseLeave}
+              >
+                <a href="#" className="text-white/90 hover:bg-gradient-to-r hover:from-blue-400 hover:via-purple-500 hover:to-pink-500 hover:bg-clip-text hover:text-transparent font-bold text-lg transition-all duration-300 font-sans">
+                  Solutions
+                </a>
+                
+                {/* Solutions Dropdown */}
+                {showSolutionsDropdown && (
+                  <div 
+                    className="absolute top-full left-0 mt-4 w-80 bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/30 overflow-hidden z-50"
+                    onMouseEnter={handleSolutionsMouseEnter}
+                    onMouseLeave={handleSolutionsMouseLeave}
+                  >
+                    <div className="p-6">
+                      <div className="grid gap-4">
+                        {solutionOptions.map((option, index) => {
+                          const IconComponent = option.icon;
+                          const isSelected = selectedSolutionOption === option.id;
+                          return (
+                            <div
+                              key={index}
+                              onClick={() => {
+                                setSelectedSolutionOption(option.id);
+                                setShowSolutionsDropdown(false);
+                              }}
+                              className={`group flex items-center p-4 rounded-2xl cursor-pointer transition-all duration-300 border ${
+                                isSelected 
+                                  ? 'bg-gradient-to-r from-blue-50 to-purple-50 border-blue-300 shadow-lg' 
+                                  : 'border-transparent hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 hover:border-blue-200/50'
+                              }`}
+                            >
+                              <div className={`w-12 h-12 bg-gradient-to-r ${option.color} rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform duration-300 shadow-lg ${
+                                isSelected ? 'scale-110' : ''
+                              }`}>
+                                <IconComponent className="w-6 h-6 text-white" />
+                              </div>
+                              <div>
+                                <h4 className={`font-bold transition-all duration-300 ${
+                                  isSelected 
+                                    ? 'bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent' 
+                                    : 'text-gray-900 group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-purple-600 group-hover:bg-clip-text group-hover:text-transparent'
+                                }`}>
+                                  {option.name}
+                                </h4>
+                                <p className="text-sm text-gray-600 group-hover:text-gray-700">
+                                  {option.description}
+                                </p>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
               <a href="#" className="text-white/90 hover:bg-gradient-to-r hover:from-blue-400 hover:via-purple-500 hover:to-pink-500 hover:bg-clip-text hover:text-transparent font-bold text-lg transition-all duration-300 font-sans">Company</a>
             </div>
 
