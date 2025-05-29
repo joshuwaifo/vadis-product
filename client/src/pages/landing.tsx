@@ -28,6 +28,22 @@ export default function Landing() {
   const [selectedRole, setSelectedRole] = useState<string>("");
   const [showPlatformDropdown, setShowPlatformDropdown] = useState(false);
   const [selectedPlatformOption, setSelectedPlatformOption] = useState<string>("");
+  const [dropdownTimeout, setDropdownTimeout] = useState<NodeJS.Timeout | null>(null);
+
+  const handleMouseEnter = () => {
+    if (dropdownTimeout) {
+      clearTimeout(dropdownTimeout);
+      setDropdownTimeout(null);
+    }
+    setShowPlatformDropdown(true);
+  };
+
+  const handleMouseLeave = () => {
+    const timeout = setTimeout(() => {
+      setShowPlatformDropdown(false);
+    }, 300); // 300ms delay
+    setDropdownTimeout(timeout);
+  };
 
   const platformOptions = [
     {
@@ -151,8 +167,8 @@ export default function Landing() {
             <div className="hidden md:flex items-center space-x-10 relative z-10">
               <div 
                 className="relative"
-                onMouseEnter={() => setShowPlatformDropdown(true)}
-                onMouseLeave={() => setShowPlatformDropdown(false)}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
               >
                 <a href="#" className="text-white/90 hover:bg-gradient-to-r hover:from-blue-400 hover:via-purple-500 hover:to-pink-500 hover:bg-clip-text hover:text-transparent font-bold text-lg transition-all duration-300 font-sans">
                   Platform
@@ -160,7 +176,11 @@ export default function Landing() {
                 
                 {/* Platform Dropdown */}
                 {showPlatformDropdown && (
-                  <div className="absolute top-full left-0 mt-4 w-80 bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/30 overflow-hidden z-50">
+                  <div 
+                    className="absolute top-full left-0 mt-4 w-80 bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/30 overflow-hidden z-50"
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
+                  >
                     <div className="p-6">
                       <div className="grid gap-4">
                         {platformOptions.map((option, index) => {
