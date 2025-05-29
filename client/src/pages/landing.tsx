@@ -517,9 +517,7 @@ export default function Landing() {
           
           <div className="relative max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-16">
             <div className="text-center mb-20 relative z-10">
-              <div className="inline-block px-6 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/30 mb-8">
-                <span className="text-white font-semibold text-sm tracking-wide">REVOLUTIONARY PLATFORM</span>
-              </div>
+
               <h2 className="text-5xl md:text-6xl lg:text-7xl font-black text-white mb-8 font-sans leading-tight glow-text">
                 Turn ideas into 
                 <br />
