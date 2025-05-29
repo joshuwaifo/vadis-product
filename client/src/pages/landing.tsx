@@ -671,11 +671,7 @@ export default function Landing() {
               <p className="text-gray-400 mb-4 text-sm">
                 Address: Gartenstrasse 6, 6300 Zug, Switzerland
               </p>
-              <div className="flex space-x-4">
-                <div className="w-6 h-6 text-gray-400 hover:text-indigo-500 cursor-pointer transition-colors">📱</div>
-                <div className="w-6 h-6 text-gray-400 hover:text-indigo-500 cursor-pointer transition-colors">💼</div>
-                <div className="w-6 h-6 text-gray-400 hover:text-indigo-500 cursor-pointer transition-colors">📺</div>
-              </div>
+
             </div>
             
             <div>
