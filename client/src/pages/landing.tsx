@@ -369,10 +369,10 @@ export default function Landing() {
             <div className="text-center relative z-10">
               {/* Main heading */}
               <h1 className="text-7xl sm:text-8xl lg:text-9xl font-black text-white mb-16 animate-in fade-in slide-in-from-bottom-4 duration-1000 font-sans leading-tight tracking-tight glow-text">
-                Unite vision
+                Accelerate your business
                 <br />
                 <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent animate-pulse">
-                  with success
+                  with VadisAI
                 </span>
               </h1>
               
