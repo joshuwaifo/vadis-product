@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Link } from "wouter";
 import { 
   Film, 
   Briefcase, 
@@ -351,8 +352,8 @@ export default function Landing() {
                 <LogIn className="w-5 h-5 mr-3" />
                 Login
               </Button>
-              <Button className="bg-gradient-to-r from-blue-500 via-purple-600 to-pink-600 hover:from-blue-600 hover:via-purple-700 hover:to-pink-700 text-white font-bold px-8 py-3 text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 font-sans rounded-xl">
-                Request a demo
+              <Button asChild className="bg-gradient-to-r from-blue-500 via-purple-600 to-pink-600 hover:from-blue-600 hover:via-purple-700 hover:to-pink-700 text-white font-bold px-8 py-3 text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 font-sans rounded-xl">
+                <Link href="/demo-request">Request a demo</Link>
               </Button>
             </div>
 
