@@ -546,36 +546,58 @@ export default function Landing() {
                 return (
                   <div 
                     key={index} 
-                    className="cursor-pointer p-8 transition-all duration-500 transform hover:scale-105 backdrop-blur-lg relative z-10 overflow-hidden bg-white/10 hover:bg-white/15 border border-white/30 hover:border-white/50 rounded-3xl group"
+                    className="group relative cursor-pointer transition-all duration-700 transform hover:scale-105 hover:-rotate-1 overflow-hidden"
                   >
+                    {/* Gradient Border Container */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-all duration-700"></div>
                     
-                    {/* Badge */}
-                    <div className="flex items-center justify-between mb-6 relative z-10">
-                      <div className="inline-block px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full border border-white/30">
-                        <span className="text-white text-xs font-bold tracking-wide">
-                          {feature.badge}
-                        </span>
-                      </div>
-                      <div className={`w-14 h-14 bg-gradient-to-r ${feature.color} rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-xl`}>
-                        <IconComponent className="w-7 h-7 text-white" />
-                      </div>
-                    </div>
-                    
-                    <div className="relative z-10">
-                      <h3 className="text-2xl font-black text-white mb-4 font-sans transition-all duration-300" style={{textShadow: '0 0 10px rgba(255,255,255,0.8)'}}>
-                        {feature.title}
-                      </h3>
-                      <p className="text-white/80 leading-relaxed mb-6 text-lg font-medium">
-                        {feature.description}
-                      </p>
+                    {/* Main Card */}
+                    <div className="relative bg-gradient-to-br from-white/15 via-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-3xl p-8 h-full transition-all duration-500 group-hover:border-white/40 group-hover:shadow-2xl">
                       
-                      {/* Metric */}
-                      <div className="flex items-center">
-                        <div className="w-3 h-3 bg-green-400 rounded-full mr-2 shadow-lg"></div>
-                        <span className="text-green-300 font-bold text-sm uppercase tracking-wide">
-                          {feature.metric}
-                        </span>
+                      {/* Floating Icon */}
+                      <div className="absolute -top-6 -right-6 opacity-10 group-hover:opacity-20 transition-opacity duration-500">
+                        <div className={`w-24 h-24 bg-gradient-to-r ${feature.color} rounded-full flex items-center justify-center`}>
+                          <IconComponent className="w-12 h-12 text-white" />
+                        </div>
                       </div>
+                      
+                      {/* Header */}
+                      <div className="flex items-start justify-between mb-8 relative z-10">
+                        <div className="flex-1">
+                          <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-white/20 to-white/10 backdrop-blur-sm rounded-full border border-white/30 mb-4">
+                            <span className="text-white text-xs font-bold tracking-wider uppercase">
+                              {feature.badge}
+                            </span>
+                          </div>
+                        </div>
+                        <div className={`w-16 h-16 bg-gradient-to-br ${feature.color} rounded-2xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-12 transition-all duration-500 shadow-2xl`}>
+                          <IconComponent className="w-8 h-8 text-white drop-shadow-lg" />
+                        </div>
+                      </div>
+                      
+                      {/* Content */}
+                      <div className="relative z-10 space-y-6">
+                        <h3 className="text-2xl font-black text-white mb-4 font-sans leading-tight group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-white group-hover:via-blue-100 group-hover:to-purple-100 group-hover:bg-clip-text transition-all duration-500" style={{textShadow: '0 0 20px rgba(255,255,255,0.8)'}}>
+                          {feature.title}
+                        </h3>
+                        
+                        <p className="text-white/85 leading-relaxed text-base font-medium group-hover:text-white/95 transition-all duration-300">
+                          {feature.description}
+                        </p>
+                        
+                        {/* Enhanced Metric */}
+                        <div className="flex items-center pt-4 border-t border-white/10">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-4 h-4 bg-gradient-to-r from-emerald-400 to-green-400 rounded-full shadow-lg animate-pulse"></div>
+                            <span className="text-emerald-300 font-bold text-sm uppercase tracking-wider">
+                              {feature.metric}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Hover Gradient Overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-purple-500/5 to-pink-500/5 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
                     </div>
                   </div>
                 );
