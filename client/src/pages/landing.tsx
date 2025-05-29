@@ -665,9 +665,7 @@ export default function Landing() {
                   className="h-20 w-auto"
                 />
               </div>
-              <p className="text-gray-400 mb-4 leading-relaxed">
-                VadisAI empowers the future of film and media.
-              </p>
+
               <p className="text-gray-400 text-sm leading-relaxed">
                 Address: Gartenstrasse 6, 6300 Zug, Switzerland
               </p>
