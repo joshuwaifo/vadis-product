@@ -658,18 +658,17 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
             <div className="lg:col-span-1">
-              <div className="flex items-start mb-6">
+              <div className="mb-8">
                 <img 
                   src={vadisLogoLight} 
                   alt="VadisMedia" 
-                  className="h-20 w-auto"
+                  className="h-20 w-auto mb-6"
                 />
-              </div>
-
-              <div className="text-gray-400 text-sm leading-relaxed">
-                <p>Gartenstrasse 6,</p>
-                <p>6300 Zug,</p>
-                <p>Switzerland</p>
+                <div className="text-gray-400 text-sm leading-relaxed">
+                  <p>Gartenstrasse 6,</p>
+                  <p>6300 Zug,</p>
+                  <p>Switzerland</p>
+                </div>
               </div>
             </div>
             
