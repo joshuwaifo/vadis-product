@@ -405,7 +405,7 @@ export default function Landing() {
                         } rounded-3xl group`}
                         onClick={() => setSelectedRole(role.id)}
                       >
-                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl"></div>
+
                         <div className="text-center relative z-10">
                           <div className={`w-28 h-28 ${isSelected ? 'bg-gradient-to-br from-blue-500 via-purple-600 to-pink-600 shadow-2xl' : 'bg-gradient-to-br from-white/80 to-white/60 group-hover:from-blue-500/80 group-hover:via-purple-500/80 group-hover:to-pink-500/80'} rounded-3xl flex items-center justify-center mx-auto mb-10 transition-all duration-700 hover:scale-110 shadow-xl`}>
                             <IconComponent className={`w-14 h-14 ${isSelected ? 'text-white drop-shadow-lg' : 'text-gray-800 group-hover:text-white'} transition-all duration-500 drop-shadow-lg`} />
