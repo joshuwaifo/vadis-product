@@ -104,65 +104,165 @@ export class HubSpotService {
   }
 
   async sendConfirmationEmail(contactId: string, demoRequest: any): Promise<void> {
-    // Try using HubSpot's transactional email API
+    // Use HubSpot's transactional email API with subscription account
     const emailData = {
-      emailId: 123456789, // This would need to be a real template ID from your HubSpot account
       message: {
         to: demoRequest.email,
-        from: "noreply@vadismedia.com", // This needs to be verified in HubSpot
-        subject: "Demo Request Confirmation - VadisAI",
+        subject: "Demo Request Received - We'll Be In Touch Soon!",
+        htmlBody: `
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Demo Request Confirmation</title>
+          </head>
+          <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f8f9fa;">
+            <table role="presentation" style="width: 100%; border-collapse: collapse;">
+              <tr>
+                <td style="padding: 40px 20px;">
+                  <table role="presentation" style="max-width: 600px; margin: 0 auto; background-color: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                    <!-- Header -->
+                    <tr>
+                      <td style="background: linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899); padding: 40px 40px 30px; text-align: center; border-radius: 8px 8px 0 0;">
+                        <h1 style="color: white; margin: 0; font-size: 28px; font-weight: bold;">VadisAI</h1>
+                        <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0; font-size: 16px;">Thank you for your interest!</p>
+                      </td>
+                    </tr>
+                    
+                    <!-- Content -->
+                    <tr>
+                      <td style="padding: 40px;">
+                        <h2 style="color: #1f2937; margin: 0 0 20px; font-size: 24px;">Hi ${demoRequest.firstName},</h2>
+                        
+                        <p style="color: #4b5563; line-height: 1.6; margin: 0 0 20px; font-size: 16px;">
+                          We've received your demo request and our team will contact you within 24 hours to schedule your personalized VadisAI demonstration.
+                        </p>
+                        
+                        <!-- Request Details -->
+                        <div style="background-color: #f9fafb; padding: 24px; border-radius: 8px; margin: 24px 0; border-left: 4px solid #3b82f6;">
+                          <h3 style="color: #1f2937; margin: 0 0 16px; font-size: 18px;">Request Details:</h3>
+                          <table style="width: 100%; border-collapse: collapse;">
+                            <tr>
+                              <td style="padding: 4px 0; color: #6b7280; font-weight: 600; width: 120px;">Name:</td>
+                              <td style="padding: 4px 0; color: #1f2937;">${demoRequest.firstName} ${demoRequest.lastName}</td>
+                            </tr>
+                            <tr>
+                              <td style="padding: 4px 0; color: #6b7280; font-weight: 600;">Company:</td>
+                              <td style="padding: 4px 0; color: #1f2937;">${demoRequest.companyName}</td>
+                            </tr>
+                            <tr>
+                              <td style="padding: 4px 0; color: #6b7280; font-weight: 600;">Company Type:</td>
+                              <td style="padding: 4px 0; color: #1f2937;">${demoRequest.companyType || 'Not specified'}</td>
+                            </tr>
+                            ${demoRequest.jobTitle ? `
+                            <tr>
+                              <td style="padding: 4px 0; color: #6b7280; font-weight: 600;">Role:</td>
+                              <td style="padding: 4px 0; color: #1f2937;">${demoRequest.jobTitle}</td>
+                            </tr>
+                            ` : ''}
+                            ${demoRequest.useCase ? `
+                            <tr>
+                              <td style="padding: 4px 0; color: #6b7280; font-weight: 600;">Use Case:</td>
+                              <td style="padding: 4px 0; color: #1f2937;">${demoRequest.useCase}</td>
+                            </tr>
+                            ` : ''}
+                          </table>
+                        </div>
+                        
+                        <p style="color: #4b5563; line-height: 1.6; margin: 20px 0; font-size: 16px;">
+                          In the meantime, feel free to explore our platform resources or contact us directly if you have any questions.
+                        </p>
+                        
+                        <!-- CTA Button -->
+                        <div style="text-align: center; margin: 32px 0;">
+                          <a href="https://vadismedia.com" style="display: inline-block; background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: white; text-decoration: none; padding: 14px 28px; border-radius: 6px; font-weight: 600; font-size: 16px;">
+                            Explore VadisAI
+                          </a>
+                        </div>
+                        
+                        <p style="color: #4b5563; line-height: 1.6; margin: 24px 0 0; font-size: 16px;">
+                          Best regards,<br>
+                          <strong style="color: #1f2937;">The VadisAI Team</strong>
+                        </p>
+                      </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                      <td style="background-color: #f9fafb; padding: 24px 40px; text-align: center; border-radius: 0 0 8px 8px; border-top: 1px solid #e5e7eb;">
+                        <p style="color: #6b7280; margin: 0; font-size: 14px;">
+                          VadisMedia AG<br>
+                          Gartenstrasse 6, 6300 Zug, Switzerland
+                        </p>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </body>
+          </html>
+        `,
+        textBody: `Hi ${demoRequest.firstName},
+
+Thank you for your interest in VadisAI!
+
+We've received your demo request and our team will contact you within 24 hours to schedule your personalized demonstration.
+
+Request Details:
+- Name: ${demoRequest.firstName} ${demoRequest.lastName}
+- Company: ${demoRequest.companyName}
+- Company Type: ${demoRequest.companyType || 'Not specified'}
+${demoRequest.jobTitle ? `- Role: ${demoRequest.jobTitle}` : ''}
+${demoRequest.useCase ? `- Use Case: ${demoRequest.useCase}` : ''}
+
+Best regards,
+The VadisAI Team
+
+VadisMedia AG
+Gartenstrasse 6, 6300 Zug, Switzerland`
       },
       contactProperties: {
         firstname: demoRequest.firstName,
         lastname: demoRequest.lastName,
         company: demoRequest.companyName,
-        jobtitle: demoRequest.jobTitle || "",
-        demo_use_case: demoRequest.useCase || ""
+        industry: demoRequest.companyType || "",
+        jobtitle: demoRequest.jobTitle || ""
       }
     };
 
     try {
-      // Try transactional email first
       await this.makeRequest("/marketing/v3/transactional/single-email/send", "POST", emailData);
-      console.log(`Transactional email sent to ${demoRequest.email}`);
-    } catch (transactionalError: any) {
-      console.log("Transactional email failed, trying alternative method:", transactionalError.message);
+      console.log(`Confirmation email sent successfully to ${demoRequest.email}`);
+    } catch (error: any) {
+      console.error("Failed to send confirmation email:", error.message);
       
-      // Fall back to creating an email engagement (for logging only)
-      const engagementData = {
-        engagement: {
-          active: true,
-          type: "EMAIL",
-          timestamp: Date.now()
-        },
-        associations: {
-          contactIds: [contactId]
-        },
-        metadata: {
-          subject: "Demo Request Confirmation - VadisAI",
-          html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-              <h2 style="color: #333;">Thank you for your demo request!</h2>
-              <p>Hi ${demoRequest.firstName},</p>
-              <p>We've received your demo request for VadisAI. Our team will be in touch within 24 hours to schedule your personalized demo.</p>
-              <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
-                <h3 style="margin-top: 0;">Your Request Details:</h3>
-                <p><strong>Name:</strong> ${demoRequest.firstName} ${demoRequest.lastName}</p>
-                <p><strong>Company:</strong> ${demoRequest.companyName}</p>
-                <p><strong>Email:</strong> ${demoRequest.email}</p>
-                ${demoRequest.jobTitle ? `<p><strong>Role:</strong> ${demoRequest.jobTitle}</p>` : ''}
-                ${demoRequest.useCase ? `<p><strong>Use Case:</strong> ${demoRequest.useCase}</p>` : ''}
-              </div>
-              <p>In the meantime, feel free to explore our resources or contact us directly if you have any questions.</p>
-              <p>Best regards,<br>The VadisAI Team</p>
-            </div>
-          `,
-          text: `Hi ${demoRequest.firstName}, thank you for your demo request for VadisAI. Our team will be in touch within 24 hours to schedule your personalized demo.`
-        }
-      };
+      // Create an email engagement for tracking purposes
+      try {
+        const engagementData = {
+          engagement: {
+            active: true,
+            type: "EMAIL",
+            timestamp: Date.now()
+          },
+          associations: {
+            contactIds: [contactId]
+          },
+          metadata: {
+            subject: "Demo Request Received - We'll Be In Touch Soon!",
+            html: emailData.message.htmlBody,
+            text: emailData.message.textBody
+          }
+        };
+        
+        await this.makeRequest("/engagements/v1/engagements", "POST", engagementData);
+        console.log("Email engagement logged for tracking");
+      } catch (engagementError) {
+        console.error("Failed to log email engagement:", engagementError);
+      }
       
-      await this.makeRequest("/engagements/v1/engagements", "POST", engagementData);
-      console.log("Email engagement logged (but actual email not sent - requires HubSpot email setup)");
+      throw new Error(`Email sending failed: ${error.message}`);
     }
   }
 
