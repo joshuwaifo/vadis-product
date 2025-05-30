@@ -3,41 +3,35 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { z } from "zod";
-import { CheckCircle, Sparkles, Users, Camera, Video } from "lucide-react";
-import { SiYoutube, SiInstagram, SiTiktok, SiTwitch } from "react-icons/si";
-import { Mic, Monitor, Headphones } from "lucide-react";
+import { CheckCircle, ArrowLeft, Star } from "lucide-react";
+import { SiNetflix, SiApple, SiAmazon, SiSony, SiMercedes } from "react-icons/si";
+import vadisLogoLight from "@assets/Vadis FINAL LOGO large size Without Background.png";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
 import { Link } from "wouter";
 
 const formSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
-  email: z.string().email("Please enter a valid email"),
-  companyName: z.string().min(1, "Creator name or channel is required"),
+  email: z.string()
+    .email("Please enter a valid email")
+    .refine((email) => {
+      const workEmailDomains = /\.(com|org|net|edu|gov|co\.|inc|corp|llc)$/i;
+      const personalDomains = /\.(gmail|yahoo|hotmail|outlook|aol|icloud|protonmail)\.com$/i;
+      return workEmailDomains.test(email) && !personalDomains.test(email);
+    }, "Please use your work email address"),
+  companyName: z.string().min(1, "Company name is required"),
   jobTitle: z.string().optional(),
   phoneNumber: z.string().optional(),
   useCase: z.string().optional(),
 });
 
 type FormData = z.infer<typeof formSchema>;
-
-const industryPartners = [
-  { name: "YouTube", icon: SiYoutube, color: "text-red-600", category: "Video Platform" },
-  { name: "Instagram", icon: SiInstagram, color: "text-pink-600", category: "Social Media" },
-  { name: "TikTok", icon: SiTiktok, color: "text-black", category: "Short Form Video" },
-  { name: "Social Media", icon: Users, color: "text-blue-600", category: "Social Platform" },
-  { name: "Twitch", icon: SiTwitch, color: "text-purple-600", category: "Live Streaming" },
-  { name: "Podcast", icon: Mic, color: "text-green-600", category: "Audio Content" },
-  { name: "Streaming", icon: Monitor, color: "text-blue-700", category: "Live Content" },
-  { name: "Audio", icon: Headphones, color: "text-orange-600", category: "Sound Design" },
-];
 
 export default function DemoCreator() {
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -59,10 +53,19 @@ export default function DemoCreator() {
 
   const mutation = useMutation({
     mutationFn: async (data: FormData) => {
-      return apiRequest("/api/demo-request", {
+      const response = await fetch("/api/demo-request", {
         method: "POST",
-        body: data,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
       });
+      
+      if (!response.ok) {
+        throw new Error("Failed to submit demo request");
+      }
+      
+      return response.json();
     },
     onSuccess: (data) => {
       setIsSubmitted(true);
@@ -91,7 +94,7 @@ export default function DemoCreator() {
 
   if (isSubmitted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 flex items-center justify-center p-4">
+      <div className="min-h-screen modern-gradient grain-texture flex items-center justify-center p-4">
         <Card className="w-full max-w-2xl shadow-2xl border-0 bg-white/90 backdrop-blur-lg">
           <CardContent className="p-12 text-center">
             <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -115,12 +118,12 @@ export default function DemoCreator() {
             )}
             
             <div className="space-y-4">
-              <Button asChild className="w-full bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700">
+              <Button asChild className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
                 <Link href="/">Return to Homepage</Link>
               </Button>
               <p className="text-sm text-gray-500">
                 Need immediate assistance? Contact us at{" "}
-                <a href="mailto:sales@vadis.ai" className="text-purple-600 hover:underline font-medium">
+                <a href="mailto:sales@vadis.ai" className="text-blue-600 hover:underline font-medium">
                   sales@vadis.ai
                 </a>
               </p>
@@ -132,215 +135,255 @@ export default function DemoCreator() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
+    <div className="min-h-screen modern-gradient grain-texture">
+      {/* Floating orbs */}
+      <div className="floating-orb w-96 h-96 bg-gradient-to-r from-blue-500/20 to-purple-600/20 top-20 -left-48"></div>
+      <div className="floating-orb w-80 h-80 bg-gradient-to-r from-purple-500/20 to-pink-600/20 top-40 -right-40"></div>
+      <div className="floating-orb w-64 h-64 bg-gradient-to-r from-pink-500/20 to-blue-500/20 bottom-20 left-1/4"></div>
+
       {/* Header */}
-      <div className="bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white py-16">
-        <div className="max-w-4xl mx-auto px-6">
-          <div className="text-center">
-            <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Sparkles className="w-8 h-8 text-white" />
+      <header className="fixed top-0 w-full z-50 bg-black/30 backdrop-blur-xl border-b border-white/20 shadow-2xl">
+        <nav className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+          <div className="flex justify-between items-center h-28">
+            <div className="flex items-center relative z-10">
+              <img 
+                src={vadisLogoLight} 
+                alt="VadisMedia" 
+                className="h-24 w-auto drop-shadow-2xl"
+              />
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              Individual Creator Demo
-            </h1>
-            <p className="text-xl text-white/90 max-w-2xl mx-auto mb-8">
-              Amplify your creative vision with AI-powered collaboration tools, brand partnerships, and funding opportunities tailored for independent creators.
-            </p>
-            <Button asChild variant="outline" className="bg-white/10 border-white/30 text-white hover:bg-white/20">
-              <Link href="/">← Return to Homepage</Link>
-            </Button>
+            
+            <div className="flex items-center space-x-8 relative z-10">
+              <Link href="/" className="flex items-center text-white/90 hover:bg-gradient-to-r hover:from-blue-400 hover:via-purple-500 hover:to-pink-500 hover:bg-clip-text hover:text-transparent font-bold text-lg transition-all duration-300 font-sans">
+                <ArrowLeft className="w-5 h-5 mr-2" />
+                Back to Homepage
+              </Link>
+            </div>
           </div>
-        </div>
-      </div>
+        </nav>
+      </header>
 
-      <div className="max-w-6xl mx-auto px-6 py-16">
-        <div className="grid lg:grid-cols-2 gap-12 items-start">
-          {/* Form Section */}
-          <Card className="shadow-2xl border-0 bg-white/90 backdrop-blur-lg">
-            <CardHeader className="pb-6">
-              <CardTitle className="text-2xl font-bold text-gray-900">Request Your Demo</CardTitle>
-              <p className="text-gray-600">
-                See how independent creators are scaling their content and connecting with production partners.
-              </p>
-            </CardHeader>
-            <CardContent>
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                  <div className="grid grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="firstName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>First Name</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Alex" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="lastName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Last Name</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Rivera" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <FormControl>
-                          <Input type="email" placeholder="alex@creator.com" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="phoneNumber"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Phone Number (Optional)</FormLabel>
-                        <FormControl>
-                          <Input type="tel" placeholder="+1 (555) 123-4567" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="companyName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Creator Name/Channel</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Your Creator Name or Channel" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="jobTitle"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Content Focus (Optional)</FormLabel>
-                        <FormControl>
-                          <Input placeholder="YouTuber, Podcaster, Filmmaker, Influencer" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="useCase"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Creative Goals (Optional)</FormLabel>
-                        <FormControl>
-                          <Textarea 
-                            placeholder="Tell us about your content goals or collaboration interests..."
-                            className="min-h-[100px]" 
-                            {...field} 
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <Button 
-                    type="submit" 
-                    className="w-full bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white font-semibold py-3"
-                    disabled={mutation.isPending}
-                  >
-                    {mutation.isPending ? "Submitting..." : "Request Demo"}
-                  </Button>
-                </form>
-              </Form>
-            </CardContent>
-          </Card>
-
-          {/* Benefits Section */}
-          <div className="space-y-8">
-            <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">Why Creators Choose VadisAI</h2>
-              
+      {/* Main Content */}
+      <div className="pt-32 pb-20">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+          <div className="grid lg:grid-cols-2 gap-12 items-start">
+            {/* Left Side - Content */}
+            <div className="space-y-8">
+              {/* Hero Content */}
               <div className="space-y-6">
-                <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Users className="w-6 h-6 text-purple-600" />
+                <div className="flex items-center space-x-4">
+                  <div className="w-16 h-16 bg-gradient-to-br from-blue-500 via-purple-600 to-pink-600 rounded-2xl flex items-center justify-center shadow-2xl glow-effect">
+                    <Star className="w-8 h-8 text-white drop-shadow-lg" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Smart Collaboration Matching</h3>
-                    <p className="text-gray-600">Connect with brands, production companies, and fellow creators who share your creative vision and audience demographics.</p>
+                    <h1 className="text-4xl md:text-5xl font-black text-white glow-text font-sans leading-tight">
+                      Individual Creator <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">Demo</span>
+                    </h1>
+                    <p className="text-lg text-white/80 mt-2">Unlock collaboration and monetization opportunities</p>
                   </div>
                 </div>
+                <p className="text-xl text-white/90 leading-relaxed">
+                  Connect with production companies and brands seeking creative talent, access exclusive collaboration opportunities, and monetize your skills through strategic partnerships in the entertainment industry.
+                </p>
+              </div>
 
-                <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-pink-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Camera className="w-6 h-6 text-pink-600" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Content Amplification Tools</h3>
-                    <p className="text-gray-600">Scale your content across multiple platforms with AI-powered distribution strategies and audience growth insights.</p>
-                  </div>
-                </div>
+              {/* Benefits */}
+              <div className="space-y-6">
+                <h2 className="text-2xl font-bold text-white glow-text">What you'll see in the demo</h2>
+                <ul className="space-y-4">
+                  <li className="flex items-start space-x-3">
+                    <div className="w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full mt-3 flex-shrink-0"></div>
+                    <div>
+                      <h3 className="text-white font-semibold">Creative Collaboration Network</h3>
+                      <p className="text-white/70">Connect with production companies and fellow creators seeking collaboration. Access exclusive opportunities to contribute your skills to exciting entertainment projects.</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start space-x-3">
+                    <div className="w-2 h-2 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full mt-3 flex-shrink-0"></div>
+                    <div>
+                      <h3 className="text-white font-semibold">Monetization Opportunities</h3>
+                      <p className="text-white/70">Discover new revenue streams through brand partnerships, sponsored content, and direct collaboration with entertainment professionals looking for fresh talent.</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start space-x-3">
+                    <div className="w-2 h-2 bg-gradient-to-r from-pink-400 to-blue-500 rounded-full mt-3 flex-shrink-0"></div>
+                    <div>
+                      <h3 className="text-white font-semibold">Professional Development</h3>
+                      <p className="text-white/70">Grow your career with access to industry mentorship, skill development opportunities, and connections that can elevate your creative work to the next level.</p>
+                    </div>
+                  </li>
+                </ul>
+              </div>
 
-                <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Video className="w-6 h-6 text-blue-600" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Monetization Opportunities</h3>
-                    <p className="text-gray-600">Discover brand partnerships, sponsorship deals, and funding opportunities that align with your content and values.</p>
-                  </div>
+              {/* Trust Indicators */}
+              <div>
+                <p className="text-sm text-white/60 mb-4">The world's leading brands trust VadisAI as their growth partner</p>
+                <div className="flex items-center space-x-8 opacity-60">
+                  <SiNetflix className="w-8 h-8 text-white/40 hover:text-red-400 transition-colors" />
+                  <SiApple className="w-8 h-8 text-white/40 hover:text-white/80 transition-colors" />
+                  <SiAmazon className="w-8 h-8 text-white/40 hover:text-orange-400 transition-colors" />
+                  <SiSony className="w-8 h-8 text-white/40 hover:text-blue-400 transition-colors" />
+                  <SiMercedes className="w-8 h-8 text-white/40 hover:text-white/70 transition-colors" />
                 </div>
               </div>
             </div>
 
-            {/* Trusted Partners */}
-            <div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-6">Popular Creator Platforms</h3>
-              <div className="grid grid-cols-2 gap-4">
-                {industryPartners.map((company, index) => {
-                  const IconComponent = company.icon;
-                  return (
-                    <div 
-                      key={index} 
-                      className="group relative bg-white/80 backdrop-blur-sm rounded-xl p-4 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl border border-gray-100"
-                    >
-                      <div className="text-center">
-                        <div className="flex items-center justify-center mb-2">
-                          <IconComponent className={`w-8 h-8 ${company.color} group-hover:scale-110 transition-transform duration-300`} />
-                        </div>
-                        <h4 className="text-sm font-bold text-gray-900">{company.name}</h4>
-                        <p className="text-xs text-gray-600">{company.category}</p>
+            {/* Right Side - Form */}
+            <div className="lg:pl-8">
+              <Card className="shadow-2xl border-0 bg-white/10 backdrop-blur-xl border-white/20">
+                <CardHeader className="pb-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <CardTitle className="text-2xl font-bold text-white glow-text">Request a demo</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                      <div className="grid grid-cols-2 gap-3">
+                        <FormField
+                          control={form.control}
+                          name="firstName"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormControl>
+                                <Input 
+                                  placeholder="First name*" 
+                                  className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 h-12"
+                                  {...field} 
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="lastName"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormControl>
+                                <Input 
+                                  placeholder="Last name*" 
+                                  className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 h-12"
+                                  {...field} 
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
                       </div>
-                    </div>
-                  );
-                })}
-              </div>
+
+                      <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <Input 
+                                type="email" 
+                                placeholder="Work email*" 
+                                className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 h-12"
+                                {...field} 
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="phoneNumber"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <Input 
+                                type="tel" 
+                                placeholder="Phone number" 
+                                className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 h-12"
+                                {...field} 
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="companyName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <Input 
+                                placeholder="Creative studio/Personal brand*" 
+                                className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 h-12"
+                                {...field} 
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="jobTitle"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <Input 
+                                placeholder="Creative role/specialization" 
+                                className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 h-12"
+                                {...field} 
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="useCase"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <Textarea 
+                                placeholder="Tell us about your creative work and collaboration goals..." 
+                                className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 min-h-[100px] resize-none"
+                                {...field} 
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <Button 
+                        type="submit" 
+                        className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-6 text-lg rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl"
+                        disabled={mutation.isPending}
+                      >
+                        {mutation.isPending ? "Submitting..." : "Get demo"}
+                      </Button>
+
+                      <p className="text-xs text-white/60 text-center leading-relaxed">
+                        By submitting this form, you agree to our{" "}
+                        <a href="#" className="text-blue-300 hover:text-blue-200 underline">
+                          Terms of Service
+                        </a>{" "}
+                        and{" "}
+                        <a href="#" className="text-blue-300 hover:text-blue-200 underline">
+                          Privacy Policy
+                        </a>
+                        .
+                      </p>
+                    </form>
+                  </Form>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </div>

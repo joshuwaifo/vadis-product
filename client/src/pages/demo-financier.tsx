@@ -3,17 +3,16 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { z } from "zod";
-import { CheckCircle, DollarSign, TrendingUp, PieChart, Target } from "lucide-react";
-import { SiGoldmansachs, SiVisa, SiMastercard, SiPaypal, SiStripe } from "react-icons/si";
-import { Building2, Banknote, CreditCard } from "lucide-react";
+import { CheckCircle, ArrowLeft, DollarSign } from "lucide-react";
+import { SiNetflix, SiApple, SiAmazon, SiSony, SiMercedes } from "react-icons/si";
+import vadisLogoLight from "@assets/Vadis FINAL LOGO large size Without Background.png";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
 import { Link } from "wouter";
 
 const formSchema = z.object({
@@ -33,17 +32,6 @@ const formSchema = z.object({
 });
 
 type FormData = z.infer<typeof formSchema>;
-
-const industryPartners = [
-  { name: "Goldman Sachs", icon: SiGoldmansachs, color: "text-blue-800", category: "Investment Bank" },
-  { name: "Visa", icon: SiVisa, color: "text-blue-600", category: "Payment Network" },
-  { name: "Mastercard", icon: SiMastercard, color: "text-red-600", category: "Financial Services" },
-  { name: "PayPal", icon: SiPaypal, color: "text-blue-700", category: "Digital Payments" },
-  { name: "Stripe", icon: SiStripe, color: "text-purple-600", category: "Payment Processing" },
-  { name: "JP Morgan", icon: Building2, color: "text-blue-900", category: "Global Bank" },
-  { name: "BlackRock", icon: TrendingUp, color: "text-green-600", category: "Asset Management" },
-  { name: "Fidelity", icon: PieChart, color: "text-orange-600", category: "Investment Firm" },
-];
 
 export default function DemoFinancier() {
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -65,10 +53,19 @@ export default function DemoFinancier() {
 
   const mutation = useMutation({
     mutationFn: async (data: FormData) => {
-      return apiRequest("/api/demo-request", {
+      const response = await fetch("/api/demo-request", {
         method: "POST",
-        body: data,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
       });
+      
+      if (!response.ok) {
+        throw new Error("Failed to submit demo request");
+      }
+      
+      return response.json();
     },
     onSuccess: (data) => {
       setIsSubmitted(true);
@@ -97,7 +94,7 @@ export default function DemoFinancier() {
 
   if (isSubmitted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 flex items-center justify-center p-4">
+      <div className="min-h-screen modern-gradient grain-texture flex items-center justify-center p-4">
         <Card className="w-full max-w-2xl shadow-2xl border-0 bg-white/90 backdrop-blur-lg">
           <CardContent className="p-12 text-center">
             <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -121,12 +118,12 @@ export default function DemoFinancier() {
             )}
             
             <div className="space-y-4">
-              <Button asChild className="w-full bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700">
+              <Button asChild className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
                 <Link href="/">Return to Homepage</Link>
               </Button>
               <p className="text-sm text-gray-500">
                 Need immediate assistance? Contact us at{" "}
-                <a href="mailto:sales@vadis.ai" className="text-green-600 hover:underline font-medium">
+                <a href="mailto:sales@vadis.ai" className="text-blue-600 hover:underline font-medium">
                   sales@vadis.ai
                 </a>
               </p>
@@ -138,215 +135,255 @@ export default function DemoFinancier() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50">
+    <div className="min-h-screen modern-gradient grain-texture">
+      {/* Floating orbs */}
+      <div className="floating-orb w-96 h-96 bg-gradient-to-r from-blue-500/20 to-purple-600/20 top-20 -left-48"></div>
+      <div className="floating-orb w-80 h-80 bg-gradient-to-r from-purple-500/20 to-pink-600/20 top-40 -right-40"></div>
+      <div className="floating-orb w-64 h-64 bg-gradient-to-r from-pink-500/20 to-blue-500/20 bottom-20 left-1/4"></div>
+
       {/* Header */}
-      <div className="bg-gradient-to-r from-green-600 via-blue-600 to-purple-600 text-white py-16">
-        <div className="max-w-4xl mx-auto px-6">
-          <div className="text-center">
-            <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6">
-              <DollarSign className="w-8 h-8 text-white" />
+      <header className="fixed top-0 w-full z-50 bg-black/30 backdrop-blur-xl border-b border-white/20 shadow-2xl">
+        <nav className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+          <div className="flex justify-between items-center h-28">
+            <div className="flex items-center relative z-10">
+              <img 
+                src={vadisLogoLight} 
+                alt="VadisMedia" 
+                className="h-24 w-auto drop-shadow-2xl"
+              />
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              Financier & Investor Demo
-            </h1>
-            <p className="text-xl text-white/90 max-w-2xl mx-auto mb-8">
-              Invest in movie productions and potentially earn huge profits from the entertainment industry's next blockbusters with our data-driven investment platform.
-            </p>
-            <Button asChild variant="outline" className="bg-white/10 border-white/30 text-white hover:bg-white/20">
-              <Link href="/">← Return to Homepage</Link>
-            </Button>
+            
+            <div className="flex items-center space-x-8 relative z-10">
+              <Link href="/" className="flex items-center text-white/90 hover:bg-gradient-to-r hover:from-blue-400 hover:via-purple-500 hover:to-pink-500 hover:bg-clip-text hover:text-transparent font-bold text-lg transition-all duration-300 font-sans">
+                <ArrowLeft className="w-5 h-5 mr-2" />
+                Back to Homepage
+              </Link>
+            </div>
           </div>
-        </div>
-      </div>
+        </nav>
+      </header>
 
-      <div className="max-w-6xl mx-auto px-6 py-16">
-        <div className="grid lg:grid-cols-2 gap-12 items-start">
-          {/* Form Section */}
-          <Card className="shadow-2xl border-0 bg-white/90 backdrop-blur-lg">
-            <CardHeader className="pb-6">
-              <CardTitle className="text-2xl font-bold text-gray-900">Request Your Demo</CardTitle>
-              <p className="text-gray-600">
-                See how leading investors are identifying and funding the next generation of entertainment hits.
-              </p>
-            </CardHeader>
-            <CardContent>
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                  <div className="grid grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="firstName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>First Name</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Michael" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="lastName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Last Name</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Chen" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Work Email</FormLabel>
-                        <FormControl>
-                          <Input type="email" placeholder="michael@investmentfirm.com" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="phoneNumber"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Phone Number (Optional)</FormLabel>
-                        <FormControl>
-                          <Input type="tel" placeholder="+1 (555) 123-4567" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="companyName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Investment Firm/Fund</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Your Investment Firm" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="jobTitle"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Job Title (Optional)</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Partner, Fund Manager, Investment Director" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="useCase"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Investment Focus (Optional)</FormLabel>
-                        <FormControl>
-                          <Textarea 
-                            placeholder="Tell us about your investment thesis or entertainment sector interests..."
-                            className="min-h-[100px]" 
-                            {...field} 
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <Button 
-                    type="submit" 
-                    className="w-full bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white font-semibold py-3"
-                    disabled={mutation.isPending}
-                  >
-                    {mutation.isPending ? "Submitting..." : "Request Demo"}
-                  </Button>
-                </form>
-              </Form>
-            </CardContent>
-          </Card>
-
-          {/* Benefits Section */}
-          <div className="space-y-8">
-            <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">Why Financiers Choose VadisAI</h2>
-              
+      {/* Main Content */}
+      <div className="pt-32 pb-20">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+          <div className="grid lg:grid-cols-2 gap-12 items-start">
+            {/* Left Side - Content */}
+            <div className="space-y-8">
+              {/* Hero Content */}
               <div className="space-y-6">
-                <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <TrendingUp className="w-6 h-6 text-green-600" />
+                <div className="flex items-center space-x-4">
+                  <div className="w-16 h-16 bg-gradient-to-br from-blue-500 via-purple-600 to-pink-600 rounded-2xl flex items-center justify-center shadow-2xl glow-effect">
+                    <DollarSign className="w-8 h-8 text-white drop-shadow-lg" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">High-Profit Movie Investment Opportunities</h3>
-                    <p className="text-gray-600">Access exclusive movie production investments with potential for huge returns from box office successes and streaming distribution deals.</p>
+                    <h1 className="text-4xl md:text-5xl font-black text-white glow-text font-sans leading-tight">
+                      Funding & Investment <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">Demo</span>
+                    </h1>
+                    <p className="text-lg text-white/80 mt-2">Discover high-profit entertainment investment opportunities</p>
                   </div>
                 </div>
+                <p className="text-xl text-white/90 leading-relaxed">
+                  Access exclusive investment opportunities in high-profit movie productions, leverage AI-driven risk analysis, and connect directly with promising production companies seeking funding.
+                </p>
+              </div>
 
-                <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <PieChart className="w-6 h-6 text-blue-600" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Data-Driven Investment Platform</h3>
-                    <p className="text-gray-600">Make informed investment decisions with comprehensive analytics on market trends, talent performance, and projected profitability.</p>
-                  </div>
-                </div>
+              {/* Benefits */}
+              <div className="space-y-6">
+                <h2 className="text-2xl font-bold text-white glow-text">What you'll see in the demo</h2>
+                <ul className="space-y-4">
+                  <li className="flex items-start space-x-3">
+                    <div className="w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full mt-3 flex-shrink-0"></div>
+                    <div>
+                      <h3 className="text-white font-semibold">Exclusive Investment Opportunities</h3>
+                      <p className="text-white/70">Access a curated pipeline of high-potential entertainment projects. Connect with vetted production companies actively seeking funding for their next productions.</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start space-x-3">
+                    <div className="w-2 h-2 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full mt-3 flex-shrink-0"></div>
+                    <div>
+                      <h3 className="text-white font-semibold">AI-Driven Risk Analysis</h3>
+                      <p className="text-white/70">Leverage advanced analytics to evaluate project potential and market performance. Make informed investment decisions with comprehensive data insights.</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start space-x-3">
+                    <div className="w-2 h-2 bg-gradient-to-r from-pink-400 to-blue-500 rounded-full mt-3 flex-shrink-0"></div>
+                    <div>
+                      <h3 className="text-white font-semibold">Direct Producer Connections</h3>
+                      <p className="text-white/70">Connect directly with production companies and filmmakers. Streamline the investment process with our integrated platform for due diligence and funding.</p>
+                    </div>
+                  </li>
+                </ul>
+              </div>
 
-                <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Target className="w-6 h-6 text-purple-600" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Vetted Production Partnerships</h3>
-                    <p className="text-gray-600">Connect with established production companies offering proven track records and promising projects ready for funding.</p>
-                  </div>
+              {/* Trust Indicators */}
+              <div>
+                <p className="text-sm text-white/60 mb-4">The world's leading brands trust VadisAI as their growth partner</p>
+                <div className="flex items-center space-x-8 opacity-60">
+                  <SiNetflix className="w-8 h-8 text-white/40 hover:text-red-400 transition-colors" />
+                  <SiApple className="w-8 h-8 text-white/40 hover:text-white/80 transition-colors" />
+                  <SiAmazon className="w-8 h-8 text-white/40 hover:text-orange-400 transition-colors" />
+                  <SiSony className="w-8 h-8 text-white/40 hover:text-blue-400 transition-colors" />
+                  <SiMercedes className="w-8 h-8 text-white/40 hover:text-white/70 transition-colors" />
                 </div>
               </div>
             </div>
 
-            {/* Trusted Partners */}
-            <div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-6">Trusted by Financial Leaders</h3>
-              <div className="grid grid-cols-2 gap-4">
-                {industryPartners.map((company, index) => {
-                  const IconComponent = company.icon;
-                  return (
-                    <div 
-                      key={index} 
-                      className="group relative bg-white/80 backdrop-blur-sm rounded-xl p-4 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl border border-gray-100"
-                    >
-                      <div className="text-center">
-                        <div className="flex items-center justify-center mb-2">
-                          <IconComponent className={`w-8 h-8 ${company.color} group-hover:scale-110 transition-transform duration-300`} />
-                        </div>
-                        <h4 className="text-sm font-bold text-gray-900">{company.name}</h4>
-                        <p className="text-xs text-gray-600">{company.category}</p>
+            {/* Right Side - Form */}
+            <div className="lg:pl-8">
+              <Card className="shadow-2xl border-0 bg-white/10 backdrop-blur-xl border-white/20">
+                <CardHeader className="pb-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <CardTitle className="text-2xl font-bold text-white glow-text">Request a demo</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                      <div className="grid grid-cols-2 gap-3">
+                        <FormField
+                          control={form.control}
+                          name="firstName"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormControl>
+                                <Input 
+                                  placeholder="First name*" 
+                                  className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 h-12"
+                                  {...field} 
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="lastName"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormControl>
+                                <Input 
+                                  placeholder="Last name*" 
+                                  className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 h-12"
+                                  {...field} 
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
                       </div>
-                    </div>
-                  );
-                })}
-              </div>
+
+                      <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <Input 
+                                type="email" 
+                                placeholder="Work email*" 
+                                className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 h-12"
+                                {...field} 
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="phoneNumber"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <Input 
+                                type="tel" 
+                                placeholder="Phone number" 
+                                className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 h-12"
+                                {...field} 
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="companyName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <Input 
+                                placeholder="Investment firm/Fund name*" 
+                                className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 h-12"
+                                {...field} 
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="jobTitle"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <Input 
+                                placeholder="Job title" 
+                                className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 h-12"
+                                {...field} 
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="useCase"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <Textarea 
+                                placeholder="Tell us about your investment criteria or interests..." 
+                                className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 min-h-[100px] resize-none"
+                                {...field} 
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <Button 
+                        type="submit" 
+                        className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-6 text-lg rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl"
+                        disabled={mutation.isPending}
+                      >
+                        {mutation.isPending ? "Submitting..." : "Get demo"}
+                      </Button>
+
+                      <p className="text-xs text-white/60 text-center leading-relaxed">
+                        By submitting this form, you agree to our{" "}
+                        <a href="#" className="text-blue-300 hover:text-blue-200 underline">
+                          Terms of Service
+                        </a>{" "}
+                        and{" "}
+                        <a href="#" className="text-blue-300 hover:text-blue-200 underline">
+                          Privacy Policy
+                        </a>
+                        .
+                      </p>
+                    </form>
+                  </Form>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </div>

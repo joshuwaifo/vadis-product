@@ -3,14 +3,13 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { z } from "zod";
-import { CheckCircle, Film, Users, TrendingUp, Award, ArrowLeft } from "lucide-react";
-import { SiNetflix, SiSony } from "react-icons/si";
-import { Building2, Camera, Clapperboard, Video } from "lucide-react";
+import { CheckCircle, ArrowLeft, PlayCircle } from "lucide-react";
+import { SiNetflix, SiApple, SiAmazon, SiSony, SiMercedes } from "react-icons/si";
 import vadisLogoLight from "@assets/Vadis FINAL LOGO large size Without Background.png";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
@@ -33,17 +32,6 @@ const formSchema = z.object({
 });
 
 type FormData = z.infer<typeof formSchema>;
-
-const industryPartners = [
-  { name: "Netflix", icon: SiNetflix, color: "text-red-600", category: "Streaming Platform" },
-  { name: "Sony Pictures", icon: SiSony, color: "text-black", category: "Global Studio" },
-  { name: "Warner Bros", icon: Building2, color: "text-blue-800", category: "Major Studio" },
-  { name: "Universal", icon: Camera, color: "text-purple-600", category: "Production House" },
-  { name: "Paramount", icon: Clapperboard, color: "text-blue-700", category: "Legendary Studio" },
-  { name: "Lionsgate", icon: Video, color: "text-orange-600", category: "Independent Studio" },
-  { name: "Disney", icon: Building2, color: "text-blue-600", category: "Entertainment Giant" },
-  { name: "A24", icon: Film, color: "text-green-600", category: "Boutique Studio" },
-];
 
 export default function DemoProduction() {
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -148,7 +136,12 @@ export default function DemoProduction() {
 
   return (
     <div className="min-h-screen modern-gradient grain-texture">
-      {/* Header Navigation */}
+      {/* Floating orbs */}
+      <div className="floating-orb w-96 h-96 bg-gradient-to-r from-blue-500/20 to-purple-600/20 top-20 -left-48"></div>
+      <div className="floating-orb w-80 h-80 bg-gradient-to-r from-purple-500/20 to-pink-600/20 top-40 -right-40"></div>
+      <div className="floating-orb w-64 h-64 bg-gradient-to-r from-pink-500/20 to-blue-500/20 bottom-20 left-1/4"></div>
+
+      {/* Header */}
       <header className="fixed top-0 w-full z-50 bg-black/30 backdrop-blur-xl border-b border-white/20 shadow-2xl">
         <nav className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
           <div className="flex justify-between items-center h-28">
@@ -160,7 +153,7 @@ export default function DemoProduction() {
               />
             </div>
             
-            <div className="flex items-center relative z-10">
+            <div className="flex items-center space-x-8 relative z-10">
               <Link href="/" className="flex items-center text-white/90 hover:bg-gradient-to-r hover:from-blue-400 hover:via-purple-500 hover:to-pink-500 hover:bg-clip-text hover:text-transparent font-bold text-lg transition-all duration-300 font-sans">
                 <ArrowLeft className="w-5 h-5 mr-2" />
                 Back to Homepage
@@ -170,48 +163,94 @@ export default function DemoProduction() {
         </nav>
       </header>
 
-      <main className="pt-28">
-        {/* Floating Orbs */}
-        <div className="floating-orb w-96 h-96 bg-gradient-to-r from-blue-500/20 to-purple-600/20 top-20 -left-48"></div>
-        <div className="floating-orb w-80 h-80 bg-gradient-to-r from-purple-500/20 to-pink-600/20 top-40 -right-40"></div>
-        <div className="floating-orb w-64 h-64 bg-gradient-to-r from-pink-500/20 to-blue-500/20 bottom-20 left-1/4"></div>
-
-        {/* Hero Section */}
-        <section className="relative overflow-hidden py-32">
-          <div className="relative max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-            <div className="text-center relative z-10 mb-20">
-              <div className="w-20 h-20 bg-gradient-to-br from-blue-500 via-purple-600 to-pink-600 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl glow-effect">
-                <Film className="w-10 h-10 text-white drop-shadow-lg" />
+      {/* Main Content */}
+      <div className="pt-32 pb-20">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+          <div className="grid lg:grid-cols-2 gap-12 items-start">
+            {/* Left Side - Content */}
+            <div className="space-y-8">
+              {/* Hero Content */}
+              <div className="space-y-6">
+                <div className="flex items-center space-x-4">
+                  <div className="w-16 h-16 bg-gradient-to-br from-blue-500 via-purple-600 to-pink-600 rounded-2xl flex items-center justify-center shadow-2xl glow-effect">
+                    <PlayCircle className="w-8 h-8 text-white drop-shadow-lg" />
+                  </div>
+                  <div>
+                    <h1 className="text-4xl md:text-5xl font-black text-white glow-text font-sans leading-tight">
+                      Production Company <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">Demo</span>
+                    </h1>
+                    <p className="text-lg text-white/80 mt-2">Scale your productions with AI-powered insights</p>
+                  </div>
+                </div>
+                <p className="text-xl text-white/90 leading-relaxed">
+                  Transform your productions with AI talent matching, location incentives, brand integration visualization, VFX previews, and direct connections to brands and financiers.
+                </p>
               </div>
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-black text-white mb-8 animate-in fade-in slide-in-from-bottom-4 duration-1000 font-sans leading-tight glow-text">
-                Production Company <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">Demo</span>
-              </h1>
-              <p className="text-xl md:text-2xl text-white/90 max-w-4xl mx-auto leading-relaxed font-medium animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-200">
-                Transform your productions with AI talent matching, location incentives, brand integration visualization, VFX previews, and direct connections to brands and financiers.
-              </p>
+
+              {/* Benefits */}
+              <div className="space-y-6">
+                <h2 className="text-2xl font-bold text-white glow-text">What you'll see in the demo</h2>
+                <ul className="space-y-4">
+                  <li className="flex items-start space-x-3">
+                    <div className="w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full mt-3 flex-shrink-0"></div>
+                    <div>
+                      <h3 className="text-white font-semibold">AI Talent Matching & Location Incentives</h3>
+                      <p className="text-white/70">Find the perfect cast, crew, and filming locations with AI-powered matching. Access comprehensive location incentive data to maximize your production budget.</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start space-x-3">
+                    <div className="w-2 h-2 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full mt-3 flex-shrink-0"></div>
+                    <div>
+                      <h3 className="text-white font-semibold">Brand Integration & VFX Visualization</h3>
+                      <p className="text-white/70">Get inspired with AI-powered systems that visualize brand integrations and VFX concepts, helping you pitch and plan productions more effectively.</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start space-x-3">
+                    <div className="w-2 h-2 bg-gradient-to-r from-pink-400 to-blue-500 rounded-full mt-3 flex-shrink-0"></div>
+                    <div>
+                      <h3 className="text-white font-semibold">Direct Brand & Financier Connections</h3>
+                      <p className="text-white/70">Connect directly with brands seeking partnership opportunities and financiers ready to invest in promising productions.</p>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Trust Indicators */}
+              <div>
+                <p className="text-sm text-white/60 mb-4">The world's leading brands trust VadisAI as their growth partner</p>
+                <div className="flex items-center space-x-8 opacity-60">
+                  <SiNetflix className="w-8 h-8 text-white/40 hover:text-red-400 transition-colors" />
+                  <SiApple className="w-8 h-8 text-white/40 hover:text-white/80 transition-colors" />
+                  <SiAmazon className="w-8 h-8 text-white/40 hover:text-orange-400 transition-colors" />
+                  <SiSony className="w-8 h-8 text-white/40 hover:text-blue-400 transition-colors" />
+                  <SiMercedes className="w-8 h-8 text-white/40 hover:text-white/70 transition-colors" />
+                </div>
+              </div>
             </div>
 
-            <div className="grid lg:grid-cols-2 gap-12 items-start">
-              {/* Form Section */}
-              <Card className="shadow-2xl border-0 bg-white/90 backdrop-blur-lg">
+            {/* Right Side - Form */}
+            <div className="lg:pl-8">
+              <Card className="shadow-2xl border-0 bg-white/10 backdrop-blur-xl border-white/20">
                 <CardHeader className="pb-6">
-                  <CardTitle className="text-2xl font-bold text-gray-900">Request Your Demo</CardTitle>
-                  <p className="text-gray-600">
-                    See how leading production companies are scaling their operations with AI-powered insights.
-                  </p>
+                  <div className="flex items-center justify-between mb-2">
+                    <CardTitle className="text-2xl font-bold text-white glow-text">Request a demo</CardTitle>
+                  </div>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="space-y-4">
                   <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                      <div className="grid grid-cols-2 gap-4">
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                      <div className="grid grid-cols-2 gap-3">
                         <FormField
                           control={form.control}
                           name="firstName"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>First Name</FormLabel>
                               <FormControl>
-                                <Input placeholder="John" {...field} />
+                                <Input 
+                                  placeholder="First name*" 
+                                  className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 h-12"
+                                  {...field} 
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -222,9 +261,12 @@ export default function DemoProduction() {
                           name="lastName"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Last Name</FormLabel>
                               <FormControl>
-                                <Input placeholder="Doe" {...field} />
+                                <Input 
+                                  placeholder="Last name*" 
+                                  className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 h-12"
+                                  {...field} 
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -237,9 +279,13 @@ export default function DemoProduction() {
                         name="email"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Work Email</FormLabel>
                             <FormControl>
-                              <Input type="email" placeholder="john@productioncompany.com" {...field} />
+                              <Input 
+                                type="email" 
+                                placeholder="Work email*" 
+                                className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 h-12"
+                                {...field} 
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -251,9 +297,13 @@ export default function DemoProduction() {
                         name="phoneNumber"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Phone Number (Optional)</FormLabel>
                             <FormControl>
-                              <Input type="tel" placeholder="+1 (555) 123-4567" {...field} />
+                              <Input 
+                                type="tel" 
+                                placeholder="Phone number" 
+                                className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 h-12"
+                                {...field} 
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -265,9 +315,12 @@ export default function DemoProduction() {
                         name="companyName"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Production Company</FormLabel>
                             <FormControl>
-                              <Input placeholder="Your Production Company" {...field} />
+                              <Input 
+                                placeholder="Production company*" 
+                                className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 h-12"
+                                {...field} 
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -279,9 +332,12 @@ export default function DemoProduction() {
                         name="jobTitle"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Job Title (Optional)</FormLabel>
                             <FormControl>
-                              <Input placeholder="Producer, Director, Executive" {...field} />
+                              <Input 
+                                placeholder="Job title" 
+                                className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 h-12"
+                                {...field} 
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -293,11 +349,10 @@ export default function DemoProduction() {
                         name="useCase"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Project Details (Optional)</FormLabel>
                             <FormControl>
                               <Textarea 
-                                placeholder="Tell us about your current project or production needs..."
-                                className="min-h-[100px]" 
+                                placeholder="Tell us about your project or production needs..." 
+                                className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 min-h-[100px] resize-none"
                                 {...field} 
                               />
                             </FormControl>
@@ -308,82 +363,31 @@ export default function DemoProduction() {
 
                       <Button 
                         type="submit" 
-                        className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-3"
+                        className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-6 text-lg rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl"
                         disabled={mutation.isPending}
                       >
-                        {mutation.isPending ? "Submitting..." : "Request Demo"}
+                        {mutation.isPending ? "Submitting..." : "Get demo"}
                       </Button>
+
+                      <p className="text-xs text-white/60 text-center leading-relaxed">
+                        By submitting this form, you agree to our{" "}
+                        <a href="#" className="text-blue-300 hover:text-blue-200 underline">
+                          Terms of Service
+                        </a>{" "}
+                        and{" "}
+                        <a href="#" className="text-blue-300 hover:text-blue-200 underline">
+                          Privacy Policy
+                        </a>
+                        .
+                      </p>
                     </form>
                   </Form>
                 </CardContent>
               </Card>
-
-              {/* Benefits Section */}
-              <div className="space-y-8 text-white">
-                <div>
-                  <h2 className="text-3xl font-bold mb-6 glow-text">Why Production Companies Choose VadisAI</h2>
-                  
-                  <div className="space-y-6">
-                    <div className="flex items-start space-x-4">
-                      <div className="w-12 h-12 bg-blue-100/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Users className="w-6 h-6 text-blue-400" />
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-semibold mb-2">AI Talent Matching & Location Incentives</h3>
-                        <p className="text-white/80">Find the perfect cast, crew, and filming locations with AI-powered matching. Access comprehensive location incentive data to maximize your production budget.</p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-start space-x-4">
-                      <div className="w-12 h-12 bg-purple-100/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <TrendingUp className="w-6 h-6 text-purple-400" />
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-semibold mb-2">Brand Integration & VFX Visualization</h3>
-                        <p className="text-white/80">Get inspired with AI-powered systems that visualize brand integrations and VFX concepts, helping you pitch and plan productions more effectively.</p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-start space-x-4">
-                      <div className="w-12 h-12 bg-green-100/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Award className="w-6 h-6 text-green-400" />
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-semibold mb-2">Direct Brand & Financier Connections</h3>
-                        <p className="text-white/80">Connect directly with brands seeking partnership opportunities and financiers ready to invest in promising productions.</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Trusted Partners */}
-                <div>
-                  <h3 className="text-xl font-semibold mb-6">Trusted by Industry Leaders</h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    {industryPartners.map((company, index) => {
-                      const IconComponent = company.icon;
-                      return (
-                        <div 
-                          key={index} 
-                          className="group relative bg-white/10 backdrop-blur-sm rounded-xl p-4 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl border border-white/20"
-                        >
-                          <div className="text-center">
-                            <div className="flex items-center justify-center mb-2">
-                              <IconComponent className={`w-8 h-8 ${company.color} group-hover:scale-110 transition-transform duration-300`} />
-                            </div>
-                            <h4 className="text-sm font-bold text-white">{company.name}</h4>
-                            <p className="text-xs text-white/70">{company.category}</p>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
-        </section>
-      </main>
+        </div>
+      </div>
     </div>
   );
 }
