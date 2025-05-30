@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { z } from "zod";
 import { CheckCircle, Sparkles, Users, Camera, Video } from "lucide-react";
-import { SiYoutube, SiInstagram, SiTiktok, SiTwitter, SiTwitch } from "react-icons/si";
+import { SiYoutube, SiInstagram, SiTiktok, SiTwitch } from "react-icons/si";
 import { Mic, Monitor, Headphones } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -32,7 +32,7 @@ const industryPartners = [
   { name: "YouTube", icon: SiYoutube, color: "text-red-600", category: "Video Platform" },
   { name: "Instagram", icon: SiInstagram, color: "text-pink-600", category: "Social Media" },
   { name: "TikTok", icon: SiTiktok, color: "text-black", category: "Short Form Video" },
-  { name: "Twitter", icon: SiTwitter, color: "text-blue-600", category: "Social Platform" },
+  { name: "Social Media", icon: Users, color: "text-blue-600", category: "Social Platform" },
   { name: "Twitch", icon: SiTwitch, color: "text-purple-600", category: "Live Streaming" },
   { name: "Podcast", icon: Mic, color: "text-green-600", category: "Audio Content" },
   { name: "Streaming", icon: Monitor, color: "text-blue-700", category: "Live Content" },

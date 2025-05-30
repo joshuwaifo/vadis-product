@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { z } from "zod";
 import { CheckCircle, Palette, Target, BarChart3, Zap } from "lucide-react";
-import { SiCocacola, SiNike, SiApple, SiGoogle, SiAmazon, SiMcdonalds, SiAdidas, SiPepsi } from "react-icons/si";
+import { SiCocacola, SiNike, SiApple, SiGoogle, SiAmazon, SiMcdonalds, SiAdidas } from "react-icons/si";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -35,7 +35,7 @@ const industryPartners = [
   { name: "Amazon", icon: SiAmazon, color: "text-orange-600", category: "E-commerce Leader" },
   { name: "McDonald's", icon: SiMcdonalds, color: "text-yellow-500", category: "Food & Beverage" },
   { name: "Adidas", icon: SiAdidas, color: "text-black", category: "Athletic Brand" },
-  { name: "Pepsi", icon: SiPepsi, color: "text-blue-600", category: "Beverage Brand" },
+  { name: "Energy Brands", icon: Zap, color: "text-blue-600", category: "Beverage Brand" },
 ];
 
 export default function DemoBrand() {

@@ -59,10 +59,19 @@ export default function DemoProduction() {
 
   const mutation = useMutation({
     mutationFn: async (data: FormData) => {
-      return apiRequest("/api/demo-request", {
+      const response = await fetch("/api/demo-request", {
         method: "POST",
-        body: data,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
       });
+      
+      if (!response.ok) {
+        throw new Error("Failed to submit demo request");
+      }
+      
+      return response.json();
     },
     onSuccess: (data) => {
       setIsSubmitted(true);
