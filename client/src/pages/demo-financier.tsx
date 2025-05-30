@@ -298,8 +298,8 @@ export default function DemoFinancier() {
                     <TrendingUp className="w-6 h-6 text-green-600" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Predictive ROI Analytics</h3>
-                    <p className="text-gray-600">Leverage AI-powered market analysis to predict project success rates and optimize your entertainment investment portfolio.</p>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">High-Profit Movie Investment Opportunities</h3>
+                    <p className="text-gray-600">Access exclusive movie production investments with potential for huge returns from box office successes and streaming distribution deals.</p>
                   </div>
                 </div>
 
@@ -308,8 +308,8 @@ export default function DemoFinancier() {
                     <PieChart className="w-6 h-6 text-blue-600" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Risk Assessment Tools</h3>
-                    <p className="text-gray-600">Advanced risk modeling that evaluates market conditions, talent track records, and historical performance data.</p>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Data-Driven Investment Platform</h3>
+                    <p className="text-gray-600">Make informed investment decisions with comprehensive analytics on market trends, talent performance, and projected profitability.</p>
                   </div>
                 </div>
 
@@ -318,8 +318,8 @@ export default function DemoFinancier() {
                     <Target className="w-6 h-6 text-purple-600" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Curated Deal Flow</h3>
-                    <p className="text-gray-600">Access pre-vetted investment opportunities from established production companies and emerging creative talent.</p>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Vetted Production Partnerships</h3>
+                    <p className="text-gray-600">Connect with established production companies offering proven track records and promising projects ready for funding.</p>
                   </div>
                 </div>
               </div>

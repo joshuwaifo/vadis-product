@@ -17,12 +17,12 @@ import { apiRequest } from "@/lib/queryClient";
 import { Link } from "wouter";
 
 const formSchema = z.object({
-  firstName: z.string().min(2, "First name must be at least 2 characters"),
-  lastName: z.string().min(2, "Last name must be at least 2 characters"),
-  email: z.string().email("Please enter a valid email address"),
-  phoneNumber: z.string().optional(),
-  companyName: z.string().min(2, "Creator name or channel must be at least 2 characters"),
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  email: z.string().email("Please enter a valid email"),
+  companyName: z.string().min(1, "Creator name or channel is required"),
   jobTitle: z.string().optional(),
+  phoneNumber: z.string().optional(),
   useCase: z.string().optional(),
 });
 
