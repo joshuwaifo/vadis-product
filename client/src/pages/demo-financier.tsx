@@ -11,7 +11,8 @@ import { ArrowLeft, CheckCircle, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
 import { z } from "zod";
-import { SiNetflix, SiApple, SiAmazon, SiSony, SiMercedes } from 'react-icons/si';
+import { SiGoldmansachs, SiJpmorgan, SiBlackrock, SiVisa, SiPaypal } from 'react-icons/si';
+import { Building2, TrendingUp, DollarSign } from 'lucide-react';
 import vadisLogoLight from "@assets/Vadis FINAL LOGO large size Without Background.png";
 
 // Simple form schema with only essential fields

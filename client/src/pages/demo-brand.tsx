@@ -11,7 +11,7 @@ import { ArrowLeft, CheckCircle, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
 import { z } from "zod";
-import { SiNetflix, SiApple, SiAmazon, SiSony, SiMercedes } from 'react-icons/si';
+import { SiCocacola, SiMercedes, SiNike, SiMcdonalds, SiAdidas } from 'react-icons/si';
 import vadisLogoLight from "@assets/Vadis FINAL LOGO large size Without Background.png";
 
 // Simple form schema with only essential fields
@@ -203,13 +203,13 @@ export default function DemoBrand() {
 
                 {/* Trust Indicators */}
                 <div>
-                  <p className="text-sm text-white/60 mb-4">The world's leading brands trust VadisAI as their growth partner</p>
+                  <p className="text-sm text-white/60 mb-4">Global brands trust VadisAI for entertainment partnerships</p>
                   <div className="flex items-center space-x-8 opacity-60">
-                    <SiNetflix className="w-8 h-8 text-white/40 hover:text-red-400 transition-colors" />
-                    <SiApple className="w-8 h-8 text-white/40 hover:text-white/80 transition-colors" />
-                    <SiAmazon className="w-8 h-8 text-white/40 hover:text-orange-400 transition-colors" />
-                    <SiSony className="w-8 h-8 text-white/40 hover:text-blue-400 transition-colors" />
-                    <SiMercedes className="w-8 h-8 text-white/40 hover:text-white/70 transition-colors" />
+                    <SiCocacola className="w-8 h-8 text-white/40 hover:text-red-400 transition-colors" />
+                    <SiMercedes className="w-8 h-8 text-white/40 hover:text-white/80 transition-colors" />
+                    <SiNike className="w-8 h-8 text-white/40 hover:text-orange-400 transition-colors" />
+                    <SiMcdonalds className="w-8 h-8 text-white/40 hover:text-yellow-400 transition-colors" />
+                    <SiAdidas className="w-8 h-8 text-white/40 hover:text-white/70 transition-colors" />
                   </div>
                 </div>
               </div>
