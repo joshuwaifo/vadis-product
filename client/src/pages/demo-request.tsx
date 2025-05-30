@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, CheckCircle, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
@@ -20,6 +21,7 @@ const formSchema = z.object({
   lastName: z.string().min(1, "Last name is required"),
   email: z.string().email("Please enter a valid email"),
   companyName: z.string().min(1, "Company name is required"),
+  companyType: z.string().min(1, "Company type is required"),
   jobTitle: z.string().optional(),
   phoneNumber: z.string().optional(),
   useCase: z.string().optional(),
@@ -39,6 +41,7 @@ export default function DemoRequest() {
       lastName: "",
       email: "",
       companyName: "",
+      companyType: "",
       jobTitle: "",
       phoneNumber: "",
       useCase: "",
@@ -312,6 +315,41 @@ export default function DemoRequest() {
                         )}
                       />
                     </div>
+
+                    <FormField
+                      control={form.control}
+                      name="companyType"
+                      render={({ field }) => (
+                        <FormItem>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 h-12">
+                                <SelectValue placeholder="Company type*" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="production_company">Production Company</SelectItem>
+                              <SelectItem value="vfx_studio">VFX Studio</SelectItem>
+                              <SelectItem value="animation_studio">Animation Studio</SelectItem>
+                              <SelectItem value="post_production">Post-Production House</SelectItem>
+                              <SelectItem value="brand_agency">Brand/Agency</SelectItem>
+                              <SelectItem value="advertising_agency">Advertising Agency</SelectItem>
+                              <SelectItem value="marketing_agency">Marketing Agency</SelectItem>
+                              <SelectItem value="influencer">Influencer</SelectItem>
+                              <SelectItem value="content_creator">Content Creator</SelectItem>
+                              <SelectItem value="streaming_platform">Streaming Platform</SelectItem>
+                              <SelectItem value="broadcaster">TV/Radio Broadcaster</SelectItem>
+                              <SelectItem value="financier">Financier/Investor</SelectItem>
+                              <SelectItem value="distribution">Distribution Company</SelectItem>
+                              <SelectItem value="talent_agency">Talent Agency</SelectItem>
+                              <SelectItem value="music_label">Music Label</SelectItem>
+                              <SelectItem value="other">Other</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
                     <FormField
                       control={form.control}

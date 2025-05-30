@@ -21,6 +21,7 @@ const formSchema = z.object({
   lastName: z.string().min(1, "Last name is required"),
   email: z.string().email("Please enter a valid email"),
   companyName: z.string().min(1, "Company name is required"),
+  companyType: z.string().default("production_company"),
   jobTitle: z.string().optional(),
   phoneNumber: z.string().optional(),
   useCase: z.string().optional(),

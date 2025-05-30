@@ -15,6 +15,7 @@ export const demoRequests = pgTable("demo_requests", {
   email: text("email").notNull(),
   phoneNumber: text("phone_number"),
   companyName: text("company_name").notNull(),
+  companyType: text("company_type").notNull(),
   companySize: text("company_size"),
   jobTitle: text("job_title"),
   department: text("department"),

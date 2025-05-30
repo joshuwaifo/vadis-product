@@ -44,6 +44,8 @@ export class HubSpotService {
         phone: demoRequest.phoneNumber || "",
         company: demoRequest.companyName,
         jobtitle: demoRequest.jobTitle || "",
+        // Company type for categorization
+        industry: demoRequest.companyType || "",
         // Only include properties that exist in the form
         ...(demoRequest.useCase && { hs_content_membership_notes: demoRequest.useCase }),
         // Add lifecycle stage for demo requests
