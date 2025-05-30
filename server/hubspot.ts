@@ -102,40 +102,66 @@ export class HubSpotService {
   }
 
   async sendConfirmationEmail(contactId: string, demoRequest: any): Promise<void> {
-    // Create an email engagement for the contact
+    // Try using HubSpot's transactional email API
     const emailData = {
-      engagement: {
-        active: true,
-        type: "EMAIL",
-        timestamp: Date.now()
-      },
-      associations: {
-        contactIds: [contactId]
-      },
-      metadata: {
+      emailId: 123456789, // This would need to be a real template ID from your HubSpot account
+      message: {
+        to: demoRequest.email,
+        from: "noreply@vadismedia.com", // This needs to be verified in HubSpot
         subject: "Demo Request Confirmation - VadisAI",
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2 style="color: #333;">Thank you for your demo request!</h2>
-            <p>Hi ${demoRequest.firstName},</p>
-            <p>We've received your demo request for VadisAI. Our team will be in touch within 24 hours to schedule your personalized demo.</p>
-            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
-              <h3 style="margin-top: 0;">Your Request Details:</h3>
-              <p><strong>Name:</strong> ${demoRequest.firstName} ${demoRequest.lastName}</p>
-              <p><strong>Company:</strong> ${demoRequest.companyName}</p>
-              <p><strong>Email:</strong> ${demoRequest.email}</p>
-              ${demoRequest.jobTitle ? `<p><strong>Role:</strong> ${demoRequest.jobTitle}</p>` : ''}
-              ${demoRequest.useCase ? `<p><strong>Use Case:</strong> ${demoRequest.useCase}</p>` : ''}
-            </div>
-            <p>In the meantime, feel free to explore our resources or contact us directly if you have any questions.</p>
-            <p>Best regards,<br>The VadisAI Team</p>
-          </div>
-        `,
-        text: `Hi ${demoRequest.firstName}, thank you for your demo request for VadisAI. Our team will be in touch within 24 hours to schedule your personalized demo.`
+      },
+      contactProperties: {
+        firstname: demoRequest.firstName,
+        lastname: demoRequest.lastName,
+        company: demoRequest.companyName,
+        jobtitle: demoRequest.jobTitle || "",
+        demo_use_case: demoRequest.useCase || ""
       }
     };
 
-    await this.makeRequest("/engagements/v1/engagements", "POST", emailData);
+    try {
+      // Try transactional email first
+      await this.makeRequest("/marketing/v3/transactional/single-email/send", "POST", emailData);
+      console.log(`Transactional email sent to ${demoRequest.email}`);
+    } catch (transactionalError) {
+      console.log("Transactional email failed, trying alternative method:", transactionalError.message);
+      
+      // Fall back to creating an email engagement (for logging only)
+      const engagementData = {
+        engagement: {
+          active: true,
+          type: "EMAIL",
+          timestamp: Date.now()
+        },
+        associations: {
+          contactIds: [contactId]
+        },
+        metadata: {
+          subject: "Demo Request Confirmation - VadisAI",
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+              <h2 style="color: #333;">Thank you for your demo request!</h2>
+              <p>Hi ${demoRequest.firstName},</p>
+              <p>We've received your demo request for VadisAI. Our team will be in touch within 24 hours to schedule your personalized demo.</p>
+              <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                <h3 style="margin-top: 0;">Your Request Details:</h3>
+                <p><strong>Name:</strong> ${demoRequest.firstName} ${demoRequest.lastName}</p>
+                <p><strong>Company:</strong> ${demoRequest.companyName}</p>
+                <p><strong>Email:</strong> ${demoRequest.email}</p>
+                ${demoRequest.jobTitle ? `<p><strong>Role:</strong> ${demoRequest.jobTitle}</p>` : ''}
+                ${demoRequest.useCase ? `<p><strong>Use Case:</strong> ${demoRequest.useCase}</p>` : ''}
+              </div>
+              <p>In the meantime, feel free to explore our resources or contact us directly if you have any questions.</p>
+              <p>Best regards,<br>The VadisAI Team</p>
+            </div>
+          `,
+          text: `Hi ${demoRequest.firstName}, thank you for your demo request for VadisAI. Our team will be in touch within 24 hours to schedule your personalized demo.`
+        }
+      };
+      
+      await this.makeRequest("/engagements/v1/engagements", "POST", engagementData);
+      console.log("Email engagement logged (but actual email not sent - requires HubSpot email setup)");
+    }
   }
 
   async createMeetingLink(contactId: string, demoRequest: any): Promise<string> {
