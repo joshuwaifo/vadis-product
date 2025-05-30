@@ -398,7 +398,7 @@ export default function Landing() {
                     return (
                       <Card 
                         key={role.id}
-                        className={`cursor-pointer p-12 transition-all duration-700 transform hover:scale-105 hover:rotate-1 backdrop-blur-lg relative z-10 card-glow overflow-hidden ${
+                        className={`cursor-pointer p-12 transition-all duration-700 transform backdrop-blur-lg relative z-10 card-glow overflow-hidden ${
                           isSelected 
                             ? 'bg-gradient-to-br from-white/95 via-white/90 to-white/95 shadow-2xl scale-105 border-2 border-white/50' 
                             : 'bg-gradient-to-br from-white/10 via-white/5 to-white/10 hover:from-white/20 hover:via-white/15 hover:to-white/20 border border-white/30 hover:border-white/50'
