@@ -687,8 +687,8 @@ export default function Landing() {
               <ul className="space-y-3 text-sm">
                 <li><a href="#" className="text-gray-400 hover:text-white transition-colors duration-200">Create</a></li>
                 <li><a href="#" className="text-gray-400 hover:text-white transition-colors duration-200">Analyze</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors duration-200">Brand</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors duration-200">Fund</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white transition-colors duration-200">Branding</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white transition-colors duration-200">Funding</a></li>
               </ul>
             </div>
             
