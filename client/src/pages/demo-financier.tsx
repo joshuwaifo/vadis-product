@@ -17,12 +17,18 @@ import { apiRequest } from "@/lib/queryClient";
 import { Link } from "wouter";
 
 const formSchema = z.object({
-  firstName: z.string().min(2, "First name must be at least 2 characters"),
-  lastName: z.string().min(2, "Last name must be at least 2 characters"),
-  email: z.string().email("Please enter a valid email address"),
-  phoneNumber: z.string().optional(),
-  companyName: z.string().min(2, "Company name must be at least 2 characters"),
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  email: z.string()
+    .email("Please enter a valid email")
+    .refine((email) => {
+      const workEmailDomains = /\.(com|org|net|edu|gov|co\.|inc|corp|llc)$/i;
+      const personalDomains = /\.(gmail|yahoo|hotmail|outlook|aol|icloud|protonmail)\.com$/i;
+      return workEmailDomains.test(email) && !personalDomains.test(email);
+    }, "Please use your work email address"),
+  companyName: z.string().min(1, "Company name is required"),
   jobTitle: z.string().optional(),
+  phoneNumber: z.string().optional(),
   useCase: z.string().optional(),
 });
 
@@ -144,7 +150,7 @@ export default function DemoFinancier() {
               Financier & Investor Demo
             </h1>
             <p className="text-xl text-white/90 max-w-2xl mx-auto mb-8">
-              Discover high-potential entertainment investments with data-driven insights, risk assessment tools, and direct access to vetted production opportunities.
+              Invest in movie productions and potentially earn huge profits from the entertainment industry's next blockbusters with our data-driven investment platform.
             </p>
             <Button asChild variant="outline" className="bg-white/10 border-white/30 text-white hover:bg-white/20">
               <Link href="/">← Return to Homepage</Link>

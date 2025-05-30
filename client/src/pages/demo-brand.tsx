@@ -16,12 +16,18 @@ import { apiRequest } from "@/lib/queryClient";
 import { Link } from "wouter";
 
 const formSchema = z.object({
-  firstName: z.string().min(2, "First name must be at least 2 characters"),
-  lastName: z.string().min(2, "Last name must be at least 2 characters"),
-  email: z.string().email("Please enter a valid email address"),
-  phoneNumber: z.string().optional(),
-  companyName: z.string().min(2, "Company name must be at least 2 characters"),
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  email: z.string()
+    .email("Please enter a valid email")
+    .refine((email) => {
+      const workEmailDomains = /\.(com|org|net|edu|gov|co\.|inc|corp|llc)$/i;
+      const personalDomains = /\.(gmail|yahoo|hotmail|outlook|aol|icloud|protonmail)\.com$/i;
+      return workEmailDomains.test(email) && !personalDomains.test(email);
+    }, "Please use your work email address"),
+  companyName: z.string().min(1, "Company name is required"),
   jobTitle: z.string().optional(),
+  phoneNumber: z.string().optional(),
   useCase: z.string().optional(),
 });
 
@@ -152,7 +158,7 @@ export default function DemoBrand() {
               Brand & Agency Demo
             </h1>
             <p className="text-xl text-white/90 max-w-2xl mx-auto mb-8">
-              Transform your brand partnerships with AI-driven content strategies, audience insights, and seamless collaboration tools.
+              Connect and negotiate with production companies, achieve precise audience targeting, and reach influencers and creators for maximum brand impact.
             </p>
             <Button asChild variant="outline" className="bg-white/10 border-white/30 text-white hover:bg-white/20">
               <Link href="/">← Return to Homepage</Link>
@@ -300,8 +306,8 @@ export default function DemoBrand() {
                     <Target className="w-6 h-6 text-pink-600" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Precision Audience Targeting</h3>
-                    <p className="text-gray-600">Leverage AI to identify and connect with the exact demographics that align with your brand values and campaign objectives.</p>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Production Company Connections & Negotiation</h3>
+                    <p className="text-gray-600">Connect directly with production companies for partnership opportunities and negotiate brand integration deals that align with your marketing objectives.</p>
                   </div>
                 </div>
 
@@ -310,8 +316,8 @@ export default function DemoBrand() {
                     <BarChart3 className="w-6 h-6 text-purple-600" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Real-Time Campaign Analytics</h3>
-                    <p className="text-gray-600">Monitor campaign performance with advanced analytics that provide actionable insights for optimization and ROI improvement.</p>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Precise Audience Targeting</h3>
+                    <p className="text-gray-600">Achieve unprecedented precision in audience targeting to showcase your brand to the exact demographics most likely to engage with your products.</p>
                   </div>
                 </div>
 
@@ -320,8 +326,8 @@ export default function DemoBrand() {
                     <Zap className="w-6 h-6 text-blue-600" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Creative Partnership Network</h3>
-                    <p className="text-gray-600">Access a curated network of content creators, influencers, and production partners who match your brand aesthetic and values.</p>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Influencer & Creator Network</h3>
+                    <p className="text-gray-600">Access and connect with influencers and individual creators who align with your brand values for authentic partnerships and maximum reach.</p>
                   </div>
                 </div>
               </div>

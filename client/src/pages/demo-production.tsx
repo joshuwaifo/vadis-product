@@ -17,12 +17,18 @@ import { apiRequest } from "@/lib/queryClient";
 import { Link } from "wouter";
 
 const formSchema = z.object({
-  firstName: z.string().min(2, "First name must be at least 2 characters"),
-  lastName: z.string().min(2, "Last name must be at least 2 characters"),
-  email: z.string().email("Please enter a valid email address"),
-  phoneNumber: z.string().optional(),
-  companyName: z.string().min(2, "Company name must be at least 2 characters"),
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  email: z.string()
+    .email("Please enter a valid email")
+    .refine((email) => {
+      const workEmailDomains = /\.(com|org|net|edu|gov|co\.|inc|corp|llc)$/i;
+      const personalDomains = /\.(gmail|yahoo|hotmail|outlook|aol|icloud|protonmail)\.com$/i;
+      return workEmailDomains.test(email) && !personalDomains.test(email);
+    }, "Please use your work email address"),
+  companyName: z.string().min(1, "Company name is required"),
   jobTitle: z.string().optional(),
+  phoneNumber: z.string().optional(),
   useCase: z.string().optional(),
 });
 
@@ -153,7 +159,7 @@ export default function DemoProduction() {
               Production Company Demo
             </h1>
             <p className="text-xl text-white/90 max-w-2xl mx-auto mb-8">
-              Discover how VadisAI revolutionizes content creation, streamlines collaboration, and connects you with the right talent and funding partners.
+              Transform your productions with AI talent matching, location incentives, brand integration visualization, VFX previews, and direct connections to brands and financiers.
             </p>
             <Button asChild variant="outline" className="bg-white/10 border-white/30 text-white hover:bg-white/20">
               <Link href="/">← Return to Homepage</Link>
@@ -301,8 +307,8 @@ export default function DemoProduction() {
                     <Users className="w-6 h-6 text-blue-600" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">AI-Powered Talent Matching</h3>
-                    <p className="text-gray-600">Find the perfect cast, crew, and creative partners for your projects using our intelligent matching algorithms.</p>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">AI Talent Matching & Location Incentives</h3>
+                    <p className="text-gray-600">Find the perfect cast, crew, and filming locations with AI-powered matching. Access comprehensive location incentive data to maximize your production budget.</p>
                   </div>
                 </div>
 
@@ -311,8 +317,8 @@ export default function DemoProduction() {
                     <TrendingUp className="w-6 h-6 text-purple-600" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Predictive Analytics</h3>
-                    <p className="text-gray-600">Leverage data-driven insights to predict market trends, audience preferences, and project success rates.</p>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Brand Integration & VFX Visualization</h3>
+                    <p className="text-gray-600">Get inspired with AI-powered systems that visualize brand integrations and VFX concepts, helping you pitch and plan productions more effectively.</p>
                   </div>
                 </div>
 
@@ -321,8 +327,8 @@ export default function DemoProduction() {
                     <Award className="w-6 h-6 text-green-600" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Funding Connections</h3>
-                    <p className="text-gray-600">Connect directly with investors and financing partners who align with your creative vision and budget requirements.</p>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Direct Brand & Financier Connections</h3>
+                    <p className="text-gray-600">Connect directly with brands seeking partnership opportunities and financiers ready to invest in promising productions.</p>
                   </div>
                 </div>
               </div>
