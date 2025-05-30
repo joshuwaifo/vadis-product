@@ -11,7 +11,7 @@ import { ArrowLeft, CheckCircle, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
 import { z } from "zod";
-import { SiGoldmansachs, SiJpmorgan, SiBlackrock, SiVisa, SiPaypal } from 'react-icons/si';
+import { SiVisa, SiPaypal } from 'react-icons/si';
 import { Building2, TrendingUp, DollarSign } from 'lucide-react';
 import vadisLogoLight from "@assets/Vadis FINAL LOGO large size Without Background.png";
 
@@ -204,13 +204,13 @@ export default function DemoFinancier() {
 
                 {/* Trust Indicators */}
                 <div>
-                  <p className="text-sm text-white/60 mb-4">The world's leading brands trust VadisAI as their growth partner</p>
+                  <p className="text-sm text-white/60 mb-4">Leading investment firms trust VadisAI for entertainment funding</p>
                   <div className="flex items-center space-x-8 opacity-60">
-                    <SiNetflix className="w-8 h-8 text-white/40 hover:text-red-400 transition-colors" />
-                    <SiApple className="w-8 h-8 text-white/40 hover:text-white/80 transition-colors" />
-                    <SiAmazon className="w-8 h-8 text-white/40 hover:text-orange-400 transition-colors" />
-                    <SiSony className="w-8 h-8 text-white/40 hover:text-blue-400 transition-colors" />
-                    <SiMercedes className="w-8 h-8 text-white/40 hover:text-white/70 transition-colors" />
+                    <Building2 className="w-8 h-8 text-white/40 hover:text-blue-400 transition-colors" />
+                    <TrendingUp className="w-8 h-8 text-white/40 hover:text-green-400 transition-colors" />
+                    <DollarSign className="w-8 h-8 text-white/40 hover:text-yellow-400 transition-colors" />
+                    <SiVisa className="w-8 h-8 text-white/40 hover:text-blue-600 transition-colors" />
+                    <SiPaypal className="w-8 h-8 text-white/40 hover:text-blue-500 transition-colors" />
                   </div>
                 </div>
               </div>
