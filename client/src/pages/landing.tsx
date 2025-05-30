@@ -441,7 +441,7 @@ export default function Landing() {
                     <span className="bg-gradient-to-r from-blue-500 via-purple-600 to-pink-600 bg-clip-text text-transparent font-black">
                       Request a demo
                     </span>
-                    <ArrowRight className="w-7 h-7 ml-4 text-pink-500 group-hover:translate-x-2 transition-transform duration-300" />
+                    <ArrowRight className="w-7 h-7 ml-4 text-pink-500 transition-transform duration-300" />
                     <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-purple-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
                     {selectedRole && (
                       <div className="absolute -inset-2 bg-gradient-to-r from-yellow-400/30 via-orange-400/30 to-pink-400/30 rounded-3xl animate-ping"></div>
