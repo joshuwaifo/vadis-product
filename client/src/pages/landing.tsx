@@ -407,7 +407,7 @@ export default function Landing() {
                       >
                         <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl"></div>
                         <div className="text-center relative z-10">
-                          <div className={`w-28 h-28 ${isSelected ? 'bg-gradient-to-br from-blue-500 via-purple-600 to-pink-600 shadow-2xl' : 'bg-gradient-to-br from-white/80 to-white/60 group-hover:from-blue-500/80 group-hover:via-purple-500/80 group-hover:to-pink-500/80'} rounded-3xl flex items-center justify-center mx-auto mb-10 transition-all duration-700 hover:scale-110 hover:rotate-12 shadow-xl`}>
+                          <div className={`w-28 h-28 ${isSelected ? 'bg-gradient-to-br from-blue-500 via-purple-600 to-pink-600 shadow-2xl' : 'bg-gradient-to-br from-white/80 to-white/60 group-hover:from-blue-500/80 group-hover:via-purple-500/80 group-hover:to-pink-500/80'} rounded-3xl flex items-center justify-center mx-auto mb-10 transition-all duration-700 hover:scale-110 shadow-xl`}>
                             <IconComponent className={`w-14 h-14 ${isSelected ? 'text-white drop-shadow-lg' : 'text-gray-800 group-hover:text-white'} transition-all duration-500 drop-shadow-lg`} />
                           </div>
                           <h3 className={`text-2xl font-black transition-all duration-300 font-sans ${isSelected ? 'text-gray-900' : 'text-gray-900'}`} style={{textShadow: '0 0 10px rgba(255,255,255,0.8)'}}>
@@ -429,7 +429,7 @@ export default function Landing() {
                   variant="outline" 
                   size="lg"
                   asChild
-                  className={`relative px-20 py-8 text-2xl font-black transition-all duration-700 hover:scale-105 hover:-rotate-1 font-sans rounded-2xl overflow-hidden group border-0 ${
+                  className={`relative px-20 py-8 text-2xl font-black transition-all duration-700 hover:scale-105 font-sans rounded-2xl overflow-hidden group border-0 ${
                     selectedRole ? 'animate-double-bounce' : ''
                   }`}
                   style={{
@@ -477,7 +477,7 @@ export default function Landing() {
                 return (
                   <div 
                     key={index} 
-                    className="group relative bg-white/80 backdrop-blur-sm rounded-3xl p-8 transition-all duration-500 hover:scale-105 hover:rotate-1 shadow-lg hover:shadow-2xl border border-white/50"
+                    className="group relative bg-white/80 backdrop-blur-sm rounded-3xl p-8 transition-all duration-500 hover:scale-105 shadow-lg hover:shadow-2xl border border-white/50"
                   >
                     {/* Gradient Border Effect */}
                     <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -504,7 +504,7 @@ export default function Landing() {
               <Button 
                 asChild
                 size="lg"
-                className="group relative bg-gradient-to-r from-blue-500 via-purple-600 to-pink-600 hover:from-blue-600 hover:via-purple-700 hover:to-pink-700 text-white px-8 py-4 text-lg font-bold transition-all duration-500 transform hover:scale-110 hover:rotate-1 shadow-2xl hover:shadow-3xl rounded-2xl overflow-hidden"
+                className="group relative bg-gradient-to-r from-blue-500 via-purple-600 to-pink-600 hover:from-blue-600 hover:via-purple-700 hover:to-pink-700 text-white px-8 py-4 text-lg font-bold transition-all duration-500 transform hover:scale-110 shadow-2xl hover:shadow-3xl rounded-2xl overflow-hidden"
               >
                 <Link href="/demo-request">
                   <span className="relative z-10">✨ Schedule a demo</span>
@@ -629,7 +629,7 @@ export default function Landing() {
               <Button 
                 size="lg"
                 asChild
-                className="group relative bg-gradient-to-r from-blue-500 via-purple-600 to-pink-600 hover:from-blue-600 hover:via-purple-700 hover:to-pink-700 text-white px-12 py-6 text-xl font-bold transition-all duration-500 transform hover:scale-110 hover:rotate-1 shadow-2xl hover:shadow-3xl rounded-2xl overflow-hidden"
+                className="group relative bg-gradient-to-r from-blue-500 via-purple-600 to-pink-600 hover:from-blue-600 hover:via-purple-700 hover:to-pink-700 text-white px-12 py-6 text-xl font-bold transition-all duration-500 transform hover:scale-110 shadow-2xl hover:shadow-3xl rounded-2xl overflow-hidden"
               >
                 <Link href="/demo-request">
                   <span className="relative z-10">Get Started</span>
@@ -641,7 +641,7 @@ export default function Landing() {
                 variant="outline" 
                 size="lg"
                 asChild
-                className="group relative px-12 py-6 text-xl font-bold transition-all duration-500 transform hover:scale-105 hover:-rotate-1 rounded-2xl overflow-hidden border-0"
+                className="group relative px-12 py-6 text-xl font-bold transition-all duration-500 transform hover:scale-105 rounded-2xl overflow-hidden border-0"
                 style={{
                   background: 'linear-gradient(white, white) padding-box, linear-gradient(135deg, #60a5fa, #a855f7, #ec4899) border-box',
                   border: '3px solid transparent'
