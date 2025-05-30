@@ -135,16 +135,21 @@ export default function DemoCreator() {
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
       {/* Header */}
       <div className="bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white py-16">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Sparkles className="w-8 h-8 text-white" />
+        <div className="max-w-4xl mx-auto px-6">
+          <div className="text-center">
+            <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Sparkles className="w-8 h-8 text-white" />
+            </div>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+              Individual Creator Demo
+            </h1>
+            <p className="text-xl text-white/90 max-w-2xl mx-auto mb-8">
+              Amplify your creative vision with AI-powered collaboration tools, brand partnerships, and funding opportunities tailored for independent creators.
+            </p>
+            <Button asChild variant="outline" className="bg-white/10 border-white/30 text-white hover:bg-white/20">
+              <Link href="/">← Return to Homepage</Link>
+            </Button>
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Individual Creator Demo
-          </h1>
-          <p className="text-xl text-white/90 max-w-2xl mx-auto">
-            Amplify your creative vision with AI-powered collaboration tools, brand partnerships, and funding opportunities tailored for independent creators.
-          </p>
         </div>
       </div>
 

@@ -143,16 +143,21 @@ export default function DemoBrand() {
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50">
       {/* Header */}
       <div className="bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 text-white py-16">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Palette className="w-8 h-8 text-white" />
+        <div className="max-w-4xl mx-auto px-6">
+          <div className="text-center">
+            <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Palette className="w-8 h-8 text-white" />
+            </div>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+              Brand & Agency Demo
+            </h1>
+            <p className="text-xl text-white/90 max-w-2xl mx-auto mb-8">
+              Transform your brand partnerships with AI-driven content strategies, audience insights, and seamless collaboration tools.
+            </p>
+            <Button asChild variant="outline" className="bg-white/10 border-white/30 text-white hover:bg-white/20">
+              <Link href="/">← Return to Homepage</Link>
+            </Button>
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Brand & Agency Demo
-          </h1>
-          <p className="text-xl text-white/90 max-w-2xl mx-auto">
-            Transform your brand partnerships with AI-driven content strategies, audience insights, and seamless collaboration tools.
-          </p>
         </div>
       </div>
 

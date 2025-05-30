@@ -144,16 +144,21 @@ export default function DemoProduction() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white py-16">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Film className="w-8 h-8 text-white" />
+        <div className="max-w-4xl mx-auto px-6">
+          <div className="text-center">
+            <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Film className="w-8 h-8 text-white" />
+            </div>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+              Production Company Demo
+            </h1>
+            <p className="text-xl text-white/90 max-w-2xl mx-auto mb-8">
+              Discover how VadisAI revolutionizes content creation, streamlines collaboration, and connects you with the right talent and funding partners.
+            </p>
+            <Button asChild variant="outline" className="bg-white/10 border-white/30 text-white hover:bg-white/20">
+              <Link href="/">← Return to Homepage</Link>
+            </Button>
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Production Company Demo
-          </h1>
-          <p className="text-xl text-white/90 max-w-2xl mx-auto">
-            Discover how VadisAI revolutionizes content creation, streamlines collaboration, and connects you with the right talent and funding partners.
-          </p>
         </div>
       </div>
 
