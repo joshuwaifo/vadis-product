@@ -41,6 +41,7 @@ export default function DemoProduction() {
       lastName: "",
       email: "",
       companyName: "",
+      companyType: "production_company",
       jobTitle: "",
       phoneNumber: "",
       useCase: "",
