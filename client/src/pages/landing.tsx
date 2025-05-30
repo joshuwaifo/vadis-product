@@ -82,14 +82,14 @@ export default function Landing() {
     },
     {
       id: "brand",
-      name: "Brand",
+      name: "Branding",
       icon: Heart,
       description: "Brand partnerships and collaborations", 
       color: "from-pink-500 to-red-500"
     },
     {
       id: "fund",
-      name: "Fund",
+      name: "Funding",
       icon: Banknote,
       description: "Investment and financing solutions",
       color: "from-green-500 to-blue-500"
