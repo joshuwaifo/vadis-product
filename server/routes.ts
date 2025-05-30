@@ -42,8 +42,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ 
         success: true, 
         id: demoRequest.id,
-        hubspotSynced: !!(hubspotContactId && hubspotDealId),
-        meetingLink: hubspotResult?.meetingLink
+        hubspotSynced: !!(hubspotContactId && hubspotDealId)
       });
     } catch (error) {
       console.error("Demo request submission error:", error);

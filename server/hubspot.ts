@@ -123,7 +123,7 @@ export class HubSpotService {
       // Try transactional email first
       await this.makeRequest("/marketing/v3/transactional/single-email/send", "POST", emailData);
       console.log(`Transactional email sent to ${demoRequest.email}`);
-    } catch (transactionalError) {
+    } catch (transactionalError: any) {
       console.log("Transactional email failed, trying alternative method:", transactionalError.message);
       
       // Fall back to creating an email engagement (for logging only)
@@ -164,37 +164,11 @@ export class HubSpotService {
     }
   }
 
-  async createMeetingLink(contactId: string, demoRequest: any): Promise<string> {
-    // Create a meeting using HubSpot's scheduling API
-    const meetingData = {
-      properties: {
-        hs_meeting_title: `Demo Call - ${demoRequest.companyName}`,
-        hs_meeting_body: `Demo call with ${demoRequest.firstName} ${demoRequest.lastName} from ${demoRequest.companyName}`,
-        hs_meeting_start_time: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // Tomorrow
-        hs_meeting_end_time: new Date(Date.now() + 24 * 60 * 60 * 1000 + 30 * 60 * 1000).toISOString(), // 30 minutes later
-        hs_meeting_outcome: "SCHEDULED"
-      },
-      associations: [
-        {
-          to: { id: contactId },
-          types: [
-            {
-              associationCategory: "HUBSPOT_DEFINED",
-              associationTypeId: 199 // Contact to Meeting association
-            }
-          ]
-        }
-      ]
-    };
 
-    const meeting = await this.makeRequest("/crm/v3/objects/meetings", "POST", meetingData);
-    return `https://app.hubspot.com/meetings/your-account/meeting/${meeting.id}`;
-  }
 
   async submitDemoRequest(demoRequest: any): Promise<{
     contactId: string;
     dealId: string;
-    meetingLink?: string;
   }> {
     try {
       // First, create or update the contact
@@ -211,19 +185,9 @@ export class HubSpotService {
         // Continue even if email fails
       }
 
-      // Create meeting link
-      let meetingLink;
-      try {
-        meetingLink = await this.createMeetingLink(contact.id, demoRequest);
-      } catch (meetingError) {
-        console.error("Failed to create meeting link:", meetingError);
-        // Continue even if meeting creation fails
-      }
-
       return {
         contactId: contact.id,
-        dealId: deal.id,
-        meetingLink
+        dealId: deal.id
       };
     } catch (error) {
       console.error("HubSpot submission error:", error);
