@@ -432,7 +432,7 @@ export default function Landing() {
                     selectedRole ? 'animate-double-bounce' : ''
                   }`}
                 >
-                  <Link href="/demo-request">
+                  <Link href={selectedRole ? `/demo/${selectedRole}` : "/demo-request"}>
                     <span className="relative z-10">Request a demo</span>
                     <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     {selectedRole && (
