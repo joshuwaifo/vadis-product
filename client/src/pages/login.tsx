@@ -87,8 +87,8 @@ export default function Login() {
           </Link>
           <div className="flex items-center space-x-4">
             <span className="text-white/80">Don't have an account?</span>
-            <Button asChild variant="outline" className="border-white hover:bg-white hover:text-gray-900">
-              <Link href="/signup" className="text-white hover:text-gray-900">Sign Up</Link>
+            <Button asChild className="bg-white/20 backdrop-blur-sm border border-white/30 text-white hover:bg-white hover:text-gray-900 transition-all duration-300">
+              <Link href="/signup">Sign Up</Link>
             </Button>
           </div>
         </div>
