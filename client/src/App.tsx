@@ -1,4 +1,5 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
+import { useEffect } from "react";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -11,10 +12,23 @@ import DemoBrand from "@/pages/demo-brand";
 import DemoFinancier from "@/pages/demo-financier";
 import DemoCreator from "@/pages/demo-creator";
 import RoleSelection from "@/pages/role-selection";
+import BusinessEmailVerification from "@/pages/business-email-verification";
 import NotFound from "@/pages/not-found";
 
 function Router() {
-  const { isAuthenticated, hasRole, isLoading } = useAuth();
+  const { isAuthenticated, hasRole, needsBusinessEmail, isLoading } = useAuth();
+  const [location, setLocation] = useLocation();
+
+  // Automatic redirects based on authentication state
+  useEffect(() => {
+    if (isLoading) return;
+
+    if (isAuthenticated && !hasRole && location !== '/role-selection') {
+      setLocation('/role-selection');
+    } else if (isAuthenticated && hasRole && needsBusinessEmail && location !== '/business-email-verification') {
+      setLocation('/business-email-verification');
+    }
+  }, [isAuthenticated, hasRole, needsBusinessEmail, isLoading, location, setLocation]);
 
   if (isLoading) {
     return (
@@ -40,6 +54,11 @@ function Router() {
       {/* Role selection for authenticated users without roles */}
       {isAuthenticated && !hasRole && (
         <Route path="/role-selection" component={RoleSelection} />
+      )}
+      
+      {/* Business email verification for users who need it */}
+      {isAuthenticated && hasRole && needsBusinessEmail && (
+        <Route path="/business-email-verification" component={BusinessEmailVerification} />
       )}
       
       {/* Protected routes will be added in Phase 4 */}
