@@ -46,19 +46,16 @@ export default function Signup() {
 
   const signupMutation = useMutation({
     mutationFn: async (data: SignupFormData & { role: RoleType }) => {
-      return apiRequest("/api/auth/signup", {
-        method: "POST",
-        body: JSON.stringify(data),
-      });
+      return apiRequest("/api/auth/signup", "POST", data);
     },
-    onSuccess: (data) => {
+    onSuccess: (response: any) => {
       toast({
         title: "Account created successfully!",
         description: "Welcome to VadisAI. Redirecting to your dashboard...",
       });
       
       // Redirect to role-specific dashboard
-      const role = data.user.role;
+      const role = response.user.role;
       switch (role) {
         case userRoles.PRODUCTION:
           setLocation("/production/dashboard");
@@ -106,6 +103,18 @@ export default function Signup() {
       email: "",
       password: "",
       confirmPassword: "",
+      // Production fields
+      companyName: "",
+      contactPerson: "",
+      companyWebsite: "",
+      // Brand fields
+      brandName: "",
+      // Investor fields
+      fullName: "",
+      investmentType: undefined,
+      structure: undefined,
+      // Creator fields
+      platformLink: "",
     },
   });
 
