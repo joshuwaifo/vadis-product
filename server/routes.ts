@@ -188,11 +188,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const validatedData = loginSchema.parse(req.body);
       
+      console.log("Login attempt for email:", validatedData.email);
+      
+      // Check if user exists
+      const existingUser = await storage.getUserByEmail(validatedData.email);
+      console.log("User found:", existingUser ? "Yes" : "No");
+      
       const user = await storage.validateUser(validatedData.email, validatedData.password);
       if (!user) {
+        console.log("Password validation failed");
         return res.status(401).json({ error: "Invalid email or password" });
       }
 
+      console.log("Login successful for user:", user.email);
+      
       // Return user data (without password hash)
       const { passwordHash: _, ...userResponse } = user;
       res.json({
@@ -213,6 +222,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     // This would typically check session/JWT token
     // For now, returning a placeholder response
     res.status(401).json({ error: "Authentication required" });
+  });
+
+  // Debug endpoint to list all users (remove in production)
+  app.get("/api/debug/users", async (req, res) => {
+    try {
+      // Get all users from storage for debugging
+      const users = Array.from((storage as any).users.values()).map((user: any) => ({
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        createdAt: user.createdAt
+      }));
+      res.json({ users });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to get users" });
+    }
   });
 
   const httpServer = createServer(app);
