@@ -300,30 +300,49 @@ export class MemStorage implements IStorage {
 
 export class DatabaseStorage implements IStorage {
   async getUser(id: number): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.id, id));
-    return user || undefined;
+    try {
+      const result = await db.select().from(users).where(eq(users.id, id));
+      return result[0] || undefined;
+    } catch (error) {
+      console.error('Error getting user:', error);
+      return undefined;
+    }
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.email, email));
-    return user || undefined;
+    try {
+      const result = await db.select().from(users).where(eq(users.email, email));
+      return result[0] || undefined;
+    } catch (error) {
+      console.error('Error getting user by email:', error);
+      return undefined;
+    }
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const [user] = await db
-      .insert(users)
-      .values(insertUser)
-      .returning();
-    return user;
+    try {
+      const result = await db
+        .insert(users)
+        .values(insertUser)
+        .returning();
+      return result[0];
+    } catch (error) {
+      console.error('Error creating user:', error);
+      throw error;
+    }
   }
 
   async validateUser(email: string, password: string): Promise<User | null> {
-    const user = await this.getUserByEmail(email);
-    if (!user) return null;
-    
-    const bcrypt = await import('bcryptjs');
-    const isValid = await bcrypt.compare(password, user.passwordHash);
-    return isValid ? user : null;
+    try {
+      const user = await this.getUserByEmail(email);
+      if (!user || !user.passwordHash) return null;
+      
+      const isValid = await bcrypt.compare(password, user.passwordHash);
+      return isValid ? user : null;
+    } catch (error) {
+      console.error('Error validating user:', error);
+      return null;
+    }
   }
 
   async createDemoRequest(insertDemoRequest: InsertDemoRequest): Promise<DemoRequest> {

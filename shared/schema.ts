@@ -30,6 +30,7 @@ export const projects = pgTable("projects", {
   targetGenres: text("target_genres").array(),
   synopsis: text("synopsis"),
   scriptContent: text("script_content"),
+  status: text("status").default("draft"),
   isPublished: boolean("is_published").default(false),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
