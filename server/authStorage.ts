@@ -40,6 +40,20 @@ export class DatabaseStorage {
       .returning();
     return user || undefined;
   }
+
+  async updateBusinessEmail(id: string, businessEmail: string, isIndividualFinancier: boolean = false): Promise<User | undefined> {
+    const [user] = await db
+      .update(users)
+      .set({ 
+        businessEmail,
+        isIndividualFinancier,
+        businessEmailVerified: false,
+        updatedAt: new Date()
+      })
+      .where(eq(users.id, id))
+      .returning();
+    return user || undefined;
+  }
 }
 
 export const authStorage = new DatabaseStorage();

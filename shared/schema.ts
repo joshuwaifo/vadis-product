@@ -22,6 +22,9 @@ export const users = pgTable("users", {
   profileImageUrl: varchar("profile_image_url"),
   role: text("role"), // production, brand, financier, creator
   roleAssignedAt: timestamp("role_assigned_at"),
+  businessEmail: varchar("business_email"),
+  businessEmailVerified: boolean("business_email_verified").default(false),
+  isIndividualFinancier: boolean("is_individual_financier").default(false),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -60,6 +63,9 @@ export const upsertUserSchema = createInsertSchema(users).pick({
   profileImageUrl: true,
   role: true,
   roleAssignedAt: true,
+  businessEmail: true,
+  businessEmailVerified: true,
+  isIndividualFinancier: true,
 });
 
 export const insertDemoRequestSchema = createInsertSchema(demoRequests).omit({

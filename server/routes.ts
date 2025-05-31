@@ -55,6 +55,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post('/api/auth/verify-business-email', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { businessEmail, isIndividualFinancier } = req.body;
+      
+      if (!businessEmail || typeof businessEmail !== 'string') {
+        return res.status(400).json({ message: "Valid business email is required" });
+      }
+      
+      const updatedUser = await authStorage.updateBusinessEmail(userId, businessEmail, isIndividualFinancier || false);
+      res.json(updatedUser);
+    } catch (error) {
+      console.error("Error updating business email:", error);
+      res.status(500).json({ message: "Failed to update business email" });
+    }
+  });
+
   // Demo request submission endpoint
   app.post("/api/demo-request", async (req, res) => {
     try {

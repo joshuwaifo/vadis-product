@@ -7,11 +7,17 @@ export function useAuth() {
     retry: false,
   });
 
+  const needsBusinessEmail = user?.role && 
+    ['production', 'brand', 'financier'].includes(user.role) && 
+    !user.businessEmail && 
+    !user.isIndividualFinancier;
+
   return {
     user,
     isLoading,
     isAuthenticated: !!user,
     hasRole: !!user?.role,
+    needsBusinessEmail,
     role: user?.role as UserRole | null,
   };
 }
