@@ -74,7 +74,7 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
+    <div className="min-h-screen modern-gradient grain-texture">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -87,8 +87,8 @@ export default function Login() {
           </Link>
           <div className="flex items-center space-x-4">
             <span className="text-white/80">Don't have an account?</span>
-            <Button asChild variant="outline" className="text-white border-white hover:bg-white hover:text-gray-900">
-              <Link href="/signup">Sign Up</Link>
+            <Button asChild variant="outline" className="border-white hover:bg-white hover:text-gray-900">
+              <Link href="/signup" className="text-white hover:text-gray-900">Sign Up</Link>
             </Button>
           </div>
         </div>

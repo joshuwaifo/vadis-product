@@ -147,7 +147,7 @@ export default function Signup() {
 
   if (!selectedRole) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
+      <div className="min-h-screen modern-gradient grain-texture">
         <div className="container mx-auto px-4 py-8">
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
@@ -160,8 +160,8 @@ export default function Signup() {
             </Link>
             <div className="flex items-center space-x-4">
               <span className="text-white/80">Already have an account?</span>
-              <Button asChild variant="outline" className="text-white border-white hover:bg-white hover:text-gray-900">
-                <Link href="/login">Login</Link>
+              <Button asChild variant="outline" className="border-white hover:bg-white hover:text-gray-900">
+                <Link href="/login" className="text-white hover:text-gray-900">Login</Link>
               </Button>
             </div>
           </div>
@@ -215,7 +215,7 @@ export default function Signup() {
   const selectedRoleData = roleCards.find(role => role.id === selectedRole);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
+    <div className="min-h-screen modern-gradient grain-texture">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -228,8 +228,8 @@ export default function Signup() {
           </Link>
           <div className="flex items-center space-x-4">
             <span className="text-white/80">Already have an account?</span>
-            <Button asChild variant="outline" className="text-white border-white hover:bg-white hover:text-gray-900">
-              <Link href="/login">Login</Link>
+            <Button asChild variant="outline" className="border-white hover:bg-white hover:text-gray-900">
+              <Link href="/login" className="text-white hover:text-gray-900">Login</Link>
             </Button>
           </div>
         </div>
