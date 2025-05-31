@@ -1,32 +1,11 @@
-import { pgTable, text, serial, integer, boolean, timestamp, varchar, jsonb, index } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// Session storage table for Replit Auth
-export const sessions = pgTable(
-  "sessions",
-  {
-    sid: varchar("sid").primaryKey(),
-    sess: jsonb("sess").notNull(),
-    expire: timestamp("expire").notNull(),
-  },
-  (table) => [index("IDX_session_expire").on(table.expire)],
-);
-
-// User storage table for authenticated users
 export const users = pgTable("users", {
-  id: varchar("id").primaryKey().notNull(), // Replit user ID
-  email: varchar("email").unique(),
-  firstName: varchar("first_name"),
-  lastName: varchar("last_name"),
-  profileImageUrl: varchar("profile_image_url"),
-  role: text("role"), // production, brand, financier, creator
-  roleAssignedAt: timestamp("role_assigned_at"),
-  businessEmail: varchar("business_email"),
-  businessEmailVerified: boolean("business_email_verified").default(false),
-  isIndividualFinancier: boolean("is_individual_financier").default(false),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+  id: serial("id").primaryKey(),
+  username: text("username").notNull().unique(),
+  password: text("password").notNull(),
 });
 
 export const demoRequests = pgTable("demo_requests", {
@@ -54,18 +33,9 @@ export const demoRequests = pgTable("demo_requests", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// User schemas for Replit Auth
-export const upsertUserSchema = createInsertSchema(users).pick({
-  id: true,
-  email: true,
-  firstName: true,
-  lastName: true,
-  profileImageUrl: true,
-  role: true,
-  roleAssignedAt: true,
-  businessEmail: true,
-  businessEmailVerified: true,
-  isIndividualFinancier: true,
+export const insertUserSchema = createInsertSchema(users).pick({
+  username: true,
+  password: true,
 });
 
 export const insertDemoRequestSchema = createInsertSchema(demoRequests).omit({
@@ -78,11 +48,7 @@ export const insertDemoRequestSchema = createInsertSchema(demoRequests).omit({
   updatedAt: true,
 });
 
-// User role enum
-export const userRoles = ["production", "brand", "financier", "creator"] as const;
-export type UserRole = typeof userRoles[number];
-
-export type UpsertUser = z.infer<typeof upsertUserSchema>;
+export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertDemoRequest = z.infer<typeof insertDemoRequestSchema>;
 export type DemoRequest = typeof demoRequests.$inferSelect;
