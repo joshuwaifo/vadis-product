@@ -348,11 +348,14 @@ export default function Landing() {
 
             {/* Auth Buttons */}
             <div className="hidden md:flex items-center space-x-4 relative z-10">
-              <Button variant="ghost" className="text-white hover:bg-gradient-to-r hover:from-blue-400 hover:via-purple-500 hover:to-pink-500 hover:bg-clip-text hover:text-transparent font-bold text-lg font-sans border-none">
-                <LogIn className="w-5 h-5 mr-2" />
-                Login
+              <Button asChild variant="ghost" className="text-white hover:bg-gradient-to-r hover:from-blue-400 hover:via-purple-500 hover:to-pink-500 hover:bg-clip-text hover:text-transparent font-bold text-lg font-sans border-none">
+                <Link href="/login">
+                  <LogIn className="w-5 h-5 mr-2" />
+                  Login
+                </Link>
               </Button>
               <Button 
+                asChild
                 variant="outline" 
                 className="relative px-8 py-3 text-lg font-bold transition-all duration-500 transform hover:scale-105 font-sans rounded-xl overflow-hidden border-0"
                 style={{
@@ -360,9 +363,11 @@ export default function Landing() {
                   border: '3px solid transparent'
                 }}
               >
-                <span className="bg-gradient-to-r from-blue-500 via-purple-600 to-pink-600 bg-clip-text text-transparent font-bold">
-                  Sign Up
-                </span>
+                <Link href="/signup">
+                  <span className="bg-gradient-to-r from-blue-500 via-purple-600 to-pink-600 bg-clip-text text-transparent font-bold">
+                    Sign Up
+                  </span>
+                </Link>
               </Button>
               <Button asChild className="bg-gradient-to-r from-blue-500 via-purple-600 to-pink-600 hover:from-blue-600 hover:via-purple-700 hover:to-pink-700 text-white font-bold px-8 py-3 text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 font-sans rounded-xl">
                 <Link href="/demo-request">Request a demo</Link>

@@ -160,10 +160,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Create investor profile if needed
       if (role === userRoles.INVESTOR) {
+        const investorData = validatedData as any;
         await storage.createInvestorProfile({
           userId: user.id,
-          investmentType: validatedData.investmentType,
-          structure: validatedData.structure
+          investmentType: investorData.investmentType,
+          structure: investorData.structure
         });
       }
 
