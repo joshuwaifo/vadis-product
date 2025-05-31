@@ -1,12 +1,13 @@
-import { users, demoRequests, type User, type InsertUser, type DemoRequest, type InsertDemoRequest } from "@shared/schema";
+import { users, demoRequests, type User, type UpsertUser, type DemoRequest, type InsertDemoRequest } from "@shared/schema";
 
 // modify the interface with any CRUD methods
 // you might need
 
 export interface IStorage {
-  getUser(id: number): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
+  // User operations for Replit Auth
+  getUser(id: string): Promise<User | undefined>;
+  upsertUser(user: UpsertUser): Promise<User>;
+  // Demo request operations
   createDemoRequest(demoRequest: InsertDemoRequest): Promise<DemoRequest>;
   getDemoRequest(id: number): Promise<DemoRequest | undefined>;
   updateDemoRequest(id: number, updates: Partial<DemoRequest>): Promise<DemoRequest | undefined>;
