@@ -93,6 +93,9 @@ export default function AuthLogin() {
         }
       })
 
+      console.log('Magic link request sent to:', data.email)
+      console.log('Redirect URL:', `${window.location.origin}/auth-callback`)
+
       if (error) throw error
 
       setMessage({
