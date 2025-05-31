@@ -3,8 +3,58 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { hubspotService } from "./hubspot";
 import { insertDemoRequestSchema } from "@shared/schema";
+import { setupAuth, isAuthenticated } from "./replitAuth";
+import { authStorage } from "./authStorage";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Setup authentication
+  await setupAuth(app);
+
+  // Authentication routes
+  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await authStorage.getUser(userId);
+      
+      if (!user) {
+        // Create user on first login
+        const claims = req.user.claims;
+        const newUser = await authStorage.upsertUser({
+          id: userId,
+          email: claims.email,
+          firstName: claims.first_name,
+          lastName: claims.last_name,
+          profileImageUrl: claims.profile_image_url,
+          role: null, // Will be set during role selection
+          roleAssignedAt: null,
+        });
+        res.json(newUser);
+      } else {
+        res.json(user);
+      }
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
+
+  app.post('/api/auth/select-role', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { role } = req.body;
+      
+      if (!['production', 'brand', 'financier', 'creator'].includes(role)) {
+        return res.status(400).json({ message: "Invalid role" });
+      }
+      
+      const updatedUser = await authStorage.updateUserRole(userId, role);
+      res.json(updatedUser);
+    } catch (error) {
+      console.error("Error updating user role:", error);
+      res.status(500).json({ message: "Failed to update role" });
+    }
+  });
+
   // Demo request submission endpoint
   app.post("/api/demo-request", async (req, res) => {
     try {

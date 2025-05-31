@@ -348,7 +348,11 @@ export default function Landing() {
 
             {/* Auth Buttons */}
             <div className="hidden md:flex items-center space-x-6 relative z-10">
-              <Button variant="ghost" className="text-white hover:bg-gradient-to-r hover:from-blue-400 hover:via-purple-500 hover:to-pink-500 hover:bg-clip-text hover:text-transparent font-bold text-lg font-sans border-none">
+              <Button 
+                variant="ghost" 
+                className="text-white hover:bg-gradient-to-r hover:from-blue-400 hover:via-purple-500 hover:to-pink-500 hover:bg-clip-text hover:text-transparent font-bold text-lg font-sans border-none"
+                onClick={() => window.location.href = '/api/login'}
+              >
                 <LogIn className="w-5 h-5 mr-3" />
                 Login
               </Button>
