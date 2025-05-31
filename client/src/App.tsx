@@ -12,6 +12,7 @@ import DemoFinancier from "@/pages/demo-financier";
 import DemoCreator from "@/pages/demo-creator";
 import RoleSelection from "@/pages/role-selection";
 import BusinessEmailVerification from "@/pages/business-email-verification";
+import AuthLogin from "@/pages/auth-login";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -39,6 +40,7 @@ function Router() {
       <Route path="/demo/creator" component={DemoCreator} />
       
       {/* Authentication flow routes */}
+      <Route path="/login" component={AuthLogin} />
       <Route path="/role-selection" component={RoleSelection} />
       <Route path="/business-email-verification" component={BusinessEmailVerification} />
       
