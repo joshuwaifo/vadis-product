@@ -14,6 +14,7 @@ import RoleSelection from "@/pages/role-selection";
 import BusinessEmailVerification from "@/pages/business-email-verification";
 import AuthLogin from "@/pages/auth-login";
 import AuthCallback from "@/pages/auth-callback";
+import DashboardProduction from "@/pages/dashboard-production";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -46,7 +47,8 @@ function Router() {
       <Route path="/role-selection" component={RoleSelection} />
       <Route path="/business-email-verification" component={BusinessEmailVerification} />
       
-      {/* Protected routes will be added in Phase 4 */}
+      {/* Dashboard routes */}
+      <Route path="/dashboard/production" component={DashboardProduction} />
       
       <Route component={NotFound} />
     </Switch>

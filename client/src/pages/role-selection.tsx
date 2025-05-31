@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useLocation } from "wouter"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
@@ -43,6 +44,7 @@ export default function RoleSelection() {
   const { user } = useAuth()
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [, setLocation] = useLocation()
   const queryClient = useQueryClient()
 
   const mutation = useMutation({
@@ -51,6 +53,23 @@ export default function RoleSelection() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] })
+      // Redirect to appropriate dashboard based on role
+      switch (selectedRole) {
+        case "production":
+          setLocation("/dashboard/production")
+          break
+        case "brand":
+          setLocation("/dashboard/brand")
+          break
+        case "financier":
+          setLocation("/dashboard/financier")
+          break
+        case "creator":
+          setLocation("/dashboard/creator")
+          break
+        default:
+          setLocation("/")
+      }
     },
     onError: (error: Error) => {
       setError(error.message)
