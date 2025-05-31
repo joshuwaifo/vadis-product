@@ -17,6 +17,8 @@ import {
   type InsertInvestorProfile,
   type UserRole
 } from "@shared/schema";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
 
 export interface IStorage {
   // User authentication
@@ -294,4 +296,144 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+
+
+export class DatabaseStorage implements IStorage {
+  async getUser(id: number): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user || undefined;
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(insertUser)
+      .returning();
+    return user;
+  }
+
+  async validateUser(email: string, password: string): Promise<User | null> {
+    const user = await this.getUserByEmail(email);
+    if (!user) return null;
+    
+    const bcrypt = await import('bcryptjs');
+    const isValid = await bcrypt.compare(password, user.passwordHash);
+    return isValid ? user : null;
+  }
+
+  async createDemoRequest(insertDemoRequest: InsertDemoRequest): Promise<DemoRequest> {
+    const [demoRequest] = await db
+      .insert(demoRequests)
+      .values(insertDemoRequest)
+      .returning();
+    return demoRequest;
+  }
+
+  async getDemoRequest(id: number): Promise<DemoRequest | undefined> {
+    const [demoRequest] = await db.select().from(demoRequests).where(eq(demoRequests.id, id));
+    return demoRequest || undefined;
+  }
+
+  async updateDemoRequest(id: number, updates: Partial<DemoRequest>): Promise<DemoRequest | undefined> {
+    const [updated] = await db
+      .update(demoRequests)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(demoRequests.id, id))
+      .returning();
+    return updated || undefined;
+  }
+
+  async createProject(insertProject: InsertProject): Promise<Project> {
+    const [project] = await db
+      .insert(projects)
+      .values(insertProject)
+      .returning();
+    return project;
+  }
+
+  async getProject(id: number): Promise<Project | undefined> {
+    const [project] = await db.select().from(projects).where(eq(projects.id, id));
+    return project || undefined;
+  }
+
+  async getProjectsByUser(userId: number): Promise<Project[]> {
+    return await db.select().from(projects).where(eq(projects.userId, userId));
+  }
+
+  async updateProject(id: number, updates: Partial<Project>): Promise<Project | undefined> {
+    const [updated] = await db
+      .update(projects)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(projects.id, id))
+      .returning();
+    return updated || undefined;
+  }
+
+  async publishProject(id: number): Promise<Project | undefined> {
+    return this.updateProject(id, { status: 'published' });
+  }
+
+  async getPublishedProjects(): Promise<Project[]> {
+    return await db.select().from(projects).where(eq(projects.status, 'published'));
+  }
+
+  async createProduct(insertProduct: InsertProduct): Promise<Product> {
+    const [product] = await db
+      .insert(products)
+      .values(insertProduct)
+      .returning();
+    return product;
+  }
+
+  async getProduct(id: number): Promise<Product | undefined> {
+    const [product] = await db.select().from(products).where(eq(products.id, id));
+    return product || undefined;
+  }
+
+  async getProductsByBrand(brandUserId: number): Promise<Product[]> {
+    return await db.select().from(products).where(eq(products.brandUserId, brandUserId));
+  }
+
+  async updateProduct(id: number, updates: Partial<Product>): Promise<Product | undefined> {
+    const [updated] = await db
+      .update(products)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(products.id, id))
+      .returning();
+    return updated || undefined;
+  }
+
+  async deleteProduct(id: number): Promise<boolean> {
+    const result = await db.delete(products).where(eq(products.id, id));
+    return result.rowCount > 0;
+  }
+
+  async createInvestorProfile(insertProfile: InsertInvestorProfile): Promise<InvestorProfile> {
+    const [profile] = await db
+      .insert(investorProfiles)
+      .values(insertProfile)
+      .returning();
+    return profile;
+  }
+
+  async getInvestorProfile(userId: number): Promise<InvestorProfile | undefined> {
+    const [profile] = await db.select().from(investorProfiles).where(eq(investorProfiles.userId, userId));
+    return profile || undefined;
+  }
+
+  async updateInvestorProfile(userId: number, updates: Partial<InvestorProfile>): Promise<InvestorProfile | undefined> {
+    const [updated] = await db
+      .update(investorProfiles)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(investorProfiles.userId, userId))
+      .returning();
+    return updated || undefined;
+  }
+}
+
+export const storage = new DatabaseStorage();
