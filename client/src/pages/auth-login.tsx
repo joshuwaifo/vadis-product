@@ -80,10 +80,11 @@ export default function AuthLogin() {
       // Store signup data in localStorage for after email verification
       localStorage.setItem('vadis_signup_data', JSON.stringify(data))
 
+      // Try magic link first
       const { error } = await supabase.auth.signInWithOtp({
         email: data.email,
         options: {
-          emailRedirectTo: `${window.location.origin}/role-selection`,
+          emailRedirectTo: `${window.location.origin}/auth-callback`,
           data: {
             first_name: data.firstName,
             last_name: data.lastName,
@@ -96,12 +97,12 @@ export default function AuthLogin() {
 
       setMessage({
         type: 'success',
-        text: `Verification code sent to ${data.email}. Please check your inbox and enter the 6-digit code to complete signup.`
+        text: `Magic link sent to ${data.email}. Please check your inbox and click the link to complete signup.`
       })
     } catch (error: any) {
       setMessage({
         type: 'error',
-        text: error.message || 'Failed to send verification code. Please try again.'
+        text: error.message || 'Failed to send magic link. Please check your Supabase email configuration.'
       })
     } finally {
       setIsLoading(false)
@@ -116,7 +117,7 @@ export default function AuthLogin() {
       const { error } = await supabase.auth.signInWithOtp({
         email: data.email,
         options: {
-          emailRedirectTo: `${window.location.origin}/`
+          emailRedirectTo: `${window.location.origin}/auth-callback`
         }
       })
 
@@ -124,12 +125,12 @@ export default function AuthLogin() {
 
       setMessage({
         type: 'success',
-        text: `Verification code sent to ${data.email}. Please check your inbox and enter the 6-digit code to sign in.`
+        text: `Magic link sent to ${data.email}. Please check your inbox and click the link to sign in.`
       })
     } catch (error: any) {
       setMessage({
         type: 'error',
-        text: error.message || 'Failed to send verification code. Please try again.'
+        text: error.message || 'Failed to send magic link. Please check your Supabase email configuration.'
       })
     } finally {
       setIsLoading(false)
