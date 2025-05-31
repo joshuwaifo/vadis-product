@@ -21,7 +21,8 @@ export default function Login() {
 
   const loginMutation = useMutation({
     mutationFn: async (data: LoginData) => {
-      return apiRequest("/api/auth/login", "POST", data);
+      const response = await apiRequest("/api/auth/login", "POST", data);
+      return response.json();
     },
     onSuccess: (data: any) => {
       toast({
@@ -30,7 +31,7 @@ export default function Login() {
       });
       
       // Redirect to role-specific dashboard
-      const role = data.user.role;
+      const role = data.user?.role;
       switch (role) {
         case userRoles.PRODUCTION:
           setLocation("/production/dashboard");

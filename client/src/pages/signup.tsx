@@ -46,16 +46,17 @@ export default function Signup() {
 
   const signupMutation = useMutation({
     mutationFn: async (data: SignupFormData & { role: RoleType }) => {
-      return apiRequest("/api/auth/signup", "POST", data);
+      const response = await apiRequest("/api/auth/signup", "POST", data);
+      return response.json();
     },
-    onSuccess: (response: any) => {
+    onSuccess: (data: any) => {
       toast({
         title: "Account created successfully!",
         description: "Welcome to VadisAI. Redirecting to your dashboard...",
       });
       
       // Redirect to role-specific dashboard
-      const role = response.user.role;
+      const role = data.user?.role;
       switch (role) {
         case userRoles.PRODUCTION:
           setLocation("/production/dashboard");
