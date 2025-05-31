@@ -347,10 +347,13 @@ export default function Landing() {
             </div>
 
             {/* Auth Buttons */}
-            <div className="hidden md:flex items-center space-x-6 relative z-10">
+            <div className="hidden md:flex items-center space-x-4 relative z-10">
               <Button variant="ghost" className="text-white hover:bg-gradient-to-r hover:from-blue-400 hover:via-purple-500 hover:to-pink-500 hover:bg-clip-text hover:text-transparent font-bold text-lg font-sans border-none">
-                <LogIn className="w-5 h-5 mr-3" />
+                <LogIn className="w-5 h-5 mr-2" />
                 Login
+              </Button>
+              <Button variant="outline" className="text-white border-white hover:bg-white hover:text-gray-900 font-bold text-lg font-sans px-6 py-2 transition-all duration-300">
+                Sign Up
               </Button>
               <Button asChild className="bg-gradient-to-r from-blue-500 via-purple-600 to-pink-600 hover:from-blue-600 hover:via-purple-700 hover:to-pink-700 text-white font-bold px-8 py-3 text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 font-sans rounded-xl">
                 <Link href="/demo-request">Request a demo</Link>
