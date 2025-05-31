@@ -118,30 +118,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let roleSpecificDetails = {};
       switch (role) {
         case userRoles.PRODUCTION:
+          const prodData = validatedData as any;
           roleSpecificDetails = {
-            companyName: validatedData.companyName,
-            contactPerson: validatedData.contactPerson,
-            companyWebsite: validatedData.companyWebsite
+            companyName: prodData.companyName,
+            contactPerson: prodData.contactPerson,
+            companyWebsite: prodData.companyWebsite
           };
           break;
         case userRoles.BRAND_AGENCY:
+          const brandData = validatedData as any;
           roleSpecificDetails = {
-            brandName: validatedData.brandName,
-            contactPerson: validatedData.contactPerson,
-            companyWebsite: validatedData.companyWebsite
+            brandName: brandData.brandName,
+            contactPerson: brandData.contactPerson,
+            companyWebsite: brandData.companyWebsite
           };
           break;
         case userRoles.INVESTOR:
+          const investorData = validatedData as any;
           roleSpecificDetails = {
-            fullName: validatedData.fullName,
-            investmentType: validatedData.investmentType,
-            structure: validatedData.structure
+            fullName: investorData.fullName,
+            investmentType: investorData.investmentType,
+            structure: investorData.structure
           };
           break;
         case userRoles.INDIVIDUAL_CREATOR:
+          const creatorData = validatedData as any;
           roleSpecificDetails = {
-            fullName: validatedData.fullName,
-            platformLink: validatedData.platformLink
+            fullName: creatorData.fullName,
+            platformLink: creatorData.platformLink
           };
           break;
       }
