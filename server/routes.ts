@@ -1,8 +1,17 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import bcrypt from "bcryptjs";
 import { storage } from "./storage";
 import { hubspotService } from "./hubspot";
-import { insertDemoRequestSchema } from "@shared/schema";
+import { 
+  insertDemoRequestSchema, 
+  productionSignupSchema, 
+  brandSignupSchema, 
+  investorSignupSchema, 
+  creatorSignupSchema, 
+  loginSchema,
+  userRoles
+} from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Demo request submission endpoint
@@ -68,6 +77,137 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Get demo request error:", error);
       res.status(500).json({ error: "Internal server error" });
     }
+  });
+
+  // Authentication Routes
+  
+  // Signup endpoint
+  app.post("/api/auth/signup", async (req, res) => {
+    try {
+      const { role, ...signupData } = req.body;
+      
+      // Validate based on role
+      let validatedData;
+      switch (role) {
+        case userRoles.PRODUCTION:
+          validatedData = productionSignupSchema.parse(signupData);
+          break;
+        case userRoles.BRAND_AGENCY:
+          validatedData = brandSignupSchema.parse(signupData);
+          break;
+        case userRoles.INVESTOR:
+          validatedData = investorSignupSchema.parse(signupData);
+          break;
+        case userRoles.INDIVIDUAL_CREATOR:
+          validatedData = creatorSignupSchema.parse(signupData);
+          break;
+        default:
+          return res.status(400).json({ error: "Invalid role specified" });
+      }
+
+      // Check if user already exists
+      const existingUser = await storage.getUserByEmail(validatedData.email);
+      if (existingUser) {
+        return res.status(400).json({ error: "User with this email already exists" });
+      }
+
+      // Hash password
+      const passwordHash = await bcrypt.hash(validatedData.password, 10);
+
+      // Prepare role-specific details
+      let roleSpecificDetails = {};
+      switch (role) {
+        case userRoles.PRODUCTION:
+          roleSpecificDetails = {
+            companyName: validatedData.companyName,
+            contactPerson: validatedData.contactPerson,
+            companyWebsite: validatedData.companyWebsite
+          };
+          break;
+        case userRoles.BRAND_AGENCY:
+          roleSpecificDetails = {
+            brandName: validatedData.brandName,
+            contactPerson: validatedData.contactPerson,
+            companyWebsite: validatedData.companyWebsite
+          };
+          break;
+        case userRoles.INVESTOR:
+          roleSpecificDetails = {
+            fullName: validatedData.fullName,
+            investmentType: validatedData.investmentType,
+            structure: validatedData.structure
+          };
+          break;
+        case userRoles.INDIVIDUAL_CREATOR:
+          roleSpecificDetails = {
+            fullName: validatedData.fullName,
+            platformLink: validatedData.platformLink
+          };
+          break;
+      }
+
+      // Create user
+      const user = await storage.createUser({
+        email: validatedData.email,
+        passwordHash,
+        role,
+        roleSpecificDetails
+      });
+
+      // Create investor profile if needed
+      if (role === userRoles.INVESTOR) {
+        await storage.createInvestorProfile({
+          userId: user.id,
+          investmentType: validatedData.investmentType,
+          structure: validatedData.structure
+        });
+      }
+
+      // Return user data (without password hash)
+      const { passwordHash: _, ...userResponse } = user;
+      res.status(201).json({
+        success: true,
+        user: userResponse
+      });
+
+    } catch (error) {
+      console.error("Signup error:", error);
+      res.status(400).json({
+        error: error instanceof Error ? error.message : "Signup failed"
+      });
+    }
+  });
+
+  // Login endpoint
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      const validatedData = loginSchema.parse(req.body);
+      
+      const user = await storage.validateUser(validatedData.email, validatedData.password);
+      if (!user) {
+        return res.status(401).json({ error: "Invalid email or password" });
+      }
+
+      // Return user data (without password hash)
+      const { passwordHash: _, ...userResponse } = user;
+      res.json({
+        success: true,
+        user: userResponse
+      });
+
+    } catch (error) {
+      console.error("Login error:", error);
+      res.status(400).json({
+        error: error instanceof Error ? error.message : "Login failed"
+      });
+    }
+  });
+
+  // Get current user endpoint (for session management)
+  app.get("/api/auth/me", async (req, res) => {
+    // This would typically check session/JWT token
+    // For now, returning a placeholder response
+    res.status(401).json({ error: "Authentication required" });
   });
 
   const httpServer = createServer(app);

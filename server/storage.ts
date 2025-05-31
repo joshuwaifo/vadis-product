@@ -93,8 +93,11 @@ export class MemStorage implements IStorage {
     const id = this.currentUserId++;
     const now = new Date();
     const user: User = { 
-      ...insertUser, 
       id,
+      email: insertUser.email,
+      passwordHash: insertUser.passwordHash,
+      role: insertUser.role,
+      roleSpecificDetails: insertUser.roleSpecificDetails ?? null,
       createdAt: now,
       updatedAt: now
     };
@@ -110,6 +113,7 @@ export class MemStorage implements IStorage {
     return isValid ? user : null;
   }
 
+  // Demo requests (legacy - keeping for backward compatibility)
   async createDemoRequest(insertDemoRequest: InsertDemoRequest): Promise<DemoRequest> {
     const id = this.currentDemoRequestId++;
     const now = new Date();
@@ -155,6 +159,137 @@ export class MemStorage implements IStorage {
       updatedAt: new Date(),
     };
     this.demoRequests.set(id, updated);
+    return updated;
+  }
+
+  // Project methods (for production companies)
+  async createProject(insertProject: InsertProject): Promise<Project> {
+    const id = this.currentProjectId++;
+    const now = new Date();
+    const project: Project = {
+      id,
+      userId: insertProject.userId,
+      title: insertProject.title,
+      logline: insertProject.logline ?? null,
+      targetGenres: insertProject.targetGenres ?? null,
+      synopsis: insertProject.synopsis ?? null,
+      scriptContent: insertProject.scriptContent ?? null,
+      isPublished: insertProject.isPublished ?? false,
+      createdAt: now,
+      updatedAt: now,
+    };
+    this.projects.set(id, project);
+    return project;
+  }
+
+  async getProject(id: number): Promise<Project | undefined> {
+    return this.projects.get(id);
+  }
+
+  async getProjectsByUser(userId: number): Promise<Project[]> {
+    return Array.from(this.projects.values()).filter(project => project.userId === userId);
+  }
+
+  async updateProject(id: number, updates: Partial<Project>): Promise<Project | undefined> {
+    const existing = this.projects.get(id);
+    if (!existing) return undefined;
+    
+    const updated: Project = {
+      ...existing,
+      ...updates,
+      updatedAt: new Date(),
+    };
+    this.projects.set(id, updated);
+    return updated;
+  }
+
+  async publishProject(id: number): Promise<Project | undefined> {
+    return this.updateProject(id, { isPublished: true });
+  }
+
+  async getPublishedProjects(): Promise<Project[]> {
+    return Array.from(this.projects.values()).filter(project => project.isPublished);
+  }
+
+  // Product methods (for brands/agencies)
+  async createProduct(insertProduct: InsertProduct): Promise<Product> {
+    const id = this.currentProductId++;
+    const now = new Date();
+    const product: Product = {
+      id,
+      brandUserId: insertProduct.brandUserId,
+      productName: insertProduct.productName,
+      companyName: insertProduct.companyName,
+      category: insertProduct.category ?? null,
+      imageUrl: insertProduct.imageUrl ?? null,
+      description: insertProduct.description ?? null,
+      placementCriteria: insertProduct.placementCriteria ?? null,
+      createdAt: now,
+      updatedAt: now,
+    };
+    this.products.set(id, product);
+    return product;
+  }
+
+  async getProduct(id: number): Promise<Product | undefined> {
+    return this.products.get(id);
+  }
+
+  async getProductsByBrand(brandUserId: number): Promise<Product[]> {
+    return Array.from(this.products.values()).filter(product => product.brandUserId === brandUserId);
+  }
+
+  async updateProduct(id: number, updates: Partial<Product>): Promise<Product | undefined> {
+    const existing = this.products.get(id);
+    if (!existing) return undefined;
+    
+    const updated: Product = {
+      ...existing,
+      ...updates,
+      updatedAt: new Date(),
+    };
+    this.products.set(id, updated);
+    return updated;
+  }
+
+  async deleteProduct(id: number): Promise<boolean> {
+    return this.products.delete(id);
+  }
+
+  // Investor profile methods
+  async createInvestorProfile(insertProfile: InsertInvestorProfile): Promise<InvestorProfile> {
+    const id = this.currentInvestorProfileId++;
+    const now = new Date();
+    const profile: InvestorProfile = {
+      id,
+      userId: insertProfile.userId,
+      investmentType: insertProfile.investmentType ?? null,
+      structure: insertProfile.structure ?? null,
+      preferredGenres: insertProfile.preferredGenres ?? null,
+      minInvestment: insertProfile.minInvestment ?? null,
+      maxInvestment: insertProfile.maxInvestment ?? null,
+      otherCriteria: insertProfile.otherCriteria ?? null,
+      createdAt: now,
+      updatedAt: now,
+    };
+    this.investorProfiles.set(id, profile);
+    return profile;
+  }
+
+  async getInvestorProfile(userId: number): Promise<InvestorProfile | undefined> {
+    return Array.from(this.investorProfiles.values()).find(profile => profile.userId === userId);
+  }
+
+  async updateInvestorProfile(userId: number, updates: Partial<InvestorProfile>): Promise<InvestorProfile | undefined> {
+    const existing = await this.getInvestorProfile(userId);
+    if (!existing) return undefined;
+    
+    const updated: InvestorProfile = {
+      ...existing,
+      ...updates,
+      updatedAt: new Date(),
+    };
+    this.investorProfiles.set(existing.id, updated);
     return updated;
   }
 }
