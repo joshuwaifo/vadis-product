@@ -33,19 +33,20 @@ export default function Login() {
       // Redirect to role-specific dashboard
       const role = data.user?.role;
       switch (role) {
-        case userRoles.PRODUCTION:
+        case 'production_company':
           setLocation("/production/dashboard");
           break;
-        case userRoles.BRAND_AGENCY:
+        case 'brand':
           setLocation("/brand/dashboard");
           break;
-        case userRoles.INVESTOR:
+        case 'investor':
           setLocation("/investor/dashboard");
           break;
-        case userRoles.INDIVIDUAL_CREATOR:
+        case 'creator':
           setLocation("/creator/dashboard");
           break;
         default:
+          console.log('Unknown role:', role);
           setLocation("/");
       }
     },

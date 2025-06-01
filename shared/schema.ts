@@ -4,10 +4,10 @@ import { z } from "zod";
 
 // User roles enum
 export const userRoles = {
-  PRODUCTION: "PRODUCTION",
-  BRAND_AGENCY: "BRAND_AGENCY", 
-  INVESTOR: "INVESTOR",
-  INDIVIDUAL_CREATOR: "INDIVIDUAL_CREATOR"
+  PRODUCTION: "production_company",
+  BRAND_AGENCY: "brand", 
+  INVESTOR: "investor",
+  INDIVIDUAL_CREATOR: "creator"
 } as const;
 
 // Updated users table for multi-role authentication
