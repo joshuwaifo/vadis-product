@@ -14,6 +14,9 @@ import ProductionDashboard from "@/pages/dashboards/production-dashboard";
 import BrandDashboard from "@/pages/dashboards/brand-dashboard";
 import InvestorDashboard from "@/pages/dashboards/investor-dashboard";
 import CreatorDashboard from "@/pages/dashboards/creator-dashboard";
+import DashboardHome from "@/pages/dashboard/dashboard-home";
+import ProfilePage from "@/pages/dashboard/profile";
+import ProjectCreation from "@/pages/dashboard/project-creation";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -26,6 +29,9 @@ function Router() {
       <Route path="/demo/brand" component={DemoBrand} />
       <Route path="/demo/financier" component={DemoFinancier} />
       <Route path="/demo/creator" component={DemoCreator} />
+      <Route path="/dashboard" component={DashboardHome} />
+      <Route path="/dashboard/profile" component={ProfilePage} />
+      <Route path="/dashboard/projects/new" component={ProjectCreation} />
       <Route path="/production/dashboard" component={ProductionDashboard} />
       <Route path="/brand/dashboard" component={BrandDashboard} />
       <Route path="/investor/dashboard" component={InvestorDashboard} />
