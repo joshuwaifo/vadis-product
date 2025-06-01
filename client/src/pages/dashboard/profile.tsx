@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -71,25 +71,47 @@ export default function ProfilePage() {
   const profileForm = useForm({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      companyName: profile?.companyName || "",
-      city: profile?.city || "",
-      state: profile?.state || "",
-      country: profile?.country || "",
-      website: profile?.website || "",
-      description: profile?.description || "",
+      companyName: "",
+      city: "",
+      state: "",
+      country: "",
+      website: "",
+      description: "",
     },
   });
 
   const billingForm = useForm({
     resolver: zodResolver(billingSchema),
     defaultValues: {
-      billingAddress: profile?.billingAddress || "",
-      billingCity: profile?.billingCity || "",
-      billingState: profile?.billingState || "",
-      billingCountry: profile?.billingCountry || "",
-      billingZip: profile?.billingZip || "",
+      billingAddress: "",
+      billingCity: "",
+      billingState: "",
+      billingCountry: "",
+      billingZip: "",
     },
   });
+
+  // Reset forms when profile data loads
+  useEffect(() => {
+    if (profile) {
+      profileForm.reset({
+        companyName: profile.companyName || "",
+        city: profile.city || "",
+        state: profile.state || "",
+        country: profile.country || "",
+        website: profile.website || "",
+        description: profile.description || "",
+      });
+      
+      billingForm.reset({
+        billingAddress: profile.billingAddress || "",
+        billingCity: profile.billingCity || "",
+        billingState: profile.billingState || "",
+        billingCountry: profile.billingCountry || "",
+        billingZip: profile.billingZip || "",
+      });
+    }
+  }, [profile]);
 
   const updateProfileMutation = useMutation({
     mutationFn: (data: any) => apiRequest("/api/profile", "PATCH", data),
@@ -121,25 +143,7 @@ export default function ProfilePage() {
     updateBillingMutation.mutate(data);
   };
 
-  // Update form default values when profile data loads
-  if (profile && !profileForm.formState.isDirty) {
-    profileForm.reset({
-      companyName: profile.companyName,
-      city: profile.city || "",
-      state: profile.state || "",
-      country: profile.country || "",
-      website: profile.website || "",
-      description: profile.description || "",
-    });
 
-    billingForm.reset({
-      billingAddress: profile.billingAddress || "",
-      billingCity: profile.billingCity || "",
-      billingState: profile.billingState || "",
-      billingCountry: profile.billingCountry || "",
-      billingZip: profile.billingZip || "",
-    });
-  }
 
   return (
     <DashboardLayout>
