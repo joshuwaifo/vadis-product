@@ -184,15 +184,19 @@ export default function DemoRequest() {
                     </li>
                     <li className="flex items-center text-white/80">
                       <CheckCircle className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" />
-                      Increase brand partnership ROI
+                      Identify new marketing and branding opportunities
                     </li>
                     <li className="flex items-center text-white/80">
                       <CheckCircle className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" />
-                      Scale creative workflows
+                      Visualize scenes with VFX enhancements
                     </li>
                     <li className="flex items-center text-white/80">
                       <CheckCircle className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" />
-                      Measure performance with AI insights
+                      Estimate and improve financials per project
+                    </li>
+                    <li className="flex items-center text-white/80">
+                      <CheckCircle className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" />
+                      Improve casting process
                     </li>
                     <li className="flex items-center text-white/80">
                       <CheckCircle className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" />
