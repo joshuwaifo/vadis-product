@@ -156,7 +156,6 @@ export default function DemoFinancier() {
           </div>
         </nav>
       </header>
-
       <main className="pt-28">
         {/* Floating Orbs */}
         <div className="floating-orb w-96 h-96 bg-gradient-to-r from-blue-500/20 to-purple-600/20 top-20 -left-48"></div>
@@ -172,9 +171,7 @@ export default function DemoFinancier() {
                   Grow your portfolio exposure in a <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">unique asset class.</span>
                 </h1>
                 
-                <p className="text-xl text-white/80 mb-8 leading-relaxed">
-                  See how VadisAI helps investors access exclusive entertainment projects, analyze risks with AI, and connect with proven production companies.
-                </p>
+                <p className="text-xl text-white/80 mb-8 leading-relaxed">Learn how VadisAI can help investors and financiers access exclusive entertainment projects from proven production companies with AI-powered risk analysis.</p>
 
                 <div className="mb-8">
                   <p className="text-lg font-semibold text-white mb-4">
