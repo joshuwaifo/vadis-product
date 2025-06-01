@@ -149,7 +149,7 @@ export default function ProductionDashboard() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Link href="/production/projects/new">
+              <Link href="/production/projects/new-details">
                 <Button variant="outline" className="h-auto p-4 flex flex-col items-center space-y-2 hover:bg-gray-50">
                   <Film className="w-8 h-8 text-blue-600" />
                   <div className="text-center">
@@ -216,7 +216,7 @@ export default function ProductionDashboard() {
                 <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-gray-900 mb-2">No projects yet</h3>
                 <p className="text-gray-500 mb-4">Get started by creating your first project</p>
-                <Link href="/production/projects/new">
+                <Link href="/production/projects/new-details">
                   <Button>Create Your First Project</Button>
                 </Link>
               </div>

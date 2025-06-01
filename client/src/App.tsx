@@ -44,11 +44,14 @@ function Router() {
       <Route path="/investor/dashboard" component={InvestorDashboard} />
       <Route path="/creator/dashboard" component={CreatorDashboard} />
       
-      {/* Production company routes */}
-      <Route path="/production/projects" component={ProjectsList} />
-      <Route path="/production/projects/new" component={ProjectCreation} />
+      {/* Production company project flow */}
+      <Route path="/production/projects/new-details" component={ProjectDetailsForm} />
+      <Route path="/production/projects/:id/script-options" component={ProjectCreation} />
       <Route path="/production/projects/:id/script-writer" component={ScriptGenerator} />
       <Route path="/production/projects/:id/script-upload" component={ScriptAnalysisNew} />
+      
+      {/* Production company routes */}
+      <Route path="/production/projects" component={ProjectsList} />
       <Route path="/production/profile" component={ProfilePage} />
       
       {/* Brand/Agency routes */}
