@@ -11,11 +11,12 @@ import DemoBrand from "@/pages/demos/demo-brand";
 import DemoFinancier from "@/pages/demos/demo-financier";
 import DemoCreator from "@/pages/demos/demo-creator";
 
-import DashboardHome from "@/pages/dashboard/dashboard-home";
+
 import ProductionDashboard from "@/pages/dashboard/production-dashboard";
 import BrandDashboard from "@/pages/dashboard/brand-dashboard";
 import InvestorDashboard from "@/pages/dashboard/investor-dashboard";
 import CreatorDashboard from "@/pages/dashboard/creator-dashboard";
+import DashboardRedirect from "@/pages/dashboard/dashboard-redirect";
 import ProfilePage from "@/pages/dashboard/profile";
 import ProjectCreation from "@/pages/dashboard/project-creation";
 import ProjectsList from "@/pages/dashboard/projects-list";
@@ -33,8 +34,8 @@ function Router() {
       <Route path="/demo/brand" component={DemoBrand} />
       <Route path="/demo/financier" component={DemoFinancier} />
       <Route path="/demo/creator" component={DemoCreator} />
-      {/* Legacy unified dashboard - fallback */}
-      <Route path="/dashboard" component={DashboardHome} />
+      {/* Redirect legacy dashboard route to login */}
+      <Route path="/dashboard" component={DashboardRedirect} />
       
       {/* Role-specific dashboards as per original requirements */}
       <Route path="/production/dashboard" component={ProductionDashboard} />
