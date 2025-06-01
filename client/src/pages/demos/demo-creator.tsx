@@ -164,7 +164,7 @@ export default function DemoCreator() {
 
         <section className="relative overflow-hidden min-h-screen flex items-center">
           <div className="max-w-7xl mx-auto px-6 py-12 relative z-10">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               {/* Left Side - Value Proposition */}
               <div className="lg:pr-8">
                 <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight glow-text">
