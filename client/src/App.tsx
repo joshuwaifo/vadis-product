@@ -15,7 +15,6 @@ import DashboardHome from "@/pages/dashboard/dashboard-home";
 import ProfilePage from "@/pages/dashboard/profile";
 import ProjectCreation from "@/pages/dashboard/project-creation";
 import ProjectsList from "@/pages/dashboard/projects-list";
-import ScriptAnalysis from "@/pages/dashboard/script-analysis";
 import ScriptAnalysisNew from "@/pages/dashboard/script-analysis-new";
 import ScriptGenerator from "@/pages/dashboard/script-generator";
 import NotFound from "@/pages/not-found";
