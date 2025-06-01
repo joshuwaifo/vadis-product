@@ -30,20 +30,20 @@ export default function Login() {
         description: "Welcome back to VadisAI.",
       });
       
-      // Redirect to the new unified dashboard
+      // Redirect to role-specific dashboard
       const role = data.user?.role;
       switch (role) {
         case userRoles.PRODUCTION:
-          setLocation("/dashboard");
+          setLocation("/production/dashboard");
           break;
         case userRoles.BRAND_AGENCY:
-          setLocation("/dashboard");
+          setLocation("/brand/dashboard");
           break;
         case userRoles.INVESTOR:
-          setLocation("/dashboard");
+          setLocation("/investor/dashboard");
           break;
         case userRoles.INDIVIDUAL_CREATOR:
-          setLocation("/dashboard");
+          setLocation("/creator/dashboard");
           break;
         default:
           setLocation("/");
