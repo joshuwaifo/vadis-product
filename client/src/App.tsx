@@ -47,19 +47,19 @@ function Router() {
       </Route>
       
       {/* Role-specific dashboards */}
-      <Route path="/production/dashboard" component={ProductionDashboard} />
-      <Route path="/brand/dashboard" component={BrandDashboard} />
-      <Route path="/investor/dashboard" component={InvestorDashboard} />
-      <Route path="/creator/dashboard" component={CreatorDashboard} />
+      <Route path="/dashboard/production" component={ProductionDashboard} />
+      <Route path="/dashboard/brand" component={BrandDashboard} />
+      <Route path="/dashboard/investor" component={InvestorDashboard} />
+      <Route path="/dashboard/creator" component={CreatorDashboard} />
       
       {/* Production company project flow */}
-      <Route path="/production/projects/new-details" component={ProjectDetailsForm} />
-      <Route path="/production/projects/:id/script-options" component={ProjectCreation} />
-      <Route path="/production/projects/:id/script-writer" component={ScriptGenerator} />
-      <Route path="/production/projects/:id/script-upload" component={ScriptAnalysisNew} />
+      <Route path="/dashboard/project-creation" component={ProjectCreation} />
+      <Route path="/dashboard/project-details-form" component={ProjectDetailsForm} />
+      <Route path="/dashboard/script-generator" component={ScriptGenerator} />
+      <Route path="/dashboard/script-analysis-new" component={ScriptAnalysisNew} />
       
       {/* Shared routes */}
-      <Route path="/profile" component={ProfilePage} />
+      <Route path="/dashboard/profile" component={ProfilePage} />
       
       <Route component={NotFound} />
     </Switch>
