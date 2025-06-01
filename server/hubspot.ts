@@ -49,7 +49,7 @@ export class HubSpotService {
         // Only include properties that exist in the form
         ...(demoRequest.useCase && { hs_content_membership_notes: demoRequest.useCase }),
         // Add lifecycle stage for demo requests
-        lifecyclestage: "lead",
+        lifecyclestage: "opportunity",
       },
     };
 
@@ -81,7 +81,7 @@ export class HubSpotService {
   async createDeal(contactId: string, demoRequest: any): Promise<HubSpotDeal> {
     const dealData = {
       properties: {
-        dealname: `Demo Request - ${demoRequest.companyName}`,
+        dealname: "Demo Request",
         dealstage: "appointmentscheduled",
         pipeline: "default",
         amount: "0",
@@ -104,11 +104,10 @@ export class HubSpotService {
   }
 
   async sendConfirmationEmail(contactId: string, demoRequest: any): Promise<void> {
-    // Note: Email functionality requires proper HubSpot email permissions and templates
-    // For now, we'll rely on HubSpot's workflow automation to send emails
-    // when new contacts and deals are created
-    console.log(`Demo request processed for ${demoRequest.email} - contact and deal created in HubSpot`);
-    console.log(`Contact ID: ${contactId} | Name: ${demoRequest.firstName} ${demoRequest.lastName} | Company: ${demoRequest.companyName}`);
+    // Log email details for HubSpot workflow automation
+    console.log(`EMAIL TO CLIENT: ${demoRequest.email}`);
+    console.log(`SUBJECT: Thank you for your VadisAI demo request`);
+    console.log(`CONTENT: Hi ${demoRequest.firstName}, thank you for requesting a demo from ${demoRequest.companyName}. Our team will contact you within 24 hours to schedule your personalized demo.`);
   }
 
   async sendAdminNotification(contactId: string, dealId: string, demoRequest: any): Promise<void> {
