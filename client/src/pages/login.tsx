@@ -78,8 +78,8 @@ export default function Login() {
           <Link href="/">
             <img
               src={vadisLogoLight}
-              alt="VadisAI"
-              className="h-12 w-auto cursor-pointer"
+              alt="VadisMedia"
+              className="h-24 w-auto drop-shadow-2xl cursor-pointer"
             />
           </Link>
           <div className="flex items-center space-x-4">

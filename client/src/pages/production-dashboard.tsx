@@ -14,8 +14,8 @@ export default function ProductionDashboard() {
             <Link href="/">
               <img
                 src={vadisLogoLight}
-                alt="VadisAI"
-                className="h-10 w-auto cursor-pointer"
+                alt="VadisMedia"
+                className="h-24 w-auto drop-shadow-2xl cursor-pointer"
               />
             </Link>
             
