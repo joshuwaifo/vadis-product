@@ -23,7 +23,7 @@ const formSchema = z.object({
   companyName: z.string().min(1, "Company name is required"),
   companyType: z.string().default("production_company"),
   jobTitle: z.string().optional(),
-  phoneNumber: z.string().optional(),
+  phoneNumber: z.string().min(1, "Phone number is required"),
   useCase: z.string().optional(),
 });
 
@@ -286,7 +286,7 @@ export default function DemoProduction() {
                           <FormItem>
                             <FormControl>
                               <Input 
-                                placeholder="Phone number" 
+                                placeholder="Phone number*" 
                                 className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 h-12"
                                 {...field} 
                               />
@@ -320,7 +320,7 @@ export default function DemoProduction() {
                         <FormItem>
                           <FormControl>
                             <Input 
-                              placeholder="What's your role at the company?" 
+                              placeholder="Your position at the company" 
                               className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 h-12"
                               {...field} 
                             />
