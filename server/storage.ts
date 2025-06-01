@@ -512,6 +512,29 @@ export class DatabaseStorage implements IStorage {
       .returning();
     return updated || undefined;
   }
+
+  // Production profile methods
+  async createProductionProfile(insertProfile: InsertProductionProfile): Promise<ProductionProfile> {
+    const [profile] = await db
+      .insert(productionProfiles)
+      .values(insertProfile)
+      .returning();
+    return profile;
+  }
+
+  async getProductionProfile(userId: number): Promise<ProductionProfile | undefined> {
+    const [profile] = await db.select().from(productionProfiles).where(eq(productionProfiles.userId, userId));
+    return profile || undefined;
+  }
+
+  async updateProductionProfile(userId: number, updates: Partial<ProductionProfile>): Promise<ProductionProfile | undefined> {
+    const [updated] = await db
+      .update(productionProfiles)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(productionProfiles.userId, userId))
+      .returning();
+    return updated || undefined;
+  }
 }
 
 export const storage = new DatabaseStorage();

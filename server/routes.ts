@@ -198,6 +198,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Register script analysis routes
+  registerScriptAnalysisRoutes(app);
+
   const httpServer = createServer(app);
 
   return httpServer;
