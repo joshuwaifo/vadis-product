@@ -156,7 +156,6 @@ export default function DemoProduction() {
           </div>
         </nav>
       </header>
-
       <main className="pt-28">
         {/* Floating Orbs */}
         <div className="floating-orb w-96 h-96 bg-gradient-to-r from-blue-500/20 to-purple-600/20 top-20 -left-48"></div>
@@ -172,9 +171,7 @@ export default function DemoProduction() {
                   Elevate your upcoming productions from great to <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">extraordinary.</span>
                 </h1>
                 
-                <p className="text-xl text-white/80 mb-8 leading-relaxed">
-                  See how VadisAI helps production companies streamline workflows, find talent, and secure funding with AI-powered insights.
-                </p>
+                <p className="text-xl text-white/80 mb-8 leading-relaxed">Learn how VadisAI can help your production company streamline project analysis, unlock revenue opportunities, optimize project finances, improve talent casting, manage VFX estimates, and secure funding with AI-powered insights.</p>
 
                 <div className="mb-8">
                   <p className="text-lg font-semibold text-white mb-4">
