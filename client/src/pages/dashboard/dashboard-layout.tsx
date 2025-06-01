@@ -52,8 +52,15 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       `}>
         <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 via-purple-600 to-pink-600 rounded-lg"></div>
-            <span className="text-xl font-bold text-gray-900 dark:text-white">VadisAI</span>
+            <div className="relative w-10 h-10 bg-gradient-to-br from-blue-500 via-purple-600 to-pink-600 rounded-xl shadow-lg flex items-center justify-center">
+              <div className="w-6 h-6 bg-white rounded-md flex items-center justify-center">
+                <span className="text-xs font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">V</span>
+              </div>
+            </div>
+            <div>
+              <span className="text-xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">VadisAI</span>
+              <div className="text-xs text-gray-500 dark:text-gray-400 -mt-1">Production</div>
+            </div>
           </div>
           <Button
             variant="ghost"
@@ -65,8 +72,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           </Button>
         </div>
 
-        <nav className="mt-6 px-3">
-          <div className="space-y-1">
+        <nav className="mt-8 px-4">
+          <div className="space-y-2">
             {navigation.map((item) => {
               const Icon = item.icon;
               return (
@@ -76,13 +83,15 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                   onClick={() => setSidebarOpen(false)}
                 >
                   <div className={`
-                    flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors
+                    flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 group
                     ${isActive(item.href)
-                      ? 'bg-gradient-to-r from-blue-50 to-purple-50 text-blue-700 dark:from-blue-900/20 dark:to-purple-900/20 dark:text-blue-300'
-                      : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
+                      ? 'bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 text-blue-700 dark:text-blue-300 shadow-sm border border-blue-100 dark:border-blue-800/50'
+                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700/50 dark:hover:text-white'
                     }
                   `}>
-                    <Icon className="mr-3 h-5 w-5" />
+                    <Icon className={`mr-3 h-5 w-5 transition-colors ${
+                      isActive(item.href) ? 'text-blue-600 dark:text-blue-400' : 'group-hover:text-blue-500'
+                    }`} />
                     {item.name}
                   </div>
                 </Link>
@@ -92,15 +101,15 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
           <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
             <Link href="/dashboard/projects/new">
-              <Button className="w-full bg-gradient-to-r from-blue-500 via-purple-600 to-pink-600 hover:from-blue-600 hover:via-purple-700 hover:to-pink-700 text-white">
-                <Plus className="mr-2 h-4 w-4" />
+              <Button className="w-full bg-gradient-to-r from-blue-500 via-purple-600 to-pink-600 hover:from-blue-600 hover:via-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 rounded-xl py-3">
+                <Plus className="mr-2 h-5 w-5" />
                 New Project
               </Button>
             </Link>
           </div>
 
-          <div className="absolute bottom-6 left-3 right-3">
-            <Button variant="ghost" className="w-full justify-start text-gray-700 dark:text-gray-300">
+          <div className="absolute bottom-6 left-4 right-4">
+            <Button variant="ghost" className="w-full justify-start text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-xl transition-all duration-200">
               <LogOut className="mr-3 h-5 w-5" />
               Sign Out
             </Button>
