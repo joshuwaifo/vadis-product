@@ -56,118 +56,122 @@ export default function DashboardHome() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-12">
-        {/* Hero Welcome Section */}
-        <div className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-blue-950/20 dark:via-purple-950/20 dark:to-pink-950/20 rounded-2xl p-8 lg:p-12">
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-purple-500/5 to-pink-500/5" />
-          <div className="relative">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-                  Welcome back to <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">VadisAI</span>
+      <div className="min-h-screen">
+        {/* Hero Section with Modern Glass Morphism */}
+        <div className="relative h-96 overflow-hidden rounded-3xl mb-8">
+          {/* Animated Background */}
+          <div className="absolute inset-0 bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900">
+            <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/20 via-purple-500/20 to-pink-500/20 animate-gradient-xy"></div>
+            <div className="absolute top-0 left-0 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
+            <div className="absolute top-0 right-0 w-72 h-72 bg-yellow-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
+            <div className="absolute -bottom-8 left-20 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
+          </div>
+          
+          {/* Glass Morphism Card */}
+          <div className="relative h-full flex items-center justify-center p-8">
+            <div className="backdrop-blur-lg bg-white/10 border border-white/20 rounded-2xl p-8 lg:p-12 max-w-4xl w-full shadow-2xl">
+              <div className="text-center space-y-6">
+                <h1 className="text-5xl lg:text-7xl font-black text-white mb-6">
+                  Build. Fund. <span className="bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">Create.</span>
                 </h1>
-                <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl">
-                  Your production dashboard is ready. Create compelling scripts, secure funding, and bring your vision to life with AI-powered insights.
+                <p className="text-xl lg:text-2xl text-gray-200 max-w-3xl mx-auto leading-relaxed">
+                  Transform your creative vision into investor-ready projects with AI-powered script analysis and generation
                 </p>
-                <div className="mt-6 flex items-center gap-4">
+                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-8">
                   <Link href="/dashboard/projects/new">
-                    <Button size="lg" className="bg-gradient-to-r from-blue-500 via-purple-600 to-pink-600 hover:from-blue-600 hover:via-purple-700 hover:to-pink-700 text-white px-8">
+                    <Button size="lg" className="bg-white text-gray-900 hover:bg-gray-100 px-8 py-4 text-lg font-semibold rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
                       <Plus className="mr-2 h-5 w-5" />
-                      Start New Project
+                      Create Project
                     </Button>
                   </Link>
                   <Link href="/dashboard/profile">
-                    <Button variant="outline" size="lg" className="border-2">
-                      Complete Profile
+                    <Button variant="outline" size="lg" className="border-2 border-white/40 text-white hover:bg-white/10 px-8 py-4 text-lg rounded-xl backdrop-blur">
+                      Setup Profile
                     </Button>
                   </Link>
                 </div>
-              </div>
-              <div className="hidden lg:block">
-                <div className="w-32 h-32 bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500 rounded-full opacity-20 animate-pulse" />
               </div>
             </div>
           </div>
         </div>
 
-        {/* Enhanced Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card className="relative overflow-hidden border-0 shadow-lg bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/50 dark:to-blue-900/50">
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent" />
-            <CardHeader className="relative flex flex-row items-center justify-between space-y-0 pb-3">
-              <CardTitle className="text-sm font-semibold text-blue-700 dark:text-blue-300">Total Projects</CardTitle>
-              <div className="p-2 bg-blue-100 dark:bg-blue-800/50 rounded-lg">
-                <FolderOpen className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+        {/* Modern Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+          {/* Total Projects */}
+          <div className="group relative">
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl blur opacity-30 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
+            <div className="relative bg-white dark:bg-gray-900 p-8 rounded-2xl leading-none flex items-center justify-between">
+              <div className="flex-1">
+                <div className="text-gray-500 text-sm font-medium mb-2">Total Projects</div>
+                <div className="text-4xl font-black text-gray-900 dark:text-white mb-1">{projects?.length || 0}</div>
+                <div className="text-blue-600 text-sm font-medium">{projects?.filter(p => p.status === 'completed').length || 0} completed</div>
               </div>
-            </CardHeader>
-            <CardContent className="relative">
-              <div className="text-3xl font-bold text-gray-900 dark:text-white">{projects?.length || 0}</div>
-              <p className="text-sm text-blue-600 dark:text-blue-400 mt-1">
-                {projects?.filter(p => p.status === 'completed').length || 0} completed
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card className="relative overflow-hidden border-0 shadow-lg bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950/50 dark:to-purple-900/50">
-            <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-transparent" />
-            <CardHeader className="relative flex flex-row items-center justify-between space-y-0 pb-3">
-              <CardTitle className="text-sm font-semibold text-purple-700 dark:text-purple-300">Published Projects</CardTitle>
-              <div className="p-2 bg-purple-100 dark:bg-purple-800/50 rounded-lg">
-                <Eye className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+              <div className="p-4 bg-blue-100 dark:bg-blue-900/50 rounded-full">
+                <FolderOpen className="h-8 w-8 text-blue-600 dark:text-blue-400" />
               </div>
-            </CardHeader>
-            <CardContent className="relative">
-              <div className="text-3xl font-bold text-gray-900 dark:text-white">{projects?.filter(p => p.isPublished).length || 0}</div>
-              <p className="text-sm text-purple-600 dark:text-purple-400 mt-1">
-                Visible to investors
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card className="relative overflow-hidden border-0 shadow-lg bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950/50 dark:to-green-900/50">
-            <div className="absolute inset-0 bg-gradient-to-r from-green-500/10 to-transparent" />
-            <CardHeader className="relative flex flex-row items-center justify-between space-y-0 pb-3">
-              <CardTitle className="text-sm font-semibold text-green-700 dark:text-green-300">Funding Goal</CardTitle>
-              <div className="p-2 bg-green-100 dark:bg-green-800/50 rounded-lg">
-                <TrendingUp className="h-5 w-5 text-green-600 dark:text-green-400" />
+            </div>
+          </div>
+
+          {/* Published Projects */}
+          <div className="group relative">
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl blur opacity-30 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
+            <div className="relative bg-white dark:bg-gray-900 p-8 rounded-2xl leading-none flex items-center justify-between">
+              <div className="flex-1">
+                <div className="text-gray-500 text-sm font-medium mb-2">Published</div>
+                <div className="text-4xl font-black text-gray-900 dark:text-white mb-1">{projects?.filter(p => p.isPublished).length || 0}</div>
+                <div className="text-purple-600 text-sm font-medium">Visible to investors</div>
               </div>
-            </CardHeader>
-            <CardContent className="relative">
-              <div className="text-3xl font-bold text-gray-900 dark:text-white">
-                {formatCurrency(projects?.reduce((sum, p) => sum + (p.fundingGoal || 0), 0) || 0)}
+              <div className="p-4 bg-purple-100 dark:bg-purple-900/50 rounded-full">
+                <Eye className="h-8 w-8 text-purple-600 dark:text-purple-400" />
               </div>
-              <p className="text-sm text-green-600 dark:text-green-400 mt-1">
-                Across all projects
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card className="relative overflow-hidden border-0 shadow-lg bg-gradient-to-br from-pink-50 to-pink-100 dark:from-pink-950/50 dark:to-pink-900/50">
-            <div className="absolute inset-0 bg-gradient-to-r from-pink-500/10 to-transparent" />
-            <CardHeader className="relative flex flex-row items-center justify-between space-y-0 pb-3">
-              <CardTitle className="text-sm font-semibold text-pink-700 dark:text-pink-300">Funds Raised</CardTitle>
-              <div className="p-2 bg-pink-100 dark:bg-pink-800/50 rounded-lg">
-                <DollarSign className="h-5 w-5 text-pink-600 dark:text-pink-400" />
+            </div>
+          </div>
+
+          {/* Funding Goal */}
+          <div className="group relative">
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-green-600 to-blue-600 rounded-2xl blur opacity-30 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
+            <div className="relative bg-white dark:bg-gray-900 p-8 rounded-2xl leading-none flex items-center justify-between">
+              <div className="flex-1">
+                <div className="text-gray-500 text-sm font-medium mb-2">Funding Goal</div>
+                <div className="text-4xl font-black text-gray-900 dark:text-white mb-1">
+                  {formatCurrency(projects?.reduce((sum, p) => sum + (p.fundingGoal || 0), 0) || 0)}
+                </div>
+                <div className="text-green-600 text-sm font-medium">Across all projects</div>
               </div>
-            </CardHeader>
-            <CardContent className="relative">
-              <div className="text-3xl font-bold text-gray-900 dark:text-white">
-                {formatCurrency(projects?.reduce((sum, p) => sum + p.fundingRaised, 0) || 0)}
+              <div className="p-4 bg-green-100 dark:bg-green-900/50 rounded-full">
+                <TrendingUp className="h-8 w-8 text-green-600 dark:text-green-400" />
               </div>
-              <p className="text-sm text-pink-600 dark:text-pink-400 mt-1">
-                Total amount raised
-              </p>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
+
+          {/* Funds Raised */}
+          <div className="group relative">
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-pink-600 to-orange-600 rounded-2xl blur opacity-30 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
+            <div className="relative bg-white dark:bg-gray-900 p-8 rounded-2xl leading-none flex items-center justify-between">
+              <div className="flex-1">
+                <div className="text-gray-500 text-sm font-medium mb-2">Funds Raised</div>
+                <div className="text-4xl font-black text-gray-900 dark:text-white mb-1">
+                  {formatCurrency(projects?.reduce((sum, p) => sum + p.fundingRaised, 0) || 0)}
+                </div>
+                <div className="text-pink-600 text-sm font-medium">Total amount raised</div>
+              </div>
+              <div className="p-4 bg-pink-100 dark:bg-pink-900/50 rounded-full">
+                <DollarSign className="h-8 w-8 text-pink-600 dark:text-pink-400" />
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Recent Projects */}
-        <div className="space-y-6">
+        {/* Projects Section */}
+        <div className="space-y-8">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Recent Projects</h2>
+            <div>
+              <h2 className="text-3xl font-black text-gray-900 dark:text-white">Your Projects</h2>
+              <p className="text-gray-600 dark:text-gray-400 mt-2">Manage your creative portfolio and funding journey</p>
+            </div>
             <Link href="/dashboard/projects/new">
-              <Button className="bg-gradient-to-r from-blue-500 via-purple-600 to-pink-600 hover:from-blue-600 hover:via-purple-700 hover:to-pink-700">
-                <Plus className="mr-2 h-4 w-4" />
+              <Button className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:from-blue-700 hover:via-purple-700 hover:to-pink-700 text-white px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+                <Plus className="mr-2 h-5 w-5" />
                 New Project
               </Button>
             </Link>
@@ -248,31 +252,62 @@ export default function DashboardHome() {
               ))}
             </div>
           ) : (
-            <Card className="relative overflow-hidden border-0 shadow-xl bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-blue-950/30 dark:to-purple-950/30">
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-purple-500/5 to-pink-500/5" />
+            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+              <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 via-purple-400/20 to-pink-400/20 animate-gradient-xy"></div>
+              <div className="absolute top-0 left-0 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-blob"></div>
+              <div className="absolute top-0 right-0 w-72 h-72 bg-yellow-300 rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-blob animation-delay-2000"></div>
+              <div className="absolute -bottom-8 left-20 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-blob animation-delay-4000"></div>
+              
               <div className="relative p-16 text-center">
-                <div className="mx-auto w-24 h-24 bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100 dark:from-blue-900/50 dark:via-purple-900/50 dark:to-pink-900/50 rounded-full flex items-center justify-center mb-8 shadow-lg">
-                  <FolderOpen className="h-12 w-12 text-blue-600 dark:text-blue-400" />
+                <div className="inline-flex items-center justify-center w-32 h-32 mb-8">
+                  <div className="relative">
+                    <div className="w-24 h-24 bg-gradient-to-br from-white/20 to-white/5 backdrop-blur-lg rounded-full flex items-center justify-center border border-white/20">
+                      <FolderOpen className="h-12 w-12 text-white" />
+                    </div>
+                    <div className="absolute -inset-2 bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 rounded-full blur-sm opacity-30"></div>
+                  </div>
                 </div>
-                <CardTitle className="text-2xl mb-4 text-gray-900 dark:text-white">Ready to create your first project?</CardTitle>
-                <CardDescription className="text-lg mb-8 max-w-md mx-auto text-gray-600 dark:text-gray-300">
-                  Transform your creative vision into reality. Choose between AI-powered script analysis or intelligent script generation to get started.
-                </CardDescription>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                
+                <h3 className="text-4xl font-black text-white mb-6">
+                  Your Creative Journey <span className="bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">Starts Here</span>
+                </h3>
+                
+                <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto leading-relaxed">
+                  Launch your first project and unlock AI-powered tools designed to transform scripts into investor-ready productions
+                </p>
+                
+                <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
                   <Link href="/dashboard/projects/new">
-                    <Button size="lg" className="bg-gradient-to-r from-blue-500 via-purple-600 to-pink-600 hover:from-blue-600 hover:via-purple-700 hover:to-pink-700 text-white px-8 py-3 text-lg shadow-xl hover:shadow-2xl transition-all duration-300">
+                    <Button size="lg" className="bg-white text-gray-900 hover:bg-gray-100 px-8 py-4 text-lg font-semibold rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
                       <Plus className="mr-2 h-5 w-5" />
-                      Create Your First Project
+                      Start First Project
                     </Button>
                   </Link>
                   <Link href="/dashboard/profile">
-                    <Button variant="outline" size="lg" className="border-2 px-6 py-3">
-                      Set Up Profile First
+                    <Button variant="outline" size="lg" className="border-2 border-white/40 text-white hover:bg-white/10 px-8 py-4 text-lg rounded-xl backdrop-blur">
+                      Complete Profile
                     </Button>
                   </Link>
                 </div>
+                
+                <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+                  <div className="backdrop-blur-lg bg-white/5 border border-white/10 rounded-xl p-6 text-left">
+                    <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center mb-4">
+                      <FileText className="h-5 w-5 text-blue-400" />
+                    </div>
+                    <h4 className="text-white font-semibold mb-2">Script Analysis</h4>
+                    <p className="text-gray-400 text-sm">Upload existing scripts for AI-powered insights and investment readiness evaluation</p>
+                  </div>
+                  <div className="backdrop-blur-lg bg-white/5 border border-white/10 rounded-xl p-6 text-left">
+                    <div className="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center mb-4">
+                      <BarChart3 className="h-5 w-5 text-purple-400" />
+                    </div>
+                    <h4 className="text-white font-semibold mb-2">Script Generation</h4>
+                    <p className="text-gray-400 text-sm">Transform concepts into full scripts with intelligent AI assistance and market analysis</p>
+                  </div>
+                </div>
               </div>
-            </Card>
+            </div>
           )}
         </div>
 
