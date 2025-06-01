@@ -71,10 +71,10 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen modern-gradient grain-texture">
+    <div className="min-h-screen modern-gradient grain-texture flex flex-col">
+      {/* Header */}
       <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between">
           <Link href="/">
             <img
               src={vadisLogoLight}
@@ -89,9 +89,11 @@ export default function Login() {
             </Button>
           </div>
         </div>
+      </div>
 
-        {/* Login Form */}
-        <div className="max-w-md mx-auto">
+      {/* Login Form - Centered */}
+      <div className="flex-1 flex items-center justify-center px-4 pb-8">
+        <div className="w-full max-w-md">
           <Card className="p-8">
             <div className="text-center mb-8">
               <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-blue-500 via-purple-600 to-pink-600 flex items-center justify-center">
