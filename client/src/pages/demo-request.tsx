@@ -175,7 +175,7 @@ export default function DemoRequest() {
 
                 <div className="mb-8">
                   <p className="text-lg font-semibold text-white mb-4">
-                    <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent glow-text">250,000+</span> content creators use VadisAI to:
+                    A wide range of businesses use VadisAI to:
                   </p>
                   <ul className="space-y-3">
                     <li className="flex items-center text-white/80">
