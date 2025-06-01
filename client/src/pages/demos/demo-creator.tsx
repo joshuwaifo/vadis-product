@@ -179,23 +179,15 @@ export default function DemoCreator() {
                   <ul className="space-y-3">
                     <li className="flex items-center text-white/80">
                       <CheckCircle className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" />
-                      Connect with production companies seeking talent
+                      AI-assisted idea generation for short and long form content
                     </li>
                     <li className="flex items-center text-white/80">
                       <CheckCircle className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" />
-                      Access exclusive collaboration opportunities
+                      Storyboard before your create content
                     </li>
                     <li className="flex items-center text-white/80">
                       <CheckCircle className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" />
-                      Monetize skills through strategic partnerships
-                    </li>
-                    <li className="flex items-center text-white/80">
-                      <CheckCircle className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" />
-                      Build professional networks in entertainment
-                    </li>
-                    <li className="flex items-center text-white/80">
-                      <CheckCircle className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" />
-                      Develop career growth with industry mentorship
+                      Analyze your script for alternative suggestions
                     </li>
                   </ul>
                 </div>
