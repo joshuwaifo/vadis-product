@@ -82,6 +82,7 @@ export class MemStorage implements IStorage {
     this.projects = new Map();
     this.products = new Map();
     this.investorProfiles = new Map();
+    this.productionProfiles = new Map();
     
     this.currentUserId = 1;
     this.currentDemoRequestId = 1;
@@ -332,6 +333,13 @@ export class MemStorage implements IStorage {
       country: insertProfile.country || null,
       website: insertProfile.website || null,
       description: insertProfile.description || null,
+      billingAddress: insertProfile.billingAddress || null,
+      billingCity: insertProfile.billingCity || null,
+      billingState: insertProfile.billingState || null,
+      billingCountry: insertProfile.billingCountry || null,
+      billingZip: insertProfile.billingZip || null,
+
+      paymentMethodId: insertProfile.paymentMethodId || null,
       createdAt: now,
       updatedAt: now,
     };

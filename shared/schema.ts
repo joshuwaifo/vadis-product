@@ -69,6 +69,7 @@ export const projects = pgTable("projects", {
   keyTalent: jsonb("key_talent"), // Array of key talent involved
   distributionPlan: text("distribution_plan"),
   marketAnalysis: text("market_analysis"),
+  readerReport: text("reader_report"), // Generated reader's report
   
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),

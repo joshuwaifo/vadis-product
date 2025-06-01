@@ -43,12 +43,12 @@ export default function ScriptGenerator() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
-  const form = useForm({
+  const form = useForm<z.infer<typeof projectSchema>>({
     resolver: zodResolver(projectSchema),
     defaultValues: {
       title: "",
       concept: "",
-      targetGenres: [],
+      targetGenres: [] as string[],
       budgetRange: "",
       fundingGoal: 0,
       productionTimeline: "",
@@ -250,7 +250,7 @@ export default function ScriptGenerator() {
                         onClick={() => {
                           const current = form.getValues("targetGenres") || [];
                           if (current.includes(genre)) {
-                            form.setValue("targetGenres", current.filter(g => g !== genre));
+                            form.setValue("targetGenres", current.filter((g: string) => g !== genre));
                           } else {
                             form.setValue("targetGenres", [...current, genre]);
                           }

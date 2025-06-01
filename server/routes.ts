@@ -92,7 +92,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { title, projectType = 'script_analysis', logline, targetGenres, synopsis } = req.body;
       
       const project = await storage.createProject({
-        userId: req.user?.id || 1, // Fallback to user ID 1 for now
+        userId: (req as any).user?.id || 1, // Fallback to user ID 1 for now
         title,
         projectType,
         logline: logline || null,
