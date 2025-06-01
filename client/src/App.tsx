@@ -18,6 +18,7 @@ import InvestorDashboard from "@/pages/dashboard/investor-dashboard";
 import CreatorDashboard from "@/pages/dashboard/creator-dashboard";
 import DashboardRedirect from "@/pages/dashboard/dashboard-redirect";
 import ProfilePage from "@/pages/dashboard/profile";
+import ProjectDetailsForm from "@/pages/dashboard/project-details-form";
 import ProjectCreation from "@/pages/dashboard/project-creation";
 import ProjectsList from "@/pages/dashboard/projects-list";
 import ScriptAnalysisNew from "@/pages/dashboard/script-analysis-new";

@@ -89,14 +89,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/projects", async (req, res) => {
     try {
+      const { title, projectType = 'script_analysis', logline, targetGenres, synopsis } = req.body;
+      
       const project = await storage.createProject({
-        userId: 1, // Using hardcoded user ID for now
-        ...req.body,
+        userId: req.user?.id || 1, // Fallback to user ID 1 for now
+        title,
+        projectType,
+        logline: logline || null,
+        targetGenres: targetGenres || null,
+        synopsis: synopsis || null,
       });
       res.json(project);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error creating project:", error);
-      res.status(500).json({ error: "Failed to create project" });
+      res.status(400).json({ error: error.message });
     }
   });
 
