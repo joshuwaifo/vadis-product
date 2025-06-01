@@ -92,10 +92,7 @@ export default function ProfilePage() {
   });
 
   const updateProfileMutation = useMutation({
-    mutationFn: (data: any) => apiRequest("/api/profile", {
-      method: "PATCH",
-      body: data,
-    }),
+    mutationFn: (data: any) => apiRequest("/api/profile", "PATCH", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/profile'] });
       toast({
@@ -106,10 +103,7 @@ export default function ProfilePage() {
   });
 
   const updateBillingMutation = useMutation({
-    mutationFn: (data: any) => apiRequest("/api/profile/billing", {
-      method: "PATCH",
-      body: data,
-    }),
+    mutationFn: (data: any) => apiRequest("/api/profile/billing", "PATCH", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/profile'] });
       toast({
