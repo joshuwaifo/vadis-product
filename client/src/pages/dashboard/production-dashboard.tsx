@@ -256,6 +256,7 @@ export default function ProductionDashboard() {
           </CardContent>
         </Card>
       </div>
-    </DashboardLayout>
+      </div>
+    </div>
   );
 }

@@ -487,6 +487,7 @@ export default function ScriptGenerator() {
           )}
         </form>
       </div>
-    </DashboardLayout>
+      </div>
+    </div>
   );
 }

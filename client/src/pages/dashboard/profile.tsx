@@ -433,6 +433,7 @@ export default function ProfilePage() {
           </TabsContent>
         </Tabs>
       </div>
-    </DashboardLayout>
+      </div>
+    </div>
   );
 }

@@ -249,6 +249,7 @@ export default function CreatorDashboard() {
           </CardContent>
         </Card>
       </div>
-    </DashboardLayout>
+      </div>
+    </div>
   );
 }

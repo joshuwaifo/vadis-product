@@ -250,6 +250,7 @@ export default function BrandDashboard() {
           </CardContent>
         </Card>
       </div>
-    </DashboardLayout>
+      </div>
+    </div>
   );
 }

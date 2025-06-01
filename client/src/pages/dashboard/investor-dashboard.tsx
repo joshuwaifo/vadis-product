@@ -252,6 +252,7 @@ export default function InvestorDashboard() {
           </CardContent>
         </Card>
       </div>
-    </DashboardLayout>
+      </div>
+    </div>
   );
 }
