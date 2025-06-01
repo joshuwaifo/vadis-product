@@ -169,7 +169,7 @@ export default function DemoFinancier() {
               {/* Left Side - Value Proposition */}
               <div className="lg:pr-8">
                 <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight glow-text">
-                  <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">Grow your portfolio exposure in a unique asset class.</span>
+                  Grow your portfolio exposure in a <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">unique asset class.</span>
                 </h1>
                 
                 <p className="text-xl text-white/80 mb-8 leading-relaxed">
