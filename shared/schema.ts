@@ -184,7 +184,7 @@ export const financialPlans = pgTable("financial_plans", {
   streamingRevenue: integer("streaming_revenue"),
   merchandiseRevenue: integer("merchandise_revenue"),
   productPlacementRevenue: integer("product_placement_revenue"),
-  roi: decimal("roi", { precision: 5, scale: 2 }),
+  roi: text("roi"),
   breakEvenPoint: integer("break_even_point"),
   createdAt: timestamp("created_at").defaultNow(),
 });

@@ -8,6 +8,7 @@ import {
   loginSchema,
   userRoles
 } from "@shared/schema";
+import { registerScriptAnalysisRoutes } from "./script-analysis-routes";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Demo request submission endpoint

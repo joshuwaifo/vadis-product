@@ -16,6 +16,7 @@ import ProfilePage from "@/pages/dashboard/profile";
 import ProjectCreation from "@/pages/dashboard/project-creation";
 import ProjectsList from "@/pages/dashboard/projects-list";
 import ScriptAnalysis from "@/pages/dashboard/script-analysis";
+import ScriptAnalysisNew from "@/pages/dashboard/script-analysis-new";
 import ScriptGenerator from "@/pages/dashboard/script-generator";
 import NotFound from "@/pages/not-found";
 
@@ -33,7 +34,7 @@ function Router() {
       <Route path="/dashboard/profile" component={ProfilePage} />
       <Route path="/dashboard/projects" component={ProjectsList} />
       <Route path="/dashboard/projects/new" component={ProjectCreation} />
-      <Route path="/dashboard/projects/new/script_analysis" component={ScriptAnalysis} />
+      <Route path="/dashboard/projects/new/script_analysis" component={ScriptAnalysisNew} />
       <Route path="/dashboard/projects/new/script_generator" component={ScriptGenerator} />
       <Route component={NotFound} />
     </Switch>
