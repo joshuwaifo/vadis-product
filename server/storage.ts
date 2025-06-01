@@ -181,10 +181,21 @@ export class MemStorage implements IStorage {
       id,
       userId: insertProject.userId,
       title: insertProject.title,
+      projectType: insertProject.projectType || "script_analysis",
       logline: insertProject.logline ?? null,
       targetGenres: insertProject.targetGenres ?? null,
       synopsis: insertProject.synopsis ?? null,
       scriptContent: insertProject.scriptContent ?? null,
+      status: insertProject.status ?? "draft",
+      budgetRange: insertProject.budgetRange ?? null,
+      fundingGoal: insertProject.fundingGoal ?? null,
+      fundingRaised: insertProject.fundingRaised ?? 0,
+      projectedROI: insertProject.projectedROI ?? null,
+      investmentTerms: insertProject.investmentTerms ?? null,
+      productionTimeline: insertProject.productionTimeline ?? null,
+      keyTalent: insertProject.keyTalent ?? null,
+      distributionPlan: insertProject.distributionPlan ?? null,
+      marketAnalysis: insertProject.marketAnalysis ?? null,
       isPublished: insertProject.isPublished ?? false,
       createdAt: now,
       updatedAt: now,
@@ -301,6 +312,45 @@ export class MemStorage implements IStorage {
       updatedAt: new Date(),
     };
     this.investorProfiles.set(existing.id, updated);
+    return updated;
+  }
+
+  // Production profile methods
+  async createProductionProfile(insertProfile: InsertProductionProfile): Promise<ProductionProfile> {
+    const id = this.currentProductionProfileId || 1;
+    this.currentProductionProfileId = (this.currentProductionProfileId || 1) + 1;
+    const now = new Date();
+    const profile: ProductionProfile = {
+      id,
+      userId: insertProfile.userId,
+      companyName: insertProfile.companyName,
+      logoUrl: insertProfile.logoUrl || null,
+      city: insertProfile.city || null,
+      state: insertProfile.state || null,
+      country: insertProfile.country || null,
+      website: insertProfile.website || null,
+      description: insertProfile.description || null,
+      createdAt: now,
+      updatedAt: now,
+    };
+    this.productionProfiles.set(insertProfile.userId, profile);
+    return profile;
+  }
+
+  async getProductionProfile(userId: number): Promise<ProductionProfile | undefined> {
+    return this.productionProfiles.get(userId);
+  }
+
+  async updateProductionProfile(userId: number, updates: Partial<ProductionProfile>): Promise<ProductionProfile | undefined> {
+    const existing = this.productionProfiles.get(userId);
+    if (!existing) return undefined;
+    
+    const updated: ProductionProfile = {
+      ...existing,
+      ...updates,
+      updatedAt: new Date(),
+    };
+    this.productionProfiles.set(userId, updated);
     return updated;
   }
 }

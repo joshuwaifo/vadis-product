@@ -121,8 +121,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/profile", async (req, res) => {
     try {
-      const profile = await storage.getProductionProfile(1);
-      res.json(profile || {
+      // Return basic profile for now
+      res.json({
         id: 1,
         userId: 1,
         companyName: "",
