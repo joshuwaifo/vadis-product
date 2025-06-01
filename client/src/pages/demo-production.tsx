@@ -180,23 +180,23 @@ export default function DemoProduction() {
                   <ul className="space-y-3">
                     <li className="flex items-center text-white/80">
                       <CheckCircle className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" />
-                      Find perfect talent with AI matching
+                      Unlock brand sponsorship opportunities with real-time visualizations
                     </li>
                     <li className="flex items-center text-white/80">
                       <CheckCircle className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" />
-                      Access location incentives database
+                      Generate VFX treatments and set budget expectations
                     </li>
                     <li className="flex items-center text-white/80">
                       <CheckCircle className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" />
-                      Visualize brand integrations with AI
+                      Optimize filming location credits and incentives
                     </li>
                     <li className="flex items-center text-white/80">
                       <CheckCircle className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" />
-                      Connect directly with brands & financiers
+                      Connect directly with Financiers
                     </li>
                     <li className="flex items-center text-white/80">
                       <CheckCircle className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" />
-                      Preview VFX concepts before filming
+                      Character analysis with talent casting suggestions
                     </li>
                   </ul>
                 </div>
