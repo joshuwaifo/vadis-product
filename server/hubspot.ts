@@ -79,9 +79,29 @@ export class HubSpotService {
   }
 
   async createDeal(contactId: string, demoRequest: any): Promise<HubSpotDeal> {
+    // Map company type to readable format
+    const companyTypeMap: Record<string, string> = {
+      'production_company': 'Production Company',
+      'vfx_studio': 'VFX Studio',
+      'animation_studio': 'Animation Studio',
+      'post_production': 'Post-Production House',
+      'brand_agency': 'Brand/Agency',
+      'advertising_agency': 'Advertising Agency',
+      'marketing_agency': 'Marketing Agency',
+      'financier': 'Financier',
+      'investment_fund': 'Investment Fund',
+      'private_investor': 'Private Investor',
+      'content_creator': 'Content Creator',
+      'influencer': 'Influencer',
+      'freelance_creator': 'Freelance Creator',
+      'other': 'Other'
+    };
+
+    const userType = companyTypeMap[demoRequest.companyType] || 'Unknown Type';
+    
     const dealData = {
       properties: {
-        dealname: "Demo Request",
+        dealname: `Demo Request - ${userType}`,
         dealstage: "appointmentscheduled",
         pipeline: "default",
         amount: "0",
