@@ -132,21 +132,11 @@ export class HubSpotService {
       // Then, create a deal associated with the contact
       const deal = await this.createDeal(contact.id, demoRequest);
 
-      // Send confirmation email to client
-      try {
-        await this.sendConfirmationEmail(contact.id, demoRequest);
-      } catch (emailError) {
-        console.error("Failed to send confirmation email:", emailError);
-        // Continue even if email fails
-      }
+      // Log confirmation email details (HubSpot workflows will handle actual sending)
+      this.sendConfirmationEmail(contact.id, demoRequest);
 
-      // Send admin notification
-      try {
-        await this.sendAdminNotification(contact.id, deal.id, demoRequest);
-      } catch (emailError) {
-        console.error("Failed to send admin notification:", emailError);
-        // Continue even if admin notification fails
-      }
+      // Log admin notification details (HubSpot workflows will handle actual sending)
+      this.sendAdminNotification(contact.id, deal.id, demoRequest);
 
       return {
         contactId: contact.id,
