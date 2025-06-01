@@ -179,23 +179,23 @@ export default function DemoBrand() {
                   <ul className="space-y-3">
                     <li className="flex items-center text-white/80">
                       <CheckCircle className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" />
-                      Connect with strategic production partners
+                      Identify brand sponsorship opportunities in upcoming films and TV series
                     </li>
                     <li className="flex items-center text-white/80">
                       <CheckCircle className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" />
-                      Target precise audience demographics
+                      Visualize product placement scene-by-scene in real time
                     </li>
                     <li className="flex items-center text-white/80">
                       <CheckCircle className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" />
-                      Preview brand integrations with AI
+                      Increase brand exposure through evergreen properties
                     </li>
                     <li className="flex items-center text-white/80">
                       <CheckCircle className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" />
-                      Access entertainment partnership opportunities
+                      Re-engage your existing consumer base
                     </li>
                     <li className="flex items-center text-white/80">
                       <CheckCircle className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" />
-                      Maximize campaign ROI with data insights
+                      Connect directly with Production Companies
                     </li>
                   </ul>
                 </div>
