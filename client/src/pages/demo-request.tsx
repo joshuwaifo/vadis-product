@@ -156,7 +156,6 @@ export default function DemoRequest() {
           </div>
         </nav>
       </header>
-
       <main className="pt-28">
         {/* Floating Orbs */}
         <div className="floating-orb w-96 h-96 bg-gradient-to-r from-blue-500/20 to-purple-600/20 top-20 -left-48"></div>
@@ -172,9 +171,7 @@ export default function DemoRequest() {
                   Accelerate your business with <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">VadisAI</span>
                 </h1>
                 
-                <p className="text-xl text-white/80 mb-8 leading-relaxed">
-                  Submit your request to see how VadisAI can help you achieve predictable and efficient creative growth.
-                </p>
+                <p className="text-xl text-white/80 mb-8 leading-relaxed">Submit your request to see how VadisAI can help you improve your business with our vertically-integrated AI-driven platform</p>
 
                 <div className="mb-8">
                   <p className="text-lg font-semibold text-white mb-4">
@@ -412,6 +409,6 @@ export default function DemoRequest() {
       </div>
     </section>
   </main>
-</div>
+    </div>
   );
 }
