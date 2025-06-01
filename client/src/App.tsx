@@ -14,6 +14,9 @@ import DemoCreator from "@/pages/demos/demo-creator";
 import DashboardHome from "@/pages/dashboard/dashboard-home";
 import ProfilePage from "@/pages/dashboard/profile";
 import ProjectCreation from "@/pages/dashboard/project-creation";
+import ProjectsList from "@/pages/dashboard/projects-list";
+import ScriptAnalysis from "@/pages/dashboard/script-analysis";
+import ScriptGenerator from "@/pages/dashboard/script-generator";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -28,7 +31,10 @@ function Router() {
       <Route path="/demo/creator" component={DemoCreator} />
       <Route path="/dashboard" component={DashboardHome} />
       <Route path="/dashboard/profile" component={ProfilePage} />
+      <Route path="/dashboard/projects" component={ProjectsList} />
       <Route path="/dashboard/projects/new" component={ProjectCreation} />
+      <Route path="/dashboard/projects/new/script_analysis" component={ScriptAnalysis} />
+      <Route path="/dashboard/projects/new/script_generator" component={ScriptGenerator} />
       <Route component={NotFound} />
     </Switch>
   );
