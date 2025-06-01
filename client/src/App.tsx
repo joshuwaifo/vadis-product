@@ -4,17 +4,17 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Landing from "@/pages/landing";
-import Signup from "@/pages/signup";
-import Login from "@/pages/login";
-import DemoRequest from "@/pages/demo-request";
-import DemoProduction from "@/pages/demo-production";
-import DemoBrand from "@/pages/demo-brand";
-import DemoFinancier from "@/pages/demo-financier";
-import DemoCreator from "@/pages/demo-creator";
-import ProductionDashboard from "@/pages/production-dashboard";
-import BrandDashboard from "@/pages/brand-dashboard";
-import InvestorDashboard from "@/pages/investor-dashboard";
-import CreatorDashboard from "@/pages/creator-dashboard";
+import Signup from "@/pages/auth/signup";
+import Login from "@/pages/auth/login";
+import DemoRequest from "@/pages/demos/demo-request";
+import DemoProduction from "@/pages/demos/demo-production";
+import DemoBrand from "@/pages/demos/demo-brand";
+import DemoFinancier from "@/pages/demos/demo-financier";
+import DemoCreator from "@/pages/demos/demo-creator";
+import ProductionDashboard from "@/pages/dashboards/production-dashboard";
+import BrandDashboard from "@/pages/dashboards/brand-dashboard";
+import InvestorDashboard from "@/pages/dashboards/investor-dashboard";
+import CreatorDashboard from "@/pages/dashboards/creator-dashboard";
 import NotFound from "@/pages/not-found";
 
 function Router() {
