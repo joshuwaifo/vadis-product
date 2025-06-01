@@ -155,7 +155,6 @@ export default function DemoBrand() {
           </div>
         </nav>
       </header>
-
       <main className="pt-28">
         {/* Floating Orbs */}
         <div className="floating-orb w-96 h-96 bg-gradient-to-r from-blue-500/20 to-purple-600/20 top-20 -left-48"></div>
@@ -171,9 +170,7 @@ export default function DemoBrand() {
                   Activate evergreen brand sponsorships and brand integrations in film, TV and <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">beyond.</span>
                 </h1>
                 
-                <p className="text-xl text-white/80 mb-8 leading-relaxed">
-                  See how VadisAI helps brands connect with production companies, reach precise audiences, and visualize integrations before launch.
-                </p>
+                <p className="text-xl text-white/80 mb-8 leading-relaxed">Learn how VadisAI connects your brand with live productions to reach your target audience across platforms and mediums.</p>
 
                 <div className="mb-8">
                   <p className="text-lg font-semibold text-white mb-4">
