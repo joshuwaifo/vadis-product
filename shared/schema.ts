@@ -4,10 +4,10 @@ import { z } from "zod";
 
 // User roles enum
 export const userRoles = {
-  PRODUCTION: "production_company",
-  BRAND_AGENCY: "brand", 
-  INVESTOR: "investor",
-  INDIVIDUAL_CREATOR: "creator"
+  PRODUCTION: "PRODUCTION",
+  BRAND_AGENCY: "BRAND_AGENCY", 
+  INVESTOR: "INVESTOR",
+  INDIVIDUAL_CREATOR: "INDIVIDUAL_CREATOR"
 } as const;
 
 // Updated users table for multi-role authentication
@@ -69,7 +69,6 @@ export const projects = pgTable("projects", {
   keyTalent: jsonb("key_talent"), // Array of key talent involved
   distributionPlan: text("distribution_plan"),
   marketAnalysis: text("market_analysis"),
-  readerReport: text("reader_report"), // Generated reader's report
   
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),

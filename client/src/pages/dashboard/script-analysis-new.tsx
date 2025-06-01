@@ -21,7 +21,7 @@ import {
   AlertCircle,
   Film
 } from "lucide-react";
-
+import DashboardLayout from "./dashboard-layout";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
@@ -135,8 +135,7 @@ export default function ScriptAnalysisNew() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-6">
-      <div className="max-w-4xl mx-auto">
+    <DashboardLayout>
       <div className="max-w-4xl mx-auto space-y-8">
         {/* Header */}
         <div className="text-center">
@@ -414,7 +413,6 @@ export default function ScriptAnalysisNew() {
           )}
         </form>
       </div>
-      </div>
-    </div>
+    </DashboardLayout>
   );
 }

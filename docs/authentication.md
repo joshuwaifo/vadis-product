@@ -75,17 +75,14 @@ users (
 - Session data persists across server restarts
 - Automatic redirect based on user role
 
-## Dashboard Access
+## Role-Based Redirects
 
-After successful login, all users are redirected to the unified dashboard:
+After successful login, users are redirected to their role-specific dashboard:
 
-- **All Roles** → `/dashboard`
-
-The dashboard provides role-appropriate functionality based on user type:
-- **Production Companies**: Project creation, script analysis, portfolio management
-- **Brand/Agency**: Product management, partnership opportunities
-- **Investor/Financier**: Investment opportunities, project discovery
-- **Individual Creator**: Portfolio showcase, collaboration tools
+- **Production Companies** → `/production-dashboard`
+- **Brand/Agency** → `/brand-dashboard` 
+- **Investor/Financier** → `/investor-dashboard`
+- **Individual Creator** → `/creator-dashboard`
 
 ## Database Storage
 

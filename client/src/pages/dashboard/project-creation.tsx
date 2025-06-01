@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams, Link } from "wouter";
+import { Link } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,13 +11,11 @@ import {
   Clock,
   DollarSign,
   Users,
-  Lightbulb,
-  ArrowLeft
+  Lightbulb
 } from "lucide-react";
+import DashboardLayout from "./dashboard-layout";
 
 export default function ProjectCreation() {
-  const params = useParams();
-  const projectId = params.id;
   const [selectedType, setSelectedType] = useState<string | null>(null);
 
   const projectTypes = [
@@ -58,26 +56,17 @@ export default function ProjectCreation() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-6">
-      <div className="max-w-6xl mx-auto space-y-8">
+    <DashboardLayout>
+      <div className="space-y-8">
         {/* Header */}
-        <div className="space-y-4">
-          <Button
-            variant="ghost"
-            onClick={() => window.history.back()}
-            className="mb-4"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back
-          </Button>
-          <div className="text-center space-y-4">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-              Choose Your Script Option
-            </h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              How would you like to add script content to your project?
-            </p>
-          </div>
+        <div className="text-center space-y-4">
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white">
+            Create New Project
+          </h1>
+          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+            Choose how you want to develop your next production. Whether you have an existing script or a new idea, 
+            our AI-powered tools will help bring your vision to life.
+          </p>
         </div>
 
         {/* Project Type Selection */}
@@ -167,7 +156,7 @@ export default function ProjectCreation() {
         {/* Continue Button */}
         {selectedType && (
           <div className="text-center">
-            <Link href={`/production/projects/${projectId}/script-${selectedType === 'script_analysis' ? 'upload' : 'writer'}`}>
+            <Link href={`/dashboard/projects/new/${selectedType}`}>
               <Button 
                 size="lg"
                 className="bg-gradient-to-r from-blue-500 via-purple-600 to-pink-600 hover:from-blue-600 hover:via-purple-700 hover:to-pink-700 text-lg px-8"
@@ -222,6 +211,6 @@ export default function ProjectCreation() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }

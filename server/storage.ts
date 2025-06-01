@@ -74,7 +74,6 @@ export class MemStorage implements IStorage {
   private currentProjectId: number;
   private currentProductId: number;
   private currentInvestorProfileId: number;
-  private currentProductionProfileId: number;
 
   constructor() {
     this.users = new Map();
@@ -82,14 +81,12 @@ export class MemStorage implements IStorage {
     this.projects = new Map();
     this.products = new Map();
     this.investorProfiles = new Map();
-    this.productionProfiles = new Map();
     
     this.currentUserId = 1;
     this.currentDemoRequestId = 1;
     this.currentProjectId = 1;
     this.currentProductId = 1;
     this.currentInvestorProfileId = 1;
-    this.currentProductionProfileId = 1;
   }
 
   // User authentication methods
@@ -333,13 +330,6 @@ export class MemStorage implements IStorage {
       country: insertProfile.country || null,
       website: insertProfile.website || null,
       description: insertProfile.description || null,
-      billingAddress: insertProfile.billingAddress || null,
-      billingCity: insertProfile.billingCity || null,
-      billingState: insertProfile.billingState || null,
-      billingCountry: insertProfile.billingCountry || null,
-      billingZip: insertProfile.billingZip || null,
-
-      paymentMethodId: insertProfile.paymentMethodId || null,
       createdAt: now,
       updatedAt: now,
     };

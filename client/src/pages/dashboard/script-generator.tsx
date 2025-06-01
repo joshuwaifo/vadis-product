@@ -21,7 +21,7 @@ import {
   FileText,
   Sparkles
 } from "lucide-react";
-
+import DashboardLayout from "./dashboard-layout";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
@@ -43,12 +43,12 @@ export default function ScriptGenerator() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
-  const form = useForm<z.infer<typeof projectSchema>>({
+  const form = useForm({
     resolver: zodResolver(projectSchema),
     defaultValues: {
       title: "",
       concept: "",
-      targetGenres: [] as string[],
+      targetGenres: [],
       budgetRange: "",
       fundingGoal: 0,
       productionTimeline: "",
@@ -105,8 +105,7 @@ export default function ScriptGenerator() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-6">
-      <div className="max-w-4xl mx-auto">
+    <DashboardLayout>
       <div className="max-w-4xl mx-auto space-y-8">
         {/* Header */}
         <div className="text-center">
@@ -250,7 +249,7 @@ export default function ScriptGenerator() {
                         onClick={() => {
                           const current = form.getValues("targetGenres") || [];
                           if (current.includes(genre)) {
-                            form.setValue("targetGenres", current.filter((g: string) => g !== genre));
+                            form.setValue("targetGenres", current.filter(g => g !== genre));
                           } else {
                             form.setValue("targetGenres", [...current, genre]);
                           }
@@ -487,7 +486,6 @@ export default function ScriptGenerator() {
           )}
         </form>
       </div>
-      </div>
-    </div>
+    </DashboardLayout>
   );
 }
