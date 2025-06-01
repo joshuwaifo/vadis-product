@@ -11,7 +11,8 @@ import {
   DollarSign, 
   Clock,
   Eye,
-  BarChart3
+  BarChart3,
+  FileText
 } from "lucide-react";
 import DashboardLayout from "./dashboard-layout";
 
