@@ -85,7 +85,7 @@ export default function Login() {
           <div className="flex items-center space-x-4">
             <span className="text-white/80">Don't have an account?</span>
             <Button asChild className="bg-white/20 backdrop-blur-sm border border-white/30 text-white hover:bg-white hover:text-gray-900 transition-all duration-300">
-              <Link href="/signup">Sign Up</Link>
+              <Link href="/demo-request">Request a Demo</Link>
             </Button>
           </div>
         </div>
@@ -167,8 +167,8 @@ export default function Login() {
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">
                 New to VadisAI?{" "}
-                <Link href="/signup" className="text-blue-600 hover:text-blue-700 font-medium">
-                  Create an account
+                <Link href="/demo-request" className="text-blue-600 hover:text-blue-700 font-medium">
+                  Request a Demo
                 </Link>
               </p>
             </div>
