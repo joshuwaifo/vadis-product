@@ -104,93 +104,20 @@ export class HubSpotService {
   }
 
   async sendConfirmationEmail(contactId: string, demoRequest: any): Promise<void> {
-    // Send confirmation email to client
-    const emailData = {
-      emailId: 126870675, // You'll need to create this email template in HubSpot
-      message: {
-        to: demoRequest.email,
-        from: "sales@vadis.ai",
-        subject: "Thank you for your VadisAI demo request"
-      },
-      contactProperties: [
-        {
-          name: "firstname",
-          value: demoRequest.firstName
-        },
-        {
-          name: "lastname", 
-          value: demoRequest.lastName
-        },
-        {
-          name: "company",
-          value: demoRequest.companyName
-        }
-      ]
-    };
-
-    try {
-      await this.makeRequest(`/marketing/v3/transactional/single-email/send`, "POST", emailData);
-      console.log(`Confirmation email sent to ${demoRequest.email}`);
-    } catch (error) {
-      console.error("Failed to send confirmation email:", error);
-      // Fallback: log the email content for manual follow-up
-      console.log(`Manual follow-up needed for: ${demoRequest.email} - ${demoRequest.firstName} ${demoRequest.lastName} from ${demoRequest.companyName}`);
-    }
+    // Note: Email functionality requires proper HubSpot email permissions and templates
+    // For now, we'll rely on HubSpot's workflow automation to send emails
+    // when new contacts and deals are created
+    console.log(`Demo request processed for ${demoRequest.email} - contact and deal created in HubSpot`);
+    console.log(`Contact ID: ${contactId} | Name: ${demoRequest.firstName} ${demoRequest.lastName} | Company: ${demoRequest.companyName}`);
   }
 
   async sendAdminNotification(contactId: string, dealId: string, demoRequest: any): Promise<void> {
-    // Send notification email to admin
-    const adminEmailData = {
-      emailId: 126870676, // You'll need to create this admin notification template in HubSpot  
-      message: {
-        to: "sales@vadis.ai",
-        from: "noreply@vadis.ai",
-        subject: `New Demo Request: ${demoRequest.companyName}`
-      },
-      contactProperties: [
-        {
-          name: "demo_contact_name",
-          value: `${demoRequest.firstName} ${demoRequest.lastName}`
-        },
-        {
-          name: "demo_company_name",
-          value: demoRequest.companyName
-        },
-        {
-          name: "demo_company_type",
-          value: demoRequest.companyType
-        },
-        {
-          name: "demo_email",
-          value: demoRequest.email
-        },
-        {
-          name: "demo_phone",
-          value: demoRequest.phoneNumber || "Not provided"
-        },
-        {
-          name: "demo_use_case",
-          value: demoRequest.useCase || "Not specified"
-        },
-        {
-          name: "hubspot_contact_id",
-          value: contactId
-        },
-        {
-          name: "hubspot_deal_id", 
-          value: dealId
-        }
-      ]
-    };
-
-    try {
-      await this.makeRequest(`/marketing/v3/transactional/single-email/send`, "POST", adminEmailData);
-      console.log(`Admin notification sent for demo request from ${demoRequest.companyName}`);
-    } catch (error) {
-      console.error("Failed to send admin notification:", error);
-      // Fallback: log for manual notification
-      console.log(`URGENT: Manual admin notification needed - New demo request from ${demoRequest.firstName} ${demoRequest.lastName} at ${demoRequest.companyName} (${demoRequest.email})`);
-    }
+    // Log admin notification details for manual follow-up
+    // HubSpot workflows can be configured to automatically notify admins when new deals are created
+    console.log(`NEW DEMO REQUEST - Contact ID: ${contactId} | Deal ID: ${dealId}`);
+    console.log(`Contact: ${demoRequest.firstName} ${demoRequest.lastName} (${demoRequest.email})`);
+    console.log(`Company: ${demoRequest.companyName} | Type: ${demoRequest.companyType}`);
+    console.log(`Phone: ${demoRequest.phoneNumber || "Not provided"} | Use Case: ${demoRequest.useCase || "Not specified"}`);
   }
 
 
