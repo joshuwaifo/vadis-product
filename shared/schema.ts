@@ -126,53 +126,7 @@ export const insertDemoRequestSchema = createInsertSchema(demoRequests).omit({
   updatedAt: true,
 });
 
-// Role-specific signup schemas
-export const productionSignupSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
-  confirmPassword: z.string(),
-  companyName: z.string().min(1),
-  contactPerson: z.string().min(1),
-  companyWebsite: z.string().optional(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
-});
-
-export const brandSignupSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
-  confirmPassword: z.string(),
-  brandName: z.string().min(1),
-  contactPerson: z.string().min(1),
-  companyWebsite: z.string().optional(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
-});
-
-export const investorSignupSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
-  confirmPassword: z.string(),
-  fullName: z.string().min(1),
-  investmentType: z.enum(["ROI-based Equity", "Loan-based Debt"]),
-  structure: z.enum(["Individual", "Team/Fund"]),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
-});
-
-export const creatorSignupSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
-  confirmPassword: z.string(),
-  fullName: z.string().min(1),
-  platformLink: z.string().optional(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
-});
+// Login schema for authentication
 
 export const loginSchema = z.object({
   email: z.string().email(),
@@ -192,8 +146,4 @@ export type InsertDemoRequest = z.infer<typeof insertDemoRequestSchema>;
 export type DemoRequest = typeof demoRequests.$inferSelect;
 
 export type UserRole = keyof typeof userRoles;
-export type ProductionSignup = z.infer<typeof productionSignupSchema>;
-export type BrandSignup = z.infer<typeof brandSignupSchema>;
-export type InvestorSignup = z.infer<typeof investorSignupSchema>;
-export type CreatorSignup = z.infer<typeof creatorSignupSchema>;
 export type LoginData = z.infer<typeof loginSchema>;

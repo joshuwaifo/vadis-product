@@ -5,10 +5,6 @@ import { storage } from "./storage";
 import { hubspotService } from "./hubspot";
 import { 
   insertDemoRequestSchema, 
-  productionSignupSchema, 
-  brandSignupSchema, 
-  investorSignupSchema, 
-  creatorSignupSchema, 
   loginSchema,
   userRoles
 } from "@shared/schema";
@@ -81,108 +77,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Authentication Routes
   
-  // Signup endpoint
-  app.post("/api/auth/signup", async (req, res) => {
-    try {
-      const { role, ...signupData } = req.body;
-      
-      // Validate based on role
-      let validatedData;
-      switch (role) {
-        case userRoles.PRODUCTION:
-          validatedData = productionSignupSchema.parse(signupData);
-          break;
-        case userRoles.BRAND_AGENCY:
-          validatedData = brandSignupSchema.parse(signupData);
-          break;
-        case userRoles.INVESTOR:
-          validatedData = investorSignupSchema.parse(signupData);
-          break;
-        case userRoles.INDIVIDUAL_CREATOR:
-          validatedData = creatorSignupSchema.parse(signupData);
-          break;
-        default:
-          return res.status(400).json({ error: "Invalid role specified" });
-      }
-
-      // Check if user already exists
-      const existingUser = await storage.getUserByEmail(validatedData.email);
-      if (existingUser) {
-        return res.status(400).json({ error: "User with this email already exists" });
-      }
-
-      // Hash password
-      const passwordHash = await bcrypt.hash(validatedData.password, 10);
-
-      // Prepare role-specific details
-      let roleSpecificDetails = {};
-      switch (role) {
-        case userRoles.PRODUCTION:
-          const prodData = validatedData as any;
-          roleSpecificDetails = {
-            companyName: prodData.companyName,
-            contactPerson: prodData.contactPerson,
-            companyWebsite: prodData.companyWebsite
-          };
-          break;
-        case userRoles.BRAND_AGENCY:
-          const brandData = validatedData as any;
-          roleSpecificDetails = {
-            brandName: brandData.brandName,
-            contactPerson: brandData.contactPerson,
-            companyWebsite: brandData.companyWebsite
-          };
-          break;
-        case userRoles.INVESTOR:
-          const investorData = validatedData as any;
-          roleSpecificDetails = {
-            fullName: investorData.fullName,
-            investmentType: investorData.investmentType,
-            structure: investorData.structure
-          };
-          break;
-        case userRoles.INDIVIDUAL_CREATOR:
-          const creatorData = validatedData as any;
-          roleSpecificDetails = {
-            fullName: creatorData.fullName,
-            platformLink: creatorData.platformLink
-          };
-          break;
-      }
-
-      // Create user
-      const user = await storage.createUser({
-        email: validatedData.email,
-        passwordHash,
-        role,
-        roleSpecificDetails
-      });
-
-      // Create investor profile if needed
-      if (role === userRoles.INVESTOR) {
-        const investorData = validatedData as any;
-        await storage.createInvestorProfile({
-          userId: user.id,
-          investmentType: investorData.investmentType,
-          structure: investorData.structure
-        });
-      }
-
-      // Return user data (without password hash)
-      const { passwordHash: _, ...userResponse } = user;
-      res.status(201).json({
-        success: true,
-        user: userResponse
-      });
-
-    } catch (error) {
-      console.error("Signup error:", error);
-      res.status(400).json({
-        error: error instanceof Error ? error.message : "Signup failed"
-      });
-    }
-  });
-
   // Login endpoint
   app.post("/api/auth/login", async (req, res) => {
     try {
