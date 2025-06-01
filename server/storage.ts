@@ -1,12 +1,15 @@
 import bcrypt from "bcryptjs";
 import { 
   users, 
+  productionProfiles,
   demoRequests, 
   projects, 
   products, 
   investorProfiles,
   type User, 
   type InsertUser, 
+  type ProductionProfile,
+  type InsertProductionProfile,
   type DemoRequest, 
   type InsertDemoRequest,
   type Project,
@@ -26,6 +29,11 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   validateUser(email: string, password: string): Promise<User | null>;
+  
+  // Production company profiles
+  createProductionProfile(profile: InsertProductionProfile): Promise<ProductionProfile>;
+  getProductionProfile(userId: number): Promise<ProductionProfile | undefined>;
+  updateProductionProfile(userId: number, updates: Partial<ProductionProfile>): Promise<ProductionProfile | undefined>;
   
   // Demo requests (legacy)
   createDemoRequest(demoRequest: InsertDemoRequest): Promise<DemoRequest>;
@@ -55,6 +63,7 @@ export interface IStorage {
 
 export class MemStorage implements IStorage {
   private users: Map<number, User>;
+  private productionProfiles: Map<number, ProductionProfile>;
   private demoRequests: Map<number, DemoRequest>;
   private projects: Map<number, Project>;
   private products: Map<number, Product>;
