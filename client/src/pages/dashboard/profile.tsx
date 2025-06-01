@@ -22,7 +22,7 @@ import {
   Eye,
   EyeOff
 } from "lucide-react";
-import DashboardLayout from "./dashboard-layout";
+
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
@@ -146,7 +146,8 @@ export default function ProfilePage() {
 
 
   return (
-    <DashboardLayout>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-6">
+      <div className="max-w-4xl mx-auto">
       <div className="space-y-8">
         {/* Header */}
         <div>

@@ -11,18 +11,20 @@ import DemoBrand from "@/pages/demos/demo-brand";
 import DemoFinancier from "@/pages/demos/demo-financier";
 import DemoCreator from "@/pages/demos/demo-creator";
 
-
+// Role-specific dashboards
 import ProductionDashboard from "@/pages/dashboard/production-dashboard";
 import BrandDashboard from "@/pages/dashboard/brand-dashboard";
 import InvestorDashboard from "@/pages/dashboard/investor-dashboard";
 import CreatorDashboard from "@/pages/dashboard/creator-dashboard";
-import DashboardRedirect from "@/pages/dashboard/dashboard-redirect";
-import ProfilePage from "@/pages/dashboard/profile";
+
+// Production company flow
 import ProjectDetailsForm from "@/pages/dashboard/project-details-form";
 import ProjectCreation from "@/pages/dashboard/project-creation";
-import ProjectsList from "@/pages/dashboard/projects-list";
 import ScriptAnalysisNew from "@/pages/dashboard/script-analysis-new";
 import ScriptGenerator from "@/pages/dashboard/script-generator";
+
+// Shared components
+import ProfilePage from "@/pages/dashboard/profile";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -35,10 +37,16 @@ function Router() {
       <Route path="/demo/brand" component={DemoBrand} />
       <Route path="/demo/financier" component={DemoFinancier} />
       <Route path="/demo/creator" component={DemoCreator} />
-      {/* Redirect legacy dashboard route to login */}
-      <Route path="/dashboard" component={DashboardRedirect} />
       
-      {/* Role-specific dashboards as per original requirements */}
+      {/* Redirect legacy dashboard route to login */}
+      <Route path="/dashboard">
+        {() => {
+          window.location.href = "/login";
+          return null;
+        }}
+      </Route>
+      
+      {/* Role-specific dashboards */}
       <Route path="/production/dashboard" component={ProductionDashboard} />
       <Route path="/brand/dashboard" component={BrandDashboard} />
       <Route path="/investor/dashboard" component={InvestorDashboard} />
@@ -50,30 +58,9 @@ function Router() {
       <Route path="/production/projects/:id/script-writer" component={ScriptGenerator} />
       <Route path="/production/projects/:id/script-upload" component={ScriptAnalysisNew} />
       
-      {/* Production company routes */}
-      <Route path="/production/projects" component={ProjectsList} />
-      <Route path="/production/profile" component={ProfilePage} />
+      {/* Shared routes */}
+      <Route path="/profile" component={ProfilePage} />
       
-      {/* Brand/Agency routes */}
-      <Route path="/brand/products" component={ProjectsList} />
-      <Route path="/brand/marketplace" component={ProjectsList} />
-      <Route path="/brand/profile" component={ProfilePage} />
-      
-      {/* Investor routes */}
-      <Route path="/investor/marketplace" component={ProjectsList} />
-      <Route path="/investor/profile" component={ProfilePage} />
-      
-      {/* Creator routes */}
-      <Route path="/creator/projects" component={ProjectsList} />
-      <Route path="/creator/script-generator" component={ScriptGenerator} />
-      <Route path="/creator/profile" component={ProfilePage} />
-      
-      {/* Legacy routes for backward compatibility */}
-      <Route path="/dashboard/profile" component={ProfilePage} />
-      <Route path="/dashboard/projects" component={ProjectsList} />
-      <Route path="/dashboard/projects/new" component={ProjectCreation} />
-      <Route path="/dashboard/projects/new/script_analysis" component={ScriptAnalysisNew} />
-      <Route path="/dashboard/projects/new/script_generator" component={ScriptGenerator} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -83,8 +70,8 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <Toaster />
         <Router />
+        <Toaster />
       </TooltipProvider>
     </QueryClientProvider>
   );

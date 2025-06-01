@@ -14,7 +14,7 @@ import {
   Video,
   Calendar
 } from "lucide-react";
-import DashboardLayout from "./dashboard-layout";
+
 
 interface CreatorProject {
   id: number;
@@ -45,7 +45,8 @@ export default function CreatorDashboard() {
   const recentProjects = projects.slice(0, 5);
 
   return (
-    <DashboardLayout>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-6">
+      <div className="max-w-7xl mx-auto">
       <div className="space-y-8">
         {/* Header */}
         <div className="flex items-center justify-between">
