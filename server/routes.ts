@@ -75,6 +75,69 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Projects endpoints
+  app.get("/api/projects", async (req, res) => {
+    try {
+      const projects = await storage.getProjectsByUser(1); // Using hardcoded user ID for now
+      res.json(projects);
+    } catch (error) {
+      console.error("Error fetching projects:", error);
+      res.status(500).json({ error: "Failed to fetch projects" });
+    }
+  });
+
+  app.post("/api/projects", async (req, res) => {
+    try {
+      const project = await storage.createProject({
+        userId: 1, // Using hardcoded user ID for now
+        ...req.body,
+      });
+      res.json(project);
+    } catch (error) {
+      console.error("Error creating project:", error);
+      res.status(500).json({ error: "Failed to create project" });
+    }
+  });
+
+  app.get("/api/dashboard/stats", async (req, res) => {
+    try {
+      const projects = await storage.getProjectsByUser(1);
+      const publishedProjects = projects.filter(p => p.isPublished);
+      const totalFunding = projects.reduce((sum, p) => sum + (p.fundingGoal || 0), 0);
+      const fundsRaised = projects.reduce((sum, p) => sum + (p.fundingRaised || 0), 0);
+      
+      res.json({
+        totalProjects: projects.length,
+        publishedProjects: publishedProjects.length,
+        totalFunding,
+        fundsRaised,
+      });
+    } catch (error) {
+      console.error("Error fetching dashboard stats:", error);
+      res.status(500).json({ error: "Failed to fetch dashboard stats" });
+    }
+  });
+
+  app.get("/api/profile", async (req, res) => {
+    try {
+      const profile = await storage.getProductionProfile(1);
+      res.json(profile || {
+        id: 1,
+        userId: 1,
+        companyName: "",
+        logoUrl: null,
+        city: "",
+        state: "",
+        country: "",
+        website: "",
+        description: "",
+      });
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+      res.status(500).json({ error: "Failed to fetch profile" });
+    }
+  });
+
   // Authentication Routes
   
   // Login endpoint
