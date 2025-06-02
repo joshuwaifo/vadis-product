@@ -81,6 +81,8 @@ async function extractTextFromPdf(
   provider: AIProvider = 'gemini-1.5-flash'
 ): Promise<string> {
   try {
+    // Dynamic import to avoid startup issues with pdf-parse
+    const pdfParse = (await import('pdf-parse')).default;
     const pdfData = await pdfParse(pdfBuffer);
     const extractedText = pdfData?.text || "";
     
