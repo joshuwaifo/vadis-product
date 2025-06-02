@@ -326,7 +326,7 @@ async function analyzeScriptAsync(
     for (const placement of productPlacements) {
       await storage.createProductPlacement({
         projectId,
-        sceneId: placement.sceneId || null, // AI returns sceneId as string reference
+        sceneId: null, // For now, set sceneId as null until we implement scene ID mapping
         brand: placement.brand,
         product: placement.product,
         placement: placement.placement || null,
@@ -346,7 +346,7 @@ async function analyzeScriptAsync(
         for (const suggestion of locationSet.suggestions) {
           await storage.createLocationSuggestion({
             projectId,
-            sceneId: locationSet.sceneId || null, // AI returns sceneId as string reference
+            sceneId: null, // For now, set sceneId as null until we implement scene ID mapping
             locationType: locationSet.locationType,
             location: suggestion.location,
             city: suggestion.city || null,
