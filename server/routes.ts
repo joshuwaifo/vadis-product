@@ -184,26 +184,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Get current user endpoint (for session management)
   app.get("/api/auth/me", async (req, res) => {
-    if (!(req.session as any).user) {
-      return res.status(401).json({ error: "Authentication required" });
-    }
-
-    try {
-      // Get full user data from database using session user ID
-      const user = await storage.getUser((req.session as any).user.id);
-      if (!user) {
-        return res.status(401).json({ error: "User not found" });
-      }
-
-      // Return user data (without password hash)
-      const { passwordHash: _, ...userResponse } = user;
-      res.json({
-        success: true,
-        user: userResponse
-      });
-    } catch (error) {
-      console.error("Get current user error:", error);
-      res.status(500).json({ error: "Internal server error" });
+    if ((req.session as any).user) {
+      res.json({ user: (req.session as any).user });
+    } else {
+      res.status(401).json({ user: null });
     }
   });
 
