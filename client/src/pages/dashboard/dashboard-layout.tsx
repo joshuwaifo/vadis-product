@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { 
@@ -18,8 +19,26 @@ interface DashboardLayoutProps {
 }
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Fetch current user data from session
+  const { data: currentUser, isLoading: userLoading, error: userError } = useQuery({
+    queryKey: ['currentUser'],
+    queryFn: async () => {
+      const response = await fetch('/api/auth/me');
+      if (!response.ok) {
+        throw new Error('Authentication required');
+      }
+      return response.json();
+    },
+  });
+
+  // Redirect to login if authentication fails
+  if (userError) {
+    setLocation('/login');
+    return null;
+  }
 
   const navigation = [
     { name: "Dashboard", href: "/dashboard", icon: Home },
@@ -53,7 +72,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                   </div>
                   <div>
                     <span className="text-xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">VadisAI</span>
-                    <div className="text-xs text-gray-500 dark:text-gray-400 -mt-1">Production</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400 -mt-1">
+                      {userLoading ? 'Loading...' : currentUser?.user?.role || 'User'}
+                    </div>
                   </div>
                 </div>
               </Link>
@@ -127,7 +148,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 </div>
                 <div>
                   <span className="text-xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">VadisAI</span>
-                  <div className="text-xs text-gray-500 dark:text-gray-400 -mt-1">Production</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 -mt-1">
+                    {userLoading ? 'Loading...' : currentUser?.user?.role || 'User'}
+                  </div>
                 </div>
               </div>
               <Button
