@@ -283,15 +283,16 @@ async function analyzeScriptAsync(
           sceneNumber: scene.sceneNumber,
           location: scene.location,
           timeOfDay: scene.timeOfDay || null,
-        description: scene.description || null,
-        characters: scene.characters || [],
-        content: scene.content || null,
-        pageStart: scene.pageStart || null,
-        pageEnd: scene.pageEnd || null,
-        duration: scene.duration || null,
-        vfxNeeds: scene.vfxNeeds || [],
-        productPlacementOpportunities: scene.productPlacementOpportunities || [],
-      });
+          description: scene.description || null,
+          characters: scene.characters || [],
+          content: scene.content || null,
+          pageStart: scene.pageStart || null,
+          pageEnd: scene.pageEnd || null,
+          duration: scene.duration || null,
+          vfxNeeds: scene.vfxNeeds || [],
+          productPlacementOpportunities: scene.productPlacementOpportunities || [],
+        });
+      }
     }
 
     // Step 2: Analyze characters

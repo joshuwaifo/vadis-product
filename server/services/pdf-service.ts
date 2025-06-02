@@ -10,8 +10,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 import { v4 as uuidv4 } from 'uuid';
-// Import pdf-parse with any type since @types/pdf-parse doesn't exist
-const pdfParse = require('pdf-parse');
+// Use dynamic import for pdf-parse to avoid startup issues
+// import pdfParse from 'pdf-parse';
 
 // --- Helper Functions for File Processing ---
 
