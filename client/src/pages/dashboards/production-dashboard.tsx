@@ -101,13 +101,13 @@ export default function ProductionDashboard() {
                   </div>
                   
                   <div className="flex flex-wrap gap-4">
-                    <Link to="/script-upload">
+                    <Link to="/dashboard/script-analysis-new">
                       <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
                         <Plus className="w-5 h-5 mr-2" />
                         New Project
                       </Button>
                     </Link>
-                    <Link to="/projects">
+                    <Link to="/dashboard/projects">
                       <Button variant="outline" size="lg" className="border-2 border-blue-200 dark:border-blue-800 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-300">
                         <FolderOpen className="w-5 h-5 mr-2" />
                         Browse Projects
