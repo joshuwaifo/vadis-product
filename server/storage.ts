@@ -61,6 +61,8 @@ export interface IStorage {
   updateInvestorProfile(userId: number, updates: Partial<InvestorProfile>): Promise<InvestorProfile | undefined>;
 }
 
+// DEPRECATED: MemStorage class - kept for testing purposes only
+// Use DatabaseStorage for all production operations
 export class MemStorage implements IStorage {
   private users: Map<number, User>;
   private productionProfiles: Map<number, ProductionProfile>;
@@ -74,9 +76,11 @@ export class MemStorage implements IStorage {
   private currentProjectId: number;
   private currentProductId: number;
   private currentInvestorProfileId: number;
+  private currentProductionProfileId: number;
 
   constructor() {
     this.users = new Map();
+    this.productionProfiles = new Map();
     this.demoRequests = new Map();
     this.projects = new Map();
     this.products = new Map();
@@ -87,6 +91,7 @@ export class MemStorage implements IStorage {
     this.currentProjectId = 1;
     this.currentProductId = 1;
     this.currentInvestorProfileId = 1;
+    this.currentProductionProfileId = 1;
   }
 
   // User authentication methods
@@ -317,8 +322,7 @@ export class MemStorage implements IStorage {
 
   // Production profile methods
   async createProductionProfile(insertProfile: InsertProductionProfile): Promise<ProductionProfile> {
-    const id = this.currentProductionProfileId || 1;
-    this.currentProductionProfileId = (this.currentProductionProfileId || 1) + 1;
+    const id = this.currentProductionProfileId++;
     const now = new Date();
     const profile: ProductionProfile = {
       id,
@@ -330,6 +334,12 @@ export class MemStorage implements IStorage {
       country: insertProfile.country || null,
       website: insertProfile.website || null,
       description: insertProfile.description || null,
+      billingAddress: insertProfile.billingAddress || null,
+      billingCity: insertProfile.billingCity || null,
+      billingState: insertProfile.billingState || null,
+      billingCountry: insertProfile.billingCountry || null,
+      billingZip: insertProfile.billingZip || null,
+      paymentMethodId: insertProfile.paymentMethodId || null,
       createdAt: now,
       updatedAt: now,
     };
@@ -537,4 +547,5 @@ export class DatabaseStorage implements IStorage {
   }
 }
 
+// Active storage implementation - uses PostgreSQL database
 export const storage = new DatabaseStorage();
