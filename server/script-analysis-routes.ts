@@ -12,6 +12,10 @@ import {
   generateFinancialPlan,
   generateProjectSummary
 } from "./script-analysis-agents";
+import { 
+  performCompleteCharacterAnalysis,
+  type DetailedCharacter 
+} from "./services/character-analysis-service";
 
 // Configure multer for file uploads
 const upload = multer({
@@ -295,12 +299,12 @@ async function analyzeScriptAsync(
       }
     }
 
-    // Step 2: Analyze characters
-    console.log("Analyzing characters...");
-    const { characters, relationships } = await analyzeCharacters(scenes);
+    // Step 2: Enhanced Character Analysis
+    console.log("Performing comprehensive character analysis...");
+    const characterAnalysis = await performCompleteCharacterAnalysis(scriptContent);
     
-    // Save characters to database
-    for (const character of characters) {
+    // Save detailed characters to database
+    for (const character of characterAnalysis.characters) {
       await storage.createCharacter({
         projectId,
         name: character.name,
@@ -314,8 +318,8 @@ async function analyzeScriptAsync(
       });
     }
     
-    // Save character relationships to database
-    for (const relationship of relationships) {
+    // Save enhanced character relationships to database
+    for (const relationship of characterAnalysis.relationshipMap) {
       await storage.createCharacterRelationship({
         projectId,
         fromCharacter: relationship.from,
@@ -327,7 +331,7 @@ async function analyzeScriptAsync(
 
     // Step 3: Suggest actors
     console.log("Suggesting actors...");
-    const actorSuggestions = await suggestActors(characters);
+    const actorSuggestions = await suggestActors(characterAnalysis.characters);
     
     // Save actor suggestions to database
     for (const actorSuggestionSet of actorSuggestions) {
@@ -399,7 +403,7 @@ async function analyzeScriptAsync(
     console.log("Generating financial plan...");
     const financialPlan = await generateFinancialPlan(
       scenes,
-      characters,
+      characterAnalysis.characters,
       vfxNeeds,
       actorSuggestions,
       locations,
@@ -429,7 +433,7 @@ async function analyzeScriptAsync(
     const projectSummary = await generateProjectSummary(
       projectData.title,
       scenes,
-      characters,
+      characterAnalysis.characters,
       vfxNeeds,
       productPlacements,
       financialPlan
