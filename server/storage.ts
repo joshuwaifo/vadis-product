@@ -417,6 +417,11 @@ export class MemStorage implements IStorage {
   async getCharacterRelationshipsByProject(projectId: number): Promise<CharacterRelationship[]> {
     throw new Error("MemStorage is deprecated. Use DatabaseStorage for character relationship operations.");
   }
+
+  // Script Analysis - Actor Suggestions (stub implementation for deprecated MemStorage)
+  async createActorSuggestion(suggestion: InsertActorSuggestion): Promise<ActorSuggestion> {
+    throw new Error("MemStorage is deprecated. Use DatabaseStorage for actor suggestion operations.");
+  }
 }
 
 

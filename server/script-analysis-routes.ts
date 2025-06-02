@@ -294,7 +294,24 @@ async function analyzeScriptAsync(
     // Step 3: Suggest actors
     console.log("Suggesting actors...");
     const actorSuggestions = await suggestActors(characters);
-    // Save actor suggestions to database here
+    
+    // Save actor suggestions to database
+    for (const actorSuggestionSet of actorSuggestions) {
+      if (actorSuggestionSet.suggestions && actorSuggestionSet.suggestions.length > 0) {
+        for (const suggestion of actorSuggestionSet.suggestions) {
+          await storage.createActorSuggestion({
+            projectId,
+            characterName: actorSuggestionSet.characterName,
+            actorName: suggestion.actorName,
+            reasoning: suggestion.reasoning || null,
+            fitScore: suggestion.fitScore || null,
+            availability: suggestion.availability || null,
+            estimatedFee: suggestion.estimatedFee || null,
+            workingRelationships: suggestion.workingRelationships || [],
+          });
+        }
+      }
+    }
 
     // Step 4: Analyze VFX needs
     console.log("Analyzing VFX needs...");
