@@ -62,7 +62,7 @@ async function extractTextFromImage(
     const base64Data = imageBuffer.toString('base64');
     
     // Use the existing analyzeDocument function which handles images
-    const { analyzeDocument } = await import('../ai-client');
+    const { analyzeDocument } = await import('./ai-agents/ai-client');
     const result = await analyzeDocument(provider, base64Data, prompt, mimeType);
     
     console.log("Successfully extracted text from image via Vadis AI.");

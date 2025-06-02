@@ -16,6 +16,10 @@ import {
   performCompleteCharacterAnalysis,
   type DetailedCharacter 
 } from "./services/character-analysis-service";
+import {
+  performCompleteCastingAnalysis,
+  type ActorSuggestion as CastingActorSuggestion
+} from "./services/casting-suggestion-service";
 
 // Configure multer for file uploads
 const upload = multer({
@@ -329,25 +333,35 @@ async function analyzeScriptAsync(
       });
     }
 
-    // Step 3: Suggest actors
-    console.log("Suggesting actors...");
-    const actorSuggestions = await suggestActors(characterAnalysis.characters);
+    // Step 3: AI-Powered Casting Analysis
+    console.log("Performing comprehensive casting analysis...");
+    const castingAnalysis = await performCompleteCastingAnalysis(
+      characterAnalysis.characters,
+      characterAnalysis.summaries,
+      'medium' // Default budget tier - could be determined from project data
+    );
     
     // Save actor suggestions to database
-    for (const actorSuggestionSet of actorSuggestions) {
-      if (actorSuggestionSet.suggestions && actorSuggestionSet.suggestions.length > 0) {
-        for (const suggestion of actorSuggestionSet.suggestions) {
-          await storage.createActorSuggestion({
-            projectId,
-            characterName: actorSuggestionSet.characterName,
-            actorName: suggestion.actorName,
-            reasoning: suggestion.reasoning || null,
-            fitScore: suggestion.fitScore || null,
-            availability: suggestion.availability || null,
-            estimatedFee: suggestion.estimatedFee || null,
-            workingRelationships: suggestion.workingRelationships || [],
-          });
-        }
+    for (const recommendation of castingAnalysis.individualRecommendations) {
+      const allSuggestions = [
+        ...recommendation.primarySuggestions,
+        ...recommendation.alternativeSuggestions,
+        ...recommendation.budgetConsiderations.midBudget,
+        ...recommendation.diversityOptions,
+        ...recommendation.emergingTalent
+      ];
+
+      for (const suggestion of allSuggestions) {
+        await storage.createActorSuggestion({
+          projectId,
+          characterName: recommendation.characterName,
+          actorName: suggestion.actorName,
+          reasoning: suggestion.reasoning || null,
+          fitScore: suggestion.fitScore || null,
+          availability: suggestion.availability || null,
+          estimatedFee: suggestion.estimatedFee || null,
+          workingRelationships: suggestion.workingRelationships || [],
+        });
       }
     }
 
@@ -405,7 +419,7 @@ async function analyzeScriptAsync(
       scenes,
       characterAnalysis.characters,
       vfxNeeds,
-      actorSuggestions,
+      castingAnalysis.individualRecommendations,
       locations,
       productPlacements
     );
