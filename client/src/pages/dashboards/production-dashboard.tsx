@@ -164,49 +164,65 @@ export default function ProductionDashboard() {
             {/* Quick Actions Section */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <Link to="/dashboard/script-analysis-new">
-                <Card className="group hover:shadow-lg transition-all duration-300 cursor-pointer border-2 hover:border-blue-200 dark:hover:border-blue-700">
-                  <CardContent className="p-6 text-center">
-                    <div className="h-12 w-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                      <Plus className="h-6 w-6 text-white" />
+                <Card className="group hover:shadow-lg transition-all duration-300 cursor-pointer border-2 hover:border-blue-200 dark:hover:border-blue-700 h-full">
+                  <CardContent className="p-6 text-center h-full flex flex-col justify-between">
+                    <div className="space-y-4">
+                      <div className="h-12 w-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300">
+                        <Plus className="h-6 w-6 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Upload Script</h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Start a new project with comprehensive AI analysis</p>
+                      </div>
                     </div>
-                    <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Upload Script</h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Start a new project with AI analysis</p>
                   </CardContent>
                 </Card>
               </Link>
 
               <Link to="/dashboard/marketplace">
-                <Card className="group hover:shadow-lg transition-all duration-300 cursor-pointer border-2 hover:border-green-200 dark:hover:border-green-700">
-                  <CardContent className="p-6 text-center">
-                    <div className="h-12 w-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                      <TrendingUp className="h-6 w-6 text-white" />
+                <Card className="group hover:shadow-lg transition-all duration-300 cursor-pointer border-2 hover:border-green-200 dark:hover:border-green-700 h-full">
+                  <CardContent className="p-6 text-center h-full flex flex-col justify-between">
+                    <div className="space-y-4">
+                      <div className="h-12 w-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300">
+                        <TrendingUp className="h-6 w-6 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Marketplace</h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Connect with brands and industry investors</p>
+                      </div>
                     </div>
-                    <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Marketplace</h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Find brands and investors</p>
                   </CardContent>
                 </Card>
               </Link>
 
               <Link to="/dashboard/analytics">
-                <Card className="group hover:shadow-lg transition-all duration-300 cursor-pointer border-2 hover:border-purple-200 dark:hover:border-purple-700">
-                  <CardContent className="p-6 text-center">
-                    <div className="h-12 w-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                      <BarChart3 className="h-6 w-6 text-white" />
+                <Card className="group hover:shadow-lg transition-all duration-300 cursor-pointer border-2 hover:border-purple-200 dark:hover:border-purple-700 h-full">
+                  <CardContent className="p-6 text-center h-full flex flex-col justify-between">
+                    <div className="space-y-4">
+                      <div className="h-12 w-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300">
+                        <BarChart3 className="h-6 w-6 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Analytics</h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Track performance and project metrics</p>
+                      </div>
                     </div>
-                    <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Analytics</h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Track performance metrics</p>
                   </CardContent>
                 </Card>
               </Link>
 
               <Link to="/dashboard/financial">
-                <Card className="group hover:shadow-lg transition-all duration-300 cursor-pointer border-2 hover:border-orange-200 dark:hover:border-orange-700">
-                  <CardContent className="p-6 text-center">
-                    <div className="h-12 w-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                      <DollarSign className="h-6 w-6 text-white" />
+                <Card className="group hover:shadow-lg transition-all duration-300 cursor-pointer border-2 hover:border-orange-200 dark:hover:border-orange-700 h-full">
+                  <CardContent className="p-6 text-center h-full flex flex-col justify-between">
+                    <div className="space-y-4">
+                      <div className="h-12 w-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300">
+                        <DollarSign className="h-6 w-6 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Financial</h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Monitor budget and revenue tracking</p>
+                      </div>
                     </div>
-                    <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Financial</h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Budget and revenue tracking</p>
                   </CardContent>
                 </Card>
               </Link>
