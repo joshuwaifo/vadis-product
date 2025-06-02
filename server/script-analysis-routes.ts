@@ -220,7 +220,24 @@ async function analyzeScriptAsync(
     // Step 1: Extract scenes
     console.log("Extracting scenes...");
     const scenes = await extractScenes(scriptContent);
-    // Save scenes to database here
+    
+    // Save scenes to database
+    for (const scene of scenes) {
+      await storage.createScene({
+        projectId,
+        sceneNumber: scene.sceneNumber,
+        location: scene.location,
+        timeOfDay: scene.timeOfDay || null,
+        description: scene.description || null,
+        characters: scene.characters || [],
+        content: scene.content || null,
+        pageStart: scene.pageStart || null,
+        pageEnd: scene.pageEnd || null,
+        duration: scene.duration || null,
+        vfxNeeds: scene.vfxNeeds || [],
+        productPlacementOpportunities: scene.productPlacementOpportunities || [],
+      });
+    }
 
     // Step 2: Analyze characters
     console.log("Analyzing characters...");

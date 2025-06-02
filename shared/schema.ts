@@ -285,6 +285,11 @@ export const insertDemoRequestSchema = createInsertSchema(demoRequests).omit({
   updatedAt: true,
 });
 
+export const insertSceneSchema = createInsertSchema(scenes).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Login schema for authentication
 
 export const loginSchema = z.object({
@@ -305,6 +310,8 @@ export type InsertInvestorProfile = z.infer<typeof insertInvestorProfileSchema>;
 export type InvestorProfile = typeof investorProfiles.$inferSelect;
 export type InsertDemoRequest = z.infer<typeof insertDemoRequestSchema>;
 export type DemoRequest = typeof demoRequests.$inferSelect;
+export type InsertScene = z.infer<typeof insertSceneSchema>;
+export type Scene = typeof scenes.$inferSelect;
 
 export type UserRole = keyof typeof userRoles;
 export type LoginData = z.infer<typeof loginSchema>;

@@ -6,6 +6,7 @@ import {
   projects, 
   products, 
   investorProfiles,
+  scenes,
   type User, 
   type InsertUser, 
   type ProductionProfile,
@@ -18,6 +19,8 @@ import {
   type InsertProduct,
   type InvestorProfile,
   type InsertInvestorProfile,
+  type Scene,
+  type InsertScene,
   type UserRole
 } from "@shared/schema";
 import { db } from "./db";
@@ -59,6 +62,10 @@ export interface IStorage {
   createInvestorProfile(profile: InsertInvestorProfile): Promise<InvestorProfile>;
   getInvestorProfile(userId: number): Promise<InvestorProfile | undefined>;
   updateInvestorProfile(userId: number, updates: Partial<InvestorProfile>): Promise<InvestorProfile | undefined>;
+  
+  // Script Analysis - Scenes
+  createScene(scene: InsertScene): Promise<Scene>;
+  getScenesByProject(projectId: number): Promise<Scene[]>;
 }
 
 // DEPRECATED: MemStorage class - kept for testing purposes only
@@ -363,6 +370,15 @@ export class MemStorage implements IStorage {
     this.productionProfiles.set(userId, updated);
     return updated;
   }
+
+  // Script Analysis - Scenes (stub implementation for deprecated MemStorage)
+  async createScene(scene: InsertScene): Promise<Scene> {
+    throw new Error("MemStorage is deprecated. Use DatabaseStorage for scene operations.");
+  }
+
+  async getScenesByProject(projectId: number): Promise<Scene[]> {
+    throw new Error("MemStorage is deprecated. Use DatabaseStorage for scene operations.");
+  }
 }
 
 
@@ -544,6 +560,33 @@ export class DatabaseStorage implements IStorage {
       .where(eq(productionProfiles.userId, userId))
       .returning();
     return updated || undefined;
+  }
+
+  // Script Analysis - Scenes
+  async createScene(scene: InsertScene): Promise<Scene> {
+    try {
+      const [created] = await db
+        .insert(scenes)
+        .values(scene)
+        .returning();
+      return created;
+    } catch (error) {
+      console.error('Error creating scene:', error);
+      throw error;
+    }
+  }
+
+  async getScenesByProject(projectId: number): Promise<Scene[]> {
+    try {
+      const result = await db
+        .select()
+        .from(scenes)
+        .where(eq(scenes.projectId, projectId));
+      return result;
+    } catch (error) {
+      console.error('Error getting scenes by project:', error);
+      return [];
+    }
   }
 }
 
