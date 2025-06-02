@@ -31,6 +31,11 @@ export function registerScriptAnalysisRoutes(app: Express) {
   // Create new script analysis project with PDF upload
   app.post("/api/projects/script-analysis", upload.single('scriptFile'), async (req, res) => {
     try {
+      // Check if user is authenticated
+      if (!req.session.user) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
       const { title, logline, budgetRange, fundingGoal, productionTimeline } = req.body;
       const scriptFile = req.file;
 
@@ -50,7 +55,7 @@ export function registerScriptAnalysisRoutes(app: Express) {
 
       // Create project in database
       const project = await storage.createProject({
-        userId: 1, // Using hardcoded user ID for now
+        userId: req.session.user.id,
         title,
         projectType: "script_analysis",
         logline,
