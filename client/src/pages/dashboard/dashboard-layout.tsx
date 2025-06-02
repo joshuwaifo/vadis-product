@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
 import { 
   Home, 
   User, 
@@ -21,6 +22,8 @@ interface DashboardLayoutProps {
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [location, setLocation] = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   // Fetch current user data from session
   const { data: currentUser, isLoading: userLoading, error: userError } = useQuery({
@@ -33,6 +36,41 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       return response.json();
     },
   });
+
+  // Logout mutation
+  const logoutMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+      });
+      if (!response.ok) {
+        throw new Error('Logout failed');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      // Clear all cached data
+      queryClient.clear();
+      // Redirect to login page
+      setLocation('/login');
+      toast({
+        title: "Logged out",
+        description: "You have been successfully logged out.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Logout failed",
+        description: "There was an error logging out. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleLogout = () => {
+    logoutMutation.mutate();
+  };
 
   // Redirect to login if authentication fails
   if (userError) {
@@ -123,7 +161,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               </Button>
 
               {/* User menu */}
-              <Button variant="ghost" size="sm" className="rounded-lg">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="rounded-lg"
+                onClick={handleLogout}
+                disabled={logoutMutation.isPending}
+              >
                 <LogOut className="h-4 w-4" />
               </Button>
             </div>
