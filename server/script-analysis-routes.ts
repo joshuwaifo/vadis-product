@@ -339,7 +339,27 @@ async function analyzeScriptAsync(
     // Step 6: Suggest locations
     console.log("Suggesting locations...");
     const locations = await suggestLocations(scenes);
-    // Save locations to database here
+    
+    // Save location suggestions to database
+    for (const locationSet of locations) {
+      if (locationSet.suggestions && locationSet.suggestions.length > 0) {
+        for (const suggestion of locationSet.suggestions) {
+          await storage.createLocationSuggestion({
+            projectId,
+            sceneId: locationSet.sceneId || null, // AI returns sceneId as string reference
+            locationType: locationSet.locationType,
+            location: suggestion.location,
+            city: suggestion.city || null,
+            state: suggestion.state || null,
+            country: suggestion.country || null,
+            taxIncentive: suggestion.taxIncentive || null,
+            estimatedCost: suggestion.estimatedCost || null,
+            logistics: suggestion.logistics || null,
+            weatherConsiderations: suggestion.weatherConsiderations || null,
+          });
+        }
+      }
+    }
 
     // Step 7: Generate financial plan
     console.log("Generating financial plan...");

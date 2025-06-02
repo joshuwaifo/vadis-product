@@ -11,6 +11,7 @@ import {
   characterRelationships,
   actorSuggestions,
   productPlacements,
+  locationSuggestions,
   type User, 
   type InsertUser, 
   type ProductionProfile,
@@ -33,6 +34,8 @@ import {
   type InsertActorSuggestion,
   type ProductPlacement,
   type InsertProductPlacement,
+  type LocationSuggestion,
+  type InsertLocationSuggestion,
   type UserRole
 } from "@shared/schema";
 import { db } from "./db";
@@ -92,6 +95,9 @@ export interface IStorage {
   
   // Script Analysis - Product Placements
   createProductPlacement(placement: InsertProductPlacement): Promise<ProductPlacement>;
+  
+  // Script Analysis - Location Suggestions
+  createLocationSuggestion(suggestion: InsertLocationSuggestion): Promise<LocationSuggestion>;
 }
 
 // DEPRECATED: MemStorage class - kept for testing purposes only
@@ -433,6 +439,11 @@ export class MemStorage implements IStorage {
   async createProductPlacement(placement: InsertProductPlacement): Promise<ProductPlacement> {
     throw new Error("MemStorage is deprecated. Use DatabaseStorage for product placement operations.");
   }
+
+  // Script Analysis - Location Suggestions (stub implementation for deprecated MemStorage)
+  async createLocationSuggestion(suggestion: InsertLocationSuggestion): Promise<LocationSuggestion> {
+    throw new Error("MemStorage is deprecated. Use DatabaseStorage for location suggestion operations.");
+  }
 }
 
 
@@ -721,6 +732,20 @@ export class DatabaseStorage implements IStorage {
       return created;
     } catch (error) {
       console.error('Error creating product placement:', error);
+      throw error;
+    }
+  }
+
+  // Script Analysis - Location Suggestions
+  async createLocationSuggestion(suggestion: InsertLocationSuggestion): Promise<LocationSuggestion> {
+    try {
+      const [created] = await db
+        .insert(locationSuggestions)
+        .values(suggestion)
+        .returning();
+      return created;
+    } catch (error) {
+      console.error('Error creating location suggestion:', error);
       throw error;
     }
   }

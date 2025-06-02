@@ -310,6 +310,11 @@ export const insertProductPlacementSchema = createInsertSchema(productPlacements
   createdAt: true,
 });
 
+export const insertLocationSuggestionSchema = createInsertSchema(locationSuggestions).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Login schema for authentication
 
 export const loginSchema = z.object({
@@ -340,6 +345,8 @@ export type InsertActorSuggestion = z.infer<typeof insertActorSuggestionSchema>;
 export type ActorSuggestion = typeof actorSuggestions.$inferSelect;
 export type InsertProductPlacement = z.infer<typeof insertProductPlacementSchema>;
 export type ProductPlacement = typeof productPlacements.$inferSelect;
+export type InsertLocationSuggestion = z.infer<typeof insertLocationSuggestionSchema>;
+export type LocationSuggestion = typeof locationSuggestions.$inferSelect;
 
 export type UserRole = keyof typeof userRoles;
 export type LoginData = z.infer<typeof loginSchema>;
