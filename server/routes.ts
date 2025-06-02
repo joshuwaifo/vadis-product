@@ -117,6 +117,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get individual project by ID
+  app.get("/api/projects/:id", async (req, res) => {
+    try {
+      // Check if user is authenticated
+      if (!req.session.user) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const projectId = parseInt(req.params.id);
+      if (isNaN(projectId)) {
+        return res.status(400).json({ error: "Invalid project ID" });
+      }
+
+      const project = await storage.getProject(projectId);
+      
+      if (!project) {
+        return res.status(404).json({ error: "Project not found" });
+      }
+
+      // Verify project ownership
+      if (project.userId !== req.session.user.id) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+
+      res.json(project);
+    } catch (error) {
+      console.error("Error fetching project:", error);
+      res.status(500).json({ error: "Failed to fetch project" });
+    }
+  });
+
   app.get("/api/dashboard/stats", async (req, res) => {
     try {
       // Check if user is authenticated

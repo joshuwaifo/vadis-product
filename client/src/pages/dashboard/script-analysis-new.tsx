@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -41,6 +41,13 @@ export default function ScriptAnalysisNew() {
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Fetch project data when we have a projectId
+  const { data: project, refetch: refetchProject } = useQuery({
+    queryKey: ['/api/projects', projectId],
+    enabled: !!projectId,
+    refetchInterval: projectId && step === 3 ? 5000 : false, // Poll every 5 seconds when analyzing
+  });
+
   const form = useForm({
     resolver: zodResolver(projectSchema),
     defaultValues: {
@@ -78,19 +85,29 @@ export default function ScriptAnalysisNew() {
       return response.json();
     },
     onSuccess: (data) => {
-      setProjectId(data.id);
-      setStep(3);
-      toast({
-        title: "Project created successfully!",
-        description: "Your script is being analyzed. This may take a few minutes.",
-      });
+      if (data && data.id) {
+        setProjectId(data.id);
+        setStep(3);
+        toast({
+          title: "Project created successfully!",
+          description: "Your script is being analyzed. This may take a few minutes.",
+        });
+      } else {
+        toast({
+          title: "Error creating project",
+          description: "Invalid response from server. Please try again.",
+          variant: "destructive",
+        });
+      }
     },
     onError: (error: any) => {
+      console.error("Project creation error:", error);
       toast({
         title: "Error creating project",
-        description: error.message || "Please try again.",
+        description: error.message || "There was an issue creating your project. Please try again.",
         variant: "destructive",
       });
+      // Keep user on step 2 to retry
     },
   });
 
@@ -355,58 +372,111 @@ export default function ScriptAnalysisNew() {
             </Card>
           )}
 
-          {/* Step 3: Analysis in Progress */}
+          {/* Step 3: Analysis Status */}
           {step === 3 && projectId && (
             <Card className="border-0 shadow-xl">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                  Analysis in Progress
+                  {project?.status === 'completed' ? (
+                    <CheckCircle2 className="h-5 w-5 text-green-600" />
+                  ) : project?.status === 'failed' ? (
+                    <AlertCircle className="h-5 w-5 text-red-600" />
+                  ) : (
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  )}
+                  {project?.status === 'completed' ? 'Analysis Complete' : 
+                   project?.status === 'failed' ? 'Analysis Failed' : 'Analysis in Progress'}
                 </CardTitle>
                 <CardDescription>
-                  AI is analyzing your script across multiple dimensions
+                  {project?.title || 'Loading project details...'}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span>Extracting Scenes</span>
-                      <span>In Progress...</span>
+                {project?.status === 'completed' && (
+                  <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                    <div className="flex items-center gap-2 mb-2">
+                      <CheckCircle2 className="h-5 w-5 text-green-600" />
+                      <span className="font-semibold text-green-800 dark:text-green-200">
+                        Analysis Successfully Completed
+                      </span>
                     </div>
-                    <Progress value={30} className="h-2" />
+                    <p className="text-sm text-green-700 dark:text-green-300">
+                      Your script has been fully analyzed with comprehensive insights across all dimensions.
+                    </p>
                   </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                    <div className="space-y-2">
-                      <h4 className="font-semibold">Analysis Components:</h4>
-                      <ul className="space-y-1 text-gray-600 dark:text-gray-400">
-                        <li>• Scene extraction and breakdown</li>
-                        <li>• Character analysis and relationships</li>
-                        <li>• Actor casting suggestions</li>
-                        <li>• VFX requirements identification</li>
-                      </ul>
+                )}
+
+                {project?.status === 'failed' && (
+                  <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
+                    <div className="flex items-center gap-2 mb-2">
+                      <AlertCircle className="h-5 w-5 text-red-600" />
+                      <span className="font-semibold text-red-800 dark:text-red-200">
+                        Analysis Failed
+                      </span>
                     </div>
+                    <p className="text-sm text-red-700 dark:text-red-300">
+                      There was an issue analyzing your script. Please try again or contact support.
+                    </p>
+                  </div>
+                )}
+
+                {(!project?.status || project?.status === 'analyzing') && (
+                  <div className="space-y-4">
                     <div className="space-y-2">
-                      <h4 className="font-semibold">Business Analysis:</h4>
-                      <ul className="space-y-1 text-gray-600 dark:text-gray-400">
-                        <li>• Product placement opportunities</li>
-                        <li>• Location scouting suggestions</li>
-                        <li>• Financial planning and budgeting</li>
-                        <li>• Investment readiness report</li>
-                      </ul>
+                      <div className="flex justify-between text-sm">
+                        <span>Processing Script</span>
+                        <span>In Progress...</span>
+                      </div>
+                      <Progress value={45} className="h-2" />
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                      <div className="space-y-2">
+                        <h4 className="font-semibold">Analysis Components:</h4>
+                        <ul className="space-y-1 text-gray-600 dark:text-gray-400">
+                          <li>• Scene extraction and breakdown</li>
+                          <li>• Character analysis and relationships</li>
+                          <li>• Actor casting suggestions</li>
+                          <li>• VFX requirements identification</li>
+                        </ul>
+                      </div>
+                      <div className="space-y-2">
+                        <h4 className="font-semibold">Business Analysis:</h4>
+                        <ul className="space-y-1 text-gray-600 dark:text-gray-400">
+                          <li>• Product placement opportunities</li>
+                          <li>• Location scouting suggestions</li>
+                          <li>• Financial planning and budgeting</li>
+                          <li>• Investment readiness report</li>
+                        </ul>
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
 
                 <div className="flex justify-center">
-                  <Button 
-                    onClick={() => setLocation(`/dashboard/projects/${projectId}/analysis`)}
-                    className="bg-gradient-to-r from-blue-500 to-purple-600 text-white"
-                  >
-                    View Analysis Dashboard
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
+                  {project?.status === 'completed' ? (
+                    <Button 
+                      onClick={() => setLocation(`/dashboard/projects/${projectId}/analysis`)}
+                      className="bg-gradient-to-r from-green-500 to-blue-600 text-white"
+                    >
+                      View Complete Analysis
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  ) : project?.status === 'failed' ? (
+                    <Button 
+                      onClick={() => setLocation('/dashboard/projects/new/script_analysis')}
+                      variant="outline"
+                    >
+                      Try Again
+                    </Button>
+                  ) : (
+                    <Button 
+                      onClick={() => refetchProject()}
+                      variant="outline"
+                    >
+                      Refresh Status
+                    </Button>
+                  )}
                 </div>
               </CardContent>
             </Card>
