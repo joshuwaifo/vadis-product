@@ -9,6 +9,7 @@ import {
   scenes,
   characters,
   characterRelationships,
+  actorSuggestions,
   type User, 
   type InsertUser, 
   type ProductionProfile,
@@ -27,6 +28,8 @@ import {
   type InsertCharacter,
   type CharacterRelationship,
   type InsertCharacterRelationship,
+  type ActorSuggestion,
+  type InsertActorSuggestion,
   type UserRole
 } from "@shared/schema";
 import { db } from "./db";
@@ -80,6 +83,9 @@ export interface IStorage {
   // Script Analysis - Character Relationships
   createCharacterRelationship(relationship: InsertCharacterRelationship): Promise<CharacterRelationship>;
   getCharacterRelationshipsByProject(projectId: number): Promise<CharacterRelationship[]>;
+  
+  // Script Analysis - Actor Suggestions
+  createActorSuggestion(suggestion: InsertActorSuggestion): Promise<ActorSuggestion>;
 }
 
 // DEPRECATED: MemStorage class - kept for testing purposes only
@@ -672,6 +678,20 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error('Error getting character relationships by project:', error);
       return [];
+    }
+  }
+
+  // Script Analysis - Actor Suggestions
+  async createActorSuggestion(suggestion: InsertActorSuggestion): Promise<ActorSuggestion> {
+    try {
+      const [created] = await db
+        .insert(actorSuggestions)
+        .values(suggestion)
+        .returning();
+      return created;
+    } catch (error) {
+      console.error('Error creating actor suggestion:', error);
+      throw error;
     }
   }
 }
