@@ -5,7 +5,7 @@
  * and existing Vadis AI infrastructure
  */
 
-import { generateContent, AIProvider } from '../ai-client';
+import { generateContent, AIProvider } from './ai-agents/ai-client';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';

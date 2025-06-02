@@ -6,7 +6,7 @@
  * product placement, location suggestions, and financial planning.
  */
 
-import { generateContent, analyzeDocument, extractJsonFromText, type AIProvider } from './ai-client';
+import { generateContent, analyzeDocument, extractJsonFromText, type AIProvider } from './services/ai-agents/ai-client';
 
 export interface Scene {
   id: string;

@@ -127,7 +127,7 @@ function getXAIClient(model: string) {
 }
 
 /**
- * Generate content using any provider
+ * Generate content using any provider with automatic fallback
  */
 export async function generateContent(
   provider: AIProvider,
@@ -136,57 +136,71 @@ export async function generateContent(
     maxTokens?: number;
     temperature?: number;
     responseFormat?: 'json' | 'text';
+    fallbackProviders?: AIProvider[];
   }
 ): Promise<string> {
-  const { client, modelName, provider: providerType } = getAIClient(provider);
+  const providers = [provider, ...(options?.fallbackProviders || [])];
   
-  try {
-    switch (providerType) {
-      case 'gemini': {
-        const model = (client as GoogleGenerativeAI).getGenerativeModel({
-          model: modelName,
-          safetySettings,
-          generationConfig: {
+  for (const currentProvider of providers) {
+    try {
+      const { client, modelName, provider: providerType } = getAIClient(currentProvider);
+      
+      switch (providerType) {
+        case 'gemini': {
+          const model = (client as GoogleGenerativeAI).getGenerativeModel({
+            model: modelName,
+            safetySettings,
+            generationConfig: {
+              temperature: options?.temperature || 0.7,
+              maxOutputTokens: options?.maxTokens || 4096,
+            },
+          });
+          
+          const result = await model.generateContent(sanitizeText(prompt));
+          return result.response.text();
+        }
+        
+        case 'openai': {
+          const response = await (client as OpenAI).chat.completions.create({
+            model: modelName,
+            messages: [{ role: "user", content: prompt }],
+            max_tokens: options?.maxTokens || 4096,
             temperature: options?.temperature || 0.7,
-            maxOutputTokens: options?.maxTokens || 4096,
-          },
-        });
+            response_format: options?.responseFormat === 'json' ? { type: "json_object" } : undefined,
+          });
+          
+          return response.choices[0].message.content || "";
+        }
         
-        const result = await model.generateContent(sanitizeText(prompt));
-        return result.response.text();
+        case 'xai': {
+          const response = await (client as OpenAI).chat.completions.create({
+            model: modelName,
+            messages: [{ role: "user", content: prompt }],
+            max_tokens: options?.maxTokens || 4096,
+            temperature: options?.temperature || 0.7,
+            response_format: options?.responseFormat === 'json' ? { type: "json_object" } : undefined,
+          });
+          
+          return response.choices[0].message.content || "";
+        }
+        
+        default:
+          throw new Error(`Unknown provider type: ${providerType}`);
+      }
+    } catch (error) {
+      console.error(`[AI Client] Error with ${currentProvider}:`, error);
+      
+      // If this was the last provider, throw the error
+      if (currentProvider === providers[providers.length - 1]) {
+        throw error;
       }
       
-      case 'openai': {
-        const response = await (client as OpenAI).chat.completions.create({
-          model: modelName,
-          messages: [{ role: "user", content: prompt }],
-          max_tokens: options?.maxTokens || 4096,
-          temperature: options?.temperature || 0.7,
-          response_format: options?.responseFormat === 'json' ? { type: "json_object" } : undefined,
-        });
-        
-        return response.choices[0].message.content || "";
-      }
-      
-      case 'xai': {
-        const response = await (client as OpenAI).chat.completions.create({
-          model: modelName,
-          messages: [{ role: "user", content: prompt }],
-          max_tokens: options?.maxTokens || 4096,
-          temperature: options?.temperature || 0.7,
-          response_format: options?.responseFormat === 'json' ? { type: "json_object" } : undefined,
-        });
-        
-        return response.choices[0].message.content || "";
-      }
-      
-      default:
-        throw new Error(`Unknown provider type: ${providerType}`);
+      // Otherwise, continue to the next provider
+      console.log(`[AI Client] Falling back to next provider...`);
     }
-  } catch (error) {
-    console.error(`[AI Client] Error with ${provider}:`, error);
-    throw error;
   }
+  
+  throw new Error('All AI providers failed');
 }
 
 /**
