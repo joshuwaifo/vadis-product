@@ -5,8 +5,119 @@
  * and existing Vadis AI infrastructure
  */
 
-import { analyzeDocument } from '../ai-client';
-import { AIProvider } from '../ai-client';
+import { generateContent, AIProvider } from '../ai-client';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as os from 'os';
+import { v4 as uuidv4 } from 'uuid';
+import pdfParse from 'pdf-parse';
+
+// --- Helper Functions for File Processing ---
+
+/**
+ * Convert buffer to temporary file for AI processing
+ */
+async function bufferToTempFile(buffer: Buffer, extension: string): Promise<string> {
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "vadis-"));
+  const tempFileName = `${uuidv4()}${extension}`;
+  const tempFilePath = path.join(tempDir, tempFileName);
+  try {
+    await fs.promises.writeFile(tempFilePath, buffer);
+    return tempFilePath;
+  } catch (err) {
+    console.error(`Error writing temp file ${tempFilePath}:`, err);
+    try {
+      await fs.promises.rm(tempDir, { recursive: true, force: true });
+    } catch {}
+    throw err;
+  }
+}
+
+/**
+ * Clean up temporary files
+ */
+async function cleanupTempFile(filePath: string) {
+  try {
+    const dirPath = path.dirname(filePath);
+    await fs.promises.unlink(filePath);
+    await fs.promises.rmdir(dirPath).catch(() => {});
+  } catch (cleanupErr) {
+    console.warn(`Failed to clean up temp file ${filePath}:`, cleanupErr);
+  }
+}
+
+/**
+ * Extract text from image using Vadis AI infrastructure
+ */
+async function extractTextFromImage(
+  imageBuffer: Buffer,
+  mimeType: string,
+  provider: AIProvider = 'gemini-1.5-flash'
+): Promise<string> {
+  let imagePath: string | null = null;
+  try {
+    const extension = mimeType.includes("jpeg") || mimeType.includes("jpg") ? ".jpg" : ".png";
+    imagePath = await bufferToTempFile(imageBuffer, extension);
+    
+    // Convert to base64 for AI processing
+    const imageData = fs.readFileSync(imagePath);
+    const base64Data = imageData.toString("base64");
+    
+    const prompt = "Extract all text content from this image. If it appears to be a film script or screenplay, format it properly with scene headings, action, and dialogue. If no text is visible, describe the image.";
+    
+    const result = await generateContent(
+      provider,
+      prompt,
+      undefined,
+      [{
+        type: 'image',
+        data: base64Data,
+        mimeType: mimeType
+      }]
+    );
+    
+    console.log("Successfully extracted text from image via Vadis AI.");
+    return result;
+  } catch (error) {
+    console.error("Error extracting text from image with Vadis AI:", error);
+    return `Error: Failed to extract text from image. ${error instanceof Error ? error.message : "Unknown AI error"}`;
+  } finally {
+    if (imagePath) await cleanupTempFile(imagePath);
+  }
+}
+
+/**
+ * Extract text from PDF using pdf-parse and enhance with AI if needed
+ */
+async function extractTextFromPdf(
+  pdfBuffer: Buffer,
+  provider: AIProvider = 'gemini-1.5-flash'
+): Promise<string> {
+  try {
+    const pdfData = await pdfParse(pdfBuffer);
+    const extractedText = pdfData?.text || "";
+    
+    if (extractedText.length > 100) {
+      console.log("Successfully extracted text from PDF using pdf-parse.");
+      return extractedText;
+    }
+    
+    console.log("pdf-parse extraction insufficient, trying AI for enhancement...");
+    
+    const prompt = `The following text was extracted from a PDF, but might be incomplete or badly formatted. Please analyze it. If it appears to be a film script or screenplay, reformat it accurately with scene headings (INT./EXT.), action lines, character names (centered), and dialogue. If it's not a script, simply clean up the formatting for readability. Preserve as much original content as possible. 
+
+Extracted Text: --- ${extractedText.substring(0, 25000)} --- 
+
+Formatted Output:`;
+    
+    const result = await generateContent(provider, prompt);
+    console.log("Successfully enhanced/extracted PDF text using Vadis AI.");
+    return result;
+  } catch (error) {
+    console.error("Error processing PDF with pdf-parse and/or AI:", error);
+    return `Error: Failed to process PDF. ${error instanceof Error ? error.message : "Unknown processing error"}`;
+  }
+}
 
 // Interface for extracted scene data
 export interface ExtractedScene {
@@ -33,13 +144,14 @@ export async function extractScriptFromPdf(
   try {
     console.log(`Processing uploaded file with MIME type: ${mimeType || 'application/pdf'}`);
     
-    // Use the existing Vadis analyzeDocument function for text extraction
-    const extractedText = await analyzeDocument(
-      provider,
-      fileBuffer,
-      mimeType || 'application/pdf',
-      'Extract all text content from this script document. Preserve formatting and scene structure.'
-    );
+    let extractedText = '';
+    const isImage = mimeType && mimeType.startsWith('image/');
+    
+    if (isImage && mimeType) {
+      extractedText = await extractTextFromImage(fileBuffer, mimeType, provider);
+    } else {
+      extractedText = await extractTextFromPdf(fileBuffer, provider);
+    }
     
     console.log('Successfully extracted text using Vadis AI client');
     
