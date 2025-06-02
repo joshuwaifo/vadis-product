@@ -5,6 +5,7 @@ import { storage } from "./storage";
 import { hubspotService } from "./hubspot";
 import { 
   insertDemoRequestSchema, 
+  insertProjectSchema,
   loginSchema,
   userRoles
 } from "@shared/schema";
@@ -79,7 +80,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Projects endpoints
   app.get("/api/projects", async (req, res) => {
     try {
-      const projects = await storage.getProjectsByUser(1); // Using hardcoded user ID for now
+      // Check if user is authenticated
+      if (!req.session.user) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const projects = await storage.getProjectsByUser(req.session.user.id);
       res.json(projects);
     } catch (error) {
       console.error("Error fetching projects:", error);
@@ -89,20 +95,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/projects", async (req, res) => {
     try {
-      const project = await storage.createProject({
-        userId: 1, // Using hardcoded user ID for now
+      // Check if user is authenticated
+      if (!req.session.user) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      // Validate the request body using Zod schema
+      const validatedData = insertProjectSchema.parse({
+        userId: req.session.user.id,
         ...req.body,
       });
+
+      const project = await storage.createProject(validatedData);
       res.json(project);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error creating project:", error);
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ error: "Invalid project data", details: error.errors });
+      }
       res.status(500).json({ error: "Failed to create project" });
     }
   });
 
   app.get("/api/dashboard/stats", async (req, res) => {
     try {
-      const projects = await storage.getProjectsByUser(1);
+      // Check if user is authenticated
+      if (!req.session.user) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const projects = await storage.getProjectsByUser(req.session.user.id);
       const publishedProjects = projects.filter(p => p.isPublished);
       const totalFunding = projects.reduce((sum, p) => sum + (p.fundingGoal || 0), 0);
       const fundsRaised = projects.reduce((sum, p) => sum + (p.fundingRaised || 0), 0);
