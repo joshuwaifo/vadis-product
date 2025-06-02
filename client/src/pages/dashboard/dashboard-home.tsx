@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -29,6 +29,26 @@ interface Project {
 }
 
 export default function DashboardHome() {
+  const [, setLocation] = useLocation();
+
+  // Fetch current user data from session
+  const { data: currentUser, isLoading: userLoading, error: userError } = useQuery({
+    queryKey: ['currentUser'],
+    queryFn: async () => {
+      const response = await fetch('/api/auth/me');
+      if (!response.ok) {
+        throw new Error('Authentication required');
+      }
+      return response.json();
+    },
+  });
+
+  // Redirect to login if authentication fails
+  if (userError) {
+    setLocation('/login');
+    return null;
+  }
+
   const { data: projects, isLoading } = useQuery<Project[]>({
     queryKey: ['/api/projects'],
   });
@@ -36,6 +56,20 @@ export default function DashboardHome() {
   const { data: stats } = useQuery({
     queryKey: ['/api/dashboard/stats'],
   });
+
+  // Show loading state while user data is being fetched
+  if (userLoading) {
+    return (
+      <DashboardLayout>
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center space-y-4">
+            <Skeleton className="h-8 w-64 mx-auto" />
+            <Skeleton className="h-4 w-48 mx-auto" />
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -73,9 +107,12 @@ export default function DashboardHome() {
             <div className="backdrop-blur-lg bg-white/10 border border-white/20 rounded-2xl p-8 lg:p-12 max-w-4xl w-full shadow-2xl">
               <div className="text-center space-y-6">
                 <h1 className="text-5xl lg:text-7xl font-black text-white mb-6">
-                  Build. Fund. <span className="bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">Create.</span>
+                  Welcome, {currentUser?.user?.email}!
                 </h1>
                 <p className="text-xl lg:text-2xl text-gray-200 max-w-3xl mx-auto leading-relaxed">
+                  Your role is: <span className="bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent font-bold">{currentUser?.user?.role}</span>
+                </p>
+                <p className="text-lg text-gray-300 max-w-2xl mx-auto">
                   Transform your creative vision into investor-ready projects with AI-powered script analysis and generation
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-8">
