@@ -1,106 +1,139 @@
+import { useQuery } from "@tanstack/react-query";
+import { useLocation } from "wouter";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Link } from "wouter";
-import { Briefcase, Package, Eye, LogOut } from "lucide-react";
-import vadisLogoLight from "@assets/Vadis FINAL LOGO large size Without Background.png";
+import { Skeleton } from "@/components/ui/skeleton";
+import { 
+  TrendingUp, 
+  Target, 
+  Users,
+  BarChart3
+} from "lucide-react";
+import DashboardLayout from "../dashboard/dashboard-layout";
 
 export default function BrandDashboard() {
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-green-50 to-teal-50">
-      {/* Navigation Header */}
-      <header className="bg-white/90 backdrop-blur-sm border-b border-gray-200 shadow-sm">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Link href="/">
-              <img
-                src={vadisLogoLight}
-                alt="VadisMedia"
-                className="h-24 w-auto drop-shadow-2xl cursor-pointer"
-              />
-            </Link>
-            
-            <nav className="hidden md:flex items-center space-x-8">
-              <Link href="/brand/dashboard" className="text-gray-800 hover:text-green-600 transition-colors font-medium">
-                Dashboard
-              </Link>
-              <Link href="/brand/products" className="text-gray-600 hover:text-green-600 transition-colors">
-                Products
-              </Link>
-              <Link href="/brand/marketplace" className="text-gray-600 hover:text-green-600 transition-colors">
-                Marketplace
-              </Link>
-            </nav>
+  const [, setLocation] = useLocation();
 
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-teal-600 rounded-full flex items-center justify-center">
-                  <Briefcase className="w-4 h-4 text-white" />
+  // Fetch current user data from session
+  const { data: currentUser, isLoading: userLoading, error: userError } = useQuery({
+    queryKey: ['currentUser'],
+    queryFn: async () => {
+      const response = await fetch('/api/auth/me');
+      if (!response.ok) {
+        throw new Error('Authentication required');
+      }
+      return response.json();
+    },
+  });
+
+  // Redirect to login if authentication fails
+  if (userError) {
+    setLocation('/login');
+    return null;
+  }
+
+  // Show loading state while user data is being fetched
+  if (userLoading) {
+    return (
+      <DashboardLayout>
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center space-y-4">
+            <Skeleton className="h-8 w-64 mx-auto" />
+            <Skeleton className="h-4 w-48 mx-auto" />
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  return (
+    <DashboardLayout>
+      <div className="min-h-screen">
+        {/* Hero Section */}
+        <div className="relative bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 dark:from-gray-900 dark:via-green-900/20 dark:to-teal-900/20 overflow-hidden">
+          <div className="relative px-6 py-12 sm:px-8 lg:px-12">
+            <div className="max-w-7xl mx-auto">
+              <div className="flex flex-col lg:flex-row items-start justify-between gap-8">
+                <div className="flex-1 space-y-6">
+                  <div className="space-y-4">
+                    <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-gray-900 via-green-800 to-teal-800 dark:from-white dark:via-green-200 dark:to-teal-200 bg-clip-text text-transparent leading-tight">
+                      Welcome, {currentUser?.user?.name || 'Brand Partner'}
+                    </h1>
+                    <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl leading-relaxed">
+                      Discover perfect product placement opportunities, connect with productions, and amplify your brand through entertainment partnerships.
+                    </p>
+                  </div>
+                  
+                  <div className="flex flex-wrap gap-4">
+                    <Button size="lg" className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+                      <Target className="w-5 h-5 mr-2" />
+                      Browse Opportunities
+                    </Button>
+                    <Button variant="outline" size="lg" className="border-2 border-green-200 dark:border-green-800 hover:bg-green-50 dark:hover:bg-green-900/20 transition-all duration-300">
+                      <Users className="w-5 h-5 mr-2" />
+                      View Partnerships
+                    </Button>
+                  </div>
                 </div>
-                <span className="text-gray-800 text-sm font-medium">Brand/Agency</span>
+
+                {/* Stats Cards */}
+                <div className="w-full lg:w-auto">
+                  <div className="grid grid-cols-2 lg:grid-cols-1 gap-4 lg:min-w-[300px]">
+                    <Card className="backdrop-blur-sm bg-white/70 dark:bg-gray-800/70 border border-white/20 dark:border-gray-700/30 shadow-xl">
+                      <CardContent className="p-6">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Active Campaigns</p>
+                            <p className="text-3xl font-bold text-gray-900 dark:text-white">0</p>
+                          </div>
+                          <div className="h-12 w-12 bg-gradient-to-br from-green-500 to-teal-500 rounded-xl flex items-center justify-center">
+                            <TrendingUp className="h-6 w-6 text-white" />
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="backdrop-blur-sm bg-white/70 dark:bg-gray-800/70 border border-white/20 dark:border-gray-700/30 shadow-xl">
+                      <CardContent className="p-6">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Partnerships</p>
+                            <p className="text-3xl font-bold text-gray-900 dark:text-white">0</p>
+                          </div>
+                          <div className="h-12 w-12 bg-gradient-to-br from-emerald-500 to-cyan-500 rounded-xl flex items-center justify-center">
+                            <BarChart3 className="h-6 w-6 text-white" />
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </div>
               </div>
-              <Button variant="ghost" size="sm" className="text-gray-600 hover:bg-gray-100">
-                <LogOut className="w-4 h-4" />
-              </Button>
             </div>
           </div>
         </div>
-      </header>
 
-      {/* Main Content */}
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">
-            Brand Dashboard
-          </h1>
-          <p className="text-gray-600">
-            Manage your products and discover placement opportunities
-          </p>
+        {/* Main Content */}
+        <div className="px-6 py-8 sm:px-8 lg:px-12">
+          <div className="max-w-7xl mx-auto">
+            <Card className="border-2 border-dashed border-gray-300 dark:border-gray-600">
+              <CardContent className="p-12 text-center">
+                <div className="space-y-4">
+                  <div className="h-16 w-16 bg-gray-100 dark:bg-gray-800 rounded-xl flex items-center justify-center mx-auto">
+                    <Target className="h-8 w-8 text-gray-400" />
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Brand Dashboard Coming Soon</h3>
+                    <p className="text-gray-600 dark:text-gray-400 max-w-md mx-auto">
+                      Your brand partnership dashboard is being built. Soon you'll be able to discover product placement opportunities and manage brand partnerships.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
-
-        {/* Product Management */}
-        <Card className="p-6 bg-white/80 backdrop-blur-sm border-gray-200 shadow-lg mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-800">My Products</h2>
-            <Button className="bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700">
-              <Package className="w-4 h-4 mr-2" />
-              Add Product
-            </Button>
-          </div>
-          
-          <div className="text-center py-12">
-            <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-800 mb-2">No products added yet</h3>
-            <p className="text-gray-600 mb-6">
-              Start by adding your products to connect with film and TV productions
-            </p>
-            <Button className="bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700">
-              Add Your First Product
-            </Button>
-          </div>
-        </Card>
-
-        {/* Marketplace Opportunities */}
-        <Card className="p-6 bg-white/80 backdrop-blur-sm border-gray-200 shadow-lg">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-800">Placement Opportunities</h2>
-            <Button variant="outline" className="border-gray-300 text-gray-700 hover:bg-gray-50">
-              <Eye className="w-4 h-4 mr-2" />
-              Browse Marketplace
-            </Button>
-          </div>
-          
-          <div className="text-center py-12">
-            <Eye className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-800 mb-2">Discover new opportunities</h3>
-            <p className="text-gray-600 mb-6">
-              Browse active film and TV projects looking for product placements
-            </p>
-            <Button variant="outline" className="border-gray-300 text-gray-700 hover:bg-gray-50">
-              Explore Projects
-            </Button>
-          </div>
-        </Card>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }
