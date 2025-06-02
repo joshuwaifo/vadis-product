@@ -163,7 +163,7 @@ export default function ProductionDashboard() {
             
             {/* Quick Actions Section */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <Link to="/script-upload">
+              <Link to="/dashboard/script-analysis-new">
                 <Card className="group hover:shadow-lg transition-all duration-300 cursor-pointer border-2 hover:border-blue-200 dark:hover:border-blue-700">
                   <CardContent className="p-6 text-center">
                     <div className="h-12 w-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
@@ -175,7 +175,7 @@ export default function ProductionDashboard() {
                 </Card>
               </Link>
 
-              <Link to="/marketplace">
+              <Link to="/dashboard/marketplace">
                 <Card className="group hover:shadow-lg transition-all duration-300 cursor-pointer border-2 hover:border-green-200 dark:hover:border-green-700">
                   <CardContent className="p-6 text-center">
                     <div className="h-12 w-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
@@ -187,7 +187,7 @@ export default function ProductionDashboard() {
                 </Card>
               </Link>
 
-              <Link to="/analytics">
+              <Link to="/dashboard/analytics">
                 <Card className="group hover:shadow-lg transition-all duration-300 cursor-pointer border-2 hover:border-purple-200 dark:hover:border-purple-700">
                   <CardContent className="p-6 text-center">
                     <div className="h-12 w-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
@@ -199,7 +199,7 @@ export default function ProductionDashboard() {
                 </Card>
               </Link>
 
-              <Link to="/profile">
+              <Link to="/dashboard/financial">
                 <Card className="group hover:shadow-lg transition-all duration-300 cursor-pointer border-2 hover:border-orange-200 dark:hover:border-orange-700">
                   <CardContent className="p-6 text-center">
                     <div className="h-12 w-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
@@ -216,7 +216,7 @@ export default function ProductionDashboard() {
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Recent Projects</h2>
-                <Link to="/projects">
+                <Link to="/dashboard/projects">
                   <Button variant="outline">View All Projects</Button>
                 </Link>
               </div>
@@ -300,7 +300,7 @@ export default function ProductionDashboard() {
                             Start your first project by uploading a script. Our AI will analyze it and help you find the perfect collaborators.
                           </p>
                         </div>
-                        <Link to="/script-upload">
+                        <Link to="/dashboard/script-analysis-new">
                           <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
                             <Plus className="w-4 h-4 mr-2" />
                             Upload Your First Script
