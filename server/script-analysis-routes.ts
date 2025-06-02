@@ -140,10 +140,21 @@ export function registerScriptAnalysisRoutes(app: Express) {
   // Get characters for a project
   app.get("/api/projects/:id/characters", async (req, res) => {
     try {
+      // Check if user is authenticated
+      if (!req.session.user) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
       const projectId = parseInt(req.params.id);
-      // This would be implemented in storage
-      const characters = []; // await storage.getCharactersByProject(projectId);
-      const relationships = []; // await storage.getCharacterRelationships(projectId);
+      
+      // Verify project belongs to authenticated user
+      const project = await storage.getProject(projectId);
+      if (!project || project.userId !== req.session.user.id) {
+        return res.status(404).json({ error: "Project not found" });
+      }
+
+      const characters = await storage.getCharactersByProject(projectId);
+      const relationships = await storage.getCharacterRelationshipsByProject(projectId);
       res.json({ characters, relationships });
     } catch (error) {
       console.error("Error fetching characters:", error);
@@ -253,7 +264,32 @@ async function analyzeScriptAsync(
     // Step 2: Analyze characters
     console.log("Analyzing characters...");
     const { characters, relationships } = await analyzeCharacters(scenes);
-    // Save characters and relationships to database here
+    
+    // Save characters to database
+    for (const character of characters) {
+      await storage.createCharacter({
+        projectId,
+        name: character.name,
+        description: character.description || null,
+        age: character.age || null,
+        gender: character.gender || null,
+        personality: character.personality || [],
+        importance: character.importance || null,
+        screenTime: character.screenTime || null,
+        characterArc: character.characterArc || null,
+      });
+    }
+    
+    // Save character relationships to database
+    for (const relationship of relationships) {
+      await storage.createCharacterRelationship({
+        projectId,
+        fromCharacter: relationship.from,
+        toCharacter: relationship.to,
+        relationship: relationship.type,
+        strength: relationship.strength || null,
+      });
+    }
 
     // Step 3: Suggest actors
     console.log("Suggesting actors...");

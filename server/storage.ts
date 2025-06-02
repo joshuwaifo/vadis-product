@@ -7,6 +7,8 @@ import {
   products, 
   investorProfiles,
   scenes,
+  characters,
+  characterRelationships,
   type User, 
   type InsertUser, 
   type ProductionProfile,
@@ -21,6 +23,10 @@ import {
   type InsertInvestorProfile,
   type Scene,
   type InsertScene,
+  type Character,
+  type InsertCharacter,
+  type CharacterRelationship,
+  type InsertCharacterRelationship,
   type UserRole
 } from "@shared/schema";
 import { db } from "./db";
@@ -66,6 +72,14 @@ export interface IStorage {
   // Script Analysis - Scenes
   createScene(scene: InsertScene): Promise<Scene>;
   getScenesByProject(projectId: number): Promise<Scene[]>;
+  
+  // Script Analysis - Characters
+  createCharacter(character: InsertCharacter): Promise<Character>;
+  getCharactersByProject(projectId: number): Promise<Character[]>;
+  
+  // Script Analysis - Character Relationships
+  createCharacterRelationship(relationship: InsertCharacterRelationship): Promise<CharacterRelationship>;
+  getCharacterRelationshipsByProject(projectId: number): Promise<CharacterRelationship[]>;
 }
 
 // DEPRECATED: MemStorage class - kept for testing purposes only
@@ -379,6 +393,24 @@ export class MemStorage implements IStorage {
   async getScenesByProject(projectId: number): Promise<Scene[]> {
     throw new Error("MemStorage is deprecated. Use DatabaseStorage for scene operations.");
   }
+
+  // Script Analysis - Characters (stub implementation for deprecated MemStorage)
+  async createCharacter(character: InsertCharacter): Promise<Character> {
+    throw new Error("MemStorage is deprecated. Use DatabaseStorage for character operations.");
+  }
+
+  async getCharactersByProject(projectId: number): Promise<Character[]> {
+    throw new Error("MemStorage is deprecated. Use DatabaseStorage for character operations.");
+  }
+
+  // Script Analysis - Character Relationships (stub implementation for deprecated MemStorage)
+  async createCharacterRelationship(relationship: InsertCharacterRelationship): Promise<CharacterRelationship> {
+    throw new Error("MemStorage is deprecated. Use DatabaseStorage for character relationship operations.");
+  }
+
+  async getCharacterRelationshipsByProject(projectId: number): Promise<CharacterRelationship[]> {
+    throw new Error("MemStorage is deprecated. Use DatabaseStorage for character relationship operations.");
+  }
 }
 
 
@@ -585,6 +617,60 @@ export class DatabaseStorage implements IStorage {
       return result;
     } catch (error) {
       console.error('Error getting scenes by project:', error);
+      return [];
+    }
+  }
+
+  // Script Analysis - Characters
+  async createCharacter(character: InsertCharacter): Promise<Character> {
+    try {
+      const [created] = await db
+        .insert(characters)
+        .values(character)
+        .returning();
+      return created;
+    } catch (error) {
+      console.error('Error creating character:', error);
+      throw error;
+    }
+  }
+
+  async getCharactersByProject(projectId: number): Promise<Character[]> {
+    try {
+      const result = await db
+        .select()
+        .from(characters)
+        .where(eq(characters.projectId, projectId));
+      return result;
+    } catch (error) {
+      console.error('Error getting characters by project:', error);
+      return [];
+    }
+  }
+
+  // Script Analysis - Character Relationships
+  async createCharacterRelationship(relationship: InsertCharacterRelationship): Promise<CharacterRelationship> {
+    try {
+      const [created] = await db
+        .insert(characterRelationships)
+        .values(relationship)
+        .returning();
+      return created;
+    } catch (error) {
+      console.error('Error creating character relationship:', error);
+      throw error;
+    }
+  }
+
+  async getCharacterRelationshipsByProject(projectId: number): Promise<CharacterRelationship[]> {
+    try {
+      const result = await db
+        .select()
+        .from(characterRelationships)
+        .where(eq(characterRelationships.projectId, projectId));
+      return result;
+    } catch (error) {
+      console.error('Error getting character relationships by project:', error);
       return [];
     }
   }

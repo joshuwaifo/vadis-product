@@ -290,6 +290,16 @@ export const insertSceneSchema = createInsertSchema(scenes).omit({
   createdAt: true,
 });
 
+export const insertCharacterSchema = createInsertSchema(characters).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertCharacterRelationshipSchema = createInsertSchema(characterRelationships).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Login schema for authentication
 
 export const loginSchema = z.object({
@@ -312,6 +322,10 @@ export type InsertDemoRequest = z.infer<typeof insertDemoRequestSchema>;
 export type DemoRequest = typeof demoRequests.$inferSelect;
 export type InsertScene = z.infer<typeof insertSceneSchema>;
 export type Scene = typeof scenes.$inferSelect;
+export type InsertCharacter = z.infer<typeof insertCharacterSchema>;
+export type Character = typeof characters.$inferSelect;
+export type InsertCharacterRelationship = z.infer<typeof insertCharacterRelationshipSchema>;
+export type CharacterRelationship = typeof characterRelationships.$inferSelect;
 
 export type UserRole = keyof typeof userRoles;
 export type LoginData = z.infer<typeof loginSchema>;
