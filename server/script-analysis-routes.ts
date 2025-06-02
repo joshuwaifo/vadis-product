@@ -404,7 +404,7 @@ async function analyzeScriptAsync(
     // Update project status
     await storage.updateProject(projectId, {
       status: "completed",
-      marketAnalysis: projectSummary,
+      readerReport: projectSummary,
     });
 
     console.log(`Analysis completed for project ${projectId}`);
