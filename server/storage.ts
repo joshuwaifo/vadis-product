@@ -10,6 +10,7 @@ import {
   characters,
   characterRelationships,
   actorSuggestions,
+  productPlacements,
   type User, 
   type InsertUser, 
   type ProductionProfile,
@@ -30,6 +31,8 @@ import {
   type InsertCharacterRelationship,
   type ActorSuggestion,
   type InsertActorSuggestion,
+  type ProductPlacement,
+  type InsertProductPlacement,
   type UserRole
 } from "@shared/schema";
 import { db } from "./db";
@@ -86,6 +89,9 @@ export interface IStorage {
   
   // Script Analysis - Actor Suggestions
   createActorSuggestion(suggestion: InsertActorSuggestion): Promise<ActorSuggestion>;
+  
+  // Script Analysis - Product Placements
+  createProductPlacement(placement: InsertProductPlacement): Promise<ProductPlacement>;
 }
 
 // DEPRECATED: MemStorage class - kept for testing purposes only
@@ -422,6 +428,11 @@ export class MemStorage implements IStorage {
   async createActorSuggestion(suggestion: InsertActorSuggestion): Promise<ActorSuggestion> {
     throw new Error("MemStorage is deprecated. Use DatabaseStorage for actor suggestion operations.");
   }
+
+  // Script Analysis - Product Placements (stub implementation for deprecated MemStorage)
+  async createProductPlacement(placement: InsertProductPlacement): Promise<ProductPlacement> {
+    throw new Error("MemStorage is deprecated. Use DatabaseStorage for product placement operations.");
+  }
 }
 
 
@@ -696,6 +707,20 @@ export class DatabaseStorage implements IStorage {
       return created;
     } catch (error) {
       console.error('Error creating actor suggestion:', error);
+      throw error;
+    }
+  }
+
+  // Script Analysis - Product Placements
+  async createProductPlacement(placement: InsertProductPlacement): Promise<ProductPlacement> {
+    try {
+      const [created] = await db
+        .insert(productPlacements)
+        .values(placement)
+        .returning();
+      return created;
+    } catch (error) {
+      console.error('Error creating product placement:', error);
       throw error;
     }
   }

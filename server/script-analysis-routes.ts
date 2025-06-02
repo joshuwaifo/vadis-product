@@ -321,7 +321,20 @@ async function analyzeScriptAsync(
     // Step 5: Generate product placement ideas
     console.log("Generating product placement ideas...");
     const productPlacements = await generateProductPlacement(scenes);
-    // Save product placements to database here
+    
+    // Save product placements to database
+    for (const placement of productPlacements) {
+      await storage.createProductPlacement({
+        projectId,
+        sceneId: placement.sceneId || null, // AI returns sceneId as string reference
+        brand: placement.brand,
+        product: placement.product,
+        placement: placement.placement || null,
+        naturalness: placement.naturalness || null,
+        visibility: placement.visibility || null,
+        estimatedValue: placement.estimatedValue || null,
+      });
+    }
 
     // Step 6: Suggest locations
     console.log("Suggesting locations...");
