@@ -116,9 +116,20 @@ export function registerScriptAnalysisRoutes(app: Express) {
   // Get scenes for a project
   app.get("/api/projects/:id/scenes", async (req, res) => {
     try {
+      // Check if user is authenticated
+      if (!req.session.user) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
       const projectId = parseInt(req.params.id);
-      // This would be implemented in storage
-      const scenes = []; // await storage.getScenesByProject(projectId);
+      
+      // Verify project belongs to authenticated user
+      const project = await storage.getProject(projectId);
+      if (!project || project.userId !== req.session.user.id) {
+        return res.status(404).json({ error: "Project not found" });
+      }
+
+      const scenes = await storage.getScenesByProject(projectId);
       res.json(scenes);
     } catch (error) {
       console.error("Error fetching scenes:", error);
