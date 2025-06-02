@@ -10,7 +10,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 import { v4 as uuidv4 } from 'uuid';
-import pdfParse from 'pdf-parse';
+// Import pdf-parse with any type since @types/pdf-parse doesn't exist
+const pdfParse = require('pdf-parse');
 
 // --- Helper Functions for File Processing ---
 
@@ -47,42 +48,28 @@ async function cleanupTempFile(filePath: string) {
 }
 
 /**
- * Extract text from image using Vadis AI infrastructure
+ * Extract text from image using existing Vadis analyzeDocument function
  */
 async function extractTextFromImage(
   imageBuffer: Buffer,
   mimeType: string,
   provider: AIProvider = 'gemini-1.5-flash'
 ): Promise<string> {
-  let imagePath: string | null = null;
   try {
-    const extension = mimeType.includes("jpeg") || mimeType.includes("jpg") ? ".jpg" : ".png";
-    imagePath = await bufferToTempFile(imageBuffer, extension);
-    
-    // Convert to base64 for AI processing
-    const imageData = fs.readFileSync(imagePath);
-    const base64Data = imageData.toString("base64");
-    
     const prompt = "Extract all text content from this image. If it appears to be a film script or screenplay, format it properly with scene headings, action, and dialogue. If no text is visible, describe the image.";
     
-    const result = await generateContent(
-      provider,
-      prompt,
-      undefined,
-      [{
-        type: 'image',
-        data: base64Data,
-        mimeType: mimeType
-      }]
-    );
+    // Convert buffer to base64 for analyzeDocument
+    const base64Data = imageBuffer.toString('base64');
+    
+    // Use the existing analyzeDocument function which handles images
+    const { analyzeDocument } = await import('../ai-client');
+    const result = await analyzeDocument(provider, base64Data, prompt, mimeType);
     
     console.log("Successfully extracted text from image via Vadis AI.");
     return result;
   } catch (error) {
     console.error("Error extracting text from image with Vadis AI:", error);
     return `Error: Failed to extract text from image. ${error instanceof Error ? error.message : "Unknown AI error"}`;
-  } finally {
-    if (imagePath) await cleanupTempFile(imagePath);
   }
 }
 
