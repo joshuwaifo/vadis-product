@@ -371,7 +371,24 @@ async function analyzeScriptAsync(
       locations,
       productPlacements
     );
-    // Save financial plan to database here
+    
+    // Save financial plan to database (flatten nested structure)
+    await storage.createFinancialPlan({
+      projectId,
+      totalBudget: financialPlan.totalBudget || null,
+      preProductionBudget: financialPlan.budgetBreakdown?.preProduction || null,
+      productionBudget: financialPlan.budgetBreakdown?.production || null,
+      postProductionBudget: financialPlan.budgetBreakdown?.postProduction || null,
+      marketingBudget: financialPlan.budgetBreakdown?.marketing || null,
+      contingencyBudget: financialPlan.budgetBreakdown?.contingency || null,
+      domesticRevenue: financialPlan.revenueProjections?.domestic || null,
+      internationalRevenue: financialPlan.revenueProjections?.international || null,
+      streamingRevenue: financialPlan.revenueProjections?.streaming || null,
+      merchandiseRevenue: financialPlan.revenueProjections?.merchandise || null,
+      productPlacementRevenue: financialPlan.revenueProjections?.productPlacement || null,
+      roi: financialPlan.roi?.toString() || null,
+      breakEvenPoint: financialPlan.breakEvenPoint || null,
+    });
 
     // Step 8: Generate project summary
     console.log("Generating project summary...");

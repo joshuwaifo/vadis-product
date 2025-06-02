@@ -12,6 +12,7 @@ import {
   actorSuggestions,
   productPlacements,
   locationSuggestions,
+  financialPlans,
   type User, 
   type InsertUser, 
   type ProductionProfile,
@@ -36,6 +37,8 @@ import {
   type InsertProductPlacement,
   type LocationSuggestion,
   type InsertLocationSuggestion,
+  type FinancialPlan,
+  type InsertFinancialPlan,
   type UserRole
 } from "@shared/schema";
 import { db } from "./db";
@@ -98,6 +101,9 @@ export interface IStorage {
   
   // Script Analysis - Location Suggestions
   createLocationSuggestion(suggestion: InsertLocationSuggestion): Promise<LocationSuggestion>;
+  
+  // Script Analysis - Financial Plans
+  createFinancialPlan(plan: InsertFinancialPlan): Promise<FinancialPlan>;
 }
 
 // DEPRECATED: MemStorage class - kept for testing purposes only
@@ -444,6 +450,11 @@ export class MemStorage implements IStorage {
   async createLocationSuggestion(suggestion: InsertLocationSuggestion): Promise<LocationSuggestion> {
     throw new Error("MemStorage is deprecated. Use DatabaseStorage for location suggestion operations.");
   }
+
+  // Script Analysis - Financial Plans (stub implementation for deprecated MemStorage)
+  async createFinancialPlan(plan: InsertFinancialPlan): Promise<FinancialPlan> {
+    throw new Error("MemStorage is deprecated. Use DatabaseStorage for financial plan operations.");
+  }
 }
 
 
@@ -746,6 +757,20 @@ export class DatabaseStorage implements IStorage {
       return created;
     } catch (error) {
       console.error('Error creating location suggestion:', error);
+      throw error;
+    }
+  }
+
+  // Script Analysis - Financial Plans
+  async createFinancialPlan(plan: InsertFinancialPlan): Promise<FinancialPlan> {
+    try {
+      const [created] = await db
+        .insert(financialPlans)
+        .values(plan)
+        .returning();
+      return created;
+    } catch (error) {
+      console.error('Error creating financial plan:', error);
       throw error;
     }
   }

@@ -315,6 +315,11 @@ export const insertLocationSuggestionSchema = createInsertSchema(locationSuggest
   createdAt: true,
 });
 
+export const insertFinancialPlanSchema = createInsertSchema(financialPlans).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Login schema for authentication
 
 export const loginSchema = z.object({
@@ -347,6 +352,8 @@ export type InsertProductPlacement = z.infer<typeof insertProductPlacementSchema
 export type ProductPlacement = typeof productPlacements.$inferSelect;
 export type InsertLocationSuggestion = z.infer<typeof insertLocationSuggestionSchema>;
 export type LocationSuggestion = typeof locationSuggestions.$inferSelect;
+export type InsertFinancialPlan = z.infer<typeof insertFinancialPlanSchema>;
+export type FinancialPlan = typeof financialPlans.$inferSelect;
 
 export type UserRole = keyof typeof userRoles;
 export type LoginData = z.infer<typeof loginSchema>;
