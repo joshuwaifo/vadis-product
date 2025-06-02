@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import multer from "multer";
 import { storage } from "./storage";
+import { extractScriptFromPdf } from "./services/pdf-service";
 import {
   extractScenes,
   analyzeCharacters,
@@ -19,10 +20,11 @@ const upload = multer({
     fileSize: 10 * 1024 * 1024, // 10MB limit
   },
   fileFilter: (req, file, cb) => {
-    if (file.mimetype === 'application/pdf') {
+    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+    if (allowedTypes.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new Error('Only PDF files are allowed'));
+      cb(new Error('Only PDF files and images (JPEG, PNG) are allowed'));
     }
   },
 });
@@ -40,35 +42,61 @@ export function registerScriptAnalysisRoutes(app: Express) {
       const scriptFile = req.file;
 
       if (!scriptFile) {
-        return res.status(400).json({ error: "Script PDF file is required" });
+        return res.status(400).json({ error: "Script file is required" });
       }
 
-      // For now, we'll accept the file but use the logline/synopsis as script content
-      // In production, you would implement proper PDF parsing here
-      let scriptContent = req.body.logline || "Sample script content for analysis";
+      console.log("Script file received:", scriptFile.originalname, "Size:", scriptFile.size, "Type:", scriptFile.mimetype);
+
+      // Parse the uploaded script file using the integrated PDF service
+      const parsedScript = await extractScriptFromPdf(scriptFile.buffer, scriptFile.mimetype);
       
-      console.log("PDF file received:", scriptFile.originalname, "Size:", scriptFile.size);
-
-      if (!scriptContent || scriptContent.length < 10) {
-        return res.status(400).json({ error: "Script content is required" });
+      if (!parsedScript.content || parsedScript.content.length < 10) {
+        return res.status(400).json({ error: "Failed to extract valid script content from file" });
       }
+
+      // Use parsed title if user didn't provide one, otherwise prioritize user's title
+      const finalTitle = (title && title.trim().length > 0) ? title : parsedScript.title;
 
       // Create project in database
       const project = await storage.createProject({
         userId: req.session.user.id,
-        title,
+        title: finalTitle,
         projectType: "script_analysis",
         logline,
-        scriptContent,
+        scriptContent: parsedScript.content,
         budgetRange,
         fundingGoal: parseInt(fundingGoal),
         productionTimeline,
         status: "analyzing",
       });
 
+      // Save individual scenes to the database
+      console.log(`Saving ${parsedScript.scenes.length} scenes for project ${project.id}`);
+      for (const scene of parsedScript.scenes) {
+        try {
+          await storage.createScene({
+            projectId: project.id,
+            sceneNumber: scene.sceneNumber,
+            location: scene.heading, // Use heading as location for now
+            timeOfDay: null, // Could be parsed from heading later
+            description: scene.content.substring(0, 500), // Truncate for description
+            characters: [], // Will be populated during analysis
+            content: scene.content,
+            pageStart: null,
+            pageEnd: null,
+            duration: null, // Will be estimated during analysis
+            vfxNeeds: [],
+            productPlacementOpportunities: [],
+          });
+        } catch (sceneError) {
+          console.error(`Error saving scene ${scene.sceneNumber}:`, sceneError);
+          // Continue with other scenes even if one fails
+        }
+      }
+
       // Start analysis process asynchronously
-      analyzeScriptAsync(project.id, scriptContent, {
-        title,
+      analyzeScriptAsync(project.id, parsedScript.content, {
+        title: finalTitle,
         budgetRange,
         fundingGoal: parseInt(fundingGoal),
       }).catch(error => {
@@ -239,17 +267,22 @@ async function analyzeScriptAsync(
   try {
     console.log(`Starting analysis for project ${projectId}`);
 
-    // Step 1: Extract scenes
-    console.log("Extracting scenes...");
-    const scenes = await extractScenes(scriptContent);
+    // Step 1: Get scenes from database (already saved during upload)
+    console.log("Retrieving scenes from database...");
+    const scenes = await storage.getScenesByProject(projectId);
     
-    // Save scenes to database
-    for (const scene of scenes) {
-      await storage.createScene({
-        projectId,
-        sceneNumber: scene.sceneNumber,
-        location: scene.location,
-        timeOfDay: scene.timeOfDay || null,
+    // If no scenes in database, fall back to extracting from content
+    if (scenes.length === 0) {
+      console.log("No scenes found in database, extracting from script content...");
+      const extractedScenes = await extractScenes(scriptContent);
+      
+      // Save extracted scenes to database
+      for (const scene of extractedScenes) {
+        await storage.createScene({
+          projectId,
+          sceneNumber: scene.sceneNumber,
+          location: scene.location,
+          timeOfDay: scene.timeOfDay || null,
         description: scene.description || null,
         characters: scene.characters || [],
         content: scene.content || null,
