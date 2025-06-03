@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -40,6 +40,16 @@ export default function ScriptAnalysisNew() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Check for existing project ID in URL params
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const existingProjectId = urlParams.get('projectId');
+    if (existingProjectId) {
+      setProjectId(parseInt(existingProjectId));
+      setStep(3); // Skip to analysis step since we have an existing project
+    }
+  }, []);
 
   // Fetch project data when we have a projectId
   const { data: project, refetch: refetchProject } = useQuery({

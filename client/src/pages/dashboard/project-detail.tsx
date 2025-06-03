@@ -13,7 +13,8 @@ import {
   Calendar,
   Edit,
   Eye,
-  Download
+  Download,
+  Play
 } from "lucide-react";
 import DashboardLayout from "./dashboard-layout";
 import { Link } from "wouter";
@@ -153,12 +154,21 @@ export default function ProjectDetail() {
                 Edit
               </Button>
             </Link>
-            <Link to={`/dashboard/projects/${project.id}/analysis`}>
-              <Button>
-                <Eye className="w-4 h-4 mr-2" />
-                View Analysis
-              </Button>
-            </Link>
+            {((characters?.characters && characters.characters.length > 0) || (scenes && scenes.length > 0)) ? (
+              <Link to={`/dashboard/projects/${project.id}/analysis`}>
+                <Button>
+                  <Eye className="w-4 h-4 mr-2" />
+                  View Analysis
+                </Button>
+              </Link>
+            ) : (
+              <Link to={`/dashboard/script-analysis-new?projectId=${project.id}`}>
+                <Button className="bg-gradient-to-r from-blue-500 to-purple-600 text-white">
+                  <Play className="w-4 h-4 mr-2" />
+                  Continue Analysis
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
 
