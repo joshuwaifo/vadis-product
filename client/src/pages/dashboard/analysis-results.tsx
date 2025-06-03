@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, FileText, Users, Camera, Zap, MapPin, DollarSign, Star } from "lucide-react";
 import { Link } from "wouter";
 import SceneBreakdown from "@/components/script/SceneBreakdown";
+import BrandableScenes from "@/components/script/BrandableScenes";
 import { useState } from "react";
 
 interface Scene {
@@ -594,10 +595,32 @@ export default function AnalysisResults() {
   const { id } = useParams();
   const projectId = parseInt(id!);
   const [activeSceneId, setActiveSceneId] = useState<number | undefined>();
+  const [videoGenerationStates, setVideoGenerationStates] = useState<Record<number, 'idle' | 'generating' | 'completed' | 'error'>>({});
 
   const { data: project, isLoading: projectLoading } = useQuery({
     queryKey: ['/api/projects', projectId],
   });
+
+  const handleGenerateVideoRequest = async (variationId: number) => {
+    setVideoGenerationStates(prev => ({ ...prev, [variationId]: 'generating' }));
+    
+    try {
+      const response = await fetch(`/api/variations/${variationId}/generate-video`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (response.ok) {
+        setVideoGenerationStates(prev => ({ ...prev, [variationId]: 'completed' }));
+      } else {
+        setVideoGenerationStates(prev => ({ ...prev, [variationId]: 'error' }));
+      }
+    } catch (error) {
+      setVideoGenerationStates(prev => ({ ...prev, [variationId]: 'error' }));
+    }
+  };
 
   const { data: scenes = [], isLoading: scenesLoading } = useQuery<Scene[]>({
     queryKey: ['/api/projects', projectId, 'scenes'],
@@ -649,7 +672,7 @@ export default function AnalysisResults() {
       </div>
 
       <Tabs defaultValue="summary" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-7">
+        <TabsList className="grid w-full grid-cols-8">
           <TabsTrigger value="summary" className="flex items-center gap-2">
             <FileText className="h-4 w-4" />
             Summary
@@ -669,6 +692,10 @@ export default function AnalysisResults() {
           <TabsTrigger value="vfx" className="flex items-center gap-2">
             <Zap className="h-4 w-4" />
             VFX
+          </TabsTrigger>
+          <TabsTrigger value="product-placement" className="flex items-center gap-2">
+            <Star className="h-4 w-4" />
+            Product Placement
           </TabsTrigger>
           <TabsTrigger value="locations" className="flex items-center gap-2">
             <MapPin className="h-4 w-4" />

@@ -303,6 +303,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Scene Variations API endpoints
+  app.get("/api/projects/:projectId/scenes/:sceneId/variations", async (req, res) => {
+    try {
+      if (!req.session.user) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const sceneId = parseInt(req.params.sceneId);
+      const variations = await storage.getSceneVariationsByScene(sceneId);
+      res.json(variations);
+    } catch (error) {
+      console.error("Error fetching scene variations:", error);
+      res.status(500).json({ error: "Failed to fetch scene variations" });
+    }
+  });
+
+  app.post("/api/projects/:projectId/scenes/:sceneId/variations", async (req, res) => {
+    try {
+      if (!req.session.user) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const sceneId = parseInt(req.params.sceneId);
+      const variation = await storage.createSceneVariation({
+        sceneId,
+        ...req.body
+      });
+      res.json(variation);
+    } catch (error) {
+      console.error("Error creating scene variation:", error);
+      res.status(500).json({ error: "Failed to create scene variation" });
+    }
+  });
+
+  app.patch("/api/variations/:variationId", async (req, res) => {
+    try {
+      if (!req.session.user) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const variationId = parseInt(req.params.variationId);
+      const updated = await storage.updateSceneVariation(variationId, req.body);
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating scene variation:", error);
+      res.status(500).json({ error: "Failed to update scene variation" });
+    }
+  });
+
+  app.post("/api/variations/:variationId/generate-video", async (req, res) => {
+    try {
+      if (!req.session.user) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const variationId = parseInt(req.params.variationId);
+      // For now, return a success response - video generation would be implemented with actual service
+      res.json({ 
+        success: true, 
+        message: "Video generation started",
+        variationId 
+      });
+    } catch (error) {
+      console.error("Error starting video generation:", error);
+      res.status(500).json({ error: "Failed to start video generation" });
+    }
+  });
+
   // Register script analysis routes
   registerScriptAnalysisRoutes(app);
 

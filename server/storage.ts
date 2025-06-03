@@ -13,6 +13,7 @@ import {
   productPlacements,
   locationSuggestions,
   financialPlans,
+  sceneVariations,
   type User, 
   type InsertUser, 
   type ProductionProfile,
@@ -39,6 +40,8 @@ import {
   type InsertLocationSuggestion,
   type FinancialPlan,
   type InsertFinancialPlan,
+  type SceneVariation,
+  type InsertSceneVariation,
   type UserRole
 } from "@shared/schema";
 import { db } from "./db";

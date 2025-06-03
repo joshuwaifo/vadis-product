@@ -165,10 +165,17 @@ export default function BrandableScenes({
 
   const updateVariationMutation = useMutation({
     mutationFn: async ({ variationId, updates }: { variationId: number; updates: Partial<SceneVariation> }) => {
-      return apiRequest(`/api/variations/${variationId}`, {
+      const response = await fetch(`/api/variations/${variationId}`, {
         method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify(updates),
       });
+      if (!response.ok) {
+        throw new Error('Failed to update variation');
+      }
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
