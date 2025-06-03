@@ -15,6 +15,8 @@ import DashboardHome from "@/pages/dashboard/dashboard-home";
 import ProfilePage from "@/pages/dashboard/profile";
 import ProjectCreation from "@/pages/dashboard/project-creation";
 import ProjectsList from "@/pages/dashboard/projects-list";
+import ProjectDetail from "@/pages/dashboard/project-detail";
+import ProjectAnalysis from "@/pages/dashboard/project-analysis";
 import ScriptAnalysisNew from "@/pages/dashboard/script-analysis-new";
 import ScriptGenerator from "@/pages/dashboard/script-generator";
 import ProductionDashboard from "@/pages/dashboards/production-dashboard";
@@ -39,6 +41,8 @@ function Router() {
       <Route path="/dashboard/projects/new" component={ProjectCreation} />
       <Route path="/dashboard/projects/new/script_analysis" component={ScriptAnalysisNew} />
       <Route path="/dashboard/projects/new/script_generator" component={ScriptGenerator} />
+      <Route path="/dashboard/projects/:id" component={ProjectDetail} />
+      <Route path="/dashboard/projects/:id/analysis" component={ProjectAnalysis} />
       <Route path="/production/dashboard" component={ProductionDashboard} />
       <Route path="/brand/dashboard" component={BrandDashboard} />
       <Route path="/investor/dashboard" component={InvestorDashboard} />
