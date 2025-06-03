@@ -296,10 +296,12 @@ export default function ProductionDashboard() {
                     </div>
                   </div>
                   <div className="flex-1"></div>
-                  <Button className="w-full bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white shadow-lg">
-                    <BarChart3 className="w-4 h-4 mr-2" />
-                    View Published Projects
-                  </Button>
+                  <Link to="/dashboard/project-create">
+                    <Button className="w-full bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white shadow-lg">
+                      <BarChart3 className="w-4 h-4 mr-2" />
+                      View Published Projects
+                    </Button>
+                  </Link>
                 </CardContent>
               </Card>
 
