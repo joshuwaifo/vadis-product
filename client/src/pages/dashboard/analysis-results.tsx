@@ -8,6 +8,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, FileText, Users, Camera, Zap, MapPin, DollarSign, Star } from "lucide-react";
 import { Link } from "wouter";
+import SceneBreakdown from "@/components/script/SceneBreakdown";
+import { useState } from "react";
 
 interface Scene {
   id: number;
@@ -79,124 +81,144 @@ interface FinancialPlan {
   breakEvenPoint: number | null;
 }
 
-function SceneBreakdown({ scenes, projectTitle }: { scenes: Scene[]; projectTitle: string }) {
-  const vfxScenes = scenes.filter(scene => scene.vfxNeeds && scene.vfxNeeds.length > 0);
-  const brandableScenes = scenes.filter(scene => scene.productPlacementOpportunities && scene.productPlacementOpportunities.length > 0);
+function SceneAnalysis({ projectId, projectTitle, activeSceneId, onSceneSelect }: { 
+  projectId: number; 
+  projectTitle: string; 
+  activeSceneId?: number; 
+  onSceneSelect: (sceneId: number) => void; 
+}) {
+  const { data: scenes = [] } = useQuery({
+    queryKey: ['/api/projects', projectId, 'scenes'],
+  });
+
+  const vfxScenes = scenes.filter((scene: Scene) => scene.vfxNeeds && scene.vfxNeeds.length > 0);
+  const brandableScenes = scenes.filter((scene: Scene) => scene.productPlacementOpportunities && scene.productPlacementOpportunities.length > 0);
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg">Total Scenes</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{scenes.length}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Zap className="h-5 w-5" />
-              VFX Scenes
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-purple-600">{vfxScenes.length}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Star className="h-5 w-5" />
-              Brandable Scenes
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-green-600">{brandableScenes.length}</div>
-          </CardContent>
-        </Card>
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Scene Breakdown Component */}
+      <div className="lg:col-span-1">
+        <SceneBreakdown
+          projectId={projectId}
+          projectTitle={projectTitle}
+          activeSceneId={activeSceneId}
+          onSceneSelect={onSceneSelect}
+        />
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Scene Breakdown for "{projectTitle}"</CardTitle>
-          <CardDescription>Complete scene-by-scene analysis</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ScrollArea className="h-[600px]">
-            <div className="space-y-4">
-              {scenes.map((scene) => (
-                <Card key={scene.id} className="border-l-4 border-l-blue-500">
-                  <CardHeader className="pb-3">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <CardTitle className="text-lg">Scene {scene.sceneNumber}</CardTitle>
-                        <CardDescription>{scene.location} - {scene.timeOfDay || 'Time not specified'}</CardDescription>
-                      </div>
-                      <div className="flex gap-2">
-                        {scene.vfxNeeds && scene.vfxNeeds.length > 0 && (
-                          <Badge variant="secondary" className="bg-purple-100 text-purple-800">
-                            <Zap className="h-3 w-3 mr-1" />
-                            VFX
-                          </Badge>
-                        )}
-                        {scene.productPlacementOpportunities && scene.productPlacementOpportunities.length > 0 && (
-                          <Badge variant="secondary" className="bg-green-100 text-green-800">
-                            <Star className="h-3 w-3 mr-1" />
-                            Brandable
-                          </Badge>
-                        )}
-                      </div>
+      {/* Scene Details */}
+      <div className="lg:col-span-2 space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg">Total Scenes</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold">{scenes.length}</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Zap className="h-5 w-5" />
+                VFX Scenes
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-purple-600">{vfxScenes.length}</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Star className="h-5 w-5" />
+                Brandable Scenes
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-green-600">{brandableScenes.length}</div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Selected Scene Details */}
+        {activeSceneId && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Scene Details</CardTitle>
+              <CardDescription>Detailed information for the selected scene</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {(() => {
+                const scene = scenes.find((s: Scene) => s.id === activeSceneId);
+                if (!scene) return <p className="text-muted-foreground">Scene not found</p>;
+                
+                return (
+                  <div className="space-y-4">
+                    <div>
+                      <h3 className="text-lg font-semibold">Scene {scene.sceneNumber}</h3>
+                      <p className="text-muted-foreground">{scene.location} - {scene.timeOfDay || 'Time not specified'}</p>
                     </div>
-                  </CardHeader>
-                  <CardContent>
+                    
                     {scene.description && (
-                      <p className="text-sm text-muted-foreground mb-3">{scene.description}</p>
+                      <div>
+                        <h4 className="font-medium">Description</h4>
+                        <p className="text-sm text-muted-foreground">{scene.description}</p>
+                      </div>
                     )}
+                    
                     {scene.characters && scene.characters.length > 0 && (
-                      <div className="mb-3">
-                        <span className="text-sm font-medium">Characters: </span>
-                        <span className="text-sm">{scene.characters.join(', ')}</span>
+                      <div>
+                        <h4 className="font-medium">Characters</h4>
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {scene.characters.map((character, index) => (
+                            <Badge key={index} variant="outline">{character}</Badge>
+                          ))}
+                        </div>
                       </div>
                     )}
-                    {scene.duration && (
-                      <div className="mb-3">
-                        <span className="text-sm font-medium">Estimated Duration: </span>
-                        <span className="text-sm">{scene.duration} minutes</span>
-                      </div>
-                    )}
+                    
                     {scene.vfxNeeds && scene.vfxNeeds.length > 0 && (
-                      <div className="mb-3">
-                        <span className="text-sm font-medium text-purple-700">VFX Needs: </span>
+                      <div>
+                        <h4 className="font-medium text-purple-700">VFX Requirements</h4>
                         <div className="flex flex-wrap gap-1 mt-1">
                           {scene.vfxNeeds.map((vfx, index) => (
-                            <Badge key={index} variant="outline" className="text-xs">
+                            <Badge key={index} variant="secondary" className="bg-purple-100 text-purple-800">
                               {vfx}
                             </Badge>
                           ))}
                         </div>
                       </div>
                     )}
+                    
                     {scene.productPlacementOpportunities && scene.productPlacementOpportunities.length > 0 && (
                       <div>
-                        <span className="text-sm font-medium text-green-700">Product Placement Opportunities: </span>
+                        <h4 className="font-medium text-green-700">Product Placement Opportunities</h4>
                         <div className="flex flex-wrap gap-1 mt-1">
                           {scene.productPlacementOpportunities.map((opportunity, index) => (
-                            <Badge key={index} variant="outline" className="text-xs">
+                            <Badge key={index} variant="secondary" className="bg-green-100 text-green-800">
                               {opportunity}
                             </Badge>
                           ))}
                         </div>
                       </div>
                     )}
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </ScrollArea>
-        </CardContent>
-      </Card>
+                    
+                    {scene.content && (
+                      <div>
+                        <h4 className="font-medium">Script Content</h4>
+                        <div className="bg-gray-50 p-3 rounded-md mt-1 max-h-48 overflow-y-auto">
+                          <pre className="text-sm whitespace-pre-wrap">{scene.content}</pre>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+            </CardContent>
+          </Card>
+        )}
+      </div>
     </div>
   );
 }
@@ -571,6 +593,7 @@ function LoadingSkeleton() {
 export default function AnalysisResults() {
   const { id } = useParams();
   const projectId = parseInt(id!);
+  const [activeSceneId, setActiveSceneId] = useState<number | undefined>();
 
   const { data: project, isLoading: projectLoading } = useQuery({
     queryKey: ['/api/projects', projectId],
@@ -676,7 +699,12 @@ export default function AnalysisResults() {
         </TabsContent>
 
         <TabsContent value="scenes">
-          <SceneBreakdown scenes={scenes} projectTitle={project.title} />
+          <SceneAnalysis 
+            projectId={projectId} 
+            projectTitle={project.title} 
+            activeSceneId={activeSceneId}
+            onSceneSelect={setActiveSceneId}
+          />
         </TabsContent>
 
         <TabsContent value="characters">
