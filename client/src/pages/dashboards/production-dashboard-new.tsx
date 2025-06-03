@@ -224,7 +224,7 @@ export default function ProductionDashboard() {
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Published</p>
-                        <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.publishedProjects}</p>
+                        <p className="text-2xl font-bold text-gray-900 dark:text-white">{(stats as any)?.publishedProjects || 0}</p>
                       </div>
                       <CheckCircle className="h-8 w-8 text-green-600" />
                     </div>
@@ -235,7 +235,7 @@ export default function ProductionDashboard() {
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm font-medium text-gray-600 dark:text-gray-400">In Progress</p>
-                        <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.totalProjects - stats.publishedProjects}</p>
+                        <p className="text-2xl font-bold text-gray-900 dark:text-white">{((stats as any)?.totalProjects || 0) - ((stats as any)?.publishedProjects || 0)}</p>
                       </div>
                       <Clock className="h-8 w-8 text-yellow-600" />
                     </div>
