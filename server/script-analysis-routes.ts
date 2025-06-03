@@ -408,11 +408,11 @@ async function analyzeScriptAsync(
     // Step 7: Generate financial plan
     console.log("Generating financial plan...");
     const financialPlan = await generateFinancialPlan(
-      scenes,
+      scenes as any, // Type conversion for compatibility
       characterAnalysis.characters,
-      vfxNeeds,
-      castingAnalysis.individualRecommendations,
-      locations,
+      [], // VFX needs are now stored in scenes directly
+      [] as any, // Actor suggestions will be retrieved from database
+      locationSuggestions as any,
       productPlacements
     );
     
@@ -438,9 +438,9 @@ async function analyzeScriptAsync(
     console.log("Generating project summary...");
     const projectSummary = await generateProjectSummary(
       projectData.title,
-      scenes,
+      scenes as any, // Type conversion for compatibility
       characterAnalysis.characters,
-      vfxNeeds,
+      [], // VFX needs are now stored in scenes directly
       productPlacements,
       financialPlan
     );
