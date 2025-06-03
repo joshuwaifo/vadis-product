@@ -246,6 +246,24 @@ export const demoRequests = pgTable("demo_requests", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Scene variations table for product placement
+export const sceneVariations = pgTable("scene_variations", {
+  id: serial("id").primaryKey(),
+  sceneId: integer("scene_id").notNull().references(() => scenes.id, { onDelete: "cascade" }),
+  productId: integer("product_id").references(() => products.id),
+  brandName: text("brand_name").notNull(),
+  productName: text("product_name").notNull(),
+  placementDescription: text("placement_description").notNull(),
+  imagePrompt: text("image_prompt"),
+  imageUrl: text("image_url"),
+  videoUrl: text("video_url"),
+  naturalness: integer("naturalness").default(5), // 1-10 scale
+  visibility: text("visibility").notNull().default("featured"), // background, featured, hero
+  estimatedValue: integer("estimated_value").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Zod schemas for validation
 export const insertUserSchema = createInsertSchema(users).pick({
   email: true,
@@ -296,6 +314,12 @@ export const insertSceneSchema = createInsertSchema(scenes).omit({
 export const insertCharacterSchema = createInsertSchema(characters).omit({
   id: true,
   createdAt: true,
+});
+
+export const insertSceneVariationSchema = createInsertSchema(sceneVariations).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
 });
 
 export const insertCharacterRelationshipSchema = createInsertSchema(characterRelationships).omit({
@@ -357,6 +381,8 @@ export type InsertLocationSuggestion = z.infer<typeof insertLocationSuggestionSc
 export type LocationSuggestion = typeof locationSuggestions.$inferSelect;
 export type InsertFinancialPlan = z.infer<typeof insertFinancialPlanSchema>;
 export type FinancialPlan = typeof financialPlans.$inferSelect;
+export type InsertSceneVariation = z.infer<typeof insertSceneVariationSchema>;
+export type SceneVariation = typeof sceneVariations.$inferSelect;
 
 export type UserRole = keyof typeof userRoles;
 export type LoginData = z.infer<typeof loginSchema>;

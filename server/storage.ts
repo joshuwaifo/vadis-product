@@ -798,6 +798,58 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
+  // Scene Variations for Product Placement
+  async createSceneVariation(variation: InsertSceneVariation): Promise<SceneVariation> {
+    try {
+      const [created] = await db
+        .insert(sceneVariations)
+        .values(variation)
+        .returning();
+      return created;
+    } catch (error) {
+      console.error('Error creating scene variation:', error);
+      throw error;
+    }
+  }
+
+  async getSceneVariationsByScene(sceneId: number): Promise<SceneVariation[]> {
+    try {
+      const variations = await db
+        .select()
+        .from(sceneVariations)
+        .where(eq(sceneVariations.sceneId, sceneId));
+      return variations;
+    } catch (error) {
+      console.error('Error fetching scene variations:', error);
+      return [];
+    }
+  }
+
+  async updateSceneVariation(variationId: number, updates: Partial<InsertSceneVariation>): Promise<SceneVariation> {
+    try {
+      const [updated] = await db
+        .update(sceneVariations)
+        .set({ ...updates, updatedAt: new Date() })
+        .where(eq(sceneVariations.id, variationId))
+        .returning();
+      return updated;
+    } catch (error) {
+      console.error('Error updating scene variation:', error);
+      throw error;
+    }
+  }
+
+  async deleteSceneVariation(variationId: number): Promise<void> {
+    try {
+      await db
+        .delete(sceneVariations)
+        .where(eq(sceneVariations.id, variationId));
+    } catch (error) {
+      console.error('Error deleting scene variation:', error);
+      throw error;
+    }
+  }
+
   // Script Analysis - Financial Plans
   async createFinancialPlan(plan: InsertFinancialPlan): Promise<FinancialPlan> {
     try {
