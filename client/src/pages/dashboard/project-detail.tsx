@@ -147,20 +147,18 @@ export default function ProjectDetail() {
             </p>
           </div>
           <div className="flex gap-2">
-            <Link href={`/dashboard/projects/${project.id}/edit`}>
+            <Link to={`/dashboard/projects/${project.id}/edit`}>
               <Button variant="outline">
                 <Edit className="w-4 h-4 mr-2" />
                 Edit
               </Button>
             </Link>
-            {project.status === 'completed' && (
-              <Link href={`/dashboard/projects/${project.id}/analysis`}>
-                <Button>
-                  <Eye className="w-4 h-4 mr-2" />
-                  View Analysis
-                </Button>
-              </Link>
-            )}
+            <Link to={`/dashboard/projects/${project.id}/analysis`}>
+              <Button>
+                <Eye className="w-4 h-4 mr-2" />
+                View Analysis
+              </Button>
+            </Link>
           </div>
         </div>
 
