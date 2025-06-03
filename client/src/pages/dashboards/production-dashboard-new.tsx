@@ -207,17 +207,17 @@ export default function ProductionDashboard() {
         {/* Three Main Action Panes */}
         <div className="px-6 py-8 sm:px-8 lg:px-12 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
           <div className="max-w-7xl mx-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
               
               {/* Start New Project Pane */}
-              <Card className="group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border-2 border-blue-200 dark:border-blue-800 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-blue-900/20 dark:via-indigo-900/20 dark:to-purple-900/20">
+              <Card className="group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border-2 border-blue-200 dark:border-blue-800 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-blue-900/20 dark:via-indigo-900/20 dark:to-purple-900/20 flex flex-col">
                 <CardHeader className="text-center pb-4">
                   <div className="h-16 w-16 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center mx-auto mb-4 shadow-lg">
                     <Plus className="h-8 w-8 text-white" />
                   </div>
                   <CardTitle className="text-xl font-bold text-gray-900 dark:text-white">Start New Project</CardTitle>
                 </CardHeader>
-                <CardContent className="text-center space-y-4">
+                <CardContent className="text-center space-y-4 flex flex-col flex-1">
                   <p className="text-gray-600 dark:text-gray-300">
                     Create a new project with script analysis, casting suggestions, and comprehensive production planning.
                   </p>
@@ -231,6 +231,7 @@ export default function ProductionDashboard() {
                       <span className="text-lg font-semibold text-green-600">5 min</span>
                     </div>
                   </div>
+                  <div className="flex-1"></div>
                   <Link to="/dashboard/project-create">
                     <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg">
                       <Plus className="w-4 h-4 mr-2" />
@@ -241,14 +242,14 @@ export default function ProductionDashboard() {
               </Card>
 
               {/* View Current Projects Pane */}
-              <Card className="group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border-2 border-orange-200 dark:border-orange-800 bg-gradient-to-br from-orange-50 via-yellow-50 to-amber-50 dark:from-orange-900/20 dark:via-yellow-900/20 dark:to-amber-900/20">
+              <Card className="group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border-2 border-orange-200 dark:border-orange-800 bg-gradient-to-br from-orange-50 via-yellow-50 to-amber-50 dark:from-orange-900/20 dark:via-yellow-900/20 dark:to-amber-900/20 flex flex-col">
                 <CardHeader className="text-center pb-4">
                   <div className="h-16 w-16 rounded-full bg-gradient-to-r from-orange-600 to-amber-600 flex items-center justify-center mx-auto mb-4 shadow-lg">
                     <Clock className="h-8 w-8 text-white" />
                   </div>
                   <CardTitle className="text-xl font-bold text-gray-900 dark:text-white">Current Projects</CardTitle>
                 </CardHeader>
-                <CardContent className="text-center space-y-4">
+                <CardContent className="text-center space-y-4 flex flex-col flex-1">
                   <p className="text-gray-600 dark:text-gray-300">
                     Continue working on your active projects, upload scripts, and run comprehensive analysis.
                   </p>
@@ -262,6 +263,7 @@ export default function ProductionDashboard() {
                       <span className="text-lg font-semibold text-green-600">{projects?.filter(p => p.scriptContent && !p.isPublished).length || 0}</span>
                     </div>
                   </div>
+                  <div className="flex-1"></div>
                   <Link to="/dashboard/projects">
                     <Button className="w-full bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white shadow-lg">
                       <Eye className="w-4 h-4 mr-2" />
@@ -272,14 +274,14 @@ export default function ProductionDashboard() {
               </Card>
 
               {/* View Published Projects Pane */}
-              <Card className="group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border-2 border-green-200 dark:border-green-800 bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 dark:from-green-900/20 dark:via-emerald-900/20 dark:to-teal-900/20">
+              <Card className="group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border-2 border-green-200 dark:border-green-800 bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 dark:from-green-900/20 dark:via-emerald-900/20 dark:to-teal-900/20 flex flex-col">
                 <CardHeader className="text-center pb-4">
                   <div className="h-16 w-16 rounded-full bg-gradient-to-r from-green-600 to-teal-600 flex items-center justify-center mx-auto mb-4 shadow-lg">
                     <CheckCircle className="h-8 w-8 text-white" />
                   </div>
                   <CardTitle className="text-xl font-bold text-gray-900 dark:text-white">Published Projects</CardTitle>
                 </CardHeader>
-                <CardContent className="text-center space-y-4">
+                <CardContent className="text-center space-y-4 flex flex-col flex-1">
                   <p className="text-gray-600 dark:text-gray-300">
                     Showcase your completed projects to attract investors, brands, and production partners.
                   </p>
@@ -293,6 +295,7 @@ export default function ProductionDashboard() {
                       <span className="text-lg font-semibold text-blue-600">{(projects?.filter(p => p.isPublished).length || 0) * 127}</span>
                     </div>
                   </div>
+                  <div className="flex-1"></div>
                   <Button className="w-full bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white shadow-lg">
                     <BarChart3 className="w-4 h-4 mr-2" />
                     View Published Projects
