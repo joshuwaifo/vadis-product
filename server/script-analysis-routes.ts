@@ -20,6 +20,10 @@ import {
   performCompleteCastingAnalysis,
   type ActorSuggestion as CastingActorSuggestion
 } from "./services/casting-suggestion-service";
+import {
+  suggestLocationsForScript,
+  saveLocationSuggestions
+} from "./services/location-suggestion-service";
 
 // Configure multer for file uploads
 const upload = multer({

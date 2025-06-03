@@ -101,6 +101,7 @@ export interface IStorage {
   
   // Script Analysis - Location Suggestions
   createLocationSuggestion(suggestion: InsertLocationSuggestion): Promise<LocationSuggestion>;
+  getLocationSuggestionsByProject(projectId: number): Promise<LocationSuggestion[]>;
   
   // Script Analysis - Financial Plans
   createFinancialPlan(plan: InsertFinancialPlan): Promise<FinancialPlan>;
