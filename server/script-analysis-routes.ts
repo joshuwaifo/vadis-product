@@ -161,7 +161,7 @@ export function registerScriptAnalysisRoutes(app: Express) {
       
       // Verify project belongs to authenticated user
       const project = await storage.getProject(projectId);
-      if (!project || project.userId !== req.session.user.id) {
+      if (!project || project.userId !== parseInt(req.session.user.id)) {
         return res.status(404).json({ error: "Project not found" });
       }
 
@@ -185,7 +185,7 @@ export function registerScriptAnalysisRoutes(app: Express) {
       
       // Verify project belongs to authenticated user
       const project = await storage.getProject(projectId);
-      if (!project || project.userId !== req.session.user.id) {
+      if (!project || project.userId !== parseInt(req.session.user.id)) {
         return res.status(404).json({ error: "Project not found" });
       }
 

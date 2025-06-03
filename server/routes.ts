@@ -109,7 +109,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Verify project belongs to authenticated user
-      if (project.userId !== req.session.user.id) {
+      if (project.userId !== Number(req.session.user.id)) {
         return res.status(403).json({ error: "Access denied" });
       }
 
