@@ -42,6 +42,8 @@ function Router() {
       <Route path="/dashboard/projects" component={ProjectsList} />
       <Route path="/dashboard/project-create" component={ProjectCreate} />
       <Route path="/dashboard/projects/new" component={ProjectCreation} />
+      <Route path="/dashboard/script-analysis-new" component={ScriptAnalysisNew} />
+      <Route path="/dashboard/script-generator" component={ScriptGenerator} />
       <Route path="/dashboard/projects/new/script_analysis" component={ScriptAnalysisNew} />
       <Route path="/dashboard/projects/new/script_generator" component={ScriptGenerator} />
       <Route path="/dashboard/projects/:id" component={ProjectDetail} />
