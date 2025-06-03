@@ -293,7 +293,7 @@ export default function ProductionDashboard() {
                             </div>
                           </div>
                           <div className="flex items-center gap-2 ml-4">
-                            <Link to={`/projects/${project.id}`}>
+                            <Link to={`/dashboard/projects/${project.id}`}>
                               <Button variant="outline" size="sm">
                                 View Details
                               </Button>
