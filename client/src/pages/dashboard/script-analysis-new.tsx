@@ -382,111 +382,110 @@ export default function ScriptAnalysisNew() {
             </Card>
           )}
 
-          {/* Step 3: Analysis Status */}
+          {/* Step 3: Analysis Features Selection */}
           {step === 3 && projectId && (
             <Card className="border-0 shadow-xl">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  {project?.status === 'completed' ? (
-                    <CheckCircle2 className="h-5 w-5 text-green-600" />
-                  ) : project?.status === 'failed' ? (
-                    <AlertCircle className="h-5 w-5 text-red-600" />
-                  ) : (
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                  )}
-                  {project?.status === 'completed' ? 'Analysis Complete' : 
-                   project?.status === 'failed' ? 'Analysis Failed' : 'Analysis in Progress'}
+                  <CheckCircle2 className="h-5 w-5 text-green-600" />
+                  Script Uploaded Successfully
                 </CardTitle>
                 <CardDescription>
-                  {project?.title || 'Loading project details...'}
+                  Select the analysis features you'd like to run on your script
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                {project?.status === 'completed' && (
-                  <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                    <div className="flex items-center gap-2 mb-2">
-                      <CheckCircle2 className="h-5 w-5 text-green-600" />
-                      <span className="font-semibold text-green-800 dark:text-green-200">
-                        Analysis Successfully Completed
-                      </span>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {/* Casting */}
+                  <Button
+                    variant="outline"
+                    className="h-24 flex flex-col items-center justify-center space-y-2 border-2 hover:border-orange-400 hover:bg-orange-50 dark:hover:bg-orange-950 transition-all"
+                    onClick={() => setLocation(`/dashboard/projects/${projectId}/analysis?feature=casting`)}
+                  >
+                    <div className="w-8 h-8 bg-orange-400 rounded-md flex items-center justify-center">
+                      <span className="text-white text-xs font-bold">👥</span>
                     </div>
-                    <p className="text-sm text-green-700 dark:text-green-300">
-                      Your script has been fully analyzed with comprehensive insights across all dimensions.
-                    </p>
-                  </div>
-                )}
+                    <span className="text-sm font-medium">Casting</span>
+                  </Button>
 
-                {project?.status === 'failed' && (
-                  <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
-                    <div className="flex items-center gap-2 mb-2">
-                      <AlertCircle className="h-5 w-5 text-red-600" />
-                      <span className="font-semibold text-red-800 dark:text-red-200">
-                        Analysis Failed
-                      </span>
+                  {/* Product Placement */}
+                  <Button
+                    variant="outline"
+                    className="h-24 flex flex-col items-center justify-center space-y-2 border-2 hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950 transition-all"
+                    onClick={() => setLocation(`/dashboard/projects/${projectId}/analysis?feature=product-placement`)}
+                  >
+                    <div className="w-8 h-8 bg-blue-400 rounded-md flex items-center justify-center">
+                      <span className="text-white text-xs font-bold">📦</span>
                     </div>
-                    <p className="text-sm text-red-700 dark:text-red-300">
-                      There was an issue analyzing your script. Please try again or contact support.
-                    </p>
-                  </div>
-                )}
+                    <span className="text-sm font-medium">Product Placement</span>
+                  </Button>
 
-                {(!project?.status || project?.status === 'analyzing') && (
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span>Processing Script</span>
-                        <span>In Progress...</span>
-                      </div>
-                      <Progress value={45} className="h-2" />
+                  {/* VFX */}
+                  <Button
+                    variant="outline"
+                    className="h-24 flex flex-col items-center justify-center space-y-2 border-2 hover:border-purple-400 hover:bg-purple-50 dark:hover:bg-purple-950 transition-all"
+                    onClick={() => setLocation(`/dashboard/projects/${projectId}/analysis?feature=vfx`)}
+                  >
+                    <div className="w-8 h-8 bg-purple-400 rounded-md flex items-center justify-center">
+                      <span className="text-white text-xs font-bold">✨</span>
                     </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                      <div className="space-y-2">
-                        <h4 className="font-semibold">Analysis Components:</h4>
-                        <ul className="space-y-1 text-gray-600 dark:text-gray-400">
-                          <li>• Scene extraction and breakdown</li>
-                          <li>• Character analysis and relationships</li>
-                          <li>• Actor casting suggestions</li>
-                          <li>• VFX requirements identification</li>
-                        </ul>
-                      </div>
-                      <div className="space-y-2">
-                        <h4 className="font-semibold">Business Analysis:</h4>
-                        <ul className="space-y-1 text-gray-600 dark:text-gray-400">
-                          <li>• Product placement opportunities</li>
-                          <li>• Location scouting suggestions</li>
-                          <li>• Financial planning and budgeting</li>
-                          <li>• Investment readiness report</li>
-                        </ul>
-                      </div>
+                    <span className="text-sm font-medium">VFX</span>
+                  </Button>
+
+                  {/* Location Suggestions */}
+                  <Button
+                    variant="outline"
+                    className="h-24 flex flex-col items-center justify-center space-y-2 border-2 hover:border-green-400 hover:bg-green-50 dark:hover:bg-green-950 transition-all"
+                    onClick={() => setLocation(`/dashboard/projects/${projectId}/analysis?feature=locations`)}
+                  >
+                    <div className="w-8 h-8 bg-green-400 rounded-md flex items-center justify-center">
+                      <span className="text-white text-xs font-bold">📍</span>
                     </div>
+                    <span className="text-sm font-medium">Location Suggestions</span>
+                  </Button>
+                </div>
+
+                {/* Summary Section */}
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-gray-300"></div>
                   </div>
-                )}
+                  <div className="relative flex justify-center text-sm">
+                    <span className="px-2 bg-white dark:bg-gray-900 text-gray-500">Or generate complete analysis</span>
+                  </div>
+                </div>
 
                 <div className="flex justify-center">
-                  {project?.status === 'completed' ? (
-                    <Button 
-                      onClick={() => setLocation(`/dashboard/projects/${projectId}/analysis`)}
-                      className="bg-gradient-to-r from-green-500 to-blue-600 text-white"
-                    >
-                      View Complete Analysis
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
-                  ) : project?.status === 'failed' ? (
-                    <Button 
-                      onClick={() => setLocation('/dashboard/projects/new/script_analysis')}
-                      variant="outline"
-                    >
-                      Try Again
-                    </Button>
-                  ) : (
-                    <Button 
-                      onClick={() => refetchProject()}
-                      variant="outline"
-                    >
-                      Refresh Status
-                    </Button>
-                  )}
+                  <Button
+                    className="h-32 w-32 rounded-full bg-gradient-to-br from-yellow-400 via-orange-400 to-red-400 hover:from-yellow-500 hover:via-orange-500 hover:to-red-500 text-white shadow-lg hover:shadow-xl transition-all flex flex-col items-center justify-center space-y-2"
+                    onClick={() => setLocation(`/dashboard/projects/${projectId}/analysis?feature=summary`)}
+                  >
+                    <span className="text-2xl">📋</span>
+                    <span className="text-sm font-medium">Summary</span>
+                  </Button>
+                </div>
+
+                <div className="text-center space-y-2">
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Generate a brief summary of the Script and a Reader's Report for Key Industry Insights across all analysis categories
+                  </p>
+                </div>
+
+                <div className="flex justify-between pt-4">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={() => setStep(2)}
+                  >
+                    Previous
+                  </Button>
+                  <Button 
+                    onClick={() => setLocation(`/dashboard/projects/${projectId}/analysis`)}
+                    className="bg-gradient-to-r from-blue-500 to-purple-600 text-white"
+                  >
+                    View All Results
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
                 </div>
               </CardContent>
             </Card>
