@@ -98,9 +98,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       <header className="sticky top-0 z-50 backdrop-blur-xl bg-white/80 dark:bg-slate-900/80 border-b border-gray-200/50 dark:border-gray-700/50 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            {/* Left: Logo and Primary Navigation */}
-            <div className="flex items-center space-x-8">
-              {/* Logo */}
+            {/* Left: Logo */}
+            <div className="flex items-center">
               <Link href="/dashboard">
                 <div className="flex items-center space-x-3 cursor-pointer group">
                   <div className="relative w-10 h-10 bg-gradient-to-br from-blue-500 via-purple-600 to-pink-600 rounded-xl shadow-lg flex items-center justify-center group-hover:scale-105 transition-transform duration-200">
@@ -116,40 +115,33 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                   </div>
                 </div>
               </Link>
-
-              {/* Horizontal Navigation */}
-              <nav className="hidden md:flex items-center space-x-1">
-                {navigation.map((item) => {
-                  const Icon = item.icon;
-                  return (
-                    <Link key={item.name} href={item.href}>
-                      <div className={`
-                        flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 group
-                        ${isActive(item.href)
-                          ? 'bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 text-blue-700 dark:text-blue-300 shadow-sm'
-                          : 'text-gray-600 hover:bg-gray-100/80 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800/50 dark:hover:text-white'
-                        }
-                      `}>
-                        <Icon className={`mr-2 h-4 w-4 transition-colors ${
-                          isActive(item.href) ? 'text-blue-600 dark:text-blue-400' : 'group-hover:text-blue-500'
-                        }`} />
-                        {item.name}
-                      </div>
-                    </Link>
-                  );
-                })}
-              </nav>
             </div>
+
+            {/* Center: Navigation */}
+            <nav className="hidden md:flex items-center space-x-1">
+              {navigation.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Link key={item.name} href={item.href}>
+                    <div className={`
+                      flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 group
+                      ${isActive(item.href)
+                        ? 'bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 text-blue-700 dark:text-blue-300 shadow-sm'
+                        : 'text-gray-600 hover:bg-gray-100/80 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800/50 dark:hover:text-white'
+                      }
+                    `}>
+                      <Icon className={`mr-2 h-4 w-4 transition-colors ${
+                        isActive(item.href) ? 'text-blue-600 dark:text-blue-400' : 'group-hover:text-blue-500'
+                      }`} />
+                      {item.name}
+                    </div>
+                  </Link>
+                );
+              })}
+            </nav>
 
             {/* Right: Action Buttons */}
             <div className="flex items-center space-x-4">
-              <Link href="/dashboard/projects/new">
-                <Button className="bg-gradient-to-r from-blue-500 via-purple-600 to-pink-600 hover:from-blue-600 hover:via-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 rounded-lg px-6">
-                  <Plus className="mr-2 h-4 w-4" />
-                  New Project
-                </Button>
-              </Link>
-
               {/* Mobile menu button */}
               <Button
                 variant="ghost"
