@@ -14,6 +14,7 @@ import {
   Menu,
   X
 } from "lucide-react";
+import vadisLogoLight from "@assets/Vadis FINAL LOGO large size Without Background.png";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -82,7 +83,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     { name: "Dashboard", href: "/dashboard", icon: Home },
     { name: "Projects", href: "/dashboard/projects", icon: FolderOpen },
     { name: "Profile", href: "/dashboard/profile", icon: User },
-    { name: "Settings", href: "/dashboard/settings", icon: Settings },
   ];
 
   const isActive = (href: string) => {
@@ -102,18 +102,12 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             <div className="flex items-center space-x-8">
               {/* Logo */}
               <Link href="/dashboard">
-                <div className="flex items-center space-x-3 cursor-pointer group">
-                  <div className="relative w-10 h-10 bg-gradient-to-br from-blue-500 via-purple-600 to-pink-600 rounded-xl shadow-lg flex items-center justify-center group-hover:scale-105 transition-transform duration-200">
-                    <div className="w-6 h-6 bg-white rounded-md flex items-center justify-center">
-                      <span className="text-xs font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">V</span>
-                    </div>
-                  </div>
-                  <div>
-                    <span className="text-xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">VadisAI</span>
-                    <div className="text-xs text-gray-500 dark:text-gray-400 -mt-1">
-                      {userLoading ? 'Loading...' : currentUser?.user?.role || 'User'}
-                    </div>
-                  </div>
+                <div className="flex items-center cursor-pointer group">
+                  <img 
+                    src={vadisLogoLight} 
+                    alt="VadisMedia" 
+                    className="h-12 w-auto group-hover:scale-105 transition-transform duration-200"
+                  />
                 </div>
               </Link>
 
@@ -184,18 +178,12 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           />
           <div className="fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-800 shadow-lg transform transition-transform duration-300 ease-in-out md:hidden">
             <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-              <div className="flex items-center space-x-3">
-                <div className="relative w-10 h-10 bg-gradient-to-br from-blue-500 via-purple-600 to-pink-600 rounded-xl shadow-lg flex items-center justify-center">
-                  <div className="w-6 h-6 bg-white rounded-md flex items-center justify-center">
-                    <span className="text-xs font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">V</span>
-                  </div>
-                </div>
-                <div>
-                  <span className="text-xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">VadisAI</span>
-                  <div className="text-xs text-gray-500 dark:text-gray-400 -mt-1">
-                    {userLoading ? 'Loading...' : currentUser?.user?.role || 'User'}
-                  </div>
-                </div>
+              <div className="flex items-center">
+                <img 
+                  src={vadisLogoLight} 
+                  alt="VadisMedia" 
+                  className="h-10 w-auto"
+                />
               </div>
               <Button
                 variant="ghost"
