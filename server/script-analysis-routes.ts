@@ -27,6 +27,15 @@ import {
 import {
   analyzeAndStoreScriptVFX
 } from "./services/vfx-analysis-service";
+import {
+  identifyBrandableScenesWithGemini,
+  generateCreativePlacementPrompt,
+  generateProductPlacement as generateProductPlacementImage,
+  getTopMatchingProductsForScene,
+  createSceneVariation,
+  generateVideoFromVariation,
+  getPredictionStatus
+} from "./services/product-placement-service";
 
 // Configure multer for file uploads
 const upload = multer({
@@ -241,6 +250,36 @@ export function registerScriptAnalysisRoutes(app: Express) {
     } catch (error) {
       console.error("Error fetching product placements:", error);
       res.status(500).json({ error: "Failed to fetch product placements" });
+    }
+  });
+
+  // Generate video from scene variation
+  app.post("/api/scene-variations/:id/generate-video", async (req, res) => {
+    try {
+      const variationId = parseInt(req.params.id);
+      const { imageUrl, duration = 3 } = req.body;
+
+      if (!imageUrl) {
+        return res.status(400).json({ error: "Image URL is required" });
+      }
+
+      const result = await generateVideoFromVariation(variationId, imageUrl, duration);
+      res.json(result);
+    } catch (error) {
+      console.error("Error generating video:", error);
+      res.status(500).json({ error: "Failed to generate video" });
+    }
+  });
+
+  // Check video generation status
+  app.get("/api/predictions/:id/status", async (req, res) => {
+    try {
+      const predictionId = req.params.id;
+      const status = await getPredictionStatus(predictionId);
+      res.json(status);
+    } catch (error) {
+      console.error("Error checking prediction status:", error);
+      res.status(500).json({ error: "Failed to check prediction status" });
     }
   });
 
