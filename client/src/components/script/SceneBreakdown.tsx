@@ -154,8 +154,8 @@ export default function SceneBreakdown({
             <div className="max-h-24 overflow-y-auto">
               <ul className="text-xs text-purple-700 space-y-1 pr-2">
                 {scenes
-                  .filter((scene: Scene) => vfxSceneIds.includes(scene.id))
-                  .map((scene: Scene) => {
+                  .filter((scene) => vfxSceneIds.includes(scene.id))
+                  .map((scene) => {
                     return (
                       <li key={scene.id} className="flex items-center">
                         <Sparkles className="h-4 w-4 mr-1 text-purple-600 flex-shrink-0" />
