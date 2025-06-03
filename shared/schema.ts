@@ -59,10 +59,12 @@ export const projects = pgTable("projects", {
   
   // Financial information for investor marketplace
   budgetRange: text("budget_range"), // e.g., "$1M-$5M"
+  totalBudget: integer("total_budget"), // Total project budget for financial analysis
   fundingGoal: integer("funding_goal"), // Target funding amount
   fundingRaised: integer("funding_raised").default(0), // Amount raised so far
   projectedROI: text("projected_roi"), // Expected return on investment
   investmentTerms: text("investment_terms"), // Investment structure details
+  expectedReleaseDate: text("expected_release_date"), // Expected release date for financial planning
   
   // Project details
   productionTimeline: text("production_timeline"),

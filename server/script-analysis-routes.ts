@@ -36,6 +36,11 @@ import {
   generateVideoFromVariation,
   getPredictionStatus
 } from "./services/product-placement-service";
+import {
+  generateFinancialBreakdown,
+  calculateBrandSponsorshipValue,
+  calculateLocationIncentiveValue
+} from "./services/financial-analysis-service";
 
 // Configure multer for file uploads
 const upload = multer({
