@@ -32,18 +32,18 @@ export default function SceneBreakdown({
   projectTitle,
   onSceneSelect,
 }: SceneBreakdownProps) {
-  const { data: scenes = [], isLoading } = useQuery({
+  const { data: scenes = [], isLoading } = useQuery<Scene[]>({
     queryKey: ['/api/projects', projectId, 'scenes'],
   });
 
   // Identify brandable and VFX scenes from the fetched data
   const brandableSceneIds = scenes
-    .filter((scene: Scene) => scene.productPlacementOpportunities && scene.productPlacementOpportunities.length > 0)
-    .map((scene: Scene) => scene.id);
+    .filter((scene) => scene.productPlacementOpportunities && scene.productPlacementOpportunities.length > 0)
+    .map((scene) => scene.id);
 
   const vfxSceneIds = scenes
-    .filter((scene: Scene) => scene.vfxNeeds && scene.vfxNeeds.length > 0)
-    .map((scene: Scene) => scene.id);
+    .filter((scene) => scene.vfxNeeds && scene.vfxNeeds.length > 0)
+    .map((scene) => scene.id);
 
   if (isLoading) {
     return (
@@ -73,7 +73,7 @@ export default function SceneBreakdown({
       <div className="h-[400px] overflow-hidden">
         <ScrollArea className="h-full pr-2">
           <ul className="space-y-2">
-            {scenes.map((scene: Scene) => (
+            {scenes.map((scene) => (
               <li
                 key={scene.id}
                 className={cn(
@@ -97,10 +97,10 @@ export default function SceneBreakdown({
                   </div>
                   <div className="flex items-center gap-2">
                     {vfxSceneIds.includes(scene.id) && (
-                      <Sparkles className="h-4 w-4 text-purple-500" title="VFX Scene" />
+                      <Sparkles className="h-4 w-4 text-purple-500" />
                     )}
                     {brandableSceneIds.includes(scene.id) && (
-                      <Star className="h-5 w-5 text-green-500 brandable-indicator" title="Brandable Scene" />
+                      <Star className="h-5 w-5 text-green-500 brandable-indicator" />
                     )}
                   </div>
                 </div>
@@ -117,13 +117,13 @@ export default function SceneBreakdown({
               {`VADIS AI SUGGESTED BRANDABLE SCENES`}
             </p>
             <p className="text-xs text-green-600 mb-2">
-              {`There are ${scenes.filter((scene: Scene) => brandableSceneIds.includes(scene.id)).length} scenes with product placement potential. Vadis AI has suggested the following scenes for their branding potential:`}
+              {`There are ${scenes.filter((scene) => brandableSceneIds.includes(scene.id)).length} scenes with product placement potential. Vadis AI has suggested the following scenes for their branding potential:`}
             </p>
             <div className="max-h-24 overflow-y-auto">
               <ul className="text-xs text-green-700 space-y-1 pr-2">
                 {scenes
-                  .filter((scene: Scene) => brandableSceneIds.includes(scene.id))
-                  .map((scene: Scene) => {
+                  .filter((scene) => brandableSceneIds.includes(scene.id))
+                  .map((scene) => {
                     const category = scene.productPlacementOpportunities?.length
                       ? scene.productPlacementOpportunities[0]
                       : "Product";

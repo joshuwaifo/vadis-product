@@ -599,23 +599,23 @@ export default function AnalysisResults() {
     queryKey: ['/api/projects', projectId],
   });
 
-  const { data: scenes = [], isLoading: scenesLoading } = useQuery({
+  const { data: scenes = [], isLoading: scenesLoading } = useQuery<Scene[]>({
     queryKey: ['/api/projects', projectId, 'scenes'],
   });
 
-  const { data: characters = [], isLoading: charactersLoading } = useQuery({
+  const { data: characters = [], isLoading: charactersLoading } = useQuery<Character[]>({
     queryKey: ['/api/projects', projectId, 'characters'],
   });
 
-  const { data: castingRecommendations = [], isLoading: castingLoading } = useQuery({
+  const { data: castingRecommendations = [], isLoading: castingLoading } = useQuery<CastingRecommendation[]>({
     queryKey: ['/api/projects', projectId, 'casting'],
   });
 
-  const { data: locations = [], isLoading: locationsLoading } = useQuery({
+  const { data: locations = [], isLoading: locationsLoading } = useQuery<LocationSuggestion[]>({
     queryKey: ['/api/projects', projectId, 'locations'],
   });
 
-  const { data: financialPlan, isLoading: financialLoading } = useQuery({
+  const { data: financialPlan, isLoading: financialLoading } = useQuery<FinancialPlan | null>({
     queryKey: ['/api/projects', projectId, 'financial-plan'],
   });
 
