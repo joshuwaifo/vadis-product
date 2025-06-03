@@ -20,7 +20,7 @@ import ProjectAnalysis from "@/pages/dashboard/project-analysis";
 import AnalysisResults from "@/pages/dashboard/analysis-results";
 import ScriptAnalysisNew from "@/pages/dashboard/script-analysis-new";
 import ScriptGenerator from "@/pages/dashboard/script-generator";
-import ProductionDashboard from "@/pages/dashboards/production-dashboard-new";
+
 import BrandDashboard from "@/pages/dashboards/brand-dashboard";
 import InvestorDashboard from "@/pages/dashboards/investor-dashboard";
 import CreatorDashboard from "@/pages/dashboards/creator-dashboard";
@@ -48,7 +48,7 @@ function Router() {
       <Route path="/dashboard/projects/:id/edit" component={ProjectDetail} />
       <Route path="/dashboard/projects/:id/analysis" component={ProjectAnalysis} />
       <Route path="/dashboard/projects/:id/results" component={AnalysisResults} />
-      <Route path="/production/dashboard" component={ProductionDashboard} />
+
       <Route path="/brand/dashboard" component={BrandDashboard} />
       <Route path="/investor/dashboard" component={InvestorDashboard} />
       <Route path="/creator/dashboard" component={CreatorDashboard} />

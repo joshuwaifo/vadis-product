@@ -129,7 +129,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Validate the request body using Zod schema
       const validatedData = insertProjectSchema.parse({
-        userId: req.session.user.id,
+        userId: parseInt(req.session.user.id),
         ...req.body,
       });
 
