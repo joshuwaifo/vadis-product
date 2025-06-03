@@ -14,7 +14,9 @@ import {
   Edit,
   Eye,
   Download,
-  Play
+  Play,
+  Star,
+  Zap
 } from "lucide-react";
 import DashboardLayout from "./dashboard-layout";
 import { Link } from "wouter";
@@ -33,6 +35,7 @@ interface Project {
   fundingRaised: number;
   isPublished: boolean;
   createdAt: string;
+  scriptContent?: string;
 }
 
 interface Character {
