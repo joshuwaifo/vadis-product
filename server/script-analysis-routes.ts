@@ -245,8 +245,7 @@ export function registerScriptAnalysisRoutes(app: Express) {
   app.get("/api/projects/:id/locations", async (req, res) => {
     try {
       const projectId = parseInt(req.params.id);
-      // This would be implemented in storage
-      const locations = []; // await storage.getLocationSuggestions(projectId);
+      const locations = await storage.getLocationSuggestionsByProject(projectId);
       res.json(locations);
     } catch (error) {
       console.error("Error fetching locations:", error);
@@ -392,30 +391,17 @@ async function analyzeScriptAsync(
       });
     }
 
-    // Step 6: Suggest locations
+    // Step 6: Suggest locations using enhanced service
     console.log("Suggesting locations...");
-    const locations = await suggestLocations(scenes);
+    const locationSuggestions = await suggestLocationsForScript(
+      scriptContent,
+      scenes,
+      projectData.fundingGoal,
+      5 // numberOfSuggestions
+    );
     
     // Save location suggestions to database
-    for (const locationSet of locations) {
-      if (locationSet.suggestions && locationSet.suggestions.length > 0) {
-        for (const suggestion of locationSet.suggestions) {
-          await storage.createLocationSuggestion({
-            projectId,
-            sceneId: null, // For now, set sceneId as null until we implement scene ID mapping
-            locationType: locationSet.locationType,
-            location: suggestion.location,
-            city: suggestion.city || null,
-            state: suggestion.state || null,
-            country: suggestion.country || null,
-            taxIncentive: suggestion.taxIncentive || null,
-            estimatedCost: suggestion.estimatedCost || null,
-            logistics: suggestion.logistics || null,
-            weatherConsiderations: suggestion.weatherConsiderations || null,
-          });
-        }
-      }
-    }
+    await saveLocationSuggestions(projectId, locationSuggestions);
 
     // Step 7: Generate financial plan
     console.log("Generating financial plan...");

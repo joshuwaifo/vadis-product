@@ -452,6 +452,10 @@ export class MemStorage implements IStorage {
     throw new Error("MemStorage is deprecated. Use DatabaseStorage for location suggestion operations.");
   }
 
+  async getLocationSuggestionsByProject(projectId: number): Promise<LocationSuggestion[]> {
+    throw new Error("MemStorage is deprecated. Use DatabaseStorage for location suggestion operations.");
+  }
+
   // Script Analysis - Financial Plans (stub implementation for deprecated MemStorage)
   async createFinancialPlan(plan: InsertFinancialPlan): Promise<FinancialPlan> {
     throw new Error("MemStorage is deprecated. Use DatabaseStorage for financial plan operations.");
@@ -758,6 +762,19 @@ export class DatabaseStorage implements IStorage {
       return created;
     } catch (error) {
       console.error('Error creating location suggestion:', error);
+      throw error;
+    }
+  }
+
+  async getLocationSuggestionsByProject(projectId: number): Promise<LocationSuggestion[]> {
+    try {
+      const suggestions = await db
+        .select()
+        .from(locationSuggestions)
+        .where(eq(locationSuggestions.projectId, projectId));
+      return suggestions;
+    } catch (error) {
+      console.error('Error fetching location suggestions:', error);
       throw error;
     }
   }
