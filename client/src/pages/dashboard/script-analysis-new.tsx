@@ -27,10 +27,6 @@ import { useToast } from "@/hooks/use-toast";
 
 const projectSchema = z.object({
   title: z.string().min(1, "Project title is required"),
-  logline: z.string().min(10, "Logline must be at least 10 characters"),
-  budgetRange: z.string().min(1, "Budget range is required"),
-  fundingGoal: z.number().min(1000, "Funding goal must be at least $1,000"),
-  productionTimeline: z.string().min(1, "Production timeline is required"),
 });
 
 export default function ScriptAnalysisNew() {
@@ -62,10 +58,6 @@ export default function ScriptAnalysisNew() {
     resolver: zodResolver(projectSchema),
     defaultValues: {
       title: "",
-      logline: "",
-      budgetRange: "",
-      fundingGoal: 0,
-      productionTimeline: "",
     },
   });
 
@@ -73,10 +65,6 @@ export default function ScriptAnalysisNew() {
     mutationFn: async (data: any) => {
       const formData = new FormData();
       formData.append('title', data.title);
-      formData.append('logline', data.logline);
-      formData.append('budgetRange', data.budgetRange);
-      formData.append('fundingGoal', data.fundingGoal.toString());
-      formData.append('productionTimeline', data.productionTimeline);
       formData.append('projectType', 'script_analysis');
       
       if (uploadedFile) {
@@ -156,10 +144,7 @@ export default function ScriptAnalysisNew() {
     createProjectMutation.mutate(data);
   };
 
-  const budgetRanges = [
-    "Under $100K", "$100K - $500K", "$500K - $1M", "$1M - $5M", 
-    "$5M - $10M", "$10M - $25M", "$25M+"
-  ];
+
 
   return (
     <DashboardLayout>
@@ -223,67 +208,11 @@ export default function ScriptAnalysisNew() {
                   )}
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="logline">Logline*</Label>
-                  <Textarea
-                    id="logline"
-                    {...form.register("logline")}
-                    placeholder="A compelling one-sentence summary of your story..."
-                    rows={3}
-                  />
-                  {form.formState.errors.logline && (
-                    <p className="text-sm text-red-600">{form.formState.errors.logline.message}</p>
-                  )}
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="budgetRange">Budget Range*</Label>
-                    <Select onValueChange={(value) => form.setValue("budgetRange", value)}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select budget range" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {budgetRanges.map((range) => (
-                          <SelectItem key={range} value={range}>{range}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {form.formState.errors.budgetRange && (
-                      <p className="text-sm text-red-600">{form.formState.errors.budgetRange.message}</p>
-                    )}
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="fundingGoal">Funding Goal ($)*</Label>
-                    <Input
-                      id="fundingGoal"
-                      type="number"
-                      {...form.register("fundingGoal", { valueAsNumber: true })}
-                      placeholder="1000000"
-                    />
-                    {form.formState.errors.fundingGoal && (
-                      <p className="text-sm text-red-600">{form.formState.errors.fundingGoal.message}</p>
-                    )}
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="productionTimeline">Production Timeline*</Label>
-                  <Input
-                    id="productionTimeline"
-                    {...form.register("productionTimeline")}
-                    placeholder="e.g., 6 months pre-production, 3 months filming"
-                  />
-                  {form.formState.errors.productionTimeline && (
-                    <p className="text-sm text-red-600">{form.formState.errors.productionTimeline.message}</p>
-                  )}
-                </div>
-
                 <div className="flex justify-end">
                   <Button 
                     type="button" 
                     onClick={() => setStep(2)}
+                    disabled={!form.watch("title")}
                     className="bg-gradient-to-r from-blue-500 to-purple-600 text-white"
                   >
                     Next: Upload Script
