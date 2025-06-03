@@ -793,6 +793,15 @@ export default function AnalysisResults() {
           </Card>
         </TabsContent>
 
+        <TabsContent value="product-placement">
+          <BrandableScenes
+            projectId={projectId}
+            activeSceneId={activeSceneId}
+            videoGenerationStates={videoGenerationStates}
+            onGenerateVideoRequest={handleGenerateVideoRequest}
+          />
+        </TabsContent>
+
         <TabsContent value="locations">
           <LocationSuggestions locations={locations} />
         </TabsContent>
