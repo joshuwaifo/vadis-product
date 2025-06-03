@@ -20,7 +20,8 @@ import {
   CheckCircle,
   Clock,
   AlertCircle,
-  Eye
+  Eye,
+  Wand2
 } from "lucide-react";
 import DashboardLayout from "../dashboard/dashboard-layout";
 
@@ -188,14 +189,14 @@ export default function ProductionDashboard() {
                 <div className="flex flex-wrap justify-center gap-4">
                   <Link to="/dashboard/project-create">
                     <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300">
-                      <Plus className="w-5 h-5 mr-2" />
-                      Start New Project
+                      <FileText className="w-5 h-5 mr-2" />
+                      Analyze Script
                     </Button>
                   </Link>
-                  <Link to="/dashboard/script-analysis-new">
-                    <Button variant="outline" size="lg" className="border-2 border-blue-300 dark:border-blue-600 hover:border-blue-500 dark:hover:border-blue-400">
-                      <FileText className="w-5 h-5 mr-2" />
-                      Quick Script Analysis
+                  <Link to="/dashboard/script-generator">
+                    <Button variant="outline" size="lg" className="border-2 border-purple-300 dark:border-purple-600 hover:border-purple-500 dark:hover:border-purple-400">
+                      <Wand2 className="w-5 h-5 mr-2" />
+                      Generate Script
                     </Button>
                   </Link>
                 </div>
