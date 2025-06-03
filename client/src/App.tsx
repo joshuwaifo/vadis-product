@@ -20,10 +20,11 @@ import ProjectAnalysis from "@/pages/dashboard/project-analysis";
 import AnalysisResults from "@/pages/dashboard/analysis-results";
 import ScriptAnalysisNew from "@/pages/dashboard/script-analysis-new";
 import ScriptGenerator from "@/pages/dashboard/script-generator";
-import ProductionDashboard from "@/pages/dashboards/production-dashboard";
+import ProductionDashboard from "@/pages/dashboards/production-dashboard-new";
 import BrandDashboard from "@/pages/dashboards/brand-dashboard";
 import InvestorDashboard from "@/pages/dashboards/investor-dashboard";
 import CreatorDashboard from "@/pages/dashboards/creator-dashboard";
+import ProjectCreate from "@/pages/dashboard/project-create";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -39,6 +40,7 @@ function Router() {
       <Route path="/dashboard" component={DashboardHome} />
       <Route path="/dashboard/profile" component={ProfilePage} />
       <Route path="/dashboard/projects" component={ProjectsList} />
+      <Route path="/dashboard/project-create" component={ProjectCreate} />
       <Route path="/dashboard/projects/new" component={ProjectCreation} />
       <Route path="/dashboard/projects/new/script_analysis" component={ScriptAnalysisNew} />
       <Route path="/dashboard/projects/new/script_generator" component={ScriptGenerator} />
