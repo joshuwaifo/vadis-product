@@ -109,6 +109,11 @@ export interface IStorage {
   
   // Script Analysis - Financial Plans
   createFinancialPlan(plan: InsertFinancialPlan): Promise<FinancialPlan>;
+  getFinancialPlan(projectId: number): Promise<FinancialPlan | undefined>;
+  
+  // Additional getter methods for analysis results
+  getScenes(projectId: number): Promise<Scene[]>;
+  getCharacters(projectId: number): Promise<Character[]>;
 }
 
 // DEPRECATED: MemStorage class - kept for testing purposes only

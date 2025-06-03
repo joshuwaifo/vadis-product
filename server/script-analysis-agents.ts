@@ -237,7 +237,7 @@ export async function analyzeCharacters(
  */
 export async function suggestActors(
   characters: Character[],
-  provider: AIProvider = 'gpt-4o'
+  provider: AIProvider = 'gemini-1.5-pro'
 ): Promise<ActorSuggestion[]> {
   const prompt = `
     Based on these character descriptions, suggest appropriate actors for each role.
@@ -283,7 +283,7 @@ export async function suggestActors(
  */
 export async function analyzeVFXNeeds(
   scenes: Scene[],
-  provider: AIProvider = 'gemini-2.0-flash-exp'
+  provider: AIProvider = 'gemini-1.5-pro'
 ): Promise<VFXNeed[]> {
   const prompt = `
     Analyze these scenes for VFX requirements. Identify:
@@ -327,7 +327,7 @@ export async function analyzeVFXNeeds(
  */
 export async function generateProductPlacement(
   scenes: Scene[],
-  provider: AIProvider = 'gpt-4o-mini'
+  provider: AIProvider = 'gemini-1.5-flash'
 ): Promise<ProductPlacement[]> {
   const prompt = `
     Analyze these scenes for natural product placement opportunities.
