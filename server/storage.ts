@@ -871,6 +871,45 @@ export class DatabaseStorage implements IStorage {
       throw error;
     }
   }
+
+  async getFinancialPlan(projectId: number): Promise<FinancialPlan | undefined> {
+    try {
+      const [result] = await db
+        .select()
+        .from(financialPlans)
+        .where(eq(financialPlans.projectId, projectId));
+      return result;
+    } catch (error) {
+      console.error('Error getting financial plan:', error);
+      return undefined;
+    }
+  }
+
+  async getScenes(projectId: number): Promise<Scene[]> {
+    try {
+      const result = await db
+        .select()
+        .from(scenes)
+        .where(eq(scenes.projectId, projectId));
+      return result;
+    } catch (error) {
+      console.error('Error getting scenes:', error);
+      return [];
+    }
+  }
+
+  async getCharacters(projectId: number): Promise<Character[]> {
+    try {
+      const result = await db
+        .select()
+        .from(characters)
+        .where(eq(characters.projectId, projectId));
+      return result;
+    } catch (error) {
+      console.error('Error getting characters:', error);
+      return [];
+    }
+  }
 }
 
 // Active storage implementation - uses PostgreSQL database
