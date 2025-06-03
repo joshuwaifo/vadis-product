@@ -6,6 +6,10 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
 const app = express();
+
+// Trust proxy for deployment environments
+app.set('trust proxy', 1);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
@@ -17,13 +21,16 @@ app.use(session({
     tableName: 'session',
     createTableIfMissing: true
   }),
-  secret: process.env.SESSION_SECRET!,
+  secret: process.env.SESSION_SECRET || 'vadis-dev-secret-key-change-in-production',
   resave: false,
   saveUninitialized: false,
+  name: 'vadis.sid',
   cookie: {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    secure: false, // Allow HTTP in deployment
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    sameSite: 'lax',
+    domain: undefined // Let browser handle domain
   }
 }));
 
