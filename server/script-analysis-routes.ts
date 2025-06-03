@@ -24,6 +24,9 @@ import {
   suggestLocationsForScript,
   saveLocationSuggestions
 } from "./services/location-suggestion-service";
+import {
+  analyzeAndStoreScriptVFX
+} from "./services/vfx-analysis-service";
 
 // Configure multer for file uploads
 const upload = multer({
@@ -368,10 +371,9 @@ async function analyzeScriptAsync(
       }
     }
 
-    // Step 4: Analyze VFX needs
+    // Step 4: Analyze VFX needs using enhanced service
     console.log("Analyzing VFX needs...");
-    const vfxNeeds = await analyzeVFXNeeds(scenes);
-    // Save VFX needs to database here
+    await analyzeAndStoreScriptVFX(projectId, scriptContent, scenes);
 
     // Step 5: Generate product placement ideas
     console.log("Generating product placement ideas...");

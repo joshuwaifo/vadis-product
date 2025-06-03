@@ -84,6 +84,7 @@ export interface IStorage {
   // Script Analysis - Scenes
   createScene(scene: InsertScene): Promise<Scene>;
   getScenesByProject(projectId: number): Promise<Scene[]>;
+  updateScene(sceneId: number, updates: Partial<Scene>): Promise<Scene | undefined>;
   
   // Script Analysis - Characters
   createCharacter(character: InsertCharacter): Promise<Character>;
@@ -419,6 +420,10 @@ export class MemStorage implements IStorage {
     throw new Error("MemStorage is deprecated. Use DatabaseStorage for scene operations.");
   }
 
+  async updateScene(sceneId: number, updates: Partial<Scene>): Promise<Scene | undefined> {
+    throw new Error("MemStorage is deprecated. Use DatabaseStorage for scene operations.");
+  }
+
   // Script Analysis - Characters (stub implementation for deprecated MemStorage)
   async createCharacter(character: InsertCharacter): Promise<Character> {
     throw new Error("MemStorage is deprecated. Use DatabaseStorage for character operations.");
@@ -667,6 +672,20 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error('Error getting scenes by project:', error);
       return [];
+    }
+  }
+
+  async updateScene(sceneId: number, updates: Partial<Scene>): Promise<Scene | undefined> {
+    try {
+      const [updated] = await db
+        .update(scenes)
+        .set(updates)
+        .where(eq(scenes.id, sceneId))
+        .returning();
+      return updated;
+    } catch (error) {
+      console.error('Error updating scene:', error);
+      throw error;
     }
   }
 
