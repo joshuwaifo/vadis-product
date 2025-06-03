@@ -95,11 +95,7 @@ export function registerScriptAnalysisRoutes(app: Express) {
         userId: req.session.user.id,
         title: finalTitle,
         projectType: "script_analysis",
-        logline,
         scriptContent: parsedScript.content,
-        budgetRange,
-        fundingGoal: parseInt(fundingGoal),
-        productionTimeline,
         status: "analyzing",
       });
 

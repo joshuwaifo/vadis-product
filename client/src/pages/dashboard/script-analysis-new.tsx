@@ -7,9 +7,7 @@ import { useLocation } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { 
@@ -19,7 +17,18 @@ import {
   CheckCircle2,
   Loader2,
   AlertCircle,
-  Film
+  Film,
+  Users,
+  Camera,
+  MapPin,
+  DollarSign,
+  Star,
+  Zap,
+  BarChart3,
+  Play,
+  Clock,
+  Eye,
+  Wand2
 } from "lucide-react";
 import DashboardLayout from "./dashboard-layout";
 import { apiRequest } from "@/lib/queryClient";
@@ -30,9 +39,9 @@ const projectSchema = z.object({
 });
 
 export default function ScriptAnalysisNew() {
-  const [step, setStep] = useState(1);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [projectId, setProjectId] = useState<number | null>(null);
+  const [showAnalysisTools, setShowAnalysisTools] = useState(false);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -43,15 +52,14 @@ export default function ScriptAnalysisNew() {
     const existingProjectId = urlParams.get('projectId');
     if (existingProjectId) {
       setProjectId(parseInt(existingProjectId));
-      setStep(3); // Skip to analysis step since we have an existing project
+      setShowAnalysisTools(true);
     }
   }, []);
 
   // Fetch project data when we have a projectId
-  const { data: project, refetch: refetchProject } = useQuery({
+  const { data: project } = useQuery({
     queryKey: ['/api/projects', projectId],
     enabled: !!projectId,
-    refetchInterval: projectId && step === 3 ? 5000 : false, // Poll every 5 seconds when analyzing
   });
 
   const form = useForm({
@@ -85,10 +93,10 @@ export default function ScriptAnalysisNew() {
     onSuccess: (data) => {
       if (data && data.id) {
         setProjectId(data.id);
-        setStep(3);
+        setShowAnalysisTools(true);
         toast({
           title: "Project created successfully!",
-          description: "Your script is being analyzed. This may take a few minutes.",
+          description: "Your script has been uploaded and is ready for analysis.",
         });
       } else {
         toast({
@@ -105,7 +113,6 @@ export default function ScriptAnalysisNew() {
         description: error.message || "There was an issue creating your project. Please try again.",
         variant: "destructive",
       });
-      // Keep user on step 2 to retry
     },
   });
 
@@ -144,11 +151,76 @@ export default function ScriptAnalysisNew() {
     createProjectMutation.mutate(data);
   };
 
-
+  const analysisFeatures = [
+    {
+      id: 'casting',
+      name: 'Casting',
+      icon: Users,
+      color: 'orange',
+      description: 'AI-powered actor suggestions based on character analysis',
+      emoji: '👥'
+    },
+    {
+      id: 'product-placement',
+      name: 'Product Placement',
+      icon: BarChart3,
+      color: 'blue',
+      description: 'Identify opportunities for brand partnerships',
+      emoji: '📦'
+    },
+    {
+      id: 'vfx',
+      name: 'VFX Analysis',
+      icon: Zap,
+      color: 'purple',
+      description: 'Visual effects requirements and cost estimation',
+      emoji: '✨'
+    },
+    {
+      id: 'locations',
+      name: 'Location Scouting',
+      icon: MapPin,
+      color: 'green',
+      description: 'Optimal filming locations with tax incentives',
+      emoji: '📍'
+    },
+    {
+      id: 'scenes',
+      name: 'Scene Analysis',
+      icon: Film,
+      color: 'indigo',
+      description: 'Detailed breakdown of scenes and structure',
+      emoji: '🎬'
+    },
+    {
+      id: 'characters',
+      name: 'Character Analysis',
+      icon: Eye,
+      color: 'pink',
+      description: 'Character development and relationship mapping',
+      emoji: '🎭'
+    },
+    {
+      id: 'financial',
+      name: 'Financial Planning',
+      icon: DollarSign,
+      color: 'yellow',
+      description: 'Budget estimation and revenue projections',
+      emoji: '💰'
+    },
+    {
+      id: 'summary',
+      name: 'Complete Summary',
+      icon: FileText,
+      color: 'gradient',
+      description: 'Comprehensive analysis report across all categories',
+      emoji: '📋'
+    }
+  ];
 
   return (
     <DashboardLayout>
-      <div className="max-w-4xl mx-auto space-y-8">
+      <div className="max-w-6xl mx-auto space-y-8">
         {/* Header */}
         <div className="text-center">
           <h1 className="text-4xl font-black text-gray-900 dark:text-white mb-4">
@@ -159,267 +231,182 @@ export default function ScriptAnalysisNew() {
           </p>
         </div>
 
-        {/* Progress Steps */}
-        <div className="flex items-center justify-center space-x-4 mb-8">
-          {[1, 2, 3].map((stepNumber) => (
-            <div key={stepNumber} className="flex items-center">
-              <div className={`
-                w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold
-                ${step >= stepNumber 
-                  ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white' 
-                  : 'bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-400'
-                }
-              `}>
-                {step > stepNumber ? <CheckCircle2 className="h-5 w-5" /> : stepNumber}
-              </div>
-              {stepNumber < 3 && (
-                <div className={`
-                  w-16 h-1 mx-2
-                  ${step > stepNumber ? 'bg-gradient-to-r from-blue-500 to-purple-600' : 'bg-gray-200 dark:bg-gray-700'}
-                `} />
-              )}
-            </div>
-          ))}
-        </div>
-
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          {/* Step 1: Project Information */}
-          {step === 1 && (
+        {!showAnalysisTools ? (
+          <div className="max-w-2xl mx-auto">
             <Card className="border-0 shadow-xl">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <FileText className="h-5 w-5" />
-                  Project Information
+                  Project Setup
                 </CardTitle>
                 <CardDescription>
-                  Basic details about your script and production goals
+                  Enter your project title and upload your script to get started
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="space-y-2">
-                  <Label htmlFor="title">Project Title*</Label>
-                  <Input
-                    id="title"
-                    {...form.register("title")}
-                    placeholder="Enter your project title"
-                  />
-                  {form.formState.errors.title && (
-                    <p className="text-sm text-red-600">{form.formState.errors.title.message}</p>
-                  )}
-                </div>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="title">Project Title*</Label>
+                    <Input
+                      id="title"
+                      {...form.register("title")}
+                      placeholder="Enter your project title"
+                    />
+                    {form.formState.errors.title && (
+                      <p className="text-sm text-red-600">{form.formState.errors.title.message}</p>
+                    )}
+                  </div>
 
-                <div className="flex justify-end">
-                  <Button 
-                    type="button" 
-                    onClick={() => setStep(2)}
-                    disabled={!form.watch("title")}
-                    className="bg-gradient-to-r from-blue-500 to-purple-600 text-white"
-                  >
-                    Next: Upload Script
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
+                  <div className="space-y-4">
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept=".pdf"
+                      onChange={handleFileUpload}
+                      className="hidden"
+                    />
+                    
+                    <div 
+                      onClick={() => fileInputRef.current?.click()}
+                      className="p-8 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-center cursor-pointer hover:border-blue-500 transition-colors"
+                    >
+                      {uploadedFile ? (
+                        <div className="space-y-2">
+                          <CheckCircle2 className="mx-auto h-12 w-12 text-green-600" />
+                          <p className="text-lg font-semibold text-green-600">{uploadedFile.name}</p>
+                          <p className="text-sm text-gray-500">
+                            {(uploadedFile.size / 1024 / 1024).toFixed(2)} MB
+                          </p>
+                          <Button variant="outline" size="sm" type="button">
+                            Change File
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                          <p className="text-lg font-semibold">Click to upload script PDF</p>
+                          <p className="text-sm text-gray-500">
+                            Only PDF files up to 10MB are accepted
+                          </p>
+                        </div>
+                      )}
+                    </div>
+
+                    {!uploadedFile && (
+                      <div className="flex items-center gap-2 p-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg">
+                        <AlertCircle className="h-5 w-5 text-amber-600" />
+                        <p className="text-sm text-amber-800 dark:text-amber-200">
+                          Please upload your script in PDF format to proceed with analysis
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex justify-end">
+                    <Button 
+                      type="submit"
+                      disabled={!uploadedFile || !form.watch("title") || createProjectMutation.isPending}
+                      className="bg-gradient-to-r from-blue-500 to-purple-600 text-white"
+                    >
+                      {createProjectMutation.isPending ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Creating Project...
+                        </>
+                      ) : (
+                        <>
+                          Start Analysis
+                          <Film className="ml-2 h-4 w-4" />
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </form>
+              </CardContent>
+            </Card>
+          </div>
+        ) : (
+          <div className="space-y-8">
+            {/* Success Message */}
+            <Card className="border-0 shadow-xl bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-950 dark:to-blue-950">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-4">
+                  <CheckCircle2 className="h-8 w-8 text-green-600" />
+                  <div>
+                    <h3 className="text-lg font-semibold text-green-800 dark:text-green-200">
+                      Script Uploaded Successfully!
+                    </h3>
+                    <p className="text-green-700 dark:text-green-300">
+                      {project?.title || 'Your project'} is ready for analysis. Select the tools you'd like to use below.
+                    </p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
-          )}
 
-          {/* Step 2: Script Upload */}
-          {step === 2 && (
-            <Card className="border-0 shadow-xl">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Upload className="h-5 w-5" />
-                  Upload Script
-                </CardTitle>
-                <CardDescription>
-                  Upload your script PDF for comprehensive analysis
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-4">
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept=".pdf"
-                    onChange={handleFileUpload}
-                    className="hidden"
-                  />
-                  
-                  <div 
-                    onClick={() => fileInputRef.current?.click()}
-                    className="p-8 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-center cursor-pointer hover:border-blue-500 transition-colors"
-                  >
-                    {uploadedFile ? (
-                      <div className="space-y-2">
-                        <CheckCircle2 className="mx-auto h-12 w-12 text-green-600" />
-                        <p className="text-lg font-semibold text-green-600">{uploadedFile.name}</p>
-                        <p className="text-sm text-gray-500">
-                          {(uploadedFile.size / 1024 / 1024).toFixed(2)} MB
-                        </p>
-                        <Button variant="outline" size="sm" type="button">
-                          Change File
+            {/* Analysis Tools Grid */}
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">
+                Choose Your Analysis Tools
+              </h2>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {analysisFeatures.map((feature) => {
+                  const Icon = feature.icon;
+                  return (
+                    <Card
+                      key={feature.id}
+                      className="group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer border-2 hover:border-blue-400"
+                      onClick={() => setLocation(`/dashboard/projects/${projectId}/analysis?feature=${feature.id}`)}
+                    >
+                      <CardContent className="p-6 text-center space-y-4">
+                        <div className={`w-16 h-16 mx-auto rounded-xl flex items-center justify-center text-2xl ${
+                          feature.color === 'gradient' 
+                            ? 'bg-gradient-to-br from-yellow-400 via-orange-400 to-red-400' 
+                            : `bg-${feature.color}-100 dark:bg-${feature.color}-900/20`
+                        }`}>
+                          <span>{feature.emoji}</span>
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
+                            {feature.name}
+                          </h3>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                            {feature.description}
+                          </p>
+                        </div>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="w-full group-hover:bg-blue-50 group-hover:border-blue-300"
+                        >
+                          Analyze
+                          <ArrowRight className="ml-2 h-3 w-3" />
                         </Button>
-                      </div>
-                    ) : (
-                      <div className="space-y-2">
-                        <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                        <p className="text-lg font-semibold">Click to upload script PDF</p>
-                        <p className="text-sm text-gray-500">
-                          Only PDF files up to 10MB are accepted
-                        </p>
-                      </div>
-                    )}
-                  </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            </div>
 
-                  {!uploadedFile && (
-                    <div className="flex items-center gap-2 p-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg">
-                      <AlertCircle className="h-5 w-5 text-amber-600" />
-                      <p className="text-sm text-amber-800 dark:text-amber-200">
-                        Please upload your script in PDF format to proceed with analysis
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                <div className="flex justify-between">
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    onClick={() => setStep(1)}
-                  >
-                    Previous
-                  </Button>
-                  <Button 
-                    type="submit"
-                    disabled={!uploadedFile || createProjectMutation.isPending}
-                    className="bg-gradient-to-r from-blue-500 to-purple-600 text-white"
-                  >
-                    {createProjectMutation.isPending ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Creating Project...
-                      </>
-                    ) : (
-                      <>
-                        Start Analysis
-                        <Film className="ml-2 h-4 w-4" />
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Step 3: Analysis Features Selection */}
-          {step === 3 && projectId && (
-            <Card className="border-0 shadow-xl">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-green-600" />
-                  Script Uploaded Successfully
-                </CardTitle>
-                <CardDescription>
-                  Select the analysis features you'd like to run on your script
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {/* Casting */}
-                  <Button
-                    variant="outline"
-                    className="h-24 flex flex-col items-center justify-center space-y-2 border-2 hover:border-orange-400 hover:bg-orange-50 dark:hover:bg-orange-950 transition-all"
-                    onClick={() => setLocation(`/dashboard/projects/${projectId}/analysis?feature=casting`)}
-                  >
-                    <div className="w-8 h-8 bg-orange-400 rounded-md flex items-center justify-center">
-                      <span className="text-white text-xs font-bold">👥</span>
-                    </div>
-                    <span className="text-sm font-medium">Casting</span>
-                  </Button>
-
-                  {/* Product Placement */}
-                  <Button
-                    variant="outline"
-                    className="h-24 flex flex-col items-center justify-center space-y-2 border-2 hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950 transition-all"
-                    onClick={() => setLocation(`/dashboard/projects/${projectId}/analysis?feature=product-placement`)}
-                  >
-                    <div className="w-8 h-8 bg-blue-400 rounded-md flex items-center justify-center">
-                      <span className="text-white text-xs font-bold">📦</span>
-                    </div>
-                    <span className="text-sm font-medium">Product Placement</span>
-                  </Button>
-
-                  {/* VFX */}
-                  <Button
-                    variant="outline"
-                    className="h-24 flex flex-col items-center justify-center space-y-2 border-2 hover:border-purple-400 hover:bg-purple-50 dark:hover:bg-purple-950 transition-all"
-                    onClick={() => setLocation(`/dashboard/projects/${projectId}/analysis?feature=vfx`)}
-                  >
-                    <div className="w-8 h-8 bg-purple-400 rounded-md flex items-center justify-center">
-                      <span className="text-white text-xs font-bold">✨</span>
-                    </div>
-                    <span className="text-sm font-medium">VFX</span>
-                  </Button>
-
-                  {/* Location Suggestions */}
-                  <Button
-                    variant="outline"
-                    className="h-24 flex flex-col items-center justify-center space-y-2 border-2 hover:border-green-400 hover:bg-green-50 dark:hover:bg-green-950 transition-all"
-                    onClick={() => setLocation(`/dashboard/projects/${projectId}/analysis?feature=locations`)}
-                  >
-                    <div className="w-8 h-8 bg-green-400 rounded-md flex items-center justify-center">
-                      <span className="text-white text-xs font-bold">📍</span>
-                    </div>
-                    <span className="text-sm font-medium">Location Suggestions</span>
-                  </Button>
-                </div>
-
-                {/* Summary Section */}
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-gray-300"></div>
-                  </div>
-                  <div className="relative flex justify-center text-sm">
-                    <span className="px-2 bg-white dark:bg-gray-900 text-gray-500">Or generate complete analysis</span>
-                  </div>
-                </div>
-
-                <div className="flex justify-center">
-                  <Button
-                    className="h-32 w-32 rounded-full bg-gradient-to-br from-yellow-400 via-orange-400 to-red-400 hover:from-yellow-500 hover:via-orange-500 hover:to-red-500 text-white shadow-lg hover:shadow-xl transition-all flex flex-col items-center justify-center space-y-2"
-                    onClick={() => setLocation(`/dashboard/projects/${projectId}/analysis?feature=summary`)}
-                  >
-                    <span className="text-2xl">📋</span>
-                    <span className="text-sm font-medium">Summary</span>
-                  </Button>
-                </div>
-
-                <div className="text-center space-y-2">
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Generate a brief summary of the Script and a Reader's Report for Key Industry Insights across all analysis categories
-                  </p>
-                </div>
-
-                <div className="flex justify-between pt-4">
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    onClick={() => setStep(2)}
-                  >
-                    Previous
-                  </Button>
-                  <Button 
-                    onClick={() => setLocation(`/dashboard/projects/${projectId}/analysis`)}
-                    className="bg-gradient-to-r from-blue-500 to-purple-600 text-white"
-                  >
-                    View All Results
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-        </form>
+            {/* Quick Actions */}
+            <div className="flex justify-center gap-4 pt-6">
+              <Button 
+                onClick={() => setLocation(`/dashboard/projects/${projectId}/analysis`)}
+                className="bg-gradient-to-r from-blue-500 to-purple-600 text-white"
+              >
+                View All Results
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={() => setLocation('/dashboard')}
+              >
+                Back to Dashboard
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </DashboardLayout>
   );
