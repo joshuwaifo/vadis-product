@@ -181,7 +181,7 @@ export default function ProductionDashboard() {
                     Welcome back, {currentUser?.user?.name || 'Producer'}
                   </h1>
                   <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-                    Transform your scripts into comprehensive production plans with AI-powered analysis, casting suggestions, and financial planning
+                    Upload scripts for AI analysis, complete comprehensive insights, and publish to our marketplace to attract investors and production partners
                   </p>
                 </div>
                 
@@ -209,97 +209,97 @@ export default function ProductionDashboard() {
           <div className="max-w-7xl mx-auto">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
               
-              {/* Start New Project Pane */}
+              {/* Analyze New Script Pane */}
               <Card className="group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border-2 border-blue-200 dark:border-blue-800 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-blue-900/20 dark:via-indigo-900/20 dark:to-purple-900/20 flex flex-col">
                 <CardHeader className="text-center pb-4">
                   <div className="h-16 w-16 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center mx-auto mb-4 shadow-lg">
-                    <Plus className="h-8 w-8 text-white" />
+                    <FileText className="h-8 w-8 text-white" />
                   </div>
-                  <CardTitle className="text-xl font-bold text-gray-900 dark:text-white">Start New Project</CardTitle>
+                  <CardTitle className="text-xl font-bold text-gray-900 dark:text-white">Analyze New Script</CardTitle>
                 </CardHeader>
                 <CardContent className="text-center space-y-4 flex flex-col flex-1">
                   <p className="text-gray-600 dark:text-gray-300">
-                    Create a new project with script analysis, casting suggestions, and comprehensive production planning.
+                    Upload your script for comprehensive AI analysis including character breakdown, casting suggestions, VFX needs, and financial planning.
                   </p>
                   <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-blue-200 dark:border-blue-700">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Ready to Start</span>
-                      <span className="text-2xl font-bold text-blue-600">✓</span>
+                      <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Analysis Features</span>
+                      <span className="text-2xl font-bold text-blue-600">8</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Quick Setup</span>
-                      <span className="text-lg font-semibold text-green-600">5 min</span>
+                      <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Processing Time</span>
+                      <span className="text-lg font-semibold text-green-600">2-3 hrs</span>
                     </div>
                   </div>
                   <div className="flex-1"></div>
                   <Link to="/dashboard/project-create">
                     <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg">
-                      <Plus className="w-4 h-4 mr-2" />
-                      Create Project
+                      <FileText className="w-4 h-4 mr-2" />
+                      Upload & Analyze Script
                     </Button>
                   </Link>
                 </CardContent>
               </Card>
 
-              {/* View Current Projects Pane */}
+              {/* Continue Analysis Pane */}
               <Card className="group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border-2 border-orange-200 dark:border-orange-800 bg-gradient-to-br from-orange-50 via-yellow-50 to-amber-50 dark:from-orange-900/20 dark:via-yellow-900/20 dark:to-amber-900/20 flex flex-col">
                 <CardHeader className="text-center pb-4">
                   <div className="h-16 w-16 rounded-full bg-gradient-to-r from-orange-600 to-amber-600 flex items-center justify-center mx-auto mb-4 shadow-lg">
                     <Clock className="h-8 w-8 text-white" />
                   </div>
-                  <CardTitle className="text-xl font-bold text-gray-900 dark:text-white">Current Projects</CardTitle>
+                  <CardTitle className="text-xl font-bold text-gray-900 dark:text-white">Continue Analysis</CardTitle>
                 </CardHeader>
                 <CardContent className="text-center space-y-4 flex flex-col flex-1">
                   <p className="text-gray-600 dark:text-gray-300">
-                    Continue working on your active projects, upload scripts, and run comprehensive analysis.
+                    Complete ongoing script analysis, review AI insights, and finalize comprehensive production reports.
                   </p>
                   <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-orange-200 dark:border-orange-700">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm font-medium text-gray-600 dark:text-gray-400">In Progress</span>
-                      <span className="text-2xl font-bold text-orange-600">{projects?.filter(p => !p.isPublished).length || 0}</span>
+                      <span className="text-2xl font-bold text-orange-600">{projects?.filter(p => p.status === 'in_progress' || p.status === 'draft').length || 0}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Scripts Ready</span>
-                      <span className="text-lg font-semibold text-green-600">{projects?.filter(p => p.scriptContent && !p.isPublished).length || 0}</span>
+                      <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Ready to Complete</span>
+                      <span className="text-lg font-semibold text-green-600">{projects?.filter(p => p.scriptContent && p.status !== 'completed' && p.status !== 'published').length || 0}</span>
                     </div>
                   </div>
                   <div className="flex-1"></div>
                   <Link to="/dashboard/projects">
                     <Button className="w-full bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white shadow-lg">
-                      <Eye className="w-4 h-4 mr-2" />
-                      View All Projects
+                      <Clock className="w-4 h-4 mr-2" />
+                      Continue Projects
                     </Button>
                   </Link>
                 </CardContent>
               </Card>
 
-              {/* View Published Projects Pane */}
+              {/* Project Marketplace Pane */}
               <Card className="group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border-2 border-green-200 dark:border-green-800 bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 dark:from-green-900/20 dark:via-emerald-900/20 dark:to-teal-900/20 flex flex-col">
                 <CardHeader className="text-center pb-4">
                   <div className="h-16 w-16 rounded-full bg-gradient-to-r from-green-600 to-teal-600 flex items-center justify-center mx-auto mb-4 shadow-lg">
-                    <CheckCircle className="h-8 w-8 text-white" />
+                    <BarChart3 className="h-8 w-8 text-white" />
                   </div>
-                  <CardTitle className="text-xl font-bold text-gray-900 dark:text-white">Published Projects</CardTitle>
+                  <CardTitle className="text-xl font-bold text-gray-900 dark:text-white">Project Marketplace</CardTitle>
                 </CardHeader>
                 <CardContent className="text-center space-y-4 flex flex-col flex-1">
                   <p className="text-gray-600 dark:text-gray-300">
-                    Showcase your completed projects to attract investors, brands, and production partners.
+                    Publish completed analysis to attract investors, brands, and production partners. Showcase your projects with comprehensive AI insights.
                   </p>
                   <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-green-200 dark:border-green-700">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Published</span>
-                      <span className="text-2xl font-bold text-green-600">{projects?.filter(p => p.isPublished).length || 0}</span>
+                      <span className="text-2xl font-bold text-green-600">{projects?.filter(p => p.isPublished || p.status === 'published').length || 0}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Views</span>
-                      <span className="text-lg font-semibold text-blue-600">{(projects?.filter(p => p.isPublished).length || 0) * 127}</span>
+                      <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Ready to Publish</span>
+                      <span className="text-lg font-semibold text-blue-600">{projects?.filter(p => p.status === 'completed' && !p.isPublished).length || 0}</span>
                     </div>
                   </div>
                   <div className="flex-1"></div>
-                  <Link to="/dashboard/project-create">
+                  <Link to="/dashboard/projects">
                     <Button className="w-full bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white shadow-lg">
                       <BarChart3 className="w-4 h-4 mr-2" />
-                      View Published Projects
+                      Manage Marketplace
                     </Button>
                   </Link>
                 </CardContent>
