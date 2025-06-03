@@ -130,23 +130,7 @@ export default function ProjectCreation() {
                     </ul>
                   </div>
 
-                  {/* Timeline and Pricing */}
-                  <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                    <div className="flex items-center gap-2">
-                      <Clock className="h-4 w-4 text-gray-500" />
-                      <div>
-                        <p className="text-xs text-gray-500">Timeline</p>
-                        <p className="text-sm font-medium">{type.timeframe}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <DollarSign className="h-4 w-4 text-gray-500" />
-                      <div>
-                        <p className="text-xs text-gray-500">Investment</p>
-                        <p className="text-sm font-medium">{type.pricing}</p>
-                      </div>
-                    </div>
-                  </div>
+
                 </CardContent>
               </Card>
             );
