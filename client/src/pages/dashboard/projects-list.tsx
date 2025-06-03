@@ -137,13 +137,13 @@ export default function ProjectsList() {
                           {new Date(project.createdAt).toLocaleDateString()}
                         </div>
                         <div className="flex items-center gap-2">
-                          <Link href={`/dashboard/projects/${project.id}/edit`}>
+                          <Link to={`/dashboard/projects/${project.id}/edit`}>
                             <Button variant="outline" size="sm">
                               <Edit className="h-3 w-3 mr-1" />
                               Edit
                             </Button>
                           </Link>
-                          <Link href={`/dashboard/projects/${project.id}`}>
+                          <Link to={`/dashboard/projects/${project.id}`}>
                             <Button size="sm" className="bg-gradient-to-r from-blue-500 to-purple-600 text-white">
                               <ExternalLink className="h-3 w-3 mr-1" />
                               View
@@ -178,7 +178,7 @@ export default function ProjectsList() {
                 Start building your portfolio with AI-powered script analysis or generation
               </p>
               
-              <Link href="/dashboard/projects/new">
+              <Link to="/dashboard/projects/new">
                 <Button size="lg" className="bg-white text-gray-900 hover:bg-gray-100 px-8 py-4 text-lg font-semibold rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
                   <Plus className="mr-2 h-5 w-5" />
                   Create First Project
