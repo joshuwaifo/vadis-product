@@ -14,7 +14,7 @@ import {
   Menu,
   X
 } from "lucide-react";
-import vadisLogoDark from "@assets/Vadis_logo_dark.png";
+import vadisLogoLight from "@assets/Vadis FINAL LOGO large size Without Background.png";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -104,7 +104,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               <Link href="/dashboard">
                 <div className="flex items-center cursor-pointer group">
                   <img 
-                    src={vadisLogoDark} 
+                    src={vadisLogoLight} 
                     alt="VadisMedia" 
                     className="h-12 w-auto group-hover:scale-105 transition-transform duration-200"
                   />
@@ -180,7 +180,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center">
                 <img 
-                  src={vadisLogoDark} 
+                  src={vadisLogoLight} 
                   alt="VadisMedia" 
                   className="h-10 w-auto"
                 />
