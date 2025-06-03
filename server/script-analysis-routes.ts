@@ -41,6 +41,10 @@ import {
   calculateBrandSponsorshipValue,
   calculateLocationIncentiveValue
 } from "./services/financial-analysis-service";
+import {
+  generateComprehensiveProjectSummary,
+  generateStructuredProjectAnalysis
+} from "./services/project-summary-service";
 
 // Configure multer for file uploads
 const upload = multer({
@@ -478,22 +482,24 @@ async function analyzeScriptAsync(
       breakEvenPoint: financialPlan.breakEvenPoint || null,
     });
 
-    // Step 8: Generate project summary
-    console.log("Generating project summary...");
-    const projectSummary = await generateProjectSummary(
-      projectData.title,
-      scenes as any, // Type conversion for compatibility
-      characterAnalysis.characters,
-      [], // VFX needs are now stored in scenes directly
-      productPlacements,
-      financialPlan
-    );
-
-    // Update project status
-    await storage.updateProject(projectId, {
-      status: "completed",
-      readerReport: projectSummary,
-    });
+    // Step 8: Generate comprehensive project summary
+    console.log("Generating comprehensive project summary and reader's report...");
+    const comprehensiveReport = await generateComprehensiveProjectSummary(projectId);
+    
+    if (comprehensiveReport) {
+      // Update project with completed status and reader's report
+      await storage.updateProject(projectId, {
+        status: "completed",
+        readerReport: comprehensiveReport,
+      });
+      
+      console.log("Comprehensive reader's report generated and saved");
+    } else {
+      console.warn("Failed to generate comprehensive report, updating status only");
+      await storage.updateProject(projectId, {
+        status: "completed",
+      });
+    }
 
     console.log(`Analysis completed for project ${projectId}`);
   } catch (error) {
