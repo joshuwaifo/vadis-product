@@ -221,20 +221,22 @@ export default function ProductionDashboard() {
                   <p className="text-gray-600 dark:text-gray-300">
                     Create a new project with script analysis, casting suggestions, and comprehensive production planning.
                   </p>
-                  <div className="space-y-3">
-                    <Link to="/dashboard/project-create" className="block">
-                      <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg">
-                        <Plus className="w-4 h-4 mr-2" />
-                        Create Project
-                      </Button>
-                    </Link>
-                    <Link to="/dashboard/script-analysis-new" className="block">
-                      <Button variant="outline" className="w-full border-2 border-blue-300 dark:border-blue-600 hover:border-blue-500">
-                        <FileText className="w-4 h-4 mr-2" />
-                        Quick Script Analysis
-                      </Button>
-                    </Link>
+                  <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-blue-200 dark:border-blue-700">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Ready to Start</span>
+                      <span className="text-2xl font-bold text-blue-600">✓</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Quick Setup</span>
+                      <span className="text-lg font-semibold text-green-600">5 min</span>
+                    </div>
                   </div>
+                  <Link to="/dashboard/project-create">
+                    <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg">
+                      <Plus className="w-4 h-4 mr-2" />
+                      Create Project
+                    </Button>
+                  </Link>
                 </CardContent>
               </Card>
 
