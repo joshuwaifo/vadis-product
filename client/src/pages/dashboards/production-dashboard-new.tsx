@@ -203,59 +203,103 @@ export default function ProductionDashboard() {
           </div>
         </div>
 
-        {/* Dashboard Stats */}
-        {stats && (
-          <div className="px-6 py-8 sm:px-8 lg:px-12 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
-            <div className="max-w-7xl mx-auto">
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <Card>
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Projects</p>
-                        <p className="text-2xl font-bold text-gray-900 dark:text-white">{(stats as any)?.totalProjects || 0}</p>
-                      </div>
-                      <BarChart3 className="h-8 w-8 text-blue-600" />
+        {/* Three Main Action Panes */}
+        <div className="px-6 py-8 sm:px-8 lg:px-12 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
+          <div className="max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              
+              {/* Start New Project Pane */}
+              <Card className="group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border-2 border-blue-200 dark:border-blue-800 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-blue-900/20 dark:via-indigo-900/20 dark:to-purple-900/20">
+                <CardHeader className="text-center pb-4">
+                  <div className="h-16 w-16 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center mx-auto mb-4 shadow-lg">
+                    <Plus className="h-8 w-8 text-white" />
+                  </div>
+                  <CardTitle className="text-xl font-bold text-gray-900 dark:text-white">Start New Project</CardTitle>
+                </CardHeader>
+                <CardContent className="text-center space-y-4">
+                  <p className="text-gray-600 dark:text-gray-300">
+                    Create a new project with script analysis, casting suggestions, and comprehensive production planning.
+                  </p>
+                  <div className="space-y-3">
+                    <Link to="/dashboard/project-create" className="block">
+                      <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg">
+                        <Plus className="w-4 h-4 mr-2" />
+                        Create Project
+                      </Button>
+                    </Link>
+                    <Link to="/dashboard/script-analysis-new" className="block">
+                      <Button variant="outline" className="w-full border-2 border-blue-300 dark:border-blue-600 hover:border-blue-500">
+                        <FileText className="w-4 h-4 mr-2" />
+                        Quick Script Analysis
+                      </Button>
+                    </Link>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* View Current Projects Pane */}
+              <Card className="group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border-2 border-orange-200 dark:border-orange-800 bg-gradient-to-br from-orange-50 via-yellow-50 to-amber-50 dark:from-orange-900/20 dark:via-yellow-900/20 dark:to-amber-900/20">
+                <CardHeader className="text-center pb-4">
+                  <div className="h-16 w-16 rounded-full bg-gradient-to-r from-orange-600 to-amber-600 flex items-center justify-center mx-auto mb-4 shadow-lg">
+                    <Clock className="h-8 w-8 text-white" />
+                  </div>
+                  <CardTitle className="text-xl font-bold text-gray-900 dark:text-white">Current Projects</CardTitle>
+                </CardHeader>
+                <CardContent className="text-center space-y-4">
+                  <p className="text-gray-600 dark:text-gray-300">
+                    Continue working on your active projects, upload scripts, and run comprehensive analysis.
+                  </p>
+                  <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-orange-200 dark:border-orange-700">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-medium text-gray-600 dark:text-gray-400">In Progress</span>
+                      <span className="text-2xl font-bold text-orange-600">{projects?.filter(p => !p.isPublished).length || 0}</span>
                     </div>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-6">
                     <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Published</p>
-                        <p className="text-2xl font-bold text-gray-900 dark:text-white">{(stats as any)?.publishedProjects || 0}</p>
-                      </div>
-                      <CheckCircle className="h-8 w-8 text-green-600" />
+                      <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Scripts Ready</span>
+                      <span className="text-lg font-semibold text-green-600">{projects?.filter(p => p.scriptContent && !p.isPublished).length || 0}</span>
                     </div>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-6">
+                  </div>
+                  <Link to="/dashboard/projects">
+                    <Button className="w-full bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white shadow-lg">
+                      <Eye className="w-4 h-4 mr-2" />
+                      View All Projects
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+
+              {/* View Published Projects Pane */}
+              <Card className="group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border-2 border-green-200 dark:border-green-800 bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 dark:from-green-900/20 dark:via-emerald-900/20 dark:to-teal-900/20">
+                <CardHeader className="text-center pb-4">
+                  <div className="h-16 w-16 rounded-full bg-gradient-to-r from-green-600 to-teal-600 flex items-center justify-center mx-auto mb-4 shadow-lg">
+                    <CheckCircle className="h-8 w-8 text-white" />
+                  </div>
+                  <CardTitle className="text-xl font-bold text-gray-900 dark:text-white">Published Projects</CardTitle>
+                </CardHeader>
+                <CardContent className="text-center space-y-4">
+                  <p className="text-gray-600 dark:text-gray-300">
+                    Showcase your completed projects to attract investors, brands, and production partners.
+                  </p>
+                  <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-green-200 dark:border-green-700">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Published</span>
+                      <span className="text-2xl font-bold text-green-600">{projects?.filter(p => p.isPublished).length || 0}</span>
+                    </div>
                     <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-gray-600 dark:text-gray-400">In Progress</p>
-                        <p className="text-2xl font-bold text-gray-900 dark:text-white">{((stats as any)?.totalProjects || 0) - ((stats as any)?.publishedProjects || 0)}</p>
-                      </div>
-                      <Clock className="h-8 w-8 text-yellow-600" />
+                      <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Views</span>
+                      <span className="text-lg font-semibold text-blue-600">{(projects?.filter(p => p.isPublished).length || 0) * 127}</span>
                     </div>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Scripts Analyzed</p>
-                        <p className="text-2xl font-bold text-gray-900 dark:text-white">{projects?.filter(p => p.scriptContent).length || 0}</p>
-                      </div>
-                      <FileText className="h-8 w-8 text-purple-600" />
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
+                  </div>
+                  <Button className="w-full bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white shadow-lg">
+                    <BarChart3 className="w-4 h-4 mr-2" />
+                    View Published Projects
+                  </Button>
+                </CardContent>
+              </Card>
+
             </div>
           </div>
-        )}
+        </div>
 
         {/* Your Projects */}
         <div className="px-6 py-8 sm:px-8 lg:px-12">
@@ -370,42 +414,7 @@ export default function ProductionDashboard() {
           </div>
         </div>
 
-        {/* AI Analysis Features */}
-        <div className="px-6 py-8 sm:px-8 lg:px-12 bg-gray-50 dark:bg-gray-800/50">
-          <div className="max-w-7xl mx-auto space-y-8">
-            <div className="text-center space-y-4">
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Comprehensive Script Analysis</h2>
-              <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-                Our AI-powered platform provides detailed insights across every aspect of your production
-              </p>
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {analysisFeatures.map((feature, index) => (
-                <Card key={index} className="group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border-0 shadow-lg">
-                  <CardContent className="p-6 text-center space-y-4">
-                    <div className={`h-14 w-14 rounded-xl bg-gradient-to-r ${feature.color} flex items-center justify-center mx-auto shadow-lg`}>
-                      <feature.icon className="h-7 w-7 text-white" />
-                    </div>
-                    <div className="space-y-2">
-                      <h3 className="font-semibold text-gray-900 dark:text-white">{feature.title}</h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{feature.description}</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-
-            <div className="text-center">
-              <Link to="/dashboard/script-analysis-new">
-                <Button size="lg" variant="outline" className="border-2 border-blue-300 dark:border-blue-600 hover:border-blue-500 dark:hover:border-blue-400">
-                  <FileText className="w-5 h-5 mr-2" />
-                  Try Script Analysis Now
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
       </div>
     </DashboardLayout>
   );

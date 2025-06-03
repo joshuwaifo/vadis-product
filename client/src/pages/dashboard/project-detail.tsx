@@ -394,6 +394,125 @@ export default function ProjectDetail() {
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* AI Analysis Features - Show only if script is uploaded */}
+        {project.scriptContent && (
+          <div className="mt-8 p-6 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-800 dark:via-blue-900/20 dark:to-purple-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
+            <div className="text-center space-y-4 mb-8">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Available Script Analysis Tools</h2>
+              <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+                Your script is ready for comprehensive AI analysis. Click any tool below to generate detailed insights for your production.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <Card className="group hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-0 shadow-md cursor-pointer">
+                <CardContent className="p-4 text-center space-y-3">
+                  <div className="h-12 w-12 rounded-lg bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center mx-auto shadow-md">
+                    <Users className="h-6 w-6 text-white" />
+                  </div>
+                  <div className="space-y-1">
+                    <h3 className="font-semibold text-gray-900 dark:text-white text-sm">Character Analysis</h3>
+                    <p className="text-xs text-gray-600 dark:text-gray-400">Extract and analyze all characters</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="group hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-0 shadow-md cursor-pointer">
+                <CardContent className="p-4 text-center space-y-3">
+                  <div className="h-12 w-12 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center mx-auto shadow-md">
+                    <Camera className="h-6 w-6 text-white" />
+                  </div>
+                  <div className="space-y-1">
+                    <h3 className="font-semibold text-gray-900 dark:text-white text-sm">Scene Breakdown</h3>
+                    <p className="text-xs text-gray-600 dark:text-gray-400">Detailed scene-by-scene analysis</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="group hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-0 shadow-md cursor-pointer">
+                <CardContent className="p-4 text-center space-y-3">
+                  <div className="h-12 w-12 rounded-lg bg-gradient-to-r from-yellow-500 to-orange-500 flex items-center justify-center mx-auto shadow-md">
+                    <Star className="h-6 w-6 text-white" />
+                  </div>
+                  <div className="space-y-1">
+                    <h3 className="font-semibold text-gray-900 dark:text-white text-sm">Casting Suggestions</h3>
+                    <p className="text-xs text-gray-600 dark:text-gray-400">AI-powered actor recommendations</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="group hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-0 shadow-md cursor-pointer">
+                <CardContent className="p-4 text-center space-y-3">
+                  <div className="h-12 w-12 rounded-lg bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center mx-auto shadow-md">
+                    <MapPin className="h-6 w-6 text-white" />
+                  </div>
+                  <div className="space-y-1">
+                    <h3 className="font-semibold text-gray-900 dark:text-white text-sm">Location Scouting</h3>
+                    <p className="text-xs text-gray-600 dark:text-gray-400">Find filming locations with incentives</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="group hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-0 shadow-md cursor-pointer">
+                <CardContent className="p-4 text-center space-y-3">
+                  <div className="h-12 w-12 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center mx-auto shadow-md">
+                    <Zap className="h-6 w-6 text-white" />
+                  </div>
+                  <div className="space-y-1">
+                    <h3 className="font-semibold text-gray-900 dark:text-white text-sm">VFX Analysis</h3>
+                    <p className="text-xs text-gray-600 dark:text-gray-400">Identify visual effects requirements</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="group hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-0 shadow-md cursor-pointer">
+                <CardContent className="p-4 text-center space-y-3">
+                  <div className="h-12 w-12 rounded-lg bg-gradient-to-r from-pink-500 to-rose-500 flex items-center justify-center mx-auto shadow-md">
+                    <Star className="h-6 w-6 text-white" />
+                  </div>
+                  <div className="space-y-1">
+                    <h3 className="font-semibold text-gray-900 dark:text-white text-sm">Product Placement</h3>
+                    <p className="text-xs text-gray-600 dark:text-gray-400">Discover brand partnership opportunities</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="group hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-0 shadow-md cursor-pointer">
+                <CardContent className="p-4 text-center space-y-3">
+                  <div className="h-12 w-12 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 flex items-center justify-center mx-auto shadow-md">
+                    <DollarSign className="h-6 w-6 text-white" />
+                  </div>
+                  <div className="space-y-1">
+                    <h3 className="font-semibold text-gray-900 dark:text-white text-sm">Financial Planning</h3>
+                    <p className="text-xs text-gray-600 dark:text-gray-400">Generate budget breakdowns</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="group hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-0 shadow-md cursor-pointer">
+                <CardContent className="p-4 text-center space-y-3">
+                  <div className="h-12 w-12 rounded-lg bg-gradient-to-r from-slate-500 to-gray-500 flex items-center justify-center mx-auto shadow-md">
+                    <FileText className="h-6 w-6 text-white" />
+                  </div>
+                  <div className="space-y-1">
+                    <h3 className="font-semibold text-gray-900 dark:text-white text-sm">Reader's Report</h3>
+                    <p className="text-xs text-gray-600 dark:text-gray-400">Comprehensive script analysis</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="text-center mt-6">
+              <Link to={`/dashboard/projects/${project.id}/analysis`}>
+                <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg">
+                  <Zap className="w-5 h-5 mr-2" />
+                  Run Complete Analysis
+                </Button>
+              </Link>
+            </div>
+          </div>
+        )}
       </div>
     </DashboardLayout>
   );
