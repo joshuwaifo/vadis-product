@@ -51,13 +51,23 @@ export function registerScriptGenerationRoutes(app: any) {
         accumulatedScript += chunk;
         tokenCount = tokens;
         
-        // Send progress update with just the new chunk and progress info
+        // Send progress update with minimal data to avoid JSON truncation
         res.write(`data: ${JSON.stringify({
           type: 'progress',
-          chunk: chunk,
           tokenCount: tokenCount,
-          totalLength: accumulatedScript.length
+          hasNewContent: true
         })}\n\n`);
+        
+        // Send the actual content in a separate, simpler event
+        const chunkLines = chunk.split('\n');
+        for (const line of chunkLines) {
+          if (line.trim()) {
+            res.write(`data: ${JSON.stringify({
+              type: 'content',
+              line: line
+            })}\n\n`);
+          }
+        }
       };
       
       // Generate the script using AI with streaming

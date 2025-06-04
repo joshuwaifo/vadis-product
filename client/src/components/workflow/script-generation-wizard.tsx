@@ -113,16 +113,15 @@ export default function ScriptGenerationWizard({
             try {
               const data = JSON.parse(line.slice(6));
               
-              console.log('Received streaming data:', data.type, 'tokens:', data.tokenCount);
+              console.log('Received streaming data:', data.type);
               
               if (data.type === 'progress') {
-                // Accumulate chunks locally instead of receiving full content
-                setStreamedContent(prev => prev + (data.chunk || ''));
                 setTokenCount(data.tokenCount);
+              } else if (data.type === 'content') {
+                setStreamedContent(prev => prev + data.line + '\n');
               } else if (data.type === 'complete') {
                 setGeneratedScript(data.script);
                 setStreamedContent(data.script);
-                setTokenCount(data.tokenCount);
                 setCurrentStep('review');
                 setIsGenerating(false);
                 
@@ -283,46 +282,24 @@ export default function ScriptGenerationWizard({
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="text-center space-y-4">
+            <div className="max-w-2xl mx-auto text-center space-y-6">
+              <div className="space-y-4">
                 <div className="mx-auto w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center">
                   <Sparkles className="w-8 h-8 text-purple-600 animate-pulse" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold">Creating Your Screenplay</h3>
-                  <p className="text-muted-foreground">
-                    Our AI is crafting your story with professional formatting
+                  <p className="text-lg text-muted-foreground">
+                    Your script is being generated. Please be patient as our AI crafts your screenplay.
                   </p>
                 </div>
               </div>
 
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>Generation Progress</span>
-                    <span>{Math.round((tokenCount / 32000) * 100)}%</span>
-                  </div>
-                  <Progress value={(tokenCount / 32000) * 100} className="h-2" />
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>Generation Progress</span>
+                  <span>{Math.round((tokenCount / 32000) * 100)}%</span>
                 </div>
-              </div>
-
-              <div className="space-y-2 text-sm text-muted-foreground">
-                <div className="flex items-center space-x-2">
-                  <div className={`w-2 h-2 rounded-full ${tokenCount > 1000 ? 'bg-green-500' : 'bg-gray-300'}`} />
-                  <span>Story structure development</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <div className={`w-2 h-2 rounded-full ${tokenCount > 8000 ? 'bg-green-500' : 'bg-gray-300'}`} />
-                  <span>Character development</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <div className={`w-2 h-2 rounded-full ${tokenCount > 16000 ? 'bg-green-500' : 'bg-gray-300'}`} />
-                  <span>Dialogue creation</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <div className={`w-2 h-2 rounded-full ${tokenCount > 24000 ? 'bg-green-500' : 'bg-gray-300'}`} />
-                  <span>Scene descriptions</span>
-                </div>
+                <Progress value={(tokenCount / 32000) * 100} className="h-2" />
               </div>
             </div>
           </CardContent>
