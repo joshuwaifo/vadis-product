@@ -87,6 +87,7 @@ export interface IStorage {
   getProject(id: number): Promise<Project | undefined>;
   getProjectsByUser(userId: number): Promise<Project[]>;
   updateProject(id: number, updates: Partial<Project>): Promise<Project | undefined>;
+  deleteProject(id: number): Promise<boolean>;
   publishProject(id: number): Promise<Project | undefined>;
   getPublishedProjects(): Promise<Project[]>;
   

@@ -148,6 +148,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Delete project by ID
+  app.delete("/api/projects/:id", async (req, res) => {
+    try {
+      // Check if user is authenticated
+      if (!req.session.user) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const projectId = parseInt(req.params.id);
+      const project = await storage.getProject(projectId);
+      
+      if (!project) {
+        return res.status(404).json({ error: "Project not found" });
+      }
+
+      // Verify project belongs to authenticated user
+      if (project.userId !== Number(req.session.user.id)) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+
+      await storage.deleteProject(projectId);
+      res.json({ success: true, message: "Project deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting project:", error);
+      res.status(500).json({ error: "Failed to delete project" });
+    }
+  });
+
   // Get individual project by ID
   app.get("/api/projects/:id", async (req, res) => {
     try {

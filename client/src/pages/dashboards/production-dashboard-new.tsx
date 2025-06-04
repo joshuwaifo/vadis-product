@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation, Link } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -22,8 +22,11 @@ import {
   Clock,
   AlertCircle,
   Eye,
-  Wand2
+  Wand2,
+  Trash2
 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { queryClient } from "@/lib/queryClient";
 import DashboardLayout from "../dashboard/dashboard-layout";
 
 
@@ -81,6 +84,45 @@ export default function ProductionDashboard() {
   const { data: stats } = useQuery({
     queryKey: ['/api/dashboard/stats'],
   });
+
+  const { toast } = useToast();
+
+  // Delete project mutation
+  const deleteProjectMutation = useMutation({
+    mutationFn: async (projectId: number) => {
+      const response = await fetch(`/api/projects/${projectId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to delete project');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      // Invalidate and refetch projects data
+      queryClient.invalidateQueries({ queryKey: ['/api/projects'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
+      toast({
+        title: "Project deleted",
+        description: "The project has been successfully removed.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Delete failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleDeleteProject = (projectId: number, projectTitle: string) => {
+    if (window.confirm(`Are you sure you want to delete "${projectTitle}"? This action cannot be undone.`)) {
+      deleteProjectMutation.mutate(projectId);
+    }
+  };
 
   // Show loading state while user data is being fetched
   if (userLoading) {
@@ -471,11 +513,16 @@ export default function ProductionDashboard() {
                               {nextAction.action}
                             </Button>
                           </Link>
-                          <Link to={`/dashboard/projects/${project.id}`}>
-                            <Button variant="outline" size="sm">
-                              View Details
-                            </Button>
-                          </Link>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleDeleteProject(project.id, project.title)}
+                            disabled={deleteProjectMutation.isPending}
+                            className="border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950 dark:hover:border-red-700"
+                          >
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            {deleteProjectMutation.isPending ? 'Deleting...' : 'Delete'}
+                          </Button>
                         </div>
                         
                         {project.scriptContent && (
