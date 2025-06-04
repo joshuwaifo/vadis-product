@@ -45,7 +45,7 @@ export async function rankActorsForCharacter(
   character: DetailedCharacter,
   characterSummary: CharacterSummary,
   projectBudget: 'low' | 'medium' | 'high' | 'blockbuster' = 'medium',
-  provider: AIProvider = 'grok-beta'
+  provider: AIProvider = 'gpt-4o'
 ): Promise<CastingRecommendation> {
   const prompt = `
     You are a top Hollywood casting director with 20+ years of experience. Analyze this character and provide comprehensive casting suggestions.
@@ -161,7 +161,7 @@ export async function filterActorsFromDatabase(
     budget?: 'low' | 'medium' | 'high';
     availability?: string;
   } = {},
-  provider: AIProvider = 'grok-beta'
+  provider: AIProvider = 'gpt-4o'
 ): Promise<string[]> {
   const prompt = `
     Based on these character requirements and filters, suggest appropriate actors from the entertainment industry.
@@ -218,7 +218,7 @@ export async function filterActorsFromDatabase(
 export async function generateEnsembleCasting(
   characters: DetailedCharacter[],
   projectBudget: 'low' | 'medium' | 'high' | 'blockbuster' = 'medium',
-  provider: AIProvider = 'grok-beta'
+  provider: AIProvider = 'gpt-4o'
 ): Promise<{
   castingCombinations: Array<{
     combination: Array<{ character: string; actor: string }>;
