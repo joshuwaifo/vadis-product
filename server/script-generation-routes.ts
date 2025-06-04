@@ -51,12 +51,12 @@ export function registerScriptGenerationRoutes(app: any) {
         accumulatedScript += chunk;
         tokenCount = tokens;
         
-        // Send progress update
+        // Send progress update with just the new chunk and progress info
         res.write(`data: ${JSON.stringify({
           type: 'progress',
-          content: accumulatedScript,
+          chunk: chunk,
           tokenCount: tokenCount,
-          chunk: chunk
+          totalLength: accumulatedScript.length
         })}\n\n`);
       };
       

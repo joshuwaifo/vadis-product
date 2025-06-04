@@ -43,6 +43,8 @@ export default function ScriptGenerationWizard({
   const [generatedScript, setGeneratedScript] = useState<string>("");
   const [progress, setProgress] = useState(0);
   const [streamedContent, setStreamedContent] = useState<string>("");
+  const [tokenCount, setTokenCount] = useState(0);
+  const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
 
   const form = useForm<ScriptGenerationFormData>({
@@ -64,9 +66,7 @@ export default function ScriptGenerationWizard({
     queryKey: ['/api/script-generation/templates'],
   });
 
-  // State for real-time token tracking
-  const [tokenCount, setTokenCount] = useState(0);
-  const [isGenerating, setIsGenerating] = useState(false);
+  // Additional state management handled above
 
   // Script generation with streaming
   const handleStreamingGeneration = async (formData: ScriptGenerationFormData) => {
@@ -116,7 +116,8 @@ export default function ScriptGenerationWizard({
               console.log('Received streaming data:', data.type, 'tokens:', data.tokenCount);
               
               if (data.type === 'progress') {
-                setStreamedContent(data.content);
+                // Accumulate chunks locally instead of receiving full content
+                setStreamedContent(prev => prev + (data.chunk || ''));
                 setTokenCount(data.tokenCount);
               } else if (data.type === 'complete') {
                 setGeneratedScript(data.script);
