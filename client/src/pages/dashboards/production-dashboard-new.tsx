@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation, Link } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,6 +25,7 @@ import {
   Wand2
 } from "lucide-react";
 import DashboardLayout from "../dashboard/dashboard-layout";
+import ScriptGenerationModal from "@/components/script-generation/script-generation-modal";
 
 interface Project {
   id: number;
@@ -41,6 +43,14 @@ interface Project {
 
 export default function ProductionDashboard() {
   const [, setLocation] = useLocation();
+  const [scriptGenerationModalOpen, setScriptGenerationModalOpen] = useState(false);
+
+  const handleScriptGenerated = (script: string) => {
+    // TODO: Create a new project with the generated script or update existing project
+    console.log('Generated script:', script.substring(0, 200) + '...');
+    // For now, we'll just close the modal - in the future this could create a project
+    setScriptGenerationModalOpen(false);
+  };
 
   // Fetch current user data from session
   const { data: currentUser, isLoading: userLoading, error: userError } = useQuery({
@@ -259,12 +269,15 @@ export default function ProductionDashboard() {
                       Analyze Script
                     </Button>
                   </Link>
-                  <Link to="/dashboard/project-create">
-                    <Button variant="outline" size="lg" className="border-2 border-purple-300 dark:border-purple-600 hover:border-purple-500 dark:hover:border-purple-400">
-                      <Wand2 className="w-5 h-5 mr-2" />
-                      Generate Script
-                    </Button>
-                  </Link>
+                  <Button 
+                    variant="outline" 
+                    size="lg" 
+                    className="border-2 border-purple-300 dark:border-purple-600 hover:border-purple-500 dark:hover:border-purple-400"
+                    onClick={() => setScriptGenerationModalOpen(true)}
+                  >
+                    <Wand2 className="w-5 h-5 mr-2" />
+                    Generate Script
+                  </Button>
                 </div>
               </div>
             </div>
@@ -500,6 +513,16 @@ export default function ProductionDashboard() {
 
 
       </div>
+
+      {/* Script Generation Modal */}
+      <ScriptGenerationModal
+        open={scriptGenerationModalOpen}
+        onOpenChange={setScriptGenerationModalOpen}
+        onScriptGenerated={(script: string) => {
+          console.log('Generated script:', script.substring(0, 200) + '...');
+          setScriptGenerationModalOpen(false);
+        }}
+      />
     </DashboardLayout>
   );
 }
