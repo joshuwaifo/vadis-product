@@ -25,15 +25,19 @@ export default function DashboardHome() {
       const role = currentUser.user.role;
       
       switch (role) {
+        case 'production':
         case 'PRODUCTION':
           setLocation('/production/dashboard');
           break;
+        case 'brand':
         case 'BRAND_AGENCY':
           setLocation('/brand/dashboard');
           break;
+        case 'financier':
         case 'INVESTOR':
           setLocation('/investor/dashboard');
           break;
+        case 'creator':
         case 'INDIVIDUAL_CREATOR':
           setLocation('/creator/dashboard');
           break;
