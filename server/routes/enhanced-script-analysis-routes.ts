@@ -383,25 +383,29 @@ async function analyzeProjectAsync(projectId: number, features: string[], userId
 
         const extractedScenes = await extractScenes(project.scriptContent);
         
-        // Store scenes in database
+        // Store scenes in database with proper data transformation
         for (const scene of extractedScenes) {
-          await db
-            .insert(scenes)
-            .values({
-              projectId,
-              sceneNumber: scene.sceneNumber,
-              location: scene.location,
-              timeOfDay: scene.timeOfDay,
-              description: scene.description,
-              characters: scene.characters,
-              content: scene.content,
-              pageStart: scene.pageStart,
-              pageEnd: scene.pageEnd,
-              duration: scene.duration,
-              vfxNeeds: scene.vfxNeeds,
-              productPlacementOpportunities: scene.productPlacementOpportunities
-            })
-            .onConflictDoNothing();
+          try {
+            await db
+              .insert(scenes)
+              .values({
+                projectId,
+                sceneNumber: scene.sceneNumber || 0,
+                location: scene.location || 'Unknown',
+                timeOfDay: scene.timeOfDay || null,
+                description: scene.description || null,
+                characters: Array.isArray(scene.characters) ? scene.characters : null,
+                content: scene.content || null,
+                pageStart: typeof scene.pageStart === 'number' ? scene.pageStart : null,
+                pageEnd: typeof scene.pageEnd === 'number' ? scene.pageEnd : null,
+                duration: typeof scene.duration === 'number' ? scene.duration : null,
+                vfxNeeds: Array.isArray(scene.vfxNeeds) ? scene.vfxNeeds : null,
+                productPlacementOpportunities: Array.isArray(scene.productPlacementOpportunities) ? scene.productPlacementOpportunities : null
+              })
+              .onConflictDoNothing();
+          } catch (error) {
+            console.error('Error storing scene:', error, scene);
+          }
         }
 
         await db
