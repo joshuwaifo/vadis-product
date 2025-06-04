@@ -13,13 +13,4 @@ if (!process.env.DATABASE_URL) {
 
 export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
-// Combined schema for all role-specific tables
-const combinedSchema = {
-  ...schema,
-  ...productionSchema,
-  ...brandSchema,
-  ...financierSchema,
-  ...creatorSchema,
-};
-
-export const db = drizzle({ client: pool, schema: combinedSchema });
+export const db = drizzle({ client: pool, schema: schema });

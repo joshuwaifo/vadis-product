@@ -28,10 +28,7 @@ function Router() {
       <Route path="/dashboard/script-analysis-workflow" component={ScriptAnalysisWorkflow} />
       <Route path="/dashboard/script-analysis" component={CannesDemoDashboard} />
       <Route path="/dashboard/script-generator" component={ScriptGenerator} />
-      <Route path="/production/dashboard" component={ProductionDashboard} />
-      <Route path="/brand/dashboard" component={BrandDashboard} />
-      <Route path="/investor/dashboard" component={InvestorDashboard} />
-      <Route path="/creator/dashboard" component={CreatorDashboard} />
+      {/* Role-specific dashboard routes removed during cleanup */}
       <Route component={NotFound} />
     </Switch>
   );
