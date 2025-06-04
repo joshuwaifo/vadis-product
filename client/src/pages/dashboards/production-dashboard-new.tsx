@@ -175,9 +175,9 @@ export default function ProductionDashboard() {
           };
         }
         return {
-          action: "Start Analysis",
-          icon: Play,
-          description: "Begin comprehensive script analysis",
+          action: "Continue Setup",
+          icon: Upload,
+          description: "Complete project setup and script upload",
           link: `/dashboard/script-analysis-workflow?projectId=${project.id}`,
           variant: "default" as const
         };
