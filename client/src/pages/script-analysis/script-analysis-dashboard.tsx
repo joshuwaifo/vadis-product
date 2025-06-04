@@ -80,7 +80,8 @@ export default function ScriptAnalysisDashboard() {
     queryKey: ['script-analysis', projectId],
     queryFn: async () => {
       if (!projectId) throw new Error('No project selected');
-      return apiRequest('GET', `/api/projects/${projectId}/analysis`);
+      const response = await apiRequest(`/api/projects/${projectId}/analysis`, 'GET');
+      return response.json();
     },
     enabled: !!projectId,
     refetchInterval: (data) => {
@@ -92,13 +93,16 @@ export default function ScriptAnalysisDashboard() {
   // Fetch available projects
   const { data: projects } = useQuery({
     queryKey: ['projects'],
-    queryFn: () => apiRequest('GET', '/api/projects')
+    queryFn: async () => {
+      const response = await apiRequest('/api/projects', 'GET');
+      return response.json();
+    }
   });
 
   // Start analysis mutation
   const startAnalysisMutation = useMutation({
     mutationFn: async (features: string[]) => {
-      return apiRequest('POST', `/api/projects/${projectId}/analyze`, { features });
+      return apiRequest(`/api/projects/${projectId}/analyze`, 'POST', { features });
     },
     onSuccess: () => {
       toast({
@@ -211,7 +215,7 @@ export default function ScriptAnalysisDashboard() {
           </div>
 
           <div className="grid gap-4">
-            {projects?.map((project: any) => (
+            {Array.isArray(projects) && projects.map((project: any) => (
               <Card key={project.id} className="cursor-pointer hover:shadow-md transition-shadow"
                 onClick={() => handleSelectProject(project.id)}>
                 <CardContent className="p-6">
