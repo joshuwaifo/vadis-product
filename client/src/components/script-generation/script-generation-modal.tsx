@@ -530,6 +530,22 @@ export default function ScriptGenerationModal({
                 Generate Another
               </Button>
               <div className="space-x-2">
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    const blob = new Blob([generatedScript], { type: 'text/plain' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${form.getValues('projectTitle') || 'script'}.txt`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                  }}
+                >
+                  Download Script
+                </Button>
                 <Button variant="outline" onClick={() => onOpenChange(false)}>
                   Close
                 </Button>
