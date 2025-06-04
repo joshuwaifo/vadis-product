@@ -299,10 +299,10 @@ export default function ProductionDashboard() {
                     </div>
                   </div>
                   <div className="flex-1"></div>
-                  <Link to="/dashboard/script-analysis-workflow">
+                  <Link to="/dashboard/script-analysis">
                     <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg">
                       <FileText className="w-4 h-4 mr-2" />
-                      Start Analysis Workflow
+                      Advanced Script Analysis
                     </Button>
                   </Link>
                 </CardContent>
