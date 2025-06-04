@@ -18,11 +18,7 @@ import {
 } from "lucide-react";
 
 const projectInfoSchema = z.object({
-  title: z.string().min(1, "Project title is required"),
-  logline: z.string().min(10, "Logline should be at least 10 characters"),
-  synopsis: z.string().min(50, "Synopsis should be at least 50 characters"),
-  targetGenres: z.array(z.string()).min(1, "Select at least one genre"),
-  budgetRange: z.string().min(1, "Budget range is required")
+  title: z.string().min(1, "Project title is required")
 });
 
 interface ProjectInfoStepProps {
@@ -41,11 +37,7 @@ export default function ProjectInfoStep({ onNext, onSave, isLoading }: ProjectIn
   const form = useForm<z.infer<typeof projectInfoSchema>>({
     resolver: zodResolver(projectInfoSchema),
     defaultValues: {
-      title: "",
-      logline: "",
-      synopsis: "",
-      targetGenres: [],
-      budgetRange: ""
+      title: ""
     }
   });
 
@@ -117,17 +109,6 @@ export default function ProjectInfoStep({ onNext, onSave, isLoading }: ProjectIn
     onNext({ ...data, scriptContent, uploadedFile: uploadedFile?.name });
   };
 
-  const genres = [
-    "Action", "Adventure", "Comedy", "Drama", "Fantasy", "Horror", 
-    "Mystery", "Romance", "Sci-Fi", "Thriller", "Western", "Animation",
-    "Crime", "Documentary", "Family", "Musical", "War", "Biography"
-  ];
-
-  const budgetRanges = [
-    "Under $1M", "$1M - $5M", "$5M - $15M", "$15M - $50M", 
-    "$50M - $100M", "$100M - $200M", "Over $200M"
-  ];
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -164,95 +145,6 @@ export default function ProjectInfoStep({ onNext, onSave, isLoading }: ProjectIn
                       <FormControl>
                         <Input placeholder="Enter your project title" {...field} />
                       </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="logline"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Logline</FormLabel>
-                      <FormControl>
-                        <Textarea 
-                          placeholder="A one-sentence summary of your story"
-                          rows={2}
-                          {...field} 
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="synopsis"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Synopsis</FormLabel>
-                      <FormControl>
-                        <Textarea 
-                          placeholder="Brief summary of your story (2-3 paragraphs)"
-                          rows={4}
-                          {...field} 
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="targetGenres"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Target Genres</FormLabel>
-                      <div className="grid grid-cols-3 gap-2 mt-2">
-                        {genres.map((genre) => (
-                          <Badge
-                            key={genre}
-                            variant={field.value.includes(genre) ? "default" : "outline"}
-                            className="cursor-pointer justify-center py-2"
-                            onClick={() => {
-                              const newGenres = field.value.includes(genre)
-                                ? field.value.filter(g => g !== genre)
-                                : [...field.value, genre];
-                              field.onChange(newGenres);
-                            }}
-                          >
-                            {genre}
-                          </Badge>
-                        ))}
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="budgetRange"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Target Budget Range</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select budget range" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {budgetRanges.map((range) => (
-                            <SelectItem key={range} value={range}>
-                              {range}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
