@@ -45,18 +45,20 @@ interface AnalysisFeature {
 }
 
 interface ProjectAnalysis {
-  projectId: number;
-  projectTitle: string;
-  totalScenes: number;
-  totalCharacters: number;
-  analysisProgress: number;
-  features: AnalysisFeature[];
-  metadata?: {
-    estimatedBudget?: number;
-    estimatedShootDays?: number;
-    vfxComplexityLevel?: string;
-    castingComplexity?: string;
+  project: {
+    id: number;
+    title: string;
+    userId: number;
+    scriptContent: string;
   };
+  scenes: any[];
+  characters: any[];
+  financial: any;
+  casting: any[];
+  locations: any[];
+  vfx: any[];
+  productPlacement: any[];
+  summary: any;
 }
 
 export default function ScriptAnalysisDashboard() {
@@ -75,19 +77,16 @@ export default function ScriptAnalysisDashboard() {
     }
   }, []);
 
-  // Fetch project analysis data
-  const { data: analysis, isLoading: analysisLoading } = useQuery<ProjectAnalysis>({
+  // Fetch project analysis data from Cannes demo backend
+  const { data: analysis, isLoading: analysisLoading } = useQuery({
     queryKey: ['script-analysis', projectId],
     queryFn: async () => {
       if (!projectId) throw new Error('No project selected');
-      const response = await apiRequest(`/api/projects/${projectId}/analysis`, 'GET');
+      const response = await fetch(`/api/projects/${projectId}/analysis`);
+      if (!response.ok) throw new Error('Failed to fetch analysis');
       return response.json();
     },
-    enabled: !!projectId,
-    refetchInterval: (data) => {
-      // Refetch every 5 seconds if analysis is in progress
-      return data?.analysisProgress < 100 ? 5000 : false;
-    }
+    enabled: !!projectId
   });
 
   // Fetch available projects
@@ -180,14 +179,71 @@ export default function ScriptAnalysisDashboard() {
   ];
 
   const getFeatureStatus = (featureId: string): AnalysisFeature => {
-    const baseFeature = analysisFeatures.find(f => f.id === featureId)!;
-    const analysisFeature = analysis?.features.find(f => f.id === featureId);
+    const baseFeature = analysisFeatures.find((f: AnalysisFeature) => f.id === featureId)!;
+    const analysisFeature = analysis?.features?.find((f: any) => f.id === featureId);
+    
+    // Check if we have results from the Cannes demo backend
+    let status: 'pending' | 'processing' | 'completed' | 'failed' = 'pending';
+    let results = null;
+    
+    if (analysis?.project) {
+      switch (featureId) {
+        case 'scene-breakdown':
+          if (analysis.scenes && analysis.scenes.length > 0) {
+            status = 'completed';
+            results = analysis.scenes;
+          }
+          break;
+        case 'character-analysis':
+          if (analysis.characters && analysis.characters.length > 0) {
+            status = 'completed';
+            results = analysis.characters;
+          }
+          break;
+        case 'financial-planning':
+          if (analysis.financial) {
+            status = 'completed';
+            results = analysis.financial;
+          }
+          break;
+        case 'casting-suggestions':
+          if (analysis.casting && analysis.casting.length > 0) {
+            status = 'completed';
+            results = analysis.casting;
+          }
+          break;
+        case 'location-scouting':
+          if (analysis.locations && analysis.locations.length > 0) {
+            status = 'completed';
+            results = analysis.locations;
+          }
+          break;
+        case 'vfx-analysis':
+          if (analysis.vfx && analysis.vfx.length > 0) {
+            status = 'completed';
+            results = analysis.vfx;
+          }
+          break;
+        case 'product-placement':
+          if (analysis.productPlacement && analysis.productPlacement.length > 0) {
+            status = 'completed';
+            results = analysis.productPlacement;
+          }
+          break;
+        case 'readers-report':
+          if (analysis.summary) {
+            status = 'completed';
+            results = analysis.summary;
+          }
+          break;
+      }
+    }
     
     return {
       ...baseFeature,
-      status: analysisFeature?.status || 'pending',
-      progress: analysisFeature?.progress || 0,
-      results: analysisFeature?.results
+      status: analysisFeature?.status || status,
+      progress: analysisFeature?.progress || (status === 'completed' ? 100 : 0),
+      results: analysisFeature?.results || results
     };
   };
 
