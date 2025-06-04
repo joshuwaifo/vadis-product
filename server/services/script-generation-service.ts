@@ -156,7 +156,7 @@ CONTINUE SCRIPT SEGMENT HERE:
       
       // Call progress callback if provided
       if (progressCallback) {
-        progressCallback(segmentText.trim(), estimatedTokensGenerated);
+        progressCallback(fullScriptText, estimatedTokensGenerated);
       }
 
       if (estimatedTokensGenerated >= MIN_TOTAL_TOKENS) {

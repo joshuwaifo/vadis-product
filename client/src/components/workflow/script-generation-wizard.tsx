@@ -113,6 +113,8 @@ export default function ScriptGenerationWizard({
             try {
               const data = JSON.parse(line.slice(6));
               
+              console.log('Received streaming data:', data.type, 'tokens:', data.tokenCount);
+              
               if (data.type === 'progress') {
                 setStreamedContent(data.content);
                 setTokenCount(data.tokenCount);
@@ -132,7 +134,7 @@ export default function ScriptGenerationWizard({
                 throw new Error(data.error);
               }
             } catch (parseError) {
-              // Ignore parsing errors for incomplete chunks
+              console.log('Parse error:', parseError, 'for line:', line);
             }
           }
         }
@@ -296,13 +298,10 @@ export default function ScriptGenerationWizard({
               <div className="space-y-4">
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span>Token Generation Progress</span>
+                    <span>Generation Progress</span>
                     <span>{Math.round((tokenCount / 32000) * 100)}%</span>
                   </div>
                   <Progress value={(tokenCount / 32000) * 100} className="h-2" />
-                  <div className="text-xs text-muted-foreground">
-                    {tokenCount.toLocaleString()} / ~32,000 tokens generated
-                  </div>
                 </div>
               </div>
 
