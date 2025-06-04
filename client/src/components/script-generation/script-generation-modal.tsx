@@ -209,7 +209,7 @@ export default function ScriptGenerationModal({
         {generationStep === 'form' && (
           <div className="space-y-6">
             {/* Template Section */}
-            {templates && (
+            {templates?.samplePrompts && (
               <Card>
                 <CardHeader>
                   <CardTitle className="text-sm flex items-center gap-2">
@@ -219,7 +219,7 @@ export default function ScriptGenerationModal({
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    {templates.samplePrompts?.map((template: any, index: number) => (
+                    {templates.samplePrompts.map((template: any, index: number) => (
                       <Card
                         key={index}
                         className="cursor-pointer hover:bg-muted/50 transition-colors"
@@ -272,11 +272,21 @@ export default function ScriptGenerationModal({
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {templates?.genres?.map((genre: string) => (
+                            {templates && Array.isArray(templates.genres) ? templates.genres.map((genre: string) => (
                               <SelectItem key={genre} value={genre}>
                                 {genre}
                               </SelectItem>
-                            ))}
+                            )) : (
+                              <>
+                                <SelectItem value="Action">Action</SelectItem>
+                                <SelectItem value="Comedy">Comedy</SelectItem>
+                                <SelectItem value="Drama">Drama</SelectItem>
+                                <SelectItem value="Horror">Horror</SelectItem>
+                                <SelectItem value="Romance">Romance</SelectItem>
+                                <SelectItem value="Sci-Fi">Sci-Fi</SelectItem>
+                                <SelectItem value="Thriller">Thriller</SelectItem>
+                              </>
+                            )}
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -343,11 +353,19 @@ export default function ScriptGenerationModal({
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {templates?.ratings?.map((rating: any) => (
+                            {templates && Array.isArray(templates.ratings) ? templates.ratings.map((rating: any) => (
                               <SelectItem key={rating.value} value={rating.value}>
                                 {rating.label}
                               </SelectItem>
-                            ))}
+                            )) : (
+                              <>
+                                <SelectItem value="G">G - General Audiences</SelectItem>
+                                <SelectItem value="PG">PG - Parental Guidance</SelectItem>
+                                <SelectItem value="PG-13">PG-13 - Parents Strongly Cautioned</SelectItem>
+                                <SelectItem value="R">R - Restricted</SelectItem>
+                                <SelectItem value="NC-17">NC-17 - Adults Only</SelectItem>
+                              </>
+                            )}
                           </SelectContent>
                         </Select>
                         <FormMessage />
