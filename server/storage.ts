@@ -337,6 +337,10 @@ export class MemStorage implements IStorage {
     return updated;
   }
 
+  async deleteProject(id: number): Promise<boolean> {
+    return this.projects.delete(id);
+  }
+
   async publishProject(id: number): Promise<Project | undefined> {
     return this.updateProject(id, { isPublished: true });
   }
