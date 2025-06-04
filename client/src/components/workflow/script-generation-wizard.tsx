@@ -177,91 +177,55 @@ export default function ScriptGenerationWizard({
     generateScriptMutation.mutate(data);
   };
 
-  const handleExportPDF = () => {
-    // Create a new window with the script content formatted for printing
-    const printWindow = window.open('', '_blank');
-    
-    if (!printWindow) {
+  const handleExportPDF = async () => {
+    try {
+      const projectTitle = form.getValues('projectTitle') || 'Screenplay';
+      
+      // Create formatted script content for PDF export
+      const scriptData = {
+        title: projectTitle,
+        content: generatedScript,
+        genre: form.getValues('genre'),
+        logline: form.getValues('logline')
+      };
+
+      // Make API call to generate PDF
+      const response = await fetch('/api/script-generation/export-pdf', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(scriptData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate PDF');
+      }
+
+      // Get the PDF as a blob
+      const pdfBlob = await response.blob();
+      
+      // Create download link and trigger download
+      const url = window.URL.createObjectURL(pdfBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${projectTitle.replace(/[^a-zA-Z0-9]/g, '_')}_screenplay.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      
+      toast({
+        title: "PDF Downloaded",
+        description: "Your screenplay has been exported as a PDF file.",
+      });
+    } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Export Failed",
-        description: "Please allow popups to export your script as PDF.",
+        description: error.message || "Failed to export PDF. Please try again.",
       });
-      return;
     }
-
-    const projectTitle = form.getValues('projectTitle') || 'Screenplay';
-    
-    // HTML content with proper screenplay formatting
-    const htmlContent = `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <title>${projectTitle}</title>
-        <style>
-          @page {
-            size: letter;
-            margin: 1in;
-          }
-          body {
-            font-family: 'Courier New', monospace;
-            font-size: 12pt;
-            line-height: 1.5;
-            color: black;
-            background: white;
-            margin: 0;
-            padding: 0;
-          }
-          .script-content {
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            page-break-inside: avoid;
-          }
-          .title-page {
-            text-align: center;
-            margin-top: 2in;
-            margin-bottom: 2in;
-            page-break-after: always;
-          }
-          .title {
-            font-size: 18pt;
-            font-weight: bold;
-            text-transform: uppercase;
-            margin-bottom: 1in;
-          }
-          @media print {
-            body { print-color-adjust: exact; }
-          }
-        </style>
-      </head>
-      <body>
-        <div class="title-page">
-          <div class="title">${projectTitle}</div>
-          <div>A Screenplay</div>
-        </div>
-        <div class="script-content">${generatedScript.replace(/\n/g, '<br>')}</div>
-      </body>
-      </html>
-    `;
-
-    printWindow.document.write(htmlContent);
-    printWindow.document.close();
-
-    // Wait for content to load, then trigger print dialog
-    setTimeout(() => {
-      printWindow.focus();
-      printWindow.print();
-      
-      // Close the window after printing
-      setTimeout(() => {
-        printWindow.close();
-      }, 1000);
-      
-      toast({
-        title: "Script Export Started",
-        description: "Use your browser's print dialog to save as PDF.",
-      });
-    }, 500);
   };
 
   const handleComplete = () => {
@@ -314,7 +278,7 @@ export default function ScriptGenerationWizard({
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="bg-white border rounded-lg p-6 h-[500px] overflow-y-auto font-mono text-sm leading-relaxed">
+            <div className="bg-white border rounded-lg p-6 h-[700px] overflow-y-auto font-mono text-sm leading-relaxed">
               <pre className="whitespace-pre-wrap">
                 {streamedContent || "Preparing to generate your script..."}
                 {isGenerating && (
@@ -407,7 +371,7 @@ export default function ScriptGenerationWizard({
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="bg-white border rounded-lg p-6 h-[500px] overflow-y-auto font-mono text-sm leading-relaxed">
+            <div className="bg-white border rounded-lg p-6 h-[700px] overflow-y-auto font-mono text-sm leading-relaxed">
               <pre className="whitespace-pre-wrap">{generatedScript}</pre>
             </div>
           </CardContent>

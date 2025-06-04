@@ -216,4 +216,140 @@ export function registerScriptGenerationRoutes(app: any) {
       });
     }
   });
+
+  /**
+   * Export script as PDF
+   */
+  app.post('/api/script-generation/export-pdf', async (req: Request, res: Response) => {
+    try {
+      const { title, content, genre, logline } = req.body;
+
+      if (!title || !content) {
+        return res.status(400).json({ error: 'Title and content are required' });
+      }
+
+      // Create formatted script content for PDF
+      const formattedContent = `${title.toUpperCase()}
+
+${logline ? `Logline: ${logline}\n` : ''}${genre ? `Genre: ${genre}\n` : ''}
+
+${content}`;
+
+      // Create a simple text-based PDF using a basic PDF structure
+      const pdfContent = createSimplePDF(title, formattedContent);
+      
+      // Set headers for PDF download
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="${title.replace(/[^a-zA-Z0-9]/g, '_')}_screenplay.pdf"`);
+      res.setHeader('Content-Length', pdfContent.length);
+      
+      // Send the PDF content
+      res.end(pdfContent);
+    } catch (error: any) {
+      console.error('Error exporting PDF:', error);
+      res.status(500).json({ 
+        error: 'Failed to export PDF',
+        details: error.message 
+      });
+    }
+  });
+}
+
+/**
+ * Create a simple PDF document
+ */
+function createSimplePDF(title: string, content: string): Buffer {
+  // Basic PDF structure with proper formatting
+  const pdfHeader = '%PDF-1.4\n';
+  
+  // PDF objects
+  const catalog = `1 0 obj
+<<
+/Type /Catalog
+/Pages 2 0 R
+>>
+endobj
+
+`;
+
+  const pages = `2 0 obj
+<<
+/Type /Pages
+/Kids [3 0 R]
+/Count 1
+>>
+endobj
+
+`;
+
+  // Calculate content length for the stream
+  const streamContent = `BT
+/F1 12 Tf
+72 720 Td
+(${title.toUpperCase()}) Tj
+0 -24 Td
+(${content.replace(/\n/g, ') Tj 0 -14 Td (').replace(/\r/g, '')}) Tj
+ET`;
+
+  const contentLength = streamContent.length;
+
+  const page = `3 0 obj
+<<
+/Type /Page
+/Parent 2 0 R
+/MediaBox [0 0 612 792]
+/Resources <<
+/Font <<
+/F1 4 0 R
+>>
+>>
+/Contents 5 0 R
+>>
+endobj
+
+`;
+
+  const font = `4 0 obj
+<<
+/Type /Font
+/Subtype /Type1
+/BaseFont /Courier
+>>
+endobj
+
+`;
+
+  const contentStream = `5 0 obj
+<<
+/Length ${contentLength}
+>>
+stream
+${streamContent}
+endstream
+endobj
+
+`;
+
+  const xref = `xref
+0 6
+0000000000 65535 f 
+0000000010 00000 n 
+0000000053 00000 n 
+0000000125 00000 n 
+0000000284 00000 n 
+0000000354 00000 n 
+`;
+
+  const trailer = `trailer
+<<
+/Size 6
+/Root 1 0 R
+>>
+startxref
+${(pdfHeader + catalog + pages + page + font + contentStream).length}
+%%EOF`;
+
+  const fullPdf = pdfHeader + catalog + pages + page + font + contentStream + xref + trailer;
+  
+  return Buffer.from(fullPdf, 'utf8');
 }
