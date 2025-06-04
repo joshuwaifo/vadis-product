@@ -123,16 +123,10 @@ export function registerScriptAnalysisRoutes(app: Express) {
         }
       }
 
-      // Start analysis process asynchronously
-      analyzeScriptAsync(project.id, parsedScript.content, {
-        title: finalTitle,
-        budgetRange,
-        fundingGoal: parseInt(fundingGoal),
-      }).catch(error => {
-        console.error("Script analysis error:", error);
-      });
+      // Project created successfully, ready for analysis tools selection
+      console.log(`Project ${project.id} created successfully. Analysis tools ready.`);
 
-      res.json({ id: project.id, status: "analyzing" });
+      res.json({ id: project.id, status: "ready", title: finalTitle });
     } catch (error) {
       console.error("Error creating script analysis project:", error);
       res.status(500).json({ error: "Failed to create project" });
