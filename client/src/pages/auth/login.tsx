@@ -12,7 +12,7 @@ import { Eye, EyeOff, LogIn } from "lucide-react";
 import { loginSchema, type LoginData, userRoles } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-// Logo removed since assets directory was cleaned up
+import vadisLogoLight from "@assets/Vadis FINAL LOGO large size Without Background.png";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -39,7 +39,7 @@ export default function Login() {
         case userRoles.BRAND_AGENCY:
           setLocation("/dashboard");
           break;
-        case userRoles.FINANCIER:
+        case userRoles.INVESTOR:
           setLocation("/dashboard");
           break;
         case userRoles.INDIVIDUAL_CREATOR:
@@ -76,9 +76,11 @@ export default function Login() {
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-between">
           <Link href="/">
-            <div className="text-white text-3xl font-bold">
-              Vadis AI
-            </div>
+            <img
+              src={vadisLogoLight}
+              alt="VadisMedia"
+              className="h-24 w-auto drop-shadow-2xl cursor-pointer"
+            />
           </Link>
           <div className="flex items-center space-x-4">
             <span className="text-white/80">Don't have an account?</span>
