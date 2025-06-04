@@ -6,10 +6,11 @@ import { Progress } from "@/components/ui/progress";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import ComprehensiveAnalysisPanel from "@/components/script-analysis/comprehensive-analysis-panel";
 import { 
   Users, MapPin, Sparkles, DollarSign, 
   Film, User, BarChart3, FileText,
-  ArrowRight, Save, Play 
+  ArrowRight, Save, Play, Wand2, CheckCircle
 } from "lucide-react";
 
 interface AnalysisFeature {
@@ -98,6 +99,8 @@ const ANALYSIS_FEATURES: AnalysisFeature[] = [
 export default function ScriptAnalysisStep({ projectId, onNext, onSave, isLoading }: ScriptAnalysisStepProps) {
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>(['scenes', 'characters']);
   const [analysisProgress, setAnalysisProgress] = useState(0);
+  const [analysisComplete, setAnalysisComplete] = useState(false);
+  const [analysisResults, setAnalysisResults] = useState<any>(null);
   const [currentAnalysis, setCurrentAnalysis] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const { toast } = useToast();
@@ -199,113 +202,128 @@ export default function ScriptAnalysisStep({ projectId, onNext, onSave, isLoadin
     return total;
   }, 0);
 
-  return (
-    <div className="space-y-6">
-      {/* Project Overview */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Project: {project?.title}</CardTitle>
-          <p className="text-gray-600">
-            Select the analysis features you want to run on your script
-          </p>
-        </CardHeader>
-      </Card>
+  // Handle analysis completion
+  const handleAnalysisComplete = (results: any) => {
+    setAnalysisComplete(true);
+    setAnalysisResults(results);
+    toast({
+      title: "Analysis Complete",
+      description: "Comprehensive script analysis has been completed successfully."
+    });
+  };
 
-      {/* Analysis Features Selection */}
-      <Card>
-        <CardContent className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {ANALYSIS_FEATURES.map((feature) => {
-              const isSelected = selectedFeatures.includes(feature.id);
-              const IconComponent = feature.icon;
-              
-              return (
-                <div
-                  key={feature.id}
-                  className={`p-4 border rounded-lg cursor-pointer transition-all ${
-                    isSelected ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                  onClick={() => handleFeatureToggle(feature.id, !isSelected)}
-                >
-                  <div className="flex items-start space-x-3">
-                    <Checkbox
-                      checked={isSelected}
-                      onCheckedChange={(checked) => handleFeatureToggle(feature.id, checked as boolean)}
-                    />
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-2">
-                        <IconComponent className="w-5 h-5 text-blue-600" />
-                        <h4 className="font-medium">{feature.name}</h4>
-                        <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                          {feature.estimatedTime}
-                        </span>
-                      </div>
-                      <p className="text-sm text-gray-600 mt-1">{feature.description}</p>
-                    </div>
+  // Show comprehensive analysis panel if project has script content
+  if (project?.scriptContent && !analysisComplete) {
+    return (
+      <div className="space-y-6">
+        <ComprehensiveAnalysisPanel
+          projectId={projectId}
+          scriptContent={project.scriptContent}
+          onAnalysisComplete={handleAnalysisComplete}
+        />
+        
+        <div className="flex justify-between pt-6">
+          <Button variant="outline" onClick={handleSave} disabled={isLoading}>
+            <Save className="h-4 w-4 mr-2" />
+            Save Progress
+          </Button>
+          <div className="space-x-3">
+            <Button variant="outline" onClick={() => window.history.back()}>
+              Back
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show results and next step if analysis is complete
+  if (analysisComplete && analysisResults) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center space-y-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 dark:bg-green-900/20 rounded-full">
+            <CheckCircle className="h-8 w-8 text-green-600" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+            Analysis Complete
+          </h2>
+          <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+            Your comprehensive script analysis is ready. Review the results in the next step.
+          </p>
+        </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Analysis Summary</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {analysisResults.map((task: any) => (
+                <div key={task.id} className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                  <div className="text-sm font-medium text-gray-900 dark:text-white">
+                    {task.name}
+                  </div>
+                  <div className="text-xs text-green-600 dark:text-green-400 mt-1">
+                    Completed
                   </div>
                 </div>
-              );
-            })}
-          </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="flex justify-between pt-6">
+          <Button variant="outline" onClick={handleSave} disabled={isLoading}>
+            <Save className="h-4 w-4 mr-2" />
+            Save Progress
+          </Button>
+          <Button onClick={handleNext} disabled={isLoading}>
+            Review Results
+            <ArrowRight className="h-4 w-4 ml-2" />
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="text-center space-y-4">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+          Script Analysis
+        </h2>
+        <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+          Upload a script in the previous step to begin comprehensive AI analysis.
+        </p>
+      </div>
+      
+      <Card>
+        <CardHeader>
+          <CardTitle>Ready for Analysis</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-gray-600 dark:text-gray-400">
+            Once you upload a script, the AI analysis suite will automatically begin processing your content with advanced features including:
+          </p>
+          <ul className="mt-4 space-y-2 text-sm text-gray-600 dark:text-gray-400">
+            <li>• Scene breakdown and character analysis</li>
+            <li>• AI casting director suggestions</li>
+            <li>• Location intelligence with tax incentives</li>
+            <li>• VFX requirements and cost estimation</li>
+            <li>• Brand placement opportunities</li>
+            <li>• Financial projections and budget planning</li>
+          </ul>
         </CardContent>
       </Card>
 
-      {/* Analysis Summary */}
-      {selectedFeatures.length > 0 && (
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h4 className="font-medium">Selected Features: {selectedFeatures.length}</h4>
-                <p className="text-sm text-gray-600">
-                  Estimated total time: {totalEstimatedTime} minutes
-                </p>
-              </div>
-              {!isAnalyzing && analysisProgress === 0 && (
-                <Button onClick={handleStartAnalysis}>
-                  <Play className="w-4 h-4 mr-2" />
-                  Start Analysis
-                </Button>
-              )}
-            </div>
-            
-            {isAnalyzing && (
-              <div className="mt-4 space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm">Running analysis...</span>
-                  <span className="text-sm text-gray-500">{Math.round(analysisProgress)}%</span>
-                </div>
-                <Progress value={analysisProgress} className="w-full" />
-              </div>
-            )}
-            
-            {analysisProgress === 100 && (
-              <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded">
-                <p className="text-green-800 text-sm">
-                  ✓ Analysis completed successfully! You can now review the results.
-                </p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Action Buttons */}
-      <div className="flex items-center justify-between pt-6">
-        <Button
-          variant="outline"
-          onClick={handleSave}
-        >
-          <Save className="w-4 h-4 mr-2" />
+      <div className="flex justify-between pt-6">
+        <Button variant="outline" onClick={handleSave} disabled={isLoading}>
+          <Save className="h-4 w-4 mr-2" />
           Save Progress
         </Button>
-
-        <Button
-          onClick={handleNext}
-          disabled={analysisProgress < 100 || isLoading}
-        >
-          {isLoading ? 'Processing...' : 'Continue to Review'}
-          <ArrowRight className="w-4 h-4 ml-2" />
+        <Button variant="outline" onClick={() => window.history.back()}>
+          Back to Upload
         </Button>
       </div>
     </div>
