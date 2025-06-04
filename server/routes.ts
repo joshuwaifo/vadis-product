@@ -13,6 +13,7 @@ import {
 import { registerScriptAnalysisRoutes } from "./script-analysis-routes";
 import { registerWorkflowRoutes } from "./workflow-routes";
 import { registerComprehensiveAnalysisRoutes } from "./comprehensive-analysis-routes";
+import { registerScriptGenerationRoutes } from "./script-generation-routes";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Demo request submission endpoint
@@ -382,6 +383,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   registerScriptAnalysisRoutes(app);
   registerWorkflowRoutes(app);
   registerComprehensiveAnalysisRoutes(app);
+  registerScriptGenerationRoutes(app);
 
   const httpServer = createServer(app);
 
