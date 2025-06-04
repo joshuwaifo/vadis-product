@@ -1,8 +1,4 @@
-// Re-export all role-specific schemas for centralized access
-export * from "../server/db-schemas/production-schema";
-export * from "../server/db-schemas/brand-schema";
-export * from "../server/db-schemas/financier-schema";
-export * from "../server/db-schemas/creator-schema";
+// Consolidated schema file for all entities
 
 import { pgTable, text, serial, integer, boolean, timestamp, jsonb, decimal } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";

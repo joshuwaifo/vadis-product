@@ -5,11 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Landing from "@/pages/landing";
 import Login from "@/pages/auth/login";
-import DemoRequest from "@/pages/demos/demo-request";
-import DemoProduction from "@/pages/demos/demo-production";
-import DemoBrand from "@/pages/demos/demo-brand";
-import DemoFinancier from "@/pages/demos/demo-financier";
-import DemoCreator from "@/pages/demos/demo-creator";
+// Demo pages removed during cleanup
 
 import DashboardHome from "@/pages/dashboard/dashboard-home";
 import ProfilePage from "@/pages/dashboard/profile";
@@ -18,10 +14,7 @@ import ScriptAnalysisWorkflow from "@/pages/dashboard/script-analysis-workflow";
 import ScriptAnalysisDashboard from "@/pages/script-analysis/script-analysis-dashboard";
 import CannesDemoDashboard from "@/pages/script-analysis/cannes-demo-dashboard";
 import ScriptGenerator from "@/pages/dashboard/script-generator";
-import ProductionDashboard from "@/pages/dashboards/production-dashboard-new";
-import BrandDashboard from "@/pages/dashboards/brand-dashboard";
-import InvestorDashboard from "@/pages/dashboards/investor-dashboard";
-import CreatorDashboard from "@/pages/dashboards/creator-dashboard";
+// Role-specific dashboards removed during cleanup
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -29,11 +22,7 @@ function Router() {
     <Switch>
       <Route path="/" component={Landing} />
       <Route path="/login" component={Login} />
-      <Route path="/demo-request" component={DemoRequest} />
-      <Route path="/demo/production" component={DemoProduction} />
-      <Route path="/demo/brand" component={DemoBrand} />
-      <Route path="/demo/financier" component={DemoFinancier} />
-      <Route path="/demo/creator" component={DemoCreator} />
+      {/* Demo routes removed during cleanup */}
       <Route path="/dashboard" component={DashboardHome} />
       <Route path="/dashboard/profile" component={ProfilePage} />
       <Route path="/dashboard/script-analysis-workflow" component={ScriptAnalysisWorkflow} />
