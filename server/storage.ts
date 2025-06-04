@@ -575,6 +575,99 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
+  // Role-specific authentication methods
+  async getProductionUserByEmail(email: string): Promise<ProductionUser | undefined> {
+    try {
+      const result = await db.select().from(productionUsers).where(eq(productionUsers.email, email));
+      return result[0] || undefined;
+    } catch (error) {
+      console.error('Error getting production user by email:', error);
+      return undefined;
+    }
+  }
+
+  async getBrandUserByEmail(email: string): Promise<BrandUser | undefined> {
+    try {
+      const result = await db.select().from(brandUsers).where(eq(brandUsers.email, email));
+      return result[0] || undefined;
+    } catch (error) {
+      console.error('Error getting brand user by email:', error);
+      return undefined;
+    }
+  }
+
+  async getFinancierUserByEmail(email: string): Promise<FinancierUser | undefined> {
+    try {
+      const result = await db.select().from(financierUsers).where(eq(financierUsers.email, email));
+      return result[0] || undefined;
+    } catch (error) {
+      console.error('Error getting financier user by email:', error);
+      return undefined;
+    }
+  }
+
+  async getCreatorUserByEmail(email: string): Promise<CreatorUser | undefined> {
+    try {
+      const result = await db.select().from(creatorUsers).where(eq(creatorUsers.email, email));
+      return result[0] || undefined;
+    } catch (error) {
+      console.error('Error getting creator user by email:', error);
+      return undefined;
+    }
+  }
+
+  async validateProductionUser(email: string, password: string): Promise<ProductionUser | null> {
+    try {
+      const user = await this.getProductionUserByEmail(email);
+      if (!user || !user.passwordHash) return null;
+      
+      const isValid = await bcrypt.compare(password, user.passwordHash);
+      return isValid ? user : null;
+    } catch (error) {
+      console.error('Error validating production user:', error);
+      return null;
+    }
+  }
+
+  async validateBrandUser(email: string, password: string): Promise<BrandUser | null> {
+    try {
+      const user = await this.getBrandUserByEmail(email);
+      if (!user || !user.passwordHash) return null;
+      
+      const isValid = await bcrypt.compare(password, user.passwordHash);
+      return isValid ? user : null;
+    } catch (error) {
+      console.error('Error validating brand user:', error);
+      return null;
+    }
+  }
+
+  async validateFinancierUser(email: string, password: string): Promise<FinancierUser | null> {
+    try {
+      const user = await this.getFinancierUserByEmail(email);
+      if (!user || !user.passwordHash) return null;
+      
+      const isValid = await bcrypt.compare(password, user.passwordHash);
+      return isValid ? user : null;
+    } catch (error) {
+      console.error('Error validating financier user:', error);
+      return null;
+    }
+  }
+
+  async validateCreatorUser(email: string, password: string): Promise<CreatorUser | null> {
+    try {
+      const user = await this.getCreatorUserByEmail(email);
+      if (!user || !user.passwordHash) return null;
+      
+      const isValid = await bcrypt.compare(password, user.passwordHash);
+      return isValid ? user : null;
+    } catch (error) {
+      console.error('Error validating creator user:', error);
+      return null;
+    }
+  }
+
   async createDemoRequest(insertDemoRequest: InsertDemoRequest): Promise<DemoRequest> {
     const [demoRequest] = await db
       .insert(demoRequests)
