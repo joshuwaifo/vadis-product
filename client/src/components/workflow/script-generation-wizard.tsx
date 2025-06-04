@@ -66,54 +66,78 @@ export default function ScriptGenerationWizard({
 
   // Script generation mutation
   const generateScriptMutation = useMutation({
-    mutationFn: async (data: ScriptGenerationFormData) => {
+    mutationFn: async (formData: ScriptGenerationFormData) => {
       const payload = {
-        ...data,
+        ...formData,
         projectId: existingProjectId,
       };
       
-      const response = await apiRequest('/api/script-generation/generate', 'POST', payload);
-      return response.json();
+      // Start the script generation request
+      const response = await fetch('/api/script-generation/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to generate script');
+      }
+      
+      const result = await response.json();
+      return result;
     },
     onMutate: () => {
       setCurrentStep('generating');
-      setProgress(0);
       setStreamedContent("");
       
-      // Simulate streaming content generation
+      // Simulate real-time script generation with more realistic content
+      const sampleScriptChunks = [
+        "FADE IN:\n\n",
+        "EXT. QUANTUM RESEARCH FACILITY - DAWN\n\n",
+        "The imposing glass structure reflects the first rays of sunlight, its angular geometry suggesting secrets hidden within.\n\n",
+        "INT. LABORATORY - CONTINUOUS\n\n",
+        "DR. SARAH CHEN (30s, brilliant physicist with determined eyes) adjusts complex equipment. Holographic displays show quantum particle trajectories.\n\n",
+        "SARAH\n(to herself)\nThe equations don't lie. If I'm right about this inheritance pattern...\n\n",
+        "She initiates a quantum scan. Energy pulses through crystalline arrays.\n\n",
+        "COMPUTER VOICE\nQuantum signature detected. Anomalous readings confirmed.\n\n",
+        "Sarah's eyes widen as she realizes the implications.\n\n",
+        "SARAH\nIt's not just theoretical anymore.\n\n",
+        "INT. GOVERNMENT FACILITY - SAME TIME\n\n",
+        "AGENT REEVES (40s, seasoned intelligence officer) reviews classified files marked 'QUANTUM INHERITANCE PROJECT'.\n\n",
+        "REEVES\n(into secure phone)\nShe's getting close. Too close.\n\n",
+        "INT. LABORATORY - CONTINUOUS\n\n",
+        "Sarah downloads data as alarms begin to sound.\n\n",
+        "SARAH\nNo, not now...\n\n",
+        "Security forces storm the facility. Sarah grabs her research and escapes through a maintenance tunnel.\n\n",
+        "EXT. CITY STREETS - NIGHT\n\n",
+        "Sarah emerges into the urban landscape, clutching her discoveries. The quantum inheritance could change everything.\n\n",
+        "She disappears into the crowd as helicopters circle overhead.\n\n",
+        "FADE TO BLACK.\n\n",
+        "TITLE CARD: 'THE QUANTUM INHERITANCE'\n\n"
+      ];
+      
+      let chunkIndex = 0;
       const streamInterval = setInterval(() => {
-        setStreamedContent(prev => {
-          if (prev.length < 2000) {
-            return prev + "FADE IN:\n\nINT. COFFEE SHOP - DAY\n\nSunlight streams through large windows...\n\n";
-          }
+        if (chunkIndex < sampleScriptChunks.length) {
+          setStreamedContent(prev => prev + sampleScriptChunks[chunkIndex]);
+          chunkIndex++;
+        } else {
           clearInterval(streamInterval);
-          return prev;
-        });
-      }, 1000);
+        }
+      }, 1500);
       
-      // Simulate progress updates
-      const progressInterval = setInterval(() => {
-        setProgress((prev) => {
-          if (prev >= 90) {
-            clearInterval(progressInterval);
-            return 90;
-          }
-          return prev + 10;
-        });
-      }, 2000);
-      
-      return { progressInterval, streamInterval };
+      return { streamInterval };
     },
-    onSuccess: (data, variables, context) => {
-      if (context?.progressInterval) {
-        clearInterval(context.progressInterval);
-      }
+    onSuccess: (responseData, variables, context) => {
       if (context?.streamInterval) {
         clearInterval(context.streamInterval);
       }
       
-      setProgress(100);
-      setGeneratedScript(data.script);
+      // Set the final generated script
+      setGeneratedScript(responseData.script);
+      setStreamedContent(responseData.script);
       setCurrentStep('review');
       
       toast({
@@ -122,15 +146,11 @@ export default function ScriptGenerationWizard({
       });
     },
     onError: (error: any, variables, context) => {
-      if (context?.progressInterval) {
-        clearInterval(context.progressInterval);
-      }
       if (context?.streamInterval) {
         clearInterval(context.streamInterval);
       }
       
       setCurrentStep('setup');
-      setProgress(0);
       setStreamedContent("");
       
       toast({
@@ -169,17 +189,17 @@ export default function ScriptGenerationWizard({
 
   if (currentStep === 'generating') {
     return (
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 h-full">
-        {/* Left Panel - Generation Status */}
-        <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Wand2 className="w-5 h-5" />
-                <span>Generating Script</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
+      <div className="space-y-6 h-full">
+        {/* Top Panel - Generation Status */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Wand2 className="w-5 h-5" />
+              <span>Generating Script</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="text-center space-y-4">
                 <div className="mx-auto w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center">
                   <Sparkles className="w-8 h-8 text-purple-600 animate-pulse" />
@@ -192,55 +212,60 @@ export default function ScriptGenerationWizard({
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>Generation Progress</span>
-                  <span>{progress}%</span>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span>Token Generation Progress</span>
+                    <span>{Math.round((streamedContent.length / 130000) * 100)}%</span>
+                  </div>
+                  <Progress value={(streamedContent.length / 130000) * 100} className="h-2" />
+                  <div className="text-xs text-muted-foreground">
+                    {streamedContent.length.toLocaleString()} / ~130,000 characters
+                  </div>
                 </div>
-                <Progress value={progress} className="h-2" />
               </div>
 
               <div className="space-y-2 text-sm text-muted-foreground">
                 <div className="flex items-center space-x-2">
-                  <div className={`w-2 h-2 rounded-full ${progress > 0 ? 'bg-green-500' : 'bg-gray-300'}`} />
+                  <div className={`w-2 h-2 rounded-full ${streamedContent.length > 1000 ? 'bg-green-500' : 'bg-gray-300'}`} />
                   <span>Story structure development</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <div className={`w-2 h-2 rounded-full ${progress > 25 ? 'bg-green-500' : 'bg-gray-300'}`} />
+                  <div className={`w-2 h-2 rounded-full ${streamedContent.length > 30000 ? 'bg-green-500' : 'bg-gray-300'}`} />
                   <span>Character development</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <div className={`w-2 h-2 rounded-full ${progress > 50 ? 'bg-green-500' : 'bg-gray-300'}`} />
+                  <div className={`w-2 h-2 rounded-full ${streamedContent.length > 65000 ? 'bg-green-500' : 'bg-gray-300'}`} />
                   <span>Dialogue creation</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <div className={`w-2 h-2 rounded-full ${progress > 75 ? 'bg-green-500' : 'bg-gray-300'}`} />
+                  <div className={`w-2 h-2 rounded-full ${streamedContent.length > 100000 ? 'bg-green-500' : 'bg-gray-300'}`} />
                   <span>Scene descriptions</span>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        </div>
+            </div>
+          </CardContent>
+        </Card>
 
-        {/* Right Panel - Live Script Preview */}
-        <div className="space-y-6">
-          <Card className="h-full">
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <FileText className="w-5 h-5" />
-                <span>Live Script Preview</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="bg-white border rounded-lg p-6 min-h-[600px] font-mono text-sm leading-relaxed">
+        {/* Bottom Panel - Live Script Preview */}
+        <Card className="flex-1">
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <FileText className="w-5 h-5" />
+              <span>Live Script Preview</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="bg-white border rounded-lg p-6 h-[500px] overflow-y-auto font-mono text-sm leading-relaxed">
+              <pre className="whitespace-pre-wrap">
                 {streamedContent || "Preparing to generate your script..."}
-                {progress < 100 && (
+                {streamedContent.length > 0 && streamedContent.length < 130000 && (
                   <span className="inline-block w-2 h-4 bg-purple-600 animate-pulse ml-1" />
                 )}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+              </pre>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }
