@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import bcrypt from "bcryptjs";
 import { storage } from "./storage";
 import { hubspotService } from "./hubspot";
+import { authService } from "./auth-service";
 import { 
   insertDemoRequestSchema, 
   insertProjectSchema,
@@ -228,30 +229,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log("Login attempt for email:", validatedData.email);
       
-      // Check if user exists
-      const existingUser = await storage.getUserByEmail(validatedData.email);
-      console.log("User found:", existingUser ? "Yes" : "No");
-      
-      const user = await storage.validateUser(validatedData.email, validatedData.password);
-      if (!user) {
-        console.log("Password validation failed");
+      // Use the new role-specific authentication service
+      const authResult = await authService.login(validatedData.email, validatedData.password);
+      if (!authResult) {
+        console.log("Authentication failed for email:", validatedData.email);
         return res.status(401).json({ error: "Invalid email or password" });
       }
 
-      console.log("Login successful for user:", user.email);
+      console.log("Login successful for user:", validatedData.email, "Role:", authResult.role);
       
       // Store user information in session
       (req.session as any).user = {
-        id: user.id,
-        email: user.email,
-        role: user.role
+        id: authResult.user.id,
+        email: authResult.user.email,
+        role: authResult.role,
+        name: authResult.role === 'creator' 
+          ? `${authResult.user.firstName} ${authResult.user.lastName}`
+          : authResult.user.contactName || authResult.user.companyName
       };
       
-      // Return user data (without password hash)
-      const { passwordHash: _, ...userResponse } = user;
+      // Return user data (without password hash) and dashboard redirect
+      const { passwordHash: _, ...userResponse } = authResult.user;
       res.json({
         success: true,
-        user: userResponse
+        user: {
+          ...userResponse,
+          role: authResult.role
+        },
+        redirectPath: authService.getDashboardPath(authResult.role)
       });
 
     } catch (error) {
