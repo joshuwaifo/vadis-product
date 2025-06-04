@@ -22,12 +22,13 @@ const projectInfoSchema = z.object({
 });
 
 interface ProjectInfoStepProps {
+  projectId?: number;
   onNext: (data: any) => void;
   onSave: (data: any) => void;
   isLoading: boolean;
 }
 
-export default function ProjectInfoStep({ onNext, onSave, isLoading }: ProjectInfoStepProps) {
+export default function ProjectInfoStep({ projectId, onNext, onSave, isLoading }: ProjectInfoStepProps) {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [scriptContent, setScriptContent] = useState<string>("");
   const [isUploading, setIsUploading] = useState(false);

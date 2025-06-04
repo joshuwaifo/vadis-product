@@ -29,6 +29,8 @@ interface ProjectWorkflow {
 
 interface ProjectWorkflowWizardProps {
   projectId?: number;
+  existingProjectId?: number;
+  initialStep?: string;
   onComplete?: (projectId: number) => void;
 }
 
@@ -59,22 +61,30 @@ const WORKFLOW_STEPS: WorkflowStep[] = [
   }
 ];
 
-export default function ProjectWorkflowWizard({ projectId, onComplete }: ProjectWorkflowWizardProps) {
+export default function ProjectWorkflowWizard({ 
+  projectId, 
+  existingProjectId, 
+  initialStep, 
+  onComplete 
+}: ProjectWorkflowWizardProps) {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [workflow, setWorkflow] = useState<ProjectWorkflow | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Fetch existing workflow if projectId is provided
+  // Use existingProjectId if provided, otherwise use projectId
+  const activeProjectId = existingProjectId || projectId;
+
+  // Fetch existing workflow if activeProjectId is provided
   const { data: existingWorkflow } = useQuery({
-    queryKey: ['workflow', projectId],
+    queryKey: ['workflow', activeProjectId],
     queryFn: async () => {
-      if (!projectId) return null;
-      const response = await apiRequest(`/api/projects/${projectId}/workflow`, "GET");
+      if (!activeProjectId) return null;
+      const response = await apiRequest(`/api/projects/${activeProjectId}/workflow`, "GET");
       return response.json();
     },
-    enabled: !!projectId
+    enabled: !!activeProjectId
   });
 
   // Initialize workflow state
@@ -83,25 +93,34 @@ export default function ProjectWorkflowWizard({ projectId, onComplete }: Project
       setWorkflow(existingWorkflow);
       const currentStepIdx = WORKFLOW_STEPS.findIndex(step => step.id === existingWorkflow.currentStep);
       setCurrentStepIndex(currentStepIdx >= 0 ? currentStepIdx : 0);
+    } else if (initialStep) {
+      // Set step based on initialStep parameter
+      const initialStepIdx = WORKFLOW_STEPS.findIndex(step => step.id === initialStep);
+      setCurrentStepIndex(initialStepIdx >= 0 ? initialStepIdx : 0);
+      setWorkflow({
+        projectId: activeProjectId || 0,
+        currentStep: initialStep,
+        steps: [...WORKFLOW_STEPS]
+      });
     } else {
       setWorkflow({
-        projectId: projectId || 0,
+        projectId: activeProjectId || 0,
         currentStep: 'project_info',
         steps: [...WORKFLOW_STEPS]
       });
     }
-  }, [existingWorkflow, projectId]);
+  }, [existingWorkflow, activeProjectId, initialStep]);
 
   // Save workflow progress
   const saveWorkflowMutation = useMutation({
     mutationFn: async (data: { currentStep: string; stepData?: any }) => {
       const response = await apiRequest(
-        projectId ? `/api/projects/${projectId}/workflow` : '/api/projects/workflow',
-        projectId ? "PUT" : "POST",
+        activeProjectId ? `/api/projects/${activeProjectId}/workflow` : '/api/projects/workflow',
+        activeProjectId ? "PUT" : "POST",
         {
           currentStep: data.currentStep,
           stepData: data.stepData,
-          projectId: workflow?.projectId
+          projectId: workflow?.projectId || activeProjectId
         }
       );
       return response.json();

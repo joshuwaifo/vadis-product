@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +9,24 @@ import { ArrowLeft, FileText, Workflow } from "lucide-react";
 export default function ScriptAnalysisWorkflow() {
   const [, setLocation] = useLocation();
   const [showWizard, setShowWizard] = useState(false);
+  const [projectId, setProjectId] = useState<number | undefined>();
+  const [initialStep, setInitialStep] = useState<string | undefined>();
+
+  useEffect(() => {
+    // Parse URL parameters for project continuation
+    const urlParams = new URLSearchParams(window.location.search);
+    const projectIdParam = urlParams.get('projectId');
+    const stepParam = urlParams.get('step');
+    
+    if (projectIdParam) {
+      setProjectId(parseInt(projectIdParam));
+      setShowWizard(true);
+    }
+    
+    if (stepParam) {
+      setInitialStep(stepParam);
+    }
+  }, []);
 
   const handleStartWorkflow = () => {
     setShowWizard(true);
@@ -38,6 +56,8 @@ export default function ScriptAnalysisWorkflow() {
             
             <ProjectWorkflowWizard
               onComplete={handleWorkflowComplete}
+              existingProjectId={projectId}
+              initialStep={initialStep}
             />
           </div>
         </div>
