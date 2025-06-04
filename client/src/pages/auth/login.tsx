@@ -39,7 +39,7 @@ export default function Login() {
         case userRoles.BRAND_AGENCY:
           setLocation("/dashboard");
           break;
-        case userRoles.INVESTOR:
+        case userRoles.FINANCIER:
           setLocation("/dashboard");
           break;
         case userRoles.INDIVIDUAL_CREATOR:
