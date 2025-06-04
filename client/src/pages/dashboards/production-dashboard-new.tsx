@@ -33,6 +33,7 @@ interface Project {
   budget: number;
   timeline: string;
   status: string;
+  workflowStatus?: string;
   isPublished: boolean;
   createdAt: string;
   scriptContent?: string;
@@ -82,10 +83,38 @@ export default function ProductionDashboard() {
   }
 
   const getProjectProgress = (project: Project) => {
-    let progress = 10; // Basic project creation
-    if (project.scriptContent) progress += 20; // Script uploaded
-    // Add more progress indicators based on analysis completion
-    return Math.min(progress, 100);
+    const workflowStep = project.workflowStatus || 'project_info';
+    
+    switch (workflowStep) {
+      case 'project_info':
+        return project.scriptContent ? 25 : 10;
+      case 'script_analysis':
+        return 50;
+      case 'review_results':
+        return 75;
+      case 'finalize_project':
+        return 90;
+      default:
+        if (project.status === 'completed') return 100;
+        return 10;
+    }
+  };
+
+  const getWorkflowStepName = (project: Project) => {
+    const workflowStep = project.workflowStatus || 'project_info';
+    
+    switch (workflowStep) {
+      case 'project_info':
+        return 'Project Setup';
+      case 'script_analysis':
+        return 'Analysis Running';
+      case 'review_results':
+        return 'Review Phase';
+      case 'finalize_project':
+        return 'Finalizing';
+      default:
+        return project.status?.replace('_', ' ') || 'New Project';
+    }
   };
 
   const getStatusColor = (status: string) => {
@@ -99,23 +128,60 @@ export default function ProductionDashboard() {
   };
 
   const getNextAction = (project: Project) => {
-    if (!project.scriptContent) {
-      return {
-        action: "Upload Script",
-        icon: Upload,
-        description: "Upload your PDF script to begin analysis",
-        link: `/dashboard/projects/${project.id}/upload-script`,
-        variant: "default" as const
-      };
-    }
+    // Map workflow status to appropriate action
+    const workflowStep = project.workflowStatus || 'project_info';
     
-    return {
-      action: "Run Analysis",
-      icon: Play,
-      description: "Generate comprehensive script analysis",
-      link: `/dashboard/projects/${project.id}/run-analysis`,
-      variant: "default" as const
-    };
+    switch (workflowStep) {
+      case 'project_info':
+        return {
+          action: "Continue Setup",
+          icon: Upload,
+          description: "Complete project information and script upload",
+          link: `/dashboard/script-analysis-workflow?projectId=${project.id}&step=project_info`,
+          variant: "default" as const
+        };
+      case 'script_analysis':
+        return {
+          action: "Continue Analysis",
+          icon: Play,
+          description: "Run remaining analysis tools",
+          link: `/dashboard/script-analysis-workflow?projectId=${project.id}&step=script_analysis`,
+          variant: "default" as const
+        };
+      case 'review_results':
+        return {
+          action: "Review Results",
+          icon: FileText,
+          description: "Review and approve analysis results",
+          link: `/dashboard/script-analysis-workflow?projectId=${project.id}&step=review_results`,
+          variant: "default" as const
+        };
+      case 'finalize_project':
+        return {
+          action: "Finalize Project",
+          icon: CheckCircle,
+          description: "Complete and publish your project",
+          link: `/dashboard/script-analysis-workflow?projectId=${project.id}&step=finalize_project`,
+          variant: "default" as const
+        };
+      default:
+        if (project.status === 'completed') {
+          return {
+            action: "View Project",
+            icon: Eye,
+            description: "View completed project details",
+            link: `/dashboard/projects/${project.id}`,
+            variant: "outline" as const
+          };
+        }
+        return {
+          action: "Start Analysis",
+          icon: Play,
+          description: "Begin comprehensive script analysis",
+          link: `/dashboard/script-analysis-workflow?projectId=${project.id}`,
+          variant: "default" as const
+        };
+    }
   };
 
   const analysisFeatures = [
@@ -350,9 +416,18 @@ export default function ProductionDashboard() {
                         <div className="flex items-start justify-between">
                           <div className="space-y-2 flex-1">
                             <CardTitle className="text-lg">{project.title}</CardTitle>
-                            <Badge className={getStatusColor(project.status)}>
-                              {project.status.replace('-', ' ')}
-                            </Badge>
+                            <div className="flex items-center space-x-2">
+                              <Badge className={getStatusColor(project.status)}>
+                                {getWorkflowStepName(project)}
+                              </Badge>
+                              {project.workflowStatus && (
+                                <Badge variant="outline" className="text-xs">
+                                  Step {project.workflowStatus === 'project_info' ? '1' : 
+                                        project.workflowStatus === 'script_analysis' ? '2' :
+                                        project.workflowStatus === 'review_results' ? '3' : '4'}/4
+                                </Badge>
+                              )}
+                            </div>
                           </div>
                           {project.isPublished && (
                             <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />
