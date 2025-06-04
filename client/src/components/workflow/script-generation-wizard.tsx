@@ -176,19 +176,90 @@ export default function ScriptGenerationWizard({
   };
 
   const handleExportPDF = () => {
-    // Create and trigger PDF download
-    const element = document.createElement("a");
-    const file = new Blob([generatedScript], { type: 'text/plain' });
-    element.href = URL.createObjectURL(file);
-    element.download = `${form.getValues('projectTitle')}.txt`;
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
+    // Create a new window with the script content formatted for printing
+    const printWindow = window.open('', '_blank');
     
-    toast({
-      title: "Script Exported",
-      description: "Your script has been downloaded successfully.",
-    });
+    if (!printWindow) {
+      toast({
+        variant: "destructive",
+        title: "Export Failed",
+        description: "Please allow popups to export your script as PDF.",
+      });
+      return;
+    }
+
+    const projectTitle = form.getValues('projectTitle') || 'Screenplay';
+    
+    // HTML content with proper screenplay formatting
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>${projectTitle}</title>
+        <style>
+          @page {
+            size: letter;
+            margin: 1in;
+          }
+          body {
+            font-family: 'Courier New', monospace;
+            font-size: 12pt;
+            line-height: 1.5;
+            color: black;
+            background: white;
+            margin: 0;
+            padding: 0;
+          }
+          .script-content {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            page-break-inside: avoid;
+          }
+          .title-page {
+            text-align: center;
+            margin-top: 2in;
+            margin-bottom: 2in;
+            page-break-after: always;
+          }
+          .title {
+            font-size: 18pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 1in;
+          }
+          @media print {
+            body { print-color-adjust: exact; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="title-page">
+          <div class="title">${projectTitle}</div>
+          <div>A Screenplay</div>
+        </div>
+        <div class="script-content">${generatedScript.replace(/\n/g, '<br>')}</div>
+      </body>
+      </html>
+    `;
+
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
+
+    // Wait for content to load, then trigger print dialog
+    setTimeout(() => {
+      printWindow.focus();
+      printWindow.print();
+      
+      // Close the window after printing
+      setTimeout(() => {
+        printWindow.close();
+      }, 1000);
+      
+      toast({
+        title: "Script Export Started",
+        description: "Use your browser's print dialog to save as PDF.",
+      });
+    }, 500);
   };
 
   const handleComplete = () => {
@@ -282,17 +353,17 @@ export default function ScriptGenerationWizard({
 
   if (currentStep === 'review') {
     return (
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 h-full">
-        {/* Left Panel - Actions */}
-        <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Check className="w-5 h-5 text-green-600" />
-                <span>Script Generated Successfully!</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
+      <div className="space-y-6 h-full">
+        {/* Top Panel - Completion Status */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Check className="w-5 h-5 text-green-600" />
+              <span>Script Generated Successfully!</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="text-center space-y-4">
                 <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
                   <Check className="w-8 h-8 text-green-600" />
@@ -305,9 +376,20 @@ export default function ScriptGenerationWizard({
                 </div>
               </div>
 
-              <Separator />
-
               <div className="space-y-4">
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span>Generation Complete</span>
+                    <span>100%</span>
+                  </div>
+                  <Progress value={100} className="h-2" />
+                  <div className="text-xs text-muted-foreground">
+                    {tokenCount.toLocaleString()} tokens generated
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-2">
                 <Button
                   onClick={handleExportPDF}
                   className="w-full"
@@ -335,26 +417,24 @@ export default function ScriptGenerationWizard({
                   Generate Another Script
                 </Button>
               </div>
-            </CardContent>
-          </Card>
-        </div>
+            </div>
+          </CardContent>
+        </Card>
 
-        {/* Right Panel - Full Script */}
-        <div className="space-y-6">
-          <Card className="h-full">
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <FileText className="w-5 h-5" />
-                <span>Complete Script</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="bg-white border rounded-lg p-6 max-h-[700px] overflow-y-auto font-mono text-sm leading-relaxed">
-                <pre className="whitespace-pre-wrap">{generatedScript}</pre>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        {/* Bottom Panel - Complete Script */}
+        <Card className="flex-1">
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <FileText className="w-5 h-5" />
+              <span>Complete Script</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="bg-white border rounded-lg p-6 h-[500px] overflow-y-auto font-mono text-sm leading-relaxed">
+              <pre className="whitespace-pre-wrap">{generatedScript}</pre>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }
