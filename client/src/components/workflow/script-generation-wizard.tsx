@@ -189,6 +189,8 @@ export default function ScriptGenerationWizard({
         logline: form.getValues('logline')
       };
 
+      console.log('Exporting PDF for:', projectTitle);
+
       // Make API call to generate PDF
       const response = await fetch('/api/script-generation/export-pdf', {
         method: 'POST',
@@ -198,28 +200,60 @@ export default function ScriptGenerationWizard({
         body: JSON.stringify(scriptData),
       });
 
+      console.log('PDF export response status:', response.status);
+
       if (!response.ok) {
-        throw new Error('Failed to generate PDF');
+        const errorText = await response.text();
+        console.error('PDF export failed:', errorText);
+        throw new Error(`Failed to generate PDF: ${response.status}`);
       }
+
+      // Verify content type
+      const contentType = response.headers.get('content-type');
+      console.log('Response content type:', contentType);
 
       // Get the PDF as a blob
       const pdfBlob = await response.blob();
+      console.log('PDF blob size:', pdfBlob.size, 'bytes');
       
-      // Create download link and trigger download
-      const url = window.URL.createObjectURL(pdfBlob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `${projectTitle.replace(/[^a-zA-Z0-9]/g, '_')}_screenplay.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
+      if (pdfBlob.size === 0) {
+        throw new Error('Received empty PDF file');
+      }
+
+      // Create filename
+      const filename = `${projectTitle.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '_')}_screenplay.pdf`;
+      
+      // Try multiple download methods for better compatibility
+      if ((navigator as any).msSaveBlob) {
+        // For Internet Explorer
+        (navigator as any).msSaveBlob(pdfBlob, filename);
+      } else {
+        // For modern browsers
+        const url = window.URL.createObjectURL(pdfBlob);
+        
+        // Create and trigger download
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        link.style.display = 'none';
+        
+        // Add to DOM, click, and remove
+        document.body.appendChild(link);
+        link.click();
+        
+        // Clean up after a short delay
+        setTimeout(() => {
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(url);
+        }, 100);
+      }
       
       toast({
         title: "PDF Downloaded",
-        description: "Your screenplay has been exported as a PDF file.",
+        description: `Your screenplay "${projectTitle}" has been exported successfully.`,
       });
     } catch (error: any) {
+      console.error('PDF export error:', error);
       toast({
         variant: "destructive",
         title: "Export Failed",

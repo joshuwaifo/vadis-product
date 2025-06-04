@@ -256,100 +256,129 @@ ${content}`;
 }
 
 /**
- * Create a simple PDF document
+ * Create a simple PDF document with proper formatting
  */
 function createSimplePDF(title: string, content: string): Buffer {
-  // Basic PDF structure with proper formatting
-  const pdfHeader = '%PDF-1.4\n';
+  // Clean and format content for PDF
+  const cleanContent = content
+    .replace(/[()\\]/g, '\\$&')  // Escape PDF special characters
+    .replace(/\r\n/g, '\n')      // Normalize line endings
+    .replace(/\r/g, '\n');       // Normalize line endings
   
-  // PDF objects
-  const catalog = `1 0 obj
-<<
+  const lines = cleanContent.split('\n');
+  const maxLinesPerPage = 45;
+  const pages = [];
+  
+  // Split content into pages
+  for (let i = 0; i < lines.length; i += maxLinesPerPage) {
+    pages.push(lines.slice(i, i + maxLinesPerPage));
+  }
+  
+  if (pages.length === 0) {
+    pages.push([]);
+  }
+
+  // Build PDF content
+  let pdfContent = '%PDF-1.4\n';
+  let objectCount = 1;
+  const objectOffsets = [];
+  
+  // Record offset and add object
+  const addObject = (obj: string) => {
+    objectOffsets[objectCount - 1] = pdfContent.length;
+    pdfContent += `${objectCount} 0 obj\n${obj}\nendobj\n\n`;
+    objectCount++;
+  };
+
+  // Catalog
+  addObject(`<<
 /Type /Catalog
 /Pages 2 0 R
->>
-endobj
+>>`);
 
-`;
-
-  const pages = `2 0 obj
-<<
+  // Pages object
+  const pageRefs = pages.map((_, i) => `${3 + i} 0 R`).join(' ');
+  addObject(`<<
 /Type /Pages
-/Kids [3 0 R]
-/Count 1
->>
-endobj
+/Kids [${pageRefs}]
+/Count ${pages.length}
+>>`);
 
-`;
-
-  // Calculate content length for the stream
-  const streamContent = `BT
-/F1 12 Tf
-72 720 Td
-(${title.toUpperCase()}) Tj
-0 -24 Td
-(${content.replace(/\n/g, ') Tj 0 -14 Td (').replace(/\r/g, '')}) Tj
-ET`;
-
-  const contentLength = streamContent.length;
-
-  const page = `3 0 obj
-<<
+  // Create page objects and content streams
+  const contentObjStart = 3 + pages.length;
+  
+  pages.forEach((pageLines, pageIndex) => {
+    // Page object
+    addObject(`<<
 /Type /Page
 /Parent 2 0 R
 /MediaBox [0 0 612 792]
 /Resources <<
 /Font <<
-/F1 4 0 R
+/F1 ${contentObjStart + pages.length} 0 R
 >>
 >>
-/Contents 5 0 R
->>
-endobj
+/Contents ${contentObjStart + pageIndex} 0 R
+>>`);
+  });
 
-`;
-
-  const font = `4 0 obj
-<<
-/Type /Font
-/Subtype /Type1
-/BaseFont /Courier
->>
-endobj
-
-`;
-
-  const contentStream = `5 0 obj
-<<
-/Length ${contentLength}
+  // Content streams for each page
+  pages.forEach((pageLines, pageIndex) => {
+    let yPos = 720;
+    let streamContent = 'BT\n/F1 12 Tf\n72 720 Td\n';
+    
+    // Add title on first page
+    if (pageIndex === 0) {
+      streamContent += `(${title.toUpperCase()}) Tj\n0 -24 Td\n`;
+      yPos -= 24;
+    }
+    
+    // Add content lines
+    pageLines.forEach(line => {
+      if (line.trim()) {
+        streamContent += `(${line}) Tj\n0 -14 Td\n`;
+      } else {
+        streamContent += `0 -14 Td\n`;
+      }
+      yPos -= 14;
+    });
+    
+    streamContent += 'ET';
+    
+    addObject(`<<
+/Length ${streamContent.length}
 >>
 stream
 ${streamContent}
-endstream
-endobj
+endstream`);
+  });
 
-`;
+  // Font object
+  addObject(`<<
+/Type /Font
+/Subtype /Type1
+/BaseFont /Courier
+>>`);
 
-  const xref = `xref
-0 6
-0000000000 65535 f 
-0000000010 00000 n 
-0000000053 00000 n 
-0000000125 00000 n 
-0000000284 00000 n 
-0000000354 00000 n 
-`;
+  // Cross-reference table
+  const xrefPos = pdfContent.length;
+  pdfContent += 'xref\n';
+  pdfContent += `0 ${objectCount}\n`;
+  pdfContent += '0000000000 65535 f \n';
+  
+  objectOffsets.forEach(offset => {
+    pdfContent += `${offset.toString().padStart(10, '0')} 00000 n \n`;
+  });
 
-  const trailer = `trailer
+  // Trailer
+  pdfContent += `trailer
 <<
-/Size 6
+/Size ${objectCount}
 /Root 1 0 R
 >>
 startxref
-${(pdfHeader + catalog + pages + page + font + contentStream).length}
+${xrefPos}
 %%EOF`;
 
-  const fullPdf = pdfHeader + catalog + pages + page + font + contentStream + xref + trailer;
-  
-  return Buffer.from(fullPdf, 'utf8');
+  return Buffer.from(pdfContent, 'utf8');
 }
