@@ -45,12 +45,7 @@ export default function ProductionDashboard() {
   const [, setLocation] = useLocation();
   const [scriptGenerationModalOpen, setScriptGenerationModalOpen] = useState(false);
 
-  const handleScriptGenerated = (script: string) => {
-    // TODO: Create a new project with the generated script or update existing project
-    console.log('Generated script:', script.substring(0, 200) + '...');
-    // For now, we'll just close the modal - in the future this could create a project
-    setScriptGenerationModalOpen(false);
-  };
+
 
   // Fetch current user data from session
   const { data: currentUser, isLoading: userLoading, error: userError } = useQuery({
