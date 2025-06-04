@@ -230,7 +230,7 @@ export default function ProductionSuite() {
                     <Clock className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{stats?.developmentProjects || 0}</div>
+                    <div className="text-2xl font-bold">{(stats as any)?.developmentProjects || 0}</div>
                   </CardContent>
                 </Card>
                 
@@ -323,7 +323,7 @@ export default function ProductionSuite() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {projects?.map((project: Project) => (
+                {(projects as Project[])?.map((project: Project) => (
                   <Card key={project.id} className="hover:shadow-lg transition-shadow cursor-pointer">
                     <CardHeader>
                       <div className="flex justify-between items-start">
