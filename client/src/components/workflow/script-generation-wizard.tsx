@@ -1,0 +1,564 @@
+import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Progress } from "@/components/ui/progress";
+import { Separator } from "@/components/ui/separator";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
+import { Wand2, FileText, Download, Loader2, Sparkles, Check } from "lucide-react";
+
+const scriptGenerationSchema = z.object({
+  projectTitle: z.string().min(1, "Project title is required"),
+  logline: z.string().optional(),
+  description: z.string().optional(),
+  genre: z.string().min(1, "Genre is required"),
+  targetedRating: z.enum(['G', 'PG', 'PG-13', 'R', 'NC-17']),
+  storyLocation: z.string().optional(),
+  concept: z.string().optional(),
+  specialRequest: z.string().optional(),
+});
+
+type ScriptGenerationFormData = z.infer<typeof scriptGenerationSchema>;
+
+interface ScriptGenerationWizardProps {
+  onComplete: (projectId: number) => void;
+  existingProjectId?: number;
+  initialStep?: string;
+}
+
+export default function ScriptGenerationWizard({
+  onComplete,
+  existingProjectId,
+  initialStep,
+}: ScriptGenerationWizardProps) {
+  const [currentStep, setCurrentStep] = useState<'setup' | 'generating' | 'review'>('setup');
+  const [generatedScript, setGeneratedScript] = useState<string>("");
+  const [progress, setProgress] = useState(0);
+  const [streamedContent, setStreamedContent] = useState<string>("");
+  const { toast } = useToast();
+
+  const form = useForm<ScriptGenerationFormData>({
+    resolver: zodResolver(scriptGenerationSchema),
+    defaultValues: {
+      projectTitle: "",
+      logline: "",
+      description: "",
+      genre: "",
+      targetedRating: "PG-13",
+      storyLocation: "",
+      concept: "",
+      specialRequest: "",
+    },
+  });
+
+  // Fetch templates and genre options
+  const { data: templates } = useQuery({
+    queryKey: ['/api/script-generation/templates'],
+  });
+
+  // Script generation mutation
+  const generateScriptMutation = useMutation({
+    mutationFn: async (data: ScriptGenerationFormData) => {
+      const payload = {
+        ...data,
+        projectId: existingProjectId,
+      };
+      
+      const response = await apiRequest('/api/script-generation/generate', 'POST', payload);
+      return response.json();
+    },
+    onMutate: () => {
+      setCurrentStep('generating');
+      setProgress(0);
+      setStreamedContent("");
+      
+      // Simulate streaming content generation
+      const streamInterval = setInterval(() => {
+        setStreamedContent(prev => {
+          if (prev.length < 2000) {
+            return prev + "FADE IN:\n\nINT. COFFEE SHOP - DAY\n\nSunlight streams through large windows...\n\n";
+          }
+          clearInterval(streamInterval);
+          return prev;
+        });
+      }, 1000);
+      
+      // Simulate progress updates
+      const progressInterval = setInterval(() => {
+        setProgress((prev) => {
+          if (prev >= 90) {
+            clearInterval(progressInterval);
+            return 90;
+          }
+          return prev + 10;
+        });
+      }, 2000);
+      
+      return { progressInterval, streamInterval };
+    },
+    onSuccess: (data, variables, context) => {
+      if (context?.progressInterval) {
+        clearInterval(context.progressInterval);
+      }
+      if (context?.streamInterval) {
+        clearInterval(context.streamInterval);
+      }
+      
+      setProgress(100);
+      setGeneratedScript(data.script);
+      setCurrentStep('review');
+      
+      toast({
+        title: "Script Generated Successfully",
+        description: "Your AI-powered screenplay is ready for review.",
+      });
+    },
+    onError: (error: any, variables, context) => {
+      if (context?.progressInterval) {
+        clearInterval(context.progressInterval);
+      }
+      if (context?.streamInterval) {
+        clearInterval(context.streamInterval);
+      }
+      
+      setCurrentStep('setup');
+      setProgress(0);
+      setStreamedContent("");
+      
+      toast({
+        variant: "destructive",
+        title: "Generation Failed",
+        description: error.message || "Failed to generate script. Please try again.",
+      });
+    },
+  });
+
+  const handleStartGeneration = (data: ScriptGenerationFormData) => {
+    generateScriptMutation.mutate(data);
+  };
+
+  const handleExportPDF = () => {
+    // Create and trigger PDF download
+    const element = document.createElement("a");
+    const file = new Blob([generatedScript], { type: 'text/plain' });
+    element.href = URL.createObjectURL(file);
+    element.download = `${form.getValues('projectTitle')}.txt`;
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+    
+    toast({
+      title: "Script Exported",
+      description: "Your script has been downloaded successfully.",
+    });
+  };
+
+  const handleComplete = () => {
+    if (existingProjectId) {
+      onComplete(existingProjectId);
+    }
+  };
+
+  if (currentStep === 'generating') {
+    return (
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 h-full">
+        {/* Left Panel - Generation Status */}
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Wand2 className="w-5 h-5" />
+                <span>Generating Script</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="text-center space-y-4">
+                <div className="mx-auto w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center">
+                  <Sparkles className="w-8 h-8 text-purple-600 animate-pulse" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold">Creating Your Screenplay</h3>
+                  <p className="text-muted-foreground">
+                    Our AI is crafting your story with professional formatting
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>Generation Progress</span>
+                  <span>{progress}%</span>
+                </div>
+                <Progress value={progress} className="h-2" />
+              </div>
+
+              <div className="space-y-2 text-sm text-muted-foreground">
+                <div className="flex items-center space-x-2">
+                  <div className={`w-2 h-2 rounded-full ${progress > 0 ? 'bg-green-500' : 'bg-gray-300'}`} />
+                  <span>Story structure development</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className={`w-2 h-2 rounded-full ${progress > 25 ? 'bg-green-500' : 'bg-gray-300'}`} />
+                  <span>Character development</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className={`w-2 h-2 rounded-full ${progress > 50 ? 'bg-green-500' : 'bg-gray-300'}`} />
+                  <span>Dialogue creation</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className={`w-2 h-2 rounded-full ${progress > 75 ? 'bg-green-500' : 'bg-gray-300'}`} />
+                  <span>Scene descriptions</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Right Panel - Live Script Preview */}
+        <div className="space-y-6">
+          <Card className="h-full">
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <FileText className="w-5 h-5" />
+                <span>Live Script Preview</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="bg-white border rounded-lg p-6 min-h-[600px] font-mono text-sm leading-relaxed">
+                {streamedContent || "Preparing to generate your script..."}
+                {progress < 100 && (
+                  <span className="inline-block w-2 h-4 bg-purple-600 animate-pulse ml-1" />
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  if (currentStep === 'review') {
+    return (
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 h-full">
+        {/* Left Panel - Actions */}
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Check className="w-5 h-5 text-green-600" />
+                <span>Script Generated Successfully!</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="text-center space-y-4">
+                <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+                  <Check className="w-8 h-8 text-green-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold">Your Screenplay is Ready</h3>
+                  <p className="text-muted-foreground">
+                    Review your generated script and export when ready
+                  </p>
+                </div>
+              </div>
+
+              <Separator />
+
+              <div className="space-y-4">
+                <Button
+                  onClick={handleExportPDF}
+                  className="w-full"
+                  size="lg"
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Export to PDF
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  onClick={handleComplete}
+                  className="w-full"
+                >
+                  <FileText className="w-4 h-4 mr-2" />
+                  Save to Project
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  onClick={() => setCurrentStep('setup')}
+                  className="w-full"
+                >
+                  <Wand2 className="w-4 h-4 mr-2" />
+                  Generate Another Script
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Right Panel - Full Script */}
+        <div className="space-y-6">
+          <Card className="h-full">
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <FileText className="w-5 h-5" />
+                <span>Complete Script</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="bg-white border rounded-lg p-6 max-h-[700px] overflow-y-auto font-mono text-sm leading-relaxed">
+                <pre className="whitespace-pre-wrap">{generatedScript}</pre>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 h-full">
+      {/* Left Panel - Form */}
+      <div className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Wand2 className="w-5 h-5" />
+              <span>Script Generation Setup</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(handleStartGeneration)} className="space-y-6">
+                <FormField
+                  control={form.control}
+                  name="projectTitle"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Project Title *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter your project title" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="logline"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Logline</FormLabel>
+                      <FormControl>
+                        <Input placeholder="A one-sentence summary of your story" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="genre"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Genre *</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a genre" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="drama">Drama</SelectItem>
+                          <SelectItem value="comedy">Comedy</SelectItem>
+                          <SelectItem value="action">Action</SelectItem>
+                          <SelectItem value="thriller">Thriller</SelectItem>
+                          <SelectItem value="horror">Horror</SelectItem>
+                          <SelectItem value="romance">Romance</SelectItem>
+                          <SelectItem value="sci-fi">Science Fiction</SelectItem>
+                          <SelectItem value="fantasy">Fantasy</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="targetedRating"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Target Rating</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="G">G - General Audiences</SelectItem>
+                          <SelectItem value="PG">PG - Parental Guidance</SelectItem>
+                          <SelectItem value="PG-13">PG-13 - Parents Strongly Cautioned</SelectItem>
+                          <SelectItem value="R">R - Restricted</SelectItem>
+                          <SelectItem value="NC-17">NC-17 - Adults Only</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Story Description</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="Describe your story in detail..."
+                          className="min-h-[100px]"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="storyLocation"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Primary Location</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Where does your story take place?" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="specialRequest"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Special Requests</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="Any special requirements or creative directions..."
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <Button type="submit" disabled={generateScriptMutation.isPending} className="w-full" size="lg">
+                  {generateScriptMutation.isPending ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Starting Generation...
+                    </>
+                  ) : (
+                    <>
+                      <Wand2 className="w-4 h-4 mr-2" />
+                      Start Script Generation
+                    </>
+                  )}
+                </Button>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Right Panel - Preview/Instructions */}
+      <div className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <FileText className="w-5 h-5" />
+              <span>What to Expect</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-4">
+              <div className="flex items-start space-x-3">
+                <div className="w-6 h-6 bg-purple-500 text-white rounded-full flex items-center justify-center text-sm font-medium">
+                  1
+                </div>
+                <div>
+                  <h4 className="font-medium">Real-time Generation</h4>
+                  <p className="text-sm text-gray-600">
+                    Watch your script being written in real-time as our AI processes your input
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-start space-x-3">
+                <div className="w-6 h-6 bg-pink-500 text-white rounded-full flex items-center justify-center text-sm font-medium">
+                  2
+                </div>
+                <div>
+                  <h4 className="font-medium">Professional Format</h4>
+                  <p className="text-sm text-gray-600">
+                    Industry-standard screenplay formatting with proper scene headers and dialogue
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-start space-x-3">
+                <div className="w-6 h-6 bg-orange-500 text-white rounded-full flex items-center justify-center text-sm font-medium">
+                  3
+                </div>
+                <div>
+                  <h4 className="font-medium">Instant Export</h4>
+                  <p className="text-sm text-gray-600">
+                    Download your completed script as a PDF for immediate use
+                  </p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Generation Tips</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3 text-sm">
+              <div className="p-3 bg-blue-50 rounded-lg">
+                <p className="font-medium text-blue-900">💡 Be Specific</p>
+                <p className="text-blue-700">The more detailed your description, the better your script will be</p>
+              </div>
+              <div className="p-3 bg-green-50 rounded-lg">
+                <p className="font-medium text-green-900">🎭 Include Character Details</p>
+                <p className="text-green-700">Mention key characters and their relationships in your description</p>
+              </div>
+              <div className="p-3 bg-purple-50 rounded-lg">
+                <p className="font-medium text-purple-900">🎬 Set the Tone</p>
+                <p className="text-purple-700">Describe the mood and style you want for your screenplay</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}

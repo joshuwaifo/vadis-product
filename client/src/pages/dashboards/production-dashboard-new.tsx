@@ -25,7 +25,7 @@ import {
   Wand2
 } from "lucide-react";
 import DashboardLayout from "../dashboard/dashboard-layout";
-import ScriptGenerationModal from "@/components/script-generation/script-generation-modal";
+
 
 interface Project {
   id: number;
@@ -43,7 +43,7 @@ interface Project {
 
 export default function ProductionDashboard() {
   const [, setLocation] = useLocation();
-  const [scriptGenerationModalOpen, setScriptGenerationModalOpen] = useState(false);
+
 
 
 
@@ -273,15 +273,16 @@ export default function ProductionDashboard() {
                       Analyze Script
                     </Button>
                   </Link>
-                  <Button 
-                    variant="outline" 
-                    size="lg" 
-                    className="border-2 border-purple-300 dark:border-purple-600 hover:border-purple-500 dark:hover:border-purple-400"
-                    onClick={() => setScriptGenerationModalOpen(true)}
-                  >
-                    <Wand2 className="w-5 h-5 mr-2" />
-                    Generate Script
-                  </Button>
+                  <Link href="/dashboard/script-generation-workflow">
+                    <Button 
+                      variant="outline" 
+                      size="lg" 
+                      className="border-2 border-purple-300 dark:border-purple-600 hover:border-purple-500 dark:hover:border-purple-400"
+                    >
+                      <Wand2 className="w-5 h-5 mr-2" />
+                      Generate Script
+                    </Button>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -518,15 +519,7 @@ export default function ProductionDashboard() {
 
       </div>
 
-      {/* Script Generation Modal */}
-      <ScriptGenerationModal
-        open={scriptGenerationModalOpen}
-        onOpenChange={setScriptGenerationModalOpen}
-        onScriptGenerated={(script: string) => {
-          console.log('Generated script:', script.substring(0, 200) + '...');
-          setScriptGenerationModalOpen(false);
-        }}
-      />
+
     </DashboardLayout>
   );
 }

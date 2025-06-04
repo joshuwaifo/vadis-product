@@ -15,6 +15,7 @@ import DashboardHome from "@/pages/dashboard/dashboard-home";
 import ProfilePage from "@/pages/dashboard/profile";
 import ScriptAnalysisNew from "@/pages/dashboard/script-analysis-new";
 import ScriptAnalysisWorkflow from "@/pages/dashboard/script-analysis-workflow";
+import ScriptGenerationWorkflow from "@/pages/dashboard/script-generation-workflow";
 import ScriptGenerator from "@/pages/dashboard/script-generator";
 import ProductionDashboard from "@/pages/dashboards/production-dashboard-new";
 import BrandDashboard from "@/pages/dashboards/brand-dashboard";
