@@ -22,7 +22,8 @@ import {
   Banknote
 } from "lucide-react";
 import { SiNetflix, SiApple, SiAmazon, SiNike, SiCocacola, SiMercedes, SiSony } from 'react-icons/si';
-// Logo assets removed - assets directory deleted
+import vadisLogoLight from "@assets/Vadis FINAL LOGO large size Without Background.png";
+import vadisLogoDark from "@assets/Vadis_logo_dark.png";
 
 export default function Landing() {
   const [selectedRole, setSelectedRole] = useState<string>("");
@@ -216,7 +217,7 @@ export default function Landing() {
             {/* Logo */}
             <div className="flex items-center relative z-10">
               <img 
-                src="#" 
+                src={vadisLogoLight} 
                 alt="VadisMedia" 
                 className="h-24 w-auto drop-shadow-2xl"
               />
@@ -667,7 +668,7 @@ export default function Landing() {
             <div className="flex flex-col">
               <div className="mb-6">
                 <img 
-                  src="#" 
+                  src={vadisLogoLight} 
                   alt="VadisMedia" 
                   className="h-16 w-auto object-contain"
                 />

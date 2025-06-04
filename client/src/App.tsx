@@ -11,10 +11,13 @@ import DemoBrand from "@/pages/demos/demo-brand";
 import DemoFinancier from "@/pages/demos/demo-financier";
 import DemoCreator from "@/pages/demos/demo-creator";
 
-// New role-specific dashboards
-import ProductionDashboard from "@/pages/dashboards/production-dashboard";
+import DashboardHome from "@/pages/dashboard/dashboard-home";
+import ProfilePage from "@/pages/dashboard/profile";
+import ScriptAnalysisNew from "@/pages/dashboard/script-analysis-new";
+import ScriptGenerator from "@/pages/dashboard/script-generator";
+import ProductionDashboard from "@/pages/dashboards/production-dashboard-new";
 import BrandDashboard from "@/pages/dashboards/brand-dashboard";
-import FinancierDashboard from "@/pages/dashboards/financier-dashboard";
+import InvestorDashboard from "@/pages/dashboards/investor-dashboard";
 import CreatorDashboard from "@/pages/dashboards/creator-dashboard";
 import NotFound from "@/pages/not-found";
 
@@ -28,13 +31,15 @@ function Router() {
       <Route path="/demo/brand" component={DemoBrand} />
       <Route path="/demo/financier" component={DemoFinancier} />
       <Route path="/demo/creator" component={DemoCreator} />
-      
-      {/* Role-specific dashboards */}
-      <Route path="/dashboard/production" component={ProductionDashboard} />
-      <Route path="/dashboard/brand" component={BrandDashboard} />
-      <Route path="/dashboard/financier" component={FinancierDashboard} />
-      <Route path="/dashboard/creator" component={CreatorDashboard} />
-      
+      <Route path="/dashboard" component={DashboardHome} />
+      <Route path="/dashboard/profile" component={ProfilePage} />
+      <Route path="/dashboard/script-analysis-new" component={ScriptAnalysisNew} />
+      <Route path="/dashboard/script-generator" component={ScriptGenerator} />
+      <Route path="/dashboard/script-analysis" component={ScriptAnalysisNew} />
+      <Route path="/production/dashboard" component={ProductionDashboard} />
+      <Route path="/brand/dashboard" component={BrandDashboard} />
+      <Route path="/investor/dashboard" component={InvestorDashboard} />
+      <Route path="/creator/dashboard" component={CreatorDashboard} />
       <Route component={NotFound} />
     </Switch>
   );

@@ -1,290 +1,139 @@
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Plus, Target, TrendingUp, Eye, ShoppingBag, Calendar, Users, DollarSign } from "lucide-react";
+import { useLocation } from "wouter";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
+import { Skeleton } from "@/components/ui/skeleton";
+import { 
+  TrendingUp, 
+  Target, 
+  Users,
+  BarChart3
+} from "lucide-react";
+import DashboardLayout from "../dashboard/dashboard-layout";
 
 export default function BrandDashboard() {
-  const [activeTab, setActiveTab] = useState("overview");
+  const [, setLocation] = useLocation();
 
-  const stats = [
-    {
-      title: "Active Campaigns",
-      value: "5",
-      change: "+2 this month",
-      icon: Target,
-      color: "text-blue-600"
+  // Fetch current user data from session
+  const { data: currentUser, isLoading: userLoading, error: userError } = useQuery({
+    queryKey: ['currentUser'],
+    queryFn: async () => {
+      const response = await fetch('/api/auth/me');
+      if (!response.ok) {
+        throw new Error('Authentication required');
+      }
+      return response.json();
     },
-    {
-      title: "Placement Value",
-      value: "$125K",
-      change: "+25% ROI",
-      icon: DollarSign,
-      color: "text-green-600"
-    },
-    {
-      title: "Brand Visibility",
-      value: "2.3M",
-      change: "+18% reach",
-      icon: Eye,
-      color: "text-purple-600"
-    },
-    {
-      title: "Products Listed",
-      value: "12",
-      change: "+3 new products",
-      icon: ShoppingBag,
-      color: "text-orange-600"
-    }
-  ];
+  });
 
-  const activeCampaigns = [
-    {
-      id: 1,
-      name: "Summer Collection Launch",
-      status: "Active",
-      progress: 75,
-      budget: "$45K",
-      impressions: "1.2M",
-      placement: "Hero Placement",
-      endDate: "Dec 15, 2024"
-    },
-    {
-      id: 2,
-      name: "Tech Innovation Series",
-      status: "In Review",
-      progress: 40,
-      budget: "$30K",
-      impressions: "800K",
-      placement: "Featured",
-      endDate: "Jan 20, 2025"
-    },
-    {
-      id: 3,
-      name: "Lifestyle Brand Partnership",
-      status: "Planning",
-      progress: 20,
-      budget: "$50K",
-      impressions: "Target 2M",
-      placement: "Background",
-      endDate: "Mar 10, 2025"
-    }
-  ];
+  // Redirect to login if authentication fails
+  if (userError) {
+    setLocation('/login');
+    return null;
+  }
 
-  const products = [
-    {
-      id: 1,
-      name: "Premium Smartphone",
-      category: "Electronics",
-      placements: 8,
-      avgValue: "$12K",
-      status: "Active"
-    },
-    {
-      id: 2,
-      name: "Designer Sunglasses",
-      category: "Fashion",
-      placements: 5,
-      avgValue: "$8K",
-      status: "Active"
-    },
-    {
-      id: 3,
-      name: "Energy Drink",
-      category: "Beverages",
-      placements: 12,
-      avgValue: "$5K",
-      status: "Active"
-    }
-  ];
-
-  return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Header */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-        <div className="px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                Brand Dashboard
-              </h1>
-              <p className="text-gray-600 dark:text-gray-400">
-                Welcome back, Brand Demo
-              </p>
-            </div>
-            <Button className="bg-blue-600 hover:bg-blue-700">
-              <Plus className="w-4 h-4 mr-2" />
-              New Campaign
-            </Button>
+  // Show loading state while user data is being fetched
+  if (userLoading) {
+    return (
+      <DashboardLayout>
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center space-y-4">
+            <Skeleton className="h-8 w-64 mx-auto" />
+            <Skeleton className="h-4 w-48 mx-auto" />
           </div>
         </div>
-      </div>
+      </DashboardLayout>
+    );
+  }
 
-      <div className="p-6">
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-          {stats.map((stat, index) => (
-            <Card key={index}>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                      {stat.title}
-                    </p>
-                    <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                      {stat.value}
-                    </p>
-                    <p className="text-xs text-green-600">
-                      {stat.change}
+  return (
+    <DashboardLayout>
+      <div className="min-h-screen">
+        {/* Hero Section */}
+        <div className="relative bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 dark:from-gray-900 dark:via-green-900/20 dark:to-teal-900/20 overflow-hidden">
+          <div className="relative px-6 py-12 sm:px-8 lg:px-12">
+            <div className="max-w-7xl mx-auto">
+              <div className="flex flex-col lg:flex-row items-start justify-between gap-8">
+                <div className="flex-1 space-y-6">
+                  <div className="space-y-4">
+                    <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-gray-900 via-green-800 to-teal-800 dark:from-white dark:via-green-200 dark:to-teal-200 bg-clip-text text-transparent leading-tight">
+                      Welcome, {currentUser?.user?.name || 'Brand Partner'}
+                    </h1>
+                    <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl leading-relaxed">
+                      Discover perfect product placement opportunities, connect with productions, and amplify your brand through entertainment partnerships.
                     </p>
                   </div>
-                  <stat.icon className={`w-8 h-8 ${stat.color}`} />
+                  
+                  <div className="flex flex-wrap gap-4">
+                    <Button size="lg" className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+                      <Target className="w-5 h-5 mr-2" />
+                      Browse Opportunities
+                    </Button>
+                    <Button variant="outline" size="lg" className="border-2 border-green-200 dark:border-green-800 hover:bg-green-50 dark:hover:bg-green-900/20 transition-all duration-300">
+                      <Users className="w-5 h-5 mr-2" />
+                      View Partnerships
+                    </Button>
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
-          ))}
+
+                {/* Stats Cards */}
+                <div className="w-full lg:w-auto">
+                  <div className="grid grid-cols-2 lg:grid-cols-1 gap-4 lg:min-w-[300px]">
+                    <Card className="backdrop-blur-sm bg-white/70 dark:bg-gray-800/70 border border-white/20 dark:border-gray-700/30 shadow-xl">
+                      <CardContent className="p-6">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Active Campaigns</p>
+                            <p className="text-3xl font-bold text-gray-900 dark:text-white">0</p>
+                          </div>
+                          <div className="h-12 w-12 bg-gradient-to-br from-green-500 to-teal-500 rounded-xl flex items-center justify-center">
+                            <TrendingUp className="h-6 w-6 text-white" />
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="backdrop-blur-sm bg-white/70 dark:bg-gray-800/70 border border-white/20 dark:border-gray-700/30 shadow-xl">
+                      <CardContent className="p-6">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Partnerships</p>
+                            <p className="text-3xl font-bold text-gray-900 dark:text-white">0</p>
+                          </div>
+                          <div className="h-12 w-12 bg-gradient-to-br from-emerald-500 to-cyan-500 rounded-xl flex items-center justify-center">
+                            <BarChart3 className="h-6 w-6 text-white" />
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Campaigns List */}
-          <div className="lg:col-span-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Active Campaigns</CardTitle>
-                <CardDescription>
-                  Your product placement campaigns
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
+        <div className="px-6 py-8 sm:px-8 lg:px-12">
+          <div className="max-w-7xl mx-auto">
+            <Card className="border-2 border-dashed border-gray-300 dark:border-gray-600">
+              <CardContent className="p-12 text-center">
                 <div className="space-y-4">
-                  {activeCampaigns.map((campaign) => (
-                    <div key={campaign.id} className="border rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-semibold text-gray-900 dark:text-white">
-                          {campaign.name}
-                        </h3>
-                        <Badge variant={campaign.status === "Active" ? "default" : "secondary"}>
-                          {campaign.status}
-                        </Badge>
-                      </div>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-600 dark:text-gray-400 mb-3">
-                        <div>
-                          <span className="font-medium">Budget:</span> {campaign.budget}
-                        </div>
-                        <div>
-                          <span className="font-medium">Impressions:</span> {campaign.impressions}
-                        </div>
-                        <div>
-                          <span className="font-medium">Placement:</span> {campaign.placement}
-                        </div>
-                        <div>
-                          <span className="font-medium">End Date:</span> {campaign.endDate}
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium">Progress</span>
-                        <span className="text-sm text-gray-600">{campaign.progress}%</span>
-                      </div>
-                      <Progress value={campaign.progress} className="h-2" />
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Quick Actions */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Quick Actions</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <Button variant="outline" className="w-full justify-start">
-                  <Target className="w-4 h-4 mr-2" />
-                  Create Campaign
-                </Button>
-                <Button variant="outline" className="w-full justify-start">
-                  <ShoppingBag className="w-4 h-4 mr-2" />
-                  Add Product
-                </Button>
-                <Button variant="outline" className="w-full justify-start">
-                  <TrendingUp className="w-4 h-4 mr-2" />
-                  View Analytics
-                </Button>
-                <Button variant="outline" className="w-full justify-start">
-                  <Eye className="w-4 h-4 mr-2" />
-                  Browse Projects
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Product Portfolio */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Product Portfolio</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {products.map((product) => (
-                    <div key={product.id} className="border rounded-lg p-3">
-                      <div className="flex items-center justify-between mb-1">
-                        <h4 className="font-medium text-sm">{product.name}</h4>
-                        <Badge variant="outline" className="text-xs">
-                          {product.status}
-                        </Badge>
-                      </div>
-                      <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
-                        {product.category}
-                      </p>
-                      <div className="grid grid-cols-2 gap-2 text-xs">
-                        <div>
-                          <span className="font-medium">Placements:</span> {product.placements}
-                        </div>
-                        <div>
-                          <span className="font-medium">Avg Value:</span> {product.avgValue}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Performance Metrics */}
-            <Card>
-              <CardHeader>
-                <CardTitle>This Month</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">Brand Exposure</span>
-                    <span className="text-sm font-medium">85%</span>
+                  <div className="h-16 w-16 bg-gray-100 dark:bg-gray-800 rounded-xl flex items-center justify-center mx-auto">
+                    <Target className="h-8 w-8 text-gray-400" />
                   </div>
-                  <Progress value={85} className="h-2" />
-                  
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">Campaign ROI</span>
-                    <span className="text-sm font-medium">92%</span>
+                  <div className="space-y-2">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Brand Dashboard Coming Soon</h3>
+                    <p className="text-gray-600 dark:text-gray-400 max-w-md mx-auto">
+                      Your brand partnership dashboard is being built. Soon you'll be able to discover product placement opportunities and manage brand partnerships.
+                    </p>
                   </div>
-                  <Progress value={92} className="h-2" />
-                  
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">Audience Reach</span>
-                    <span className="text-sm font-medium">78%</span>
-                  </div>
-                  <Progress value={78} className="h-2" />
                 </div>
               </CardContent>
             </Card>
           </div>
         </div>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }

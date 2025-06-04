@@ -13,7 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
 import { z } from "zod";
 import { SiNetflix, SiApple, SiAmazon, SiSony, SiMercedes } from 'react-icons/si';
-// Logo removed - assets directory deleted
+import vadisLogoLight from "@assets/Vadis FINAL LOGO large size Without Background.png";
 
 // Simple form schema with only essential fields
 const formSchema = z.object({
@@ -140,7 +140,7 @@ export default function DemoRequest() {
             {/* Logo */}
             <div className="flex items-center relative z-10">
               <img 
-                src="#" 
+                src={vadisLogoLight} 
                 alt="VadisMedia" 
                 className="h-24 w-auto drop-shadow-2xl"
               />
