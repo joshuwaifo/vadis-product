@@ -440,240 +440,235 @@ export default function ScriptGenerationWizard({
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 h-full">
-      {/* Left Panel - Form */}
-      <div className="space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Wand2 className="w-5 h-5" />
-              <span>Script Generation Setup</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(handleStartGeneration)} className="space-y-6">
-                <FormField
-                  control={form.control}
-                  name="projectTitle"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Project Title *</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter your project title" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="logline"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Logline</FormLabel>
-                      <FormControl>
-                        <Input placeholder="A one-sentence summary of your story" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="genre"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Genre *</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a genre" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="drama">Drama</SelectItem>
-                          <SelectItem value="comedy">Comedy</SelectItem>
-                          <SelectItem value="action">Action</SelectItem>
-                          <SelectItem value="thriller">Thriller</SelectItem>
-                          <SelectItem value="horror">Horror</SelectItem>
-                          <SelectItem value="romance">Romance</SelectItem>
-                          <SelectItem value="sci-fi">Science Fiction</SelectItem>
-                          <SelectItem value="fantasy">Fantasy</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="targetedRating"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Target Rating</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="G">G - General Audiences</SelectItem>
-                          <SelectItem value="PG">PG - Parental Guidance</SelectItem>
-                          <SelectItem value="PG-13">PG-13 - Parents Strongly Cautioned</SelectItem>
-                          <SelectItem value="R">R - Restricted</SelectItem>
-                          <SelectItem value="NC-17">NC-17 - Adults Only</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="description"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Story Description</FormLabel>
-                      <FormControl>
-                        <Textarea 
-                          placeholder="Describe your story in detail..."
-                          className="min-h-[100px]"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="storyLocation"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Primary Location</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Where does your story take place?" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="specialRequest"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Special Requests</FormLabel>
-                      <FormControl>
-                        <Textarea 
-                          placeholder="Any special requirements or creative directions..."
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <Button type="submit" disabled={generateScriptMutation.isPending} className="w-full" size="lg">
-                  {generateScriptMutation.isPending ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Starting Generation...
-                    </>
-                  ) : (
-                    <>
-                      <Wand2 className="w-4 h-4 mr-2" />
-                      Start Script Generation
-                    </>
-                  )}
-                </Button>
-              </form>
-            </Form>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Right Panel - Preview/Instructions */}
-      <div className="space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <FileText className="w-5 h-5" />
-              <span>What to Expect</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-4">
-              <div className="flex items-start space-x-3">
-                <div className="w-6 h-6 bg-purple-500 text-white rounded-full flex items-center justify-center text-sm font-medium">
-                  1
-                </div>
-                <div>
-                  <h4 className="font-medium">Real-time Generation</h4>
-                  <p className="text-sm text-gray-600">
-                    Watch your script being written in real-time as our AI processes your input
-                  </p>
-                </div>
+    <div className="space-y-6">
+      {/* Top Panel - What to Expect */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <FileText className="w-5 h-5" />
+            <span>What to Expect</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="flex items-start space-x-3">
+              <div className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-medium">
+                1
               </div>
-              
-              <div className="flex items-start space-x-3">
-                <div className="w-6 h-6 bg-pink-500 text-white rounded-full flex items-center justify-center text-sm font-medium">
-                  2
-                </div>
-                <div>
-                  <h4 className="font-medium">Professional Format</h4>
-                  <p className="text-sm text-gray-600">
-                    Industry-standard screenplay formatting with proper scene headers and dialogue
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex items-start space-x-3">
-                <div className="w-6 h-6 bg-orange-500 text-white rounded-full flex items-center justify-center text-sm font-medium">
-                  3
-                </div>
-                <div>
-                  <h4 className="font-medium">Instant Export</h4>
-                  <p className="text-sm text-gray-600">
-                    Download your completed script as a PDF for immediate use
-                  </p>
-                </div>
+              <div>
+                <h4 className="font-medium">AI-Powered Writing</h4>
+                <p className="text-sm text-gray-600">
+                  Our advanced AI will craft a professional screenplay based on your inputs
+                </p>
               </div>
             </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Generation Tips</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3 text-sm">
-              <div className="p-3 bg-blue-50 rounded-lg">
-                <p className="font-medium text-blue-900">💡 Be Specific</p>
-                <p className="text-blue-700">The more detailed your description, the better your script will be</p>
+            <div className="flex items-start space-x-3">
+              <div className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-medium">
+                2
               </div>
-              <div className="p-3 bg-green-50 rounded-lg">
-                <p className="font-medium text-green-900">🎭 Include Character Details</p>
-                <p className="text-green-700">Mention key characters and their relationships in your description</p>
-              </div>
-              <div className="p-3 bg-purple-50 rounded-lg">
-                <p className="font-medium text-purple-900">🎬 Set the Tone</p>
-                <p className="text-purple-700">Describe the mood and style you want for your screenplay</p>
+              <div>
+                <h4 className="font-medium">Real-Time Progress</h4>
+                <p className="text-sm text-gray-600">
+                  Watch your script being generated live with token-based progress tracking
+                </p>
               </div>
             </div>
-          </CardContent>
-        </Card>
-      </div>
+            <div className="flex items-start space-x-3">
+              <div className="w-6 h-6 bg-orange-500 text-white rounded-full flex items-center justify-center text-sm font-medium">
+                3
+              </div>
+              <div>
+                <h4 className="font-medium">Instant Export</h4>
+                <p className="text-sm text-gray-600">
+                  Download your completed script as a PDF for immediate use
+                </p>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Middle Panel - Generation Tips */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Generation Tips</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+            <div className="p-3 bg-blue-50 rounded-lg">
+              <p className="font-medium text-blue-900">💡 Be Specific</p>
+              <p className="text-blue-700">The more detailed your description, the better your script will be</p>
+            </div>
+            <div className="p-3 bg-green-50 rounded-lg">
+              <p className="font-medium text-green-900">🎭 Include Character Details</p>
+              <p className="text-green-700">Mention key characters and their relationships in your description</p>
+            </div>
+            <div className="p-3 bg-purple-50 rounded-lg">
+              <p className="font-medium text-purple-900">🎬 Set the Tone</p>
+              <p className="text-purple-700">Describe the mood and style you want for your screenplay</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Bottom Panel - Script Generation Setup */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Wand2 className="w-5 h-5" />
+            <span>Script Generation Setup</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleStartGeneration)} className="space-y-6">
+              <FormField
+                control={form.control}
+                name="projectTitle"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Project Title *</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter your project title" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="logline"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Logline</FormLabel>
+                    <FormControl>
+                      <Input placeholder="A one-sentence summary of your story" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="genre"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Genre *</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a genre" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="drama">Drama</SelectItem>
+                        <SelectItem value="comedy">Comedy</SelectItem>
+                        <SelectItem value="action">Action</SelectItem>
+                        <SelectItem value="thriller">Thriller</SelectItem>
+                        <SelectItem value="horror">Horror</SelectItem>
+                        <SelectItem value="romance">Romance</SelectItem>
+                        <SelectItem value="sci-fi">Science Fiction</SelectItem>
+                        <SelectItem value="fantasy">Fantasy</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="targetedRating"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Target Rating *</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select target rating" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="G">G - General Audiences</SelectItem>
+                        <SelectItem value="PG">PG - Parental Guidance</SelectItem>
+                        <SelectItem value="PG-13">PG-13 - Parents Strongly Cautioned</SelectItem>
+                        <SelectItem value="R">R - Restricted</SelectItem>
+                        <SelectItem value="NC-17">NC-17 - Adults Only</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Story Description</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        placeholder="Describe your story in detail..."
+                        className="min-h-[100px]"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="storyLocation"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Primary Location</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Where does your story take place?" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="specialRequest"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Special Requests</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        placeholder="Any special requirements or creative directions..."
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <Button type="submit" disabled={generateScriptMutation.isPending} className="w-full" size="lg">
+                {generateScriptMutation.isPending ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Starting Generation...
+                  </>
+                ) : (
+                  <>
+                    <Wand2 className="w-4 h-4 mr-2" />
+                    Start Script Generation
+                  </>
+                )}
+              </Button>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
     </div>
   );
 }
