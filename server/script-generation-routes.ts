@@ -26,7 +26,7 @@ const scriptGenerationSchema = z.object({
 export function registerScriptGenerationRoutes(app: any) {
   
   /**
-   * Generate a new script using AI
+   * Generate a new script using AI with streaming
    */
   app.post('/api/script-generation/generate', async (req: Request, res: Response) => {
     try {
@@ -34,8 +34,34 @@ export function registerScriptGenerationRoutes(app: any) {
       
       console.log('[Script Generation] Starting generation for:', validatedData.projectTitle);
       
-      // Generate the script using AI
-      const generatedScript = await generateScript(validatedData as ScriptGenerationRequest);
+      // Set up Server-Sent Events
+      res.writeHead(200, {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Cache-Control'
+      });
+      
+      let accumulatedScript = '';
+      let tokenCount = 0;
+      
+      // Custom callback to stream progress
+      const progressCallback = (chunk: string, tokens: number) => {
+        accumulatedScript += chunk;
+        tokenCount = tokens;
+        
+        // Send progress update
+        res.write(`data: ${JSON.stringify({
+          type: 'progress',
+          content: accumulatedScript,
+          tokenCount: tokenCount,
+          chunk: chunk
+        })}\n\n`);
+      };
+      
+      // Generate the script using AI with streaming
+      const generatedScript = await generateScript(validatedData as ScriptGenerationRequest, progressCallback);
       
       // If projectId is provided, update the project with the generated script
       if (validatedData.projectId) {
@@ -50,28 +76,26 @@ export function registerScriptGenerationRoutes(app: any) {
         console.log(`[Script Generation] Updated project ${validatedData.projectId} with generated script`);
       }
       
-      res.json({
-        success: true,
+      // Send completion event
+      res.write(`data: ${JSON.stringify({
+        type: 'complete',
         script: generatedScript,
-        message: "Script generated successfully"
-      });
+        tokenCount: tokenCount,
+        success: true
+      })}\n\n`);
+      
+      res.end();
       
     } catch (error: any) {
       console.error('[Script Generation] Error:', error.message);
       
-      if (error.name === 'ZodError') {
-        return res.status(400).json({
-          success: false,
-          error: "Invalid input data",
-          details: error.errors
-        });
-      }
+      // Send error event
+      res.write(`data: ${JSON.stringify({
+        type: 'error',
+        error: error.message
+      })}\n\n`);
       
-      res.status(500).json({
-        success: false,
-        error: "Failed to generate script",
-        message: error.message
-      });
+      res.end();
     }
   });
 

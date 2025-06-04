@@ -41,7 +41,10 @@ function getRatingDescription(rating: string): string {
   }
 }
 
-export async function generateScript(formData: ScriptGenerationRequest): Promise<string> {
+export async function generateScript(
+  formData: ScriptGenerationRequest, 
+  progressCallback?: (chunk: string, tokenCount: number) => void
+): Promise<string> {
   const logPrefix = `[Script Generation - ${formData.projectTitle}]`;
   console.log(`${logPrefix} Starting AI-powered script generation`);
 
@@ -150,6 +153,11 @@ CONTINUE SCRIPT SEGMENT HERE:
       estimatedTokensGenerated += segmentTokens;
 
       console.log(`${logPrefix} Generated ~${segmentTokens} tokens. Total: ${estimatedTokensGenerated}`);
+      
+      // Call progress callback if provided
+      if (progressCallback) {
+        progressCallback(segmentText.trim(), estimatedTokensGenerated);
+      }
 
       if (estimatedTokensGenerated >= MIN_TOTAL_TOKENS) {
         if (

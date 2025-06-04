@@ -64,15 +64,23 @@ export default function ScriptGenerationWizard({
     queryKey: ['/api/script-generation/templates'],
   });
 
-  // Script generation mutation
-  const generateScriptMutation = useMutation({
-    mutationFn: async (formData: ScriptGenerationFormData) => {
-      const payload = {
-        ...formData,
-        projectId: existingProjectId,
-      };
-      
-      // Start the script generation request
+  // State for real-time token tracking
+  const [tokenCount, setTokenCount] = useState(0);
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  // Script generation with streaming
+  const handleStreamingGeneration = async (formData: ScriptGenerationFormData) => {
+    setCurrentStep('generating');
+    setStreamedContent("");
+    setTokenCount(0);
+    setIsGenerating(true);
+
+    const payload = {
+      ...formData,
+      projectId: existingProjectId,
+    };
+
+    try {
       const response = await fetch('/api/script-generation/generate', {
         method: 'POST',
         headers: {
@@ -80,78 +88,80 @@ export default function ScriptGenerationWizard({
         },
         body: JSON.stringify(payload),
       });
-      
+
       if (!response.ok) {
-        throw new Error('Failed to generate script');
+        throw new Error('Failed to start script generation');
       }
-      
-      const result = await response.json();
-      return result;
-    },
-    onMutate: () => {
-      setCurrentStep('generating');
-      setStreamedContent("");
-      
-      // Simulate real-time script generation with more realistic content
-      const sampleScriptChunks = [
-        "FADE IN:\n\n",
-        "EXT. QUANTUM RESEARCH FACILITY - DAWN\n\n",
-        "The imposing glass structure reflects the first rays of sunlight, its angular geometry suggesting secrets hidden within.\n\n",
-        "INT. LABORATORY - CONTINUOUS\n\n",
-        "DR. SARAH CHEN (30s, brilliant physicist with determined eyes) adjusts complex equipment. Holographic displays show quantum particle trajectories.\n\n",
-        "SARAH\n(to herself)\nThe equations don't lie. If I'm right about this inheritance pattern...\n\n",
-        "She initiates a quantum scan. Energy pulses through crystalline arrays.\n\n",
-        "COMPUTER VOICE\nQuantum signature detected. Anomalous readings confirmed.\n\n",
-        "Sarah's eyes widen as she realizes the implications.\n\n",
-        "SARAH\nIt's not just theoretical anymore.\n\n",
-        "INT. GOVERNMENT FACILITY - SAME TIME\n\n",
-        "AGENT REEVES (40s, seasoned intelligence officer) reviews classified files marked 'QUANTUM INHERITANCE PROJECT'.\n\n",
-        "REEVES\n(into secure phone)\nShe's getting close. Too close.\n\n",
-        "INT. LABORATORY - CONTINUOUS\n\n",
-        "Sarah downloads data as alarms begin to sound.\n\n",
-        "SARAH\nNo, not now...\n\n",
-        "Security forces storm the facility. Sarah grabs her research and escapes through a maintenance tunnel.\n\n",
-        "EXT. CITY STREETS - NIGHT\n\n",
-        "Sarah emerges into the urban landscape, clutching her discoveries. The quantum inheritance could change everything.\n\n",
-        "She disappears into the crowd as helicopters circle overhead.\n\n",
-        "FADE TO BLACK.\n\n",
-        "TITLE CARD: 'THE QUANTUM INHERITANCE'\n\n"
-      ];
-      
-      let chunkIndex = 0;
-      const streamInterval = setInterval(() => {
-        if (chunkIndex < sampleScriptChunks.length) {
-          setStreamedContent(prev => prev + sampleScriptChunks[chunkIndex]);
-          chunkIndex++;
-        } else {
-          clearInterval(streamInterval);
+
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+
+      if (!reader) {
+        throw new Error('No response body');
+      }
+
+      while (true) {
+        const { done, value } = await reader.read();
+        
+        if (done) break;
+
+        const chunk = decoder.decode(value);
+        const lines = chunk.split('\n');
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            try {
+              const data = JSON.parse(line.slice(6));
+              
+              if (data.type === 'progress') {
+                setStreamedContent(data.content);
+                setTokenCount(data.tokenCount);
+              } else if (data.type === 'complete') {
+                setGeneratedScript(data.script);
+                setStreamedContent(data.script);
+                setTokenCount(data.tokenCount);
+                setCurrentStep('review');
+                setIsGenerating(false);
+                
+                toast({
+                  title: "Script Generated Successfully",
+                  description: "Your AI-powered screenplay is ready for review.",
+                });
+                return;
+              } else if (data.type === 'error') {
+                throw new Error(data.error);
+              }
+            } catch (parseError) {
+              // Ignore parsing errors for incomplete chunks
+            }
+          }
         }
-      }, 1500);
-      
-      return { streamInterval };
-    },
-    onSuccess: (responseData, variables, context) => {
-      if (context?.streamInterval) {
-        clearInterval(context.streamInterval);
       }
-      
-      // Set the final generated script
-      setGeneratedScript(responseData.script);
-      setStreamedContent(responseData.script);
-      setCurrentStep('review');
-      
-      toast({
-        title: "Script Generated Successfully",
-        description: "Your AI-powered screenplay is ready for review.",
-      });
-    },
-    onError: (error: any, variables, context) => {
-      if (context?.streamInterval) {
-        clearInterval(context.streamInterval);
-      }
-      
+    } catch (error: any) {
+      setIsGenerating(false);
       setCurrentStep('setup');
       setStreamedContent("");
+      setTokenCount(0);
+      
+      toast({
+        variant: "destructive",
+        title: "Generation Failed",
+        description: error.message || "Failed to generate script. Please try again.",
+      });
+    }
+  };
+
+  // Mutation for triggering generation
+  const generateScriptMutation = useMutation({
+    mutationFn: handleStreamingGeneration,
+    onSuccess: () => {
+      // Success handled in streaming function
+    },
+    onError: (error: any) => {
+      setIsGenerating(false);
+      setCurrentStep('setup');
+      setStreamedContent("");
+      setTokenCount(0);
       
       toast({
         variant: "destructive",
@@ -216,30 +226,30 @@ export default function ScriptGenerationWizard({
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span>Token Generation Progress</span>
-                    <span>{Math.round((streamedContent.length / 130000) * 100)}%</span>
+                    <span>{Math.round((tokenCount / 32000) * 100)}%</span>
                   </div>
-                  <Progress value={(streamedContent.length / 130000) * 100} className="h-2" />
+                  <Progress value={(tokenCount / 32000) * 100} className="h-2" />
                   <div className="text-xs text-muted-foreground">
-                    {streamedContent.length.toLocaleString()} / ~130,000 characters
+                    {tokenCount.toLocaleString()} / ~32,000 tokens generated
                   </div>
                 </div>
               </div>
 
               <div className="space-y-2 text-sm text-muted-foreground">
                 <div className="flex items-center space-x-2">
-                  <div className={`w-2 h-2 rounded-full ${streamedContent.length > 1000 ? 'bg-green-500' : 'bg-gray-300'}`} />
+                  <div className={`w-2 h-2 rounded-full ${tokenCount > 1000 ? 'bg-green-500' : 'bg-gray-300'}`} />
                   <span>Story structure development</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <div className={`w-2 h-2 rounded-full ${streamedContent.length > 30000 ? 'bg-green-500' : 'bg-gray-300'}`} />
+                  <div className={`w-2 h-2 rounded-full ${tokenCount > 8000 ? 'bg-green-500' : 'bg-gray-300'}`} />
                   <span>Character development</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <div className={`w-2 h-2 rounded-full ${streamedContent.length > 65000 ? 'bg-green-500' : 'bg-gray-300'}`} />
+                  <div className={`w-2 h-2 rounded-full ${tokenCount > 16000 ? 'bg-green-500' : 'bg-gray-300'}`} />
                   <span>Dialogue creation</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <div className={`w-2 h-2 rounded-full ${streamedContent.length > 100000 ? 'bg-green-500' : 'bg-gray-300'}`} />
+                  <div className={`w-2 h-2 rounded-full ${tokenCount > 24000 ? 'bg-green-500' : 'bg-gray-300'}`} />
                   <span>Scene descriptions</span>
                 </div>
               </div>
@@ -259,7 +269,7 @@ export default function ScriptGenerationWizard({
             <div className="bg-white border rounded-lg p-6 h-[500px] overflow-y-auto font-mono text-sm leading-relaxed">
               <pre className="whitespace-pre-wrap">
                 {streamedContent || "Preparing to generate your script..."}
-                {streamedContent.length > 0 && streamedContent.length < 130000 && (
+                {isGenerating && (
                   <span className="inline-block w-2 h-4 bg-purple-600 animate-pulse ml-1" />
                 )}
               </pre>
