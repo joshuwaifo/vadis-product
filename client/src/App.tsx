@@ -16,6 +16,7 @@ import ProfilePage from "@/pages/dashboard/profile";
 import ScriptAnalysisNew from "@/pages/dashboard/script-analysis-new";
 import ScriptAnalysisWorkflow from "@/pages/dashboard/script-analysis-workflow";
 import ScriptAnalysisDashboard from "@/pages/script-analysis/script-analysis-dashboard";
+import CannesDemoDashboard from "@/pages/script-analysis/cannes-demo-dashboard";
 import ScriptGenerator from "@/pages/dashboard/script-generator";
 import ProductionDashboard from "@/pages/dashboards/production-dashboard-new";
 import BrandDashboard from "@/pages/dashboards/brand-dashboard";
@@ -36,7 +37,7 @@ function Router() {
       <Route path="/dashboard" component={DashboardHome} />
       <Route path="/dashboard/profile" component={ProfilePage} />
       <Route path="/dashboard/script-analysis-workflow" component={ScriptAnalysisWorkflow} />
-      <Route path="/dashboard/script-analysis" component={ScriptAnalysisDashboard} />
+      <Route path="/dashboard/script-analysis" component={CannesDemoDashboard} />
       <Route path="/dashboard/script-generator" component={ScriptGenerator} />
       <Route path="/production/dashboard" component={ProductionDashboard} />
       <Route path="/brand/dashboard" component={BrandDashboard} />
