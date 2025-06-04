@@ -38,16 +38,16 @@ export default function Login() {
         const role = data.user?.role;
         switch (role) {
           case 'production':
-            setLocation("/dashboard/production");
+            setLocation("/production/dashboard");
             break;
           case 'brand':
-            setLocation("/dashboard/brand");
+            setLocation("/brand/dashboard");
             break;
           case 'financier':
-            setLocation("/dashboard/financier");
+            setLocation("/investor/dashboard");
             break;
           case 'creator':
-            setLocation("/dashboard/creator");
+            setLocation("/creator/dashboard");
             break;
           default:
             setLocation("/dashboard");

@@ -77,13 +77,13 @@ export class AuthService {
   getDashboardPath(role: string): string {
     switch (role) {
       case 'production':
-        return '/dashboard/production';
+        return '/production/dashboard';
       case 'brand':
-        return '/dashboard/brand';
+        return '/brand/dashboard';
       case 'financier':
-        return '/dashboard/financier';
+        return '/investor/dashboard';
       case 'creator':
-        return '/dashboard/creator';
+        return '/creator/dashboard';
       default:
         return '/dashboard';
     }
