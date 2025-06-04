@@ -1,4 +1,8 @@
-// Consolidated schema file for all entities
+// Re-export all role-specific schemas for centralized access
+export * from "../server/db-schemas/production-schema";
+export * from "../server/db-schemas/brand-schema";
+export * from "../server/db-schemas/financier-schema";
+export * from "../server/db-schemas/creator-schema";
 
 import { pgTable, text, serial, integer, boolean, timestamp, jsonb, decimal } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
@@ -57,7 +61,6 @@ export const projects = pgTable("projects", {
   synopsis: text("synopsis"),
   scriptContent: text("script_content"),
   status: text("status").default("draft"), // draft, in_progress, completed, published
-  workflowStatus: text("workflow_status").default("project_info"), // project_info, script_analysis, review_results, finalize_project
   isPublished: boolean("is_published").default(false),
   
   // Financial information for investor marketplace
@@ -350,112 +353,6 @@ export const insertFinancialPlanSchema = createInsertSchema(financialPlans).omit
   createdAt: true,
 });
 
-// Enhanced script analysis tables from Cannes demo
-export const scriptAnalysisResults = pgTable("script_analysis_results", {
-  id: serial("id").primaryKey(),
-  projectId: integer("project_id").references(() => projects.id).notNull(),
-  analysisType: text("analysis_type").notNull(), // 'scenes', 'characters', 'casting', 'vfx', 'locations', 'financial', 'product_placement'
-  status: text("status").default("pending"), // pending, processing, completed, failed
-  results: jsonb("results"), // Store analysis results as JSON
-  processingTime: integer("processing_time"), // Time taken in seconds
-  errorMessage: text("error_message"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
-
-export const brandableScenes = pgTable("brandable_scenes", {
-  id: serial("id").primaryKey(),
-  sceneId: integer("scene_id").references(() => scenes.id).notNull(),
-  projectId: integer("project_id").references(() => projects.id).notNull(),
-  brandingOpportunities: jsonb("branding_opportunities").$type<Array<{
-    brand: string;
-    product: string;
-    placement: string;
-    naturalness: number;
-    visibility: string;
-    estimatedValue: number;
-  }>>(),
-  suggestedCategories: text("suggested_categories").array(),
-  brandabilityScore: integer("brandability_score"), // 1-100
-  reasoning: text("reasoning"),
-  createdAt: timestamp("created_at").defaultNow(),
-});
-
-export const vfxSceneDetails = pgTable("vfx_scene_details", {
-  id: serial("id").primaryKey(),
-  sceneId: integer("scene_id").references(() => scenes.id).notNull(),
-  projectId: integer("project_id").references(() => projects.id).notNull(),
-  vfxType: text("vfx_type").notNull(),
-  complexity: text("complexity").notNull(), // low, medium, high, extreme
-  estimatedCost: integer("estimated_cost"),
-  description: text("description"),
-  requirements: jsonb("requirements").$type<string[]>(),
-  referenceImages: text("reference_images").array(),
-  qualityTier: text("quality_tier"), // LOW, MEDIUM, HIGH
-  createdAt: timestamp("created_at").defaultNow(),
-});
-
-export const castingSelections = pgTable("casting_selections", {
-  id: serial("id").primaryKey(),
-  projectId: integer("project_id").references(() => projects.id).notNull(),
-  characterName: text("character_name").notNull(),
-  selectedActorId: integer("selected_actor_id"),
-  selectedActorName: text("selected_actor_name"),
-  estimatedAgeRange: text("estimated_age_range"),
-  selectionReason: text("selection_reason"),
-  fitScore: integer("fit_score"), // 1-100
-  isConfirmed: boolean("is_confirmed").default(false),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
-
-export const projectAnalysisMetadata = pgTable("project_analysis_metadata", {
-  id: serial("id").primaryKey(),
-  projectId: integer("project_id").references(() => projects.id).notNull(),
-  totalScenes: integer("total_scenes").default(0),
-  totalCharacters: integer("total_characters").default(0),
-  estimatedBudget: integer("estimated_budget"),
-  estimatedShootDays: integer("estimated_shoot_days"),
-  vfxComplexityLevel: text("vfx_complexity_level"), // Low, Medium, High
-  castingComplexity: text("casting_complexity"), // Low, Medium, High
-  productionChallenges: text("production_challenges").array(),
-  marketAnalysis: jsonb("market_analysis"),
-  riskAssessment: jsonb("risk_assessment"),
-  recommendation: jsonb("recommendation"),
-  analysisProgress: integer("analysis_progress").default(0), // 0-100
-  lastAnalysisRun: timestamp("last_analysis_run"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
-
-export const insertScriptAnalysisResultSchema = createInsertSchema(scriptAnalysisResults).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-});
-
-export const insertBrandableSceneSchema = createInsertSchema(brandableScenes).omit({
-  id: true,
-  createdAt: true,
-});
-
-export const insertVfxSceneDetailSchema = createInsertSchema(vfxSceneDetails).omit({
-  id: true,
-  createdAt: true,
-});
-
-export const insertCastingSelectionSchema = createInsertSchema(castingSelections).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-});
-
-export const insertProjectAnalysisMetadataSchema = createInsertSchema(projectAnalysisMetadata).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-});
-
 // Login schema for authentication
 
 export const loginSchema = z.object({
@@ -492,18 +389,6 @@ export type InsertFinancialPlan = z.infer<typeof insertFinancialPlanSchema>;
 export type FinancialPlan = typeof financialPlans.$inferSelect;
 export type InsertSceneVariation = z.infer<typeof insertSceneVariationSchema>;
 export type SceneVariation = typeof sceneVariations.$inferSelect;
-
-// New analysis types
-export type InsertScriptAnalysisResult = z.infer<typeof insertScriptAnalysisResultSchema>;
-export type ScriptAnalysisResult = typeof scriptAnalysisResults.$inferSelect;
-export type InsertBrandableScene = z.infer<typeof insertBrandableSceneSchema>;
-export type BrandableScene = typeof brandableScenes.$inferSelect;
-export type InsertVfxSceneDetail = z.infer<typeof insertVfxSceneDetailSchema>;
-export type VfxSceneDetail = typeof vfxSceneDetails.$inferSelect;
-export type InsertCastingSelection = z.infer<typeof insertCastingSelectionSchema>;
-export type CastingSelection = typeof castingSelections.$inferSelect;
-export type InsertProjectAnalysisMetadata = z.infer<typeof insertProjectAnalysisMetadataSchema>;
-export type ProjectAnalysisMetadata = typeof projectAnalysisMetadata.$inferSelect;
 
 export type UserRole = keyof typeof userRoles;
 export type LoginData = z.infer<typeof loginSchema>;

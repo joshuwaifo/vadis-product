@@ -14,7 +14,10 @@ import {
   locationSuggestions,
   financialPlans,
   sceneVariations,
-  // Role-specific user tables removed during cleanup
+  productionUsers,
+  brandUsers,
+  financierUsers,
+  creatorUsers,
   type User, 
   type InsertUser, 
   type ProductionProfile,
@@ -43,8 +46,11 @@ import {
   type InsertFinancialPlan,
   type SceneVariation,
   type InsertSceneVariation,
-  type UserRole
-  // Role-specific user types removed during cleanup
+  type UserRole,
+  type ProductionUser,
+  type BrandUser,
+  type FinancierUser,
+  type CreatorUser
 } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
@@ -56,7 +62,15 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   validateUser(email: string, password: string): Promise<User | null>;
   
-  // Role-specific authentication methods removed during cleanup
+  // Role-specific authentication
+  getProductionUserByEmail(email: string): Promise<ProductionUser | undefined>;
+  getBrandUserByEmail(email: string): Promise<BrandUser | undefined>;
+  getFinancierUserByEmail(email: string): Promise<FinancierUser | undefined>;
+  getCreatorUserByEmail(email: string): Promise<CreatorUser | undefined>;
+  validateProductionUser(email: string, password: string): Promise<ProductionUser | null>;
+  validateBrandUser(email: string, password: string): Promise<BrandUser | null>;
+  validateFinancierUser(email: string, password: string): Promise<FinancierUser | null>;
+  validateCreatorUser(email: string, password: string): Promise<CreatorUser | null>;
   
   // Production company profiles
   createProductionProfile(profile: InsertProductionProfile): Promise<ProductionProfile>;
