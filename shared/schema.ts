@@ -61,6 +61,7 @@ export const projects = pgTable("projects", {
   synopsis: text("synopsis"),
   scriptContent: text("script_content"),
   status: text("status").default("draft"), // draft, in_progress, completed, published
+  workflowStatus: text("workflow_status").default("project_info"), // project_info, script_analysis, review_results, finalize_project
   isPublished: boolean("is_published").default(false),
   
   // Financial information for investor marketplace
