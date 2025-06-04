@@ -30,23 +30,28 @@ export default function Login() {
         description: "Welcome back to VadisAI.",
       });
       
-      // Redirect to the new unified dashboard
-      const role = data.user?.role;
-      switch (role) {
-        case userRoles.PRODUCTION:
-          setLocation("/dashboard");
-          break;
-        case userRoles.BRAND_AGENCY:
-          setLocation("/dashboard");
-          break;
-        case userRoles.INVESTOR:
-          setLocation("/dashboard");
-          break;
-        case userRoles.INDIVIDUAL_CREATOR:
-          setLocation("/dashboard");
-          break;
-        default:
-          setLocation("/");
+      // Use the redirectPath from the server response if available
+      if (data.redirectPath) {
+        setLocation(data.redirectPath);
+      } else {
+        // Fallback: redirect based on role
+        const role = data.user?.role;
+        switch (role) {
+          case 'production':
+            setLocation("/dashboard/production");
+            break;
+          case 'brand':
+            setLocation("/dashboard/brand");
+            break;
+          case 'financier':
+            setLocation("/dashboard/financier");
+            break;
+          case 'creator':
+            setLocation("/dashboard/creator");
+            break;
+          default:
+            setLocation("/dashboard");
+        }
       }
     },
     onError: (error: any) => {
