@@ -14,6 +14,10 @@ import {
   locationSuggestions,
   financialPlans,
   sceneVariations,
+  productionUsers,
+  brandUsers,
+  financierUsers,
+  creatorUsers,
   type User, 
   type InsertUser, 
   type ProductionProfile,
@@ -42,17 +46,31 @@ import {
   type InsertFinancialPlan,
   type SceneVariation,
   type InsertSceneVariation,
-  type UserRole
+  type UserRole,
+  type ProductionUser,
+  type BrandUser,
+  type FinancierUser,
+  type CreatorUser
 } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
 
 export interface IStorage {
-  // User authentication
+  // User authentication (legacy)
   getUser(id: number): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   validateUser(email: string, password: string): Promise<User | null>;
+  
+  // Role-specific authentication
+  getProductionUserByEmail(email: string): Promise<ProductionUser | undefined>;
+  getBrandUserByEmail(email: string): Promise<BrandUser | undefined>;
+  getFinancierUserByEmail(email: string): Promise<FinancierUser | undefined>;
+  getCreatorUserByEmail(email: string): Promise<CreatorUser | undefined>;
+  validateProductionUser(email: string, password: string): Promise<ProductionUser | null>;
+  validateBrandUser(email: string, password: string): Promise<BrandUser | null>;
+  validateFinancierUser(email: string, password: string): Promise<FinancierUser | null>;
+  validateCreatorUser(email: string, password: string): Promise<CreatorUser | null>;
   
   // Production company profiles
   createProductionProfile(profile: InsertProductionProfile): Promise<ProductionProfile>;
@@ -182,6 +200,39 @@ export class MemStorage implements IStorage {
     
     const isValid = await bcrypt.compare(password, user.passwordHash);
     return isValid ? user : null;
+  }
+
+  // Role-specific authentication (stub implementations for MemStorage)
+  async getProductionUserByEmail(email: string): Promise<ProductionUser | undefined> {
+    return undefined;
+  }
+
+  async getBrandUserByEmail(email: string): Promise<BrandUser | undefined> {
+    return undefined;
+  }
+
+  async getFinancierUserByEmail(email: string): Promise<FinancierUser | undefined> {
+    return undefined;
+  }
+
+  async getCreatorUserByEmail(email: string): Promise<CreatorUser | undefined> {
+    return undefined;
+  }
+
+  async validateProductionUser(email: string, password: string): Promise<ProductionUser | null> {
+    return null;
+  }
+
+  async validateBrandUser(email: string, password: string): Promise<BrandUser | null> {
+    return null;
+  }
+
+  async validateFinancierUser(email: string, password: string): Promise<FinancierUser | null> {
+    return null;
+  }
+
+  async validateCreatorUser(email: string, password: string): Promise<CreatorUser | null> {
+    return null;
   }
 
   // Demo requests (legacy - keeping for backward compatibility)
