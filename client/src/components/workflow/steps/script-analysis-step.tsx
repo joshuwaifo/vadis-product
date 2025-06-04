@@ -230,7 +230,7 @@ export default function ScriptAnalysisStep({ projectId, onNext, onSave, isLoadin
                   <div className="flex items-start space-x-3">
                     <Checkbox
                       checked={isSelected}
-                      onChange={(checked) => handleFeatureToggle(feature.id, checked)}
+                      onCheckedChange={(checked) => handleFeatureToggle(feature.id, checked as boolean)}
                     />
                     <div className="flex-1">
                       <div className="flex items-center space-x-2">

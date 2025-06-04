@@ -1,84 +1,62 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { Badge } from "@/components/ui/badge";
+import { useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { Upload, FileText, Save, ArrowRight } from "lucide-react";
+import { 
+  Upload, FileText, ArrowRight, Save, X, 
+  Film, DollarSign, Target, BookOpen
+} from "lucide-react";
 
 const projectInfoSchema = z.object({
   title: z.string().min(1, "Project title is required"),
-  logline: z.string().optional(),
-  synopsis: z.string().optional(),
-  targetGenres: z.array(z.string()).optional(),
-  budgetRange: z.string().optional(),
+  logline: z.string().min(10, "Logline should be at least 10 characters"),
+  synopsis: z.string().min(50, "Synopsis should be at least 50 characters"),
+  targetGenres: z.array(z.string()).min(1, "Select at least one genre"),
+  budgetRange: z.string().min(1, "Budget range is required")
 });
 
-type ProjectInfoData = z.infer<typeof projectInfoSchema>;
-
 interface ProjectInfoStepProps {
-  projectId?: number;
   onNext: (data: any) => void;
   onSave: (data: any) => void;
   isLoading: boolean;
 }
 
-const GENRE_OPTIONS = [
-  "Action", "Adventure", "Animation", "Biography", "Comedy", "Crime", 
-  "Documentary", "Drama", "Family", "Fantasy", "Horror", "Musical", 
-  "Mystery", "Romance", "Sci-Fi", "Thriller", "War", "Western"
-];
-
-const BUDGET_RANGES = [
-  "Under $100K", "$100K - $500K", "$500K - $1M", "$1M - $5M", 
-  "$5M - $15M", "$15M - $50M", "$50M - $100M", "Over $100M"
-];
-
-export default function ProjectInfoStep({ projectId, onNext, onSave, isLoading }: ProjectInfoStepProps) {
+export default function ProjectInfoStep({ onNext, onSave, isLoading }: ProjectInfoStepProps) {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [scriptContent, setScriptContent] = useState<string>("");
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
-  // Fetch existing project data if editing
-  const { data: existingProject } = useQuery({
-    queryKey: ['project', projectId],
-    queryFn: async () => {
-      if (!projectId) return null;
-      const response = await apiRequest(`/api/projects/${projectId}`, "GET");
-      return response.json();
-    },
-    enabled: !!projectId
-  });
-
-  const form = useForm<ProjectInfoData>({
+  const form = useForm<z.infer<typeof projectInfoSchema>>({
     resolver: zodResolver(projectInfoSchema),
     defaultValues: {
-      title: existingProject?.title || "",
-      logline: existingProject?.logline || "",
-      synopsis: existingProject?.synopsis || "",
-      targetGenres: existingProject?.targetGenres || [],
-      budgetRange: existingProject?.budgetRange || "",
-    },
+      title: "",
+      logline: "",
+      synopsis: "",
+      targetGenres: [],
+      budgetRange: ""
+    }
   });
 
-  // File upload mutation
-  const uploadFileMutation = useMutation({
+  const uploadMutation = useMutation({
     mutationFn: async (file: File) => {
       const formData = new FormData();
       formData.append('script', file);
       
       const response = await fetch('/api/upload/script', {
         method: 'POST',
-        body: formData,
-        credentials: 'include'
+        body: formData
       });
       
       if (!response.ok) {
@@ -90,44 +68,14 @@ export default function ProjectInfoStep({ projectId, onNext, onSave, isLoading }
     onSuccess: (data) => {
       setScriptContent(data.content);
       toast({
-        title: "Script uploaded successfully",
-        description: "Your script has been processed and is ready for analysis."
+        title: "Script uploaded",
+        description: `Successfully processed ${data.fileName}`
       });
     },
     onError: () => {
       toast({
         title: "Upload failed",
-        description: "Failed to upload script. Please try again.",
-        variant: "destructive"
-      });
-    }
-  });
-
-  // Project creation/update mutation
-  const saveProjectMutation = useMutation({
-    mutationFn: async (data: ProjectInfoData & { scriptContent?: string }) => {
-      const response = await apiRequest(
-        projectId ? `/api/projects/${projectId}` : '/api/projects',
-        projectId ? "PUT" : "POST",
-        {
-          ...data,
-          scriptContent: scriptContent || data.scriptContent,
-          projectType: 'script_analysis'
-        }
-      );
-      return response.json();
-    },
-    onSuccess: (data) => {
-      toast({
-        title: "Project saved",
-        description: "Project information has been saved successfully."
-      });
-      return data;
-    },
-    onError: () => {
-      toast({
-        title: "Save failed",
-        description: "Failed to save project. Please try again.",
+        description: "Failed to process script file. Please try again.",
         variant: "destructive"
       });
     }
@@ -137,195 +85,275 @@ export default function ProjectInfoStep({ projectId, onNext, onSave, isLoading }
     const file = event.target.files?.[0];
     if (file) {
       setUploadedFile(file);
-      uploadFileMutation.mutate(file);
+      setIsUploading(true);
+      uploadMutation.mutate(file);
+      setIsUploading(false);
     }
   };
 
-  const handleSave = async () => {
-    const formData = form.getValues();
-    const result = await saveProjectMutation.mutateAsync({
-      ...formData,
-      scriptContent
-    });
-    onSave(result);
+  const handleRemoveFile = () => {
+    setUploadedFile(null);
+    setScriptContent("");
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
-  const handleNext = async () => {
-    const isValid = await form.trigger();
-    if (!isValid) return;
+  const handleSave = () => {
+    const formData = form.getValues();
+    onSave({ ...formData, scriptContent, uploadedFile: uploadedFile?.name });
+  };
 
-    if (!scriptContent && !uploadedFile) {
+  const handleNext = (data: z.infer<typeof projectInfoSchema>) => {
+    if (!scriptContent) {
       toast({
         title: "Script required",
-        description: "Please upload a script to continue.",
+        description: "Please upload a script file before proceeding.",
         variant: "destructive"
       });
       return;
     }
-
-    const formData = form.getValues();
-    const result = await saveProjectMutation.mutateAsync({
-      ...formData,
-      scriptContent
-    });
     
-    onNext(result);
+    onNext({ ...data, scriptContent, uploadedFile: uploadedFile?.name });
   };
+
+  const genres = [
+    "Action", "Adventure", "Comedy", "Drama", "Fantasy", "Horror", 
+    "Mystery", "Romance", "Sci-Fi", "Thriller", "Western", "Animation",
+    "Crime", "Documentary", "Family", "Musical", "War", "Biography"
+  ];
+
+  const budgetRanges = [
+    "Under $1M", "$1M - $5M", "$5M - $15M", "$15M - $50M", 
+    "$50M - $100M", "$100M - $200M", "Over $200M"
+  ];
 
   return (
     <div className="space-y-6">
-      <Form {...form}>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Project Information */}
-          <Card>
-            <CardContent className="p-6 space-y-4">
-              <h3 className="text-lg font-semibold">Project Details</h3>
-              
-              <FormField
-                control={form.control}
-                name="title"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Project Title *</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Enter your project title" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+      {/* Header */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Film className="w-5 h-5" />
+            <span>Project Information</span>
+          </CardTitle>
+          <p className="text-gray-600">
+            Tell us about your project and upload your script for analysis
+          </p>
+        </CardHeader>
+      </Card>
 
-              <FormField
-                control={form.control}
-                name="logline"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Logline</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="One-sentence summary of your project" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="synopsis"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Synopsis</FormLabel>
-                    <FormControl>
-                      <Textarea 
-                        {...field} 
-                        placeholder="Brief description of your project"
-                        rows={4}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="budgetRange"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Budget Range</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Project Details Form */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <BookOpen className="w-5 h-5" />
+              <span>Project Details</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(handleNext)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Project Title</FormLabel>
                       <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select budget range" />
-                        </SelectTrigger>
+                        <Input placeholder="Enter your project title" {...field} />
                       </FormControl>
-                      <SelectContent>
-                        {BUDGET_RANGES.map((range) => (
-                          <SelectItem key={range} value={range}>
-                            {range}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </CardContent>
-          </Card>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-          {/* Script Upload */}
-          <Card>
-            <CardContent className="p-6 space-y-4">
-              <h3 className="text-lg font-semibold">Script Upload</h3>
-              
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-                {uploadedFile || scriptContent ? (
-                  <div className="space-y-4">
-                    <FileText className="w-12 h-12 text-green-600 mx-auto" />
-                    <div>
-                      <p className="font-medium text-green-600">
-                        {uploadedFile ? uploadedFile.name : "Script uploaded"}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        {scriptContent && `${scriptContent.length.toLocaleString()} characters`}
-                      </p>
-                    </div>
-                    <Button
-                      variant="outline"
-                      onClick={() => document.getElementById('script-upload')?.click()}
-                    >
-                      Upload Different File
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    <Upload className="w-12 h-12 text-gray-400 mx-auto" />
-                    <div>
-                      <p className="font-medium">Upload your script</p>
-                      <p className="text-sm text-gray-500">
-                        PDF, DOC, DOCX, or TXT files supported
-                      </p>
-                    </div>
-                    <Button
-                      variant="outline"
-                      onClick={() => document.getElementById('script-upload')?.click()}
-                      disabled={uploadFileMutation.isPending}
-                    >
-                      {uploadFileMutation.isPending ? 'Uploading...' : 'Choose File'}
-                    </Button>
-                  </div>
-                )}
-                
+                <FormField
+                  control={form.control}
+                  name="logline"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Logline</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="A one-sentence summary of your story"
+                          rows={2}
+                          {...field} 
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="synopsis"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Synopsis</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="Brief summary of your story (2-3 paragraphs)"
+                          rows={4}
+                          {...field} 
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="targetGenres"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Target Genres</FormLabel>
+                      <div className="grid grid-cols-3 gap-2 mt-2">
+                        {genres.map((genre) => (
+                          <Badge
+                            key={genre}
+                            variant={field.value.includes(genre) ? "default" : "outline"}
+                            className="cursor-pointer justify-center py-2"
+                            onClick={() => {
+                              const newGenres = field.value.includes(genre)
+                                ? field.value.filter(g => g !== genre)
+                                : [...field.value, genre];
+                              field.onChange(newGenres);
+                            }}
+                          >
+                            {genre}
+                          </Badge>
+                        ))}
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="budgetRange"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Target Budget Range</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select budget range" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {budgetRanges.map((range) => (
+                            <SelectItem key={range} value={range}>
+                              {range}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+
+        {/* Script Upload */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <FileText className="w-5 h-5" />
+              <span>Script Upload</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {!uploadedFile ? (
+              <div>
+                <div 
+                  className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-gray-400 transition-colors"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                  <p className="text-lg font-medium text-gray-700 mb-2">
+                    Upload Your Script
+                  </p>
+                  <p className="text-gray-500 mb-4">
+                    Drag and drop or click to select
+                  </p>
+                  <p className="text-sm text-gray-400">
+                    Supports PDF, DOC, DOCX, and TXT files
+                  </p>
+                </div>
                 <input
-                  id="script-upload"
+                  ref={fileInputRef}
                   type="file"
                   accept=".pdf,.doc,.docx,.txt"
                   onChange={handleFileUpload}
                   className="hidden"
                 />
               </div>
-            </CardContent>
-          </Card>
-        </div>
-      </Form>
+            ) : (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <FileText className="w-8 h-8 text-green-600" />
+                    <div>
+                      <p className="font-medium text-green-800">{uploadedFile.name}</p>
+                      <p className="text-sm text-green-600">
+                        {(uploadedFile.size / 1024 / 1024).toFixed(2)} MB
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleRemoveFile}
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+
+                {scriptContent && (
+                  <div className="p-4 bg-gray-50 border rounded-lg">
+                    <p className="text-sm font-medium text-gray-700 mb-2">
+                      Script Preview ({scriptContent.length} characters)
+                    </p>
+                    <p className="text-sm text-gray-600 line-clamp-4">
+                      {scriptContent.substring(0, 200)}...
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {isUploading && (
+              <div className="mt-4 text-center">
+                <p className="text-sm text-gray-600">Processing script...</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Action Buttons */}
       <div className="flex items-center justify-between pt-6">
         <Button
           variant="outline"
           onClick={handleSave}
-          disabled={saveProjectMutation.isPending}
         >
           <Save className="w-4 h-4 mr-2" />
-          {saveProjectMutation.isPending ? 'Saving...' : 'Save Progress'}
+          Save Progress
         </Button>
 
         <Button
-          onClick={handleNext}
-          disabled={isLoading || uploadFileMutation.isPending || saveProjectMutation.isPending}
+          onClick={form.handleSubmit(handleNext)}
+          disabled={isLoading || !scriptContent}
         >
-          {isLoading ? 'Processing...' : 'Save & Continue'}
+          {isLoading ? 'Processing...' : 'Continue to Analysis'}
           <ArrowRight className="w-4 h-4 ml-2" />
         </Button>
       </div>
