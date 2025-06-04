@@ -51,16 +51,25 @@ export default function ProductionDashboard() {
   const { data: currentUser, isLoading: userLoading, error: userError } = useQuery({
     queryKey: ['currentUser'],
     queryFn: async () => {
-      const response = await fetch('/api/auth/me');
+      const response = await fetch('/api/auth/me', {
+        credentials: 'include',
+        headers: {
+          'Cache-Control': 'no-cache'
+        }
+      });
       if (!response.ok) {
-        throw new Error('Authentication required');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Authentication required');
       }
       return response.json();
     },
+    retry: false, // Don't retry auth failures
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
-  // Redirect to login if authentication fails
-  if (userError) {
+  // Redirect to login if authentication fails, but only once
+  if (userError && !userLoading) {
+    console.log('Authentication error, redirecting to login:', userError.message);
     setLocation('/login');
     return null;
   }

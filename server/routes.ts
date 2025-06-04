@@ -272,10 +272,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Get current user endpoint (for session management)
   app.get("/api/auth/me", async (req, res) => {
-    if ((req.session as any).user) {
-      res.json({ user: (req.session as any).user });
-    } else {
-      res.status(401).json({ user: null });
+    try {
+      if ((req.session as any).user) {
+        res.json({ user: (req.session as any).user });
+      } else {
+        res.status(401).json({ user: null, error: "No active session" });
+      }
+    } catch (error) {
+      console.error("Session validation error:", error);
+      res.status(500).json({ user: null, error: "Session validation failed" });
+    }
+  });
+
+  // Debug session endpoint
+  app.get("/api/debug/session", async (req, res) => {
+    try {
+      res.json({
+        sessionId: req.sessionID,
+        sessionExists: !!req.session,
+        userExists: !!(req.session as any)?.user,
+        sessionUser: (req.session as any)?.user || null,
+        cookie: req.session?.cookie
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Session debug failed" });
     }
   });
 
@@ -287,7 +307,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.error("Session destruction error:", err);
           return res.status(500).json({ error: "Logout failed" });
         }
-        res.clearCookie('connect.sid');
+        res.clearCookie('vadis.sid');
         res.json({ success: true, message: "Logged out successfully" });
       });
     } else {

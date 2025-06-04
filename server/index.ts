@@ -25,12 +25,13 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   name: 'vadis.sid',
+  rolling: true, // Reset expiration on each request
   cookie: {
     httpOnly: true,
-    secure: false, // Allow HTTP in deployment
+    secure: false, // Keep as false for deployment compatibility
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
     sameSite: 'lax',
-    domain: undefined // Let browser handle domain
+    path: '/'
   }
 }));
 
