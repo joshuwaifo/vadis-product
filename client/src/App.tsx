@@ -5,42 +5,21 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Landing from "@/pages/landing";
 import Login from "@/pages/auth/login";
-import DemoRequest from "@/pages/demos/demo-request";
-import DemoProduction from "@/pages/demos/demo-production";
-import DemoBrand from "@/pages/demos/demo-brand";
-import DemoFinancier from "@/pages/demos/demo-financier";
-import DemoCreator from "@/pages/demos/demo-creator";
-
-import DashboardHome from "@/pages/dashboard/dashboard-home";
-import ProfilePage from "@/pages/dashboard/profile";
-import ScriptAnalysisNew from "@/pages/dashboard/script-analysis-new";
-import ScriptGenerator from "@/pages/dashboard/script-generator";
-import ProductionDashboard from "@/pages/dashboards/production-dashboard-new";
-import BrandDashboard from "@/pages/dashboards/brand-dashboard";
-import InvestorDashboard from "@/pages/dashboards/investor-dashboard";
-import CreatorDashboard from "@/pages/dashboards/creator-dashboard";
-import NotFound from "@/pages/not-found";
+import ProductionDashboard from "@/pages/dashboard/production";
+import BrandDashboard from "@/pages/dashboard/brand";
+import FinancierDashboard from "@/pages/dashboard/financier";
+import CreatorDashboard from "@/pages/dashboard/creator";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={Landing} />
-      <Route path="/login" component={Login} />
-      <Route path="/demo-request" component={DemoRequest} />
-      <Route path="/demo/production" component={DemoProduction} />
-      <Route path="/demo/brand" component={DemoBrand} />
-      <Route path="/demo/financier" component={DemoFinancier} />
-      <Route path="/demo/creator" component={DemoCreator} />
-      <Route path="/dashboard" component={DashboardHome} />
-      <Route path="/dashboard/profile" component={ProfilePage} />
-      <Route path="/dashboard/script-analysis-new" component={ScriptAnalysisNew} />
-      <Route path="/dashboard/script-generator" component={ScriptGenerator} />
-      <Route path="/dashboard/script-analysis" component={ScriptAnalysisNew} />
-      <Route path="/production/dashboard" component={ProductionDashboard} />
-      <Route path="/brand/dashboard" component={BrandDashboard} />
-      <Route path="/investor/dashboard" component={InvestorDashboard} />
-      <Route path="/creator/dashboard" component={CreatorDashboard} />
-      <Route component={NotFound} />
+      <Route path="/auth/login" component={Login} />
+      <Route path="/dashboard/production" component={ProductionDashboard} />
+      <Route path="/dashboard/brand" component={BrandDashboard} />
+      <Route path="/dashboard/financier" component={FinancierDashboard} />
+      <Route path="/dashboard/creator" component={CreatorDashboard} />
+      <Route component={Landing} />
     </Switch>
   );
 }
