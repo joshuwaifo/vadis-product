@@ -20,7 +20,6 @@ import ProductionDashboard from "@/pages/dashboards/production-dashboard-new";
 import BrandDashboard from "@/pages/dashboards/brand-dashboard";
 import InvestorDashboard from "@/pages/dashboards/investor-dashboard";
 import CreatorDashboard from "@/pages/dashboards/creator-dashboard";
-import ProductionSuite from "@/pages/production-suite";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -38,7 +37,6 @@ function Router() {
       <Route path="/dashboard/script-analysis-workflow" component={ScriptAnalysisWorkflow} />
       <Route path="/dashboard/script-generator" component={ScriptGenerator} />
       <Route path="/production/dashboard" component={ProductionDashboard} />
-      <Route path="/production/suite" component={ProductionSuite} />
       <Route path="/brand/dashboard" component={BrandDashboard} />
       <Route path="/investor/dashboard" component={InvestorDashboard} />
       <Route path="/creator/dashboard" component={CreatorDashboard} />
