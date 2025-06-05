@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { 
@@ -35,12 +35,43 @@ export default function ProjectInfoStep({ projectId, onNext, onSave, isLoading }
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
+  // Fetch existing project data if projectId is provided
+  const { data: project, isLoading: projectLoading } = useQuery({
+    queryKey: ['/api/projects', projectId],
+    queryFn: async () => {
+      if (!projectId) return null;
+      const response = await fetch(`/api/projects/${projectId}`, {
+        credentials: 'include',
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch project');
+      }
+      return response.json();
+    },
+    enabled: !!projectId,
+  });
+
   const form = useForm<z.infer<typeof projectInfoSchema>>({
     resolver: zodResolver(projectInfoSchema),
     defaultValues: {
       title: ""
     }
   });
+
+  // Load existing project data into form
+  useEffect(() => {
+    if (project) {
+      form.reset({
+        title: project.title || ""
+      });
+      
+      if (project.scriptContent) {
+        setScriptContent(project.scriptContent);
+        // Indicate that script is already uploaded
+        setUploadedFile({ name: "Previously uploaded script" } as File);
+      }
+    }
+  }, [project, form]);
 
   const uploadMutation = useMutation({
     mutationFn: async (file: File) => {
@@ -118,9 +149,17 @@ export default function ProjectInfoStep({ projectId, onNext, onSave, isLoading }
           <CardTitle className="flex items-center space-x-2">
             <Film className="w-5 h-5" />
             <span>Project Information</span>
+            {project && (
+              <Badge variant="secondary" className="ml-2">
+                Loaded from existing project
+              </Badge>
+            )}
           </CardTitle>
           <p className="text-gray-600">
-            Tell us about your project and upload your script for analysis
+            {project 
+              ? "Review and update your project details and script" 
+              : "Tell us about your project and upload your script for analysis"
+            }
           </p>
         </CardHeader>
       </Card>
@@ -135,23 +174,72 @@ export default function ProjectInfoStep({ projectId, onNext, onSave, isLoading }
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(handleNext)} className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="title"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Project Title</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter your project title" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </form>
-            </Form>
+            {projectLoading ? (
+              <div className="space-y-4">
+                <div className="animate-pulse bg-gray-200 h-8 rounded"></div>
+                <div className="animate-pulse bg-gray-200 h-4 rounded w-3/4"></div>
+                <div className="animate-pulse bg-gray-200 h-4 rounded w-1/2"></div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {project && (
+                  <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg mb-4">
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium text-blue-800">Project Status</p>
+                      <div className="flex items-center space-x-2">
+                        <Badge variant="outline">{project.status || 'Draft'}</Badge>
+                        {project.workflowStatus && (
+                          <Badge variant="secondary">
+                            Step: {project.workflowStatus.replace('_', ' ')}
+                          </Badge>
+                        )}
+                      </div>
+                      {project.createdAt && (
+                        <p className="text-xs text-blue-600">
+                          Created: {new Date(project.createdAt).toLocaleDateString()}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
+                
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(handleNext)} className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="title"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Project Title</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Enter your project title" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    {project?.logline && (
+                      <div className="space-y-2">
+                        <FormLabel>Logline</FormLabel>
+                        <div className="p-3 bg-gray-50 border rounded-md">
+                          <p className="text-sm text-gray-700">{project.logline}</p>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {project?.synopsis && (
+                      <div className="space-y-2">
+                        <FormLabel>Synopsis</FormLabel>
+                        <div className="p-3 bg-gray-50 border rounded-md max-h-32 overflow-y-auto">
+                          <p className="text-sm text-gray-700">{project.synopsis}</p>
+                        </div>
+                      </div>
+                    )}
+                  </form>
+                </Form>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -164,7 +252,13 @@ export default function ProjectInfoStep({ projectId, onNext, onSave, isLoading }
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {!uploadedFile ? (
+            {projectLoading ? (
+              <div className="space-y-4">
+                <div className="animate-pulse bg-gray-200 h-8 rounded"></div>
+                <div className="animate-pulse bg-gray-200 h-4 rounded w-3/4"></div>
+                <div className="animate-pulse bg-gray-200 h-4 rounded w-1/2"></div>
+              </div>
+            ) : !uploadedFile ? (
               <div>
                 <div 
                   className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-gray-400 transition-colors"
@@ -196,9 +290,13 @@ export default function ProjectInfoStep({ projectId, onNext, onSave, isLoading }
                     <FileText className="w-8 h-8 text-green-600" />
                     <div>
                       <p className="font-medium text-green-800">{uploadedFile.name}</p>
-                      <p className="text-sm text-green-600">
-                        {(uploadedFile.size / 1024 / 1024).toFixed(2)} MB
-                      </p>
+                      {uploadedFile.size ? (
+                        <p className="text-sm text-green-600">
+                          {(uploadedFile.size / 1024 / 1024).toFixed(2)} MB
+                        </p>
+                      ) : (
+                        <p className="text-sm text-green-600">Previously uploaded</p>
+                      )}
                     </div>
                   </div>
                   <Button
