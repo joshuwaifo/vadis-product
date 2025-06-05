@@ -34,7 +34,13 @@ export async function extractScenesWithChunking(scriptText: string): Promise<Scr
   }
 
   const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-8b" });
+  const model = genAI.getGenerativeModel({ 
+    model: "gemini-2.0-flash-exp",
+    generationConfig: {
+      maxOutputTokens: 8192,
+      temperature: 0.2
+    }
+  });
   
   // Split script into smaller chunks to ensure comprehensive processing
   const chunks = chunkScript(scriptText, 15000); // Smaller chunks for better scene detection

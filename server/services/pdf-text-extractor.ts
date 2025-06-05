@@ -25,7 +25,7 @@ export async function extractTextFromPDF(pdfBuffer: Buffer): Promise<string> {
     
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-1.5-pro",
+      model: "gemini-2.0-flash-exp",
       generationConfig: {
         maxOutputTokens: 8192, // Maximum possible output
         temperature: 0.1 // Low temperature for precise extraction
