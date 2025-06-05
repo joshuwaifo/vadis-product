@@ -32,10 +32,9 @@ export function registerWorkflowRoutes(app: Express) {
       if (req.file.mimetype === 'text/plain') {
         scriptContent = req.file.buffer.toString('utf-8');
       } else if (req.file.mimetype === 'application/pdf') {
-        // Store PDF file data for on-demand extraction - no processing during upload
-        const fileData = req.file.buffer.toString('base64');
+        // Store PDF metadata without processing - actual file data will be stored during project creation
         scriptContent = `PDF_UPLOADED:${req.file.originalname}:${req.file.size}`;
-        console.log(`PDF file received: ${req.file.originalname}, Size: ${req.file.size} bytes - stored for on-demand analysis`);
+        console.log(`PDF file received: ${req.file.originalname}, Size: ${req.file.size} bytes - metadata stored for on-demand analysis`);
       } else {
         // For DOC, DOCX files
         throw new Error('Document format not fully supported. Please convert to PDF or plain text.');
@@ -44,12 +43,21 @@ export function registerWorkflowRoutes(app: Express) {
       // Log script upload
       console.log(`Script uploaded: ${req.file.originalname}, Size: ${req.file.size}, Content length: ${scriptContent.length}`);
 
+      // Store file buffer in session for later use during project creation
+      if (req.file.mimetype === 'application/pdf') {
+        req.session.uploadedPdfData = {
+          buffer: req.file.buffer.toString('base64'),
+          fileName: req.file.originalname,
+          mimeType: req.file.mimetype,
+          size: req.file.size
+        };
+      }
+
       res.json({
         success: true,
         content: scriptContent,
         fileName: req.file.originalname,
         fileSize: req.file.size,
-        fileData: req.file.mimetype === 'application/pdf' ? req.file.buffer.toString('base64') : null,
         mimeType: req.file.mimetype
       });
 
@@ -71,14 +79,24 @@ export function registerWorkflowRoutes(app: Express) {
 
       // Create new project if this is the first step
       if (currentStep === 'project_info' && stepData && !projectId) {
-        // Extract PDF file data if available from the step data
-        let fileData = stepData.fileData || null;
-        let fileName = stepData.fileName || null;
-        let mimeType = stepData.mimeType || null;
+        // Extract PDF file data from session storage if available
+        let fileData = null;
+        let fileName = null;
+        let mimeType = null;
         
         if (stepData.scriptContent && stepData.scriptContent.startsWith('PDF_UPLOADED:')) {
           const parts = stepData.scriptContent.split(':');
-          fileName = fileName || parts[1];
+          fileName = parts[1];
+          
+          // Retrieve PDF data from session if available
+          if (req.session.uploadedPdfData) {
+            fileData = req.session.uploadedPdfData.buffer;
+            mimeType = req.session.uploadedPdfData.mimeType;
+            fileName = req.session.uploadedPdfData.fileName;
+            
+            // Clear session data after use
+            delete req.session.uploadedPdfData;
+          }
         }
 
         const project = await storage.createProject({

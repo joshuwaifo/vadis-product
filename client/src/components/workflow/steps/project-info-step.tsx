@@ -31,8 +31,7 @@ interface ProjectInfoStepProps {
 export default function ProjectInfoStep({ projectId, onNext, onSave, isLoading }: ProjectInfoStepProps) {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [scriptContent, setScriptContent] = useState<string>("");
-  const [fileData, setFileData] = useState<string | null>(null);
-  const [mimeType, setMimeType] = useState<string | null>(null);
+
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
@@ -93,12 +92,6 @@ export default function ProjectInfoStep({ projectId, onNext, onSave, isLoading }
     },
     onSuccess: (data) => {
       setScriptContent(data.content);
-      
-      // Store PDF file data if available
-      if (data.fileData && data.mimeType) {
-        setFileData(data.fileData);
-        setMimeType(data.mimeType);
-      }
       
       toast({
         title: "Script uploaded",
