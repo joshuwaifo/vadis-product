@@ -3,6 +3,8 @@ import { extractScenes, analyzeCharacters, suggestActors, analyzeVFXNeeds, gener
 import { db } from "./db";
 import { projects, scenes, characters, actorSuggestions, vfxNeeds, productPlacements, locationSuggestions, financialPlans } from "@shared/schema";
 import { eq } from "drizzle-orm";
+import { extractTextFromPDF } from './services/pdf-text-extractor';
+import { extractScenesWithRegex, cleanScreenplayText } from './services/regex-scene-extractor';
 
 /**
  * Basic scene parser as fallback when AI is unavailable
@@ -254,28 +256,28 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
         }
       }
 
-      // Use proper scene extraction workflow based on demo app
+      // Use regex-based scene extraction for complete document processing
       console.log(`Processing script content of ${scriptContent.length} characters`);
       
-      // Import the proper scene extractor
-      const { analyzeScript } = await import('./services/scene-extractor');
-      const analysisResult = analyzeScript(scriptContent);
+      // Clean and process the script text
+      const cleanedScript = cleanScreenplayText(scriptContent);
+      const extractedScenes = extractScenesWithRegex(cleanedScript);
       
-      console.log(`Scene extractor found ${analysisResult.totalScenes} scenes from script analysis`);
+      console.log(`Regex extractor found ${extractedScenes.length} scenes from complete script analysis`);
       
-      // Convert to the expected format
-      const extractedScenes = analysisResult.scenes.map(scene => ({
-        id: `scene-${scene.sceneNumber}`,
+      // Convert to database format
+      const scenesToInsert = extractedScenes.map(scene => ({
+        projectId: parseInt(projectId),
         sceneNumber: scene.sceneNumber,
-        location: scene.location || 'UNSPECIFIED',
-        timeOfDay: scene.timeOfDay || 'UNSPECIFIED', 
-        description: scene.heading,
-        characters: scene.characters || [],
+        location: scene.location,
+        timeOfDay: scene.timeOfDay,
+        description: scene.description,
+        characters: scene.characters,
         content: scene.content,
-        pageStart: scene.pageStart || 1,
-        pageEnd: scene.pageEnd || 1,
-        duration: scene.duration || 1,
-        vfxNeeds: [],
+        pageStart: scene.pageStart,
+        pageEnd: scene.pageEnd,
+        duration: scene.duration,
+        vfxNeeds: scene.vfxNeeds,
         productPlacementOpportunities: []
       }));
       

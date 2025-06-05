@@ -17,18 +17,37 @@ interface PDFExtractionResult {
 export async function extractTextFromPDF(pdfBuffer: Buffer): Promise<string> {
   console.log(`Starting PDF text extraction from buffer (${pdfBuffer.length} bytes)`);
   
-  // Method 1: Try pdf-parse first
+  // Method 1: Enhanced pdf-parse with full document processing
   try {
     const pdfParse = (await import('pdf-parse')).default;
-    const pdfData = await pdfParse(pdfBuffer);
-    const extractedText = pdfData?.text || "";
     
-    if (extractedText.length > 100) {
-      console.log(`Successfully extracted ${extractedText.length} characters using pdf-parse`);
+    // Configure for maximum extraction
+    const options = {
+      normalizeWhitespace: false, // Preserve original spacing for screenplay format
+      disableCombineTextItems: false,
+      max: 0, // Process all pages
+      version: 'v1.10.1'
+    };
+    
+    const pdfData = await pdfParse(pdfBuffer, options);
+    let extractedText = pdfData?.text || "";
+    
+    if (extractedText && extractedText.length > 1000) {
+      // Clean up text while preserving screenplay structure
+      extractedText = extractedText
+        .replace(/\r\n/g, '\n')
+        .replace(/\r/g, '\n')
+        // Preserve double line breaks for scene transitions
+        .replace(/\n{4,}/g, '\n\n\n')
+        // Clean up excessive spaces but preserve indentation
+        .replace(/[ \t]{3,}/g, '  ')
+        .trim();
+        
+      console.log(`Successfully extracted ${extractedText.length} characters from ${pdfData.numpages} pages using enhanced pdf-parse`);
       return extractedText;
     }
   } catch (error) {
-    console.log('pdf-parse extraction failed, trying Gemini AI...');
+    console.log('Enhanced pdf-parse failed, trying alternative method...');
   }
   
   // Method 2: Use enhanced pdf-parse with better configuration
