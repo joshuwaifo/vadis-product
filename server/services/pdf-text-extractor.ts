@@ -31,19 +31,65 @@ export async function extractTextFromPDF(pdfBuffer: Buffer): Promise<string> {
     console.log('pdf-parse extraction failed, trying Gemini AI...');
   }
   
-  // Method 2: Use Gemini AI for PDF processing
+  // Method 2: Use enhanced pdf-parse with better configuration
+  try {
+    const pdfParse = (await import('pdf-parse')).default;
+    
+    // Enhanced options for better text extraction
+    const options = {
+      normalizeWhitespace: true,
+      disableCombineTextItems: false,
+      max: 0, // Extract all pages
+    };
+    
+    const pdfData = await pdfParse(pdfBuffer, options);
+    let extractedText = pdfData?.text || "";
+    
+    // Clean up the extracted text
+    if (extractedText) {
+      // Remove excessive whitespace but preserve screenplay formatting
+      extractedText = extractedText
+        .replace(/\r\n/g, '\n')
+        .replace(/\r/g, '\n')
+        .replace(/\n{3,}/g, '\n\n')
+        .replace(/[ \t]+/g, ' ')
+        .trim();
+        
+      console.log(`Enhanced pdf-parse extracted ${extractedText.length} characters from ${pdfData.numpages} pages`);
+      
+      if (extractedText.length > 1000) {
+        return extractedText;
+      }
+    }
+  } catch (error) {
+    console.log('Enhanced pdf-parse failed, trying Gemini AI...');
+  }
+  
+  // Method 3: Use Gemini AI for PDF processing as fallback
   try {
     if (!process.env.GEMINI_API_KEY) {
       throw new Error('GEMINI_API_KEY not available');
     }
     
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-1.5-pro",  // Use Pro model for better document processing
+      generationConfig: {
+        maxOutputTokens: 8192,   // Increase output limit
+      }
+    });
     
     // Convert PDF buffer to base64 for Gemini
     const base64Data = pdfBuffer.toString('base64');
     
-    const prompt = `Extract all text content from this PDF document. If it appears to be a film script or screenplay, preserve the formatting with scene headings (INT./EXT.), character names, and dialogue. Return only the extracted text content.`;
+    const prompt = `Extract ALL text content from this complete PDF document. This appears to be a screenplay/script document with multiple pages. Please extract every single page of text content, preserving the original formatting including:
+- Scene headings (INT./EXT.)
+- Character names
+- Dialogue
+- Action lines
+- Page breaks and scene transitions
+
+Return the complete text content from the entire document, not just a summary or excerpt.`;
     
     const result = await model.generateContent([
       {
@@ -59,7 +105,7 @@ export async function extractTextFromPDF(pdfBuffer: Buffer): Promise<string> {
     const extractedText = response.text();
     
     if (extractedText && extractedText.length > 50) {
-      console.log(`Successfully extracted ${extractedText.length} characters using Gemini AI`);
+      console.log(`Successfully extracted ${extractedText.length} characters using Gemini AI Pro`);
       return extractedText;
     }
   } catch (error) {
