@@ -36,36 +36,41 @@ export async function extractScenesWithChunking(scriptText: string): Promise<Scr
   const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
   const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-8b" });
   
-  // Split script into chunks to ensure complete processing
-  const chunks = chunkScript(scriptText, 25000); // Larger chunks to capture more scenes
+  // Split script into smaller chunks to ensure comprehensive processing
+  const chunks = chunkScript(scriptText, 15000); // Smaller chunks for better scene detection
   const allScenes: ExtractedScene[] = [];
   
+  console.log(`Script analysis: ${scriptText.length} total characters`);
   console.log(`Processing script in ${chunks.length} chunks for comprehensive scene extraction`);
+  
+  // Debug: Count potential scene markers in original text
+  const sceneMarkers = (scriptText.match(/(?:INT\.|EXT\.|FADE IN|FADE OUT|CUT TO:)/gi) || []).length;
+  console.log(`Detected ${sceneMarkers} potential scene markers in full script`);
   
   for (let i = 0; i < chunks.length; i++) {
     const chunk = chunks[i];
     console.log(`Processing chunk ${i + 1}/${chunks.length} (${chunk.length} characters)`);
     
     try {
-      const prompt = `You are a script analysis assistant. I will provide you with a movie script in standard Hollywood format. Your task is to identify and extract each scene, then return ONLY the following three pieces of information for each scene:
+      const startingSceneNumber = allScenes.length + 1;
+      const prompt = `You are a professional script analysis specialist. Extract EVERY SINGLE SCENE from this script portion. A scene typically begins with location/time headings like "INT. HOUSE - DAY" or "EXT. STREET - NIGHT", but also look for:
 
-1. **Scene Number** (if explicitly numbered, or assign sequential numbers starting from 1)
-2. **Scene Title** (create a concise, descriptive title based on the scene heading/location)
-3. **Plot Summary** (2-3 sentences maximum describing what happens in the scene)
+- FADE IN/FADE OUT transitions
+- CUT TO: directives
+- Location changes within action
+- Time jumps or narrative breaks
+- Short interstitial scenes
 
-**Guidelines:**
-- A new scene typically begins with a scene heading (INT./EXT. LOCATION - TIME)
-- Keep plot summaries concise but capture the key action, dialogue purpose, or story development
-- Focus on what happens, not how it's written
-- If scenes aren't pre-numbered, number them sequentially
-- For scene titles, use the location and key action (e.g., "Kitchen Argument," "Car Chase Downtown," "Office Meeting")
+Extract ALL scenes, including very brief ones. Number scenes starting from ${startingSceneNumber}.
 
-Format as JSON array:
+Return JSON array with this exact format:
 [{
-  "sceneNumber": 1,
-  "title": "Apartment Bedroom - Morning",
-  "plotSummary": "Sarah wakes up late and rushes to get ready for an important job interview. She spills coffee on her outfit and has to change clothes."
+  "sceneNumber": ${startingSceneNumber},
+  "title": "Location/Setting - Description",
+  "plotSummary": "Brief description of what happens in this scene."
 }]
+
+CRITICAL: Extract EVERY scene in this text. Do not skip any scenes, even 1-2 line scenes.
 
 Script text:
 ${chunk}`;
@@ -124,24 +129,59 @@ ${chunk}`;
 }
 
 /**
- * Split script into manageable chunks
+ * Split script into manageable chunks with overlap to ensure no scenes are missed
  */
 function chunkScript(text: string, maxChunkSize: number): string[] {
   const chunks: string[] = [];
-  const paragraphs = text.split(/\n\s*\n/);
-  let currentChunk = '';
+  const overlapSize = Math.floor(maxChunkSize * 0.1); // 10% overlap
   
-  for (const paragraph of paragraphs) {
-    if (currentChunk.length + paragraph.length > maxChunkSize && currentChunk.length > 0) {
-      chunks.push(currentChunk.trim());
-      currentChunk = paragraph;
+  // Split by scene headings and major transitions
+  const sceneMarkers = text.split(/(?=(?:INT\.|EXT\.|FADE IN|FADE OUT|CUT TO:|DISSOLVE TO:))/i);
+  
+  let currentChunk = '';
+  let previousChunkEnd = '';
+  
+  for (let i = 0; i < sceneMarkers.length; i++) {
+    const segment = sceneMarkers[i].trim();
+    if (!segment) continue;
+    
+    // Check if adding this segment would exceed chunk size
+    if (currentChunk.length + segment.length > maxChunkSize && currentChunk.length > 0) {
+      // Add overlap from previous chunk if available
+      const chunkWithOverlap = previousChunkEnd + currentChunk;
+      chunks.push(chunkWithOverlap.trim());
+      
+      // Store end of current chunk for next overlap
+      previousChunkEnd = currentChunk.slice(-overlapSize);
+      currentChunk = segment;
     } else {
-      currentChunk += (currentChunk ? '\n\n' : '') + paragraph;
+      currentChunk += (currentChunk ? '\n\n' : '') + segment;
     }
   }
   
+  // Add final chunk
   if (currentChunk.trim()) {
-    chunks.push(currentChunk.trim());
+    const finalChunk = previousChunkEnd + currentChunk;
+    chunks.push(finalChunk.trim());
+  }
+  
+  // If no scene markers found, fall back to paragraph-based chunking
+  if (chunks.length === 0) {
+    const paragraphs = text.split(/\n\s*\n/);
+    let currentChunk = '';
+    
+    for (const paragraph of paragraphs) {
+      if (currentChunk.length + paragraph.length > maxChunkSize && currentChunk.length > 0) {
+        chunks.push(currentChunk.trim());
+        currentChunk = paragraph;
+      } else {
+        currentChunk += (currentChunk ? '\n\n' : '') + paragraph;
+      }
+    }
+    
+    if (currentChunk.trim()) {
+      chunks.push(currentChunk.trim());
+    }
   }
   
   return chunks;
