@@ -3,13 +3,11 @@ import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import DashboardLayout from "./dashboard-layout";
-import ProjectDashboard from "@/components/project-dashboard";
 import ProjectWorkflowWizard from "@/components/workflow/project-workflow-wizard";
-import { ArrowLeft, FileText, Workflow, Plus } from "lucide-react";
+import { ArrowLeft, FileText, Workflow } from "lucide-react";
 
 export default function ScriptAnalysisWorkflow() {
   const [, setLocation] = useLocation();
-  const [showDashboard, setShowDashboard] = useState(false);
   const [showWizard, setShowWizard] = useState(false);
   const [projectId, setProjectId] = useState<number | undefined>();
   const [initialStep, setInitialStep] = useState<string | undefined>();
@@ -22,12 +20,7 @@ export default function ScriptAnalysisWorkflow() {
     
     if (projectIdParam) {
       setProjectId(parseInt(projectIdParam));
-      // If project has script content, go to dashboard, otherwise use wizard for setup
-      if (stepParam === 'project_info') {
-        setShowWizard(true);
-      } else {
-        setShowDashboard(true);
-      }
+      setShowWizard(true);
     }
     
     if (stepParam) {
@@ -39,10 +32,6 @@ export default function ScriptAnalysisWorkflow() {
     setShowWizard(true);
   };
 
-  const handleStartAnalysis = () => {
-    setShowDashboard(true);
-  };
-
   const handleWorkflowComplete = (projectId: number) => {
     setLocation(`/dashboard/projects/${projectId}`);
   };
@@ -51,22 +40,6 @@ export default function ScriptAnalysisWorkflow() {
     setLocation("/dashboard");
   };
 
-  const handleBackToOverview = () => {
-    setShowDashboard(false);
-    setShowWizard(false);
-  };
-
-  // Show project dashboard for analysis
-  if (showDashboard && projectId) {
-    return (
-      <ProjectDashboard 
-        projectId={projectId} 
-        onBack={handleBackToOverview}
-      />
-    );
-  }
-
-  // Show wizard for project setup
   if (showWizard) {
     return (
       <DashboardLayout>
@@ -74,7 +47,7 @@ export default function ScriptAnalysisWorkflow() {
           <div className="p-6">
             <Button
               variant="outline"
-              onClick={handleBackToOverview}
+              onClick={() => setShowWizard(false)}
               className="mb-4"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
@@ -110,49 +83,65 @@ export default function ScriptAnalysisWorkflow() {
           </p>
         </div>
 
-        {/* New Workflow Overview */}
+        {/* Workflow Overview */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <FileText className="w-5 h-5" />
-              <span>Simple 3-Step Process</span>
+              <span>Step-by-Step Process</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="text-center space-y-3">
-                <div className="w-12 h-12 bg-blue-500 text-white rounded-full flex items-center justify-center text-lg font-bold mx-auto">
-                  1
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <div className="flex items-start space-x-3">
+                  <div className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-medium">
+                    1
+                  </div>
+                  <div>
+                    <h4 className="font-medium">Project Information</h4>
+                    <p className="text-sm text-gray-600">
+                      Enter project details and upload your script for analysis
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="font-medium">Project Setup</h4>
-                  <p className="text-sm text-gray-600">
-                    Enter project details and upload your script
-                  </p>
+                
+                <div className="flex items-start space-x-3">
+                  <div className="w-6 h-6 bg-purple-500 text-white rounded-full flex items-center justify-center text-sm font-medium">
+                    2
+                  </div>
+                  <div>
+                    <h4 className="font-medium">Script Analysis Tools</h4>
+                    <p className="text-sm text-gray-600">
+                      Choose from 8 powerful analysis features including casting, VFX, and financial planning
+                    </p>
+                  </div>
                 </div>
               </div>
               
-              <div className="text-center space-y-3">
-                <div className="w-12 h-12 bg-purple-500 text-white rounded-full flex items-center justify-center text-lg font-bold mx-auto">
-                  2
+              <div className="space-y-4">
+                <div className="flex items-start space-x-3">
+                  <div className="w-6 h-6 bg-pink-500 text-white rounded-full flex items-center justify-center text-sm font-medium">
+                    3
+                  </div>
+                  <div>
+                    <h4 className="font-medium">Review Results</h4>
+                    <p className="text-sm text-gray-600">
+                      Review and edit AI-generated analysis results
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="font-medium">Interactive Analysis</h4>
-                  <p className="text-sm text-gray-600">
-                    Choose any analysis tool and get instant AI-powered insights
-                  </p>
-                </div>
-              </div>
-              
-              <div className="text-center space-y-3">
-                <div className="w-12 h-12 bg-green-500 text-white rounded-full flex items-center justify-center text-lg font-bold mx-auto">
-                  3
-                </div>
-                <div>
-                  <h4 className="font-medium">Export & Finalize</h4>
-                  <p className="text-sm text-gray-600">
-                    Export your analysis results and finalize your project
-                  </p>
+                
+                <div className="flex items-start space-x-3">
+                  <div className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-medium">
+                    4
+                  </div>
+                  <div>
+                    <h4 className="font-medium">Finalize Project</h4>
+                    <p className="text-sm text-gray-600">
+                      Complete your project and optionally publish to the marketplace
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -240,17 +229,8 @@ export default function ScriptAnalysisWorkflow() {
             size="lg"
             className="bg-gradient-to-r from-blue-500 via-purple-600 to-pink-600 hover:from-blue-600 hover:via-purple-700 hover:to-pink-700"
           >
-            <Plus className="w-4 h-4 mr-2" />
-            Create New Project
-          </Button>
-          
-          <Button
-            onClick={handleStartAnalysis}
-            size="lg"
-            variant="outline"
-          >
-            <Workflow className="w-4 h-4 mr-2" />
-            Open Analysis Dashboard
+            Start New Analysis
+            <Workflow className="w-4 h-4 ml-2" />
           </Button>
         </div>
       </div>
