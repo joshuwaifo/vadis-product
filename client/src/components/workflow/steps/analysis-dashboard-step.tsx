@@ -184,12 +184,24 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
   const renderAnalysisContent = () => {
     if (!selectedTask) {
       return (
-        <div className="flex flex-col items-center justify-center h-full text-center">
-          <Play className="h-16 w-16 text-muted-foreground mb-4" />
-          <h3 className="text-lg font-semibold mb-2">Select an Analysis Tool</h3>
-          <p className="text-muted-foreground">
-            Choose an analysis tool from above to run AI-powered analysis on your script.
-          </p>
+        <div className="flex flex-col items-center justify-center h-full text-center space-y-6">
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-full blur-3xl opacity-50"></div>
+            <div className="relative p-8 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-full">
+              <Play className="h-20 w-20 text-blue-600 dark:text-blue-400" />
+            </div>
+          </div>
+          <div className="space-y-3 max-w-md">
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Ready for AI Analysis</h3>
+            <p className="text-muted-foreground text-lg">
+              Select any analysis tool above to unlock powerful insights about your screenplay
+            </p>
+            <div className="flex items-center justify-center gap-2 mt-4">
+              <div className="h-2 w-2 bg-blue-400 rounded-full animate-pulse"></div>
+              <div className="h-2 w-2 bg-indigo-400 rounded-full animate-pulse delay-75"></div>
+              <div className="h-2 w-2 bg-purple-400 rounded-full animate-pulse delay-150"></div>
+            </div>
+          </div>
         </div>
       );
     }
@@ -335,99 +347,189 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
   return (
     <div className="space-y-6">
       {/* Analysis Tools at Top */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                <Play className="h-5 w-5" />
-                Analysis Tools
-              </CardTitle>
-              <CardDescription>
-                Select analysis tasks to run on your script
-              </CardDescription>
-            </div>
-            <div className="text-right">
-              <div className="text-sm text-muted-foreground">Progress</div>
-              <div className="text-lg font-semibold">{completedTasks}/{totalTasks}</div>
-              <Progress value={progressPercentage} className="w-24" />
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 rounded-xl p-6 border border-blue-200/50 dark:border-blue-800/50">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent flex items-center gap-3">
+              <div className="p-2 bg-blue-100 dark:bg-blue-900/50 rounded-lg">
+                <Play className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+              </div>
+              AI Analysis Suite
+            </h2>
+            <p className="text-muted-foreground mt-1">
+              Powerful AI tools to analyze every aspect of your screenplay
+            </p>
+          </div>
+          <div className="text-right">
+            <div className="flex items-center gap-3 p-4 bg-white/80 dark:bg-gray-900/80 rounded-lg border border-white/50 dark:border-gray-700/50 backdrop-blur-sm">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{completedTasks}</div>
+                <div className="text-xs text-muted-foreground">Completed</div>
+              </div>
+              <div className="w-px h-8 bg-border"></div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-gray-400">{totalTasks}</div>
+                <div className="text-xs text-muted-foreground">Total</div>
+              </div>
+              <div className="ml-2">
+                <Progress value={progressPercentage} className="w-20 h-2" />
+                <div className="text-xs text-center mt-1 text-muted-foreground">{Math.round(progressPercentage)}%</div>
+              </div>
             </div>
           </div>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {tasks.map((task) => (
-              <div
-                key={task.id}
-                className={`p-4 rounded-lg border cursor-pointer transition-all text-center ${
-                  selectedTask === task.id 
-                    ? 'border-primary bg-primary/5' 
-                    : 'border-border hover:border-primary/50'
-                }`}
-                onClick={() => setSelectedTask(task.id)}
-              >
-                <div className="flex flex-col items-center space-y-3">
-                  <div className="flex items-center justify-center w-12 h-12 bg-background rounded-lg border">
-                    <task.icon className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-sm">{task.title}</h4>
-                    <p className="text-xs text-muted-foreground">{task.estimatedTime}</p>
-                  </div>
-                  <div className="flex items-center gap-2">
+        </div>
+        
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {tasks.map((task) => (
+            <div
+              key={task.id}
+              className={`group relative p-6 rounded-xl transition-all duration-300 cursor-pointer ${
+                selectedTask === task.id 
+                  ? 'bg-white dark:bg-gray-900 border-2 border-blue-400 shadow-lg shadow-blue-100 dark:shadow-blue-900/50 scale-105' 
+                  : 'bg-white/70 dark:bg-gray-900/70 border border-gray-200 dark:border-gray-700 hover:bg-white dark:hover:bg-gray-900 hover:border-blue-300 dark:hover:border-blue-600 hover:shadow-md hover:scale-102'
+              } backdrop-blur-sm`}
+              onClick={() => setSelectedTask(task.id)}
+            >
+              <div className="flex flex-col items-center space-y-4">
+                <div className={`relative p-4 rounded-xl transition-colors ${
+                  task.status === 'completed' ? 'bg-green-100 dark:bg-green-900/30' :
+                  task.status === 'in_progress' ? 'bg-blue-100 dark:bg-blue-900/30' :
+                  task.status === 'error' ? 'bg-red-100 dark:bg-red-900/30' :
+                  'bg-gray-100 dark:bg-gray-800'
+                }`}>
+                  <task.icon className={`h-7 w-7 ${
+                    task.status === 'completed' ? 'text-green-600 dark:text-green-400' :
+                    task.status === 'in_progress' ? 'text-blue-600 dark:text-blue-400' :
+                    task.status === 'error' ? 'text-red-600 dark:text-red-400' :
+                    'text-gray-600 dark:text-gray-400'
+                  }`} />
+                  <div className="absolute -top-1 -right-1">
                     {getStatusIcon(task.status)}
-                    <Button
-                      size="sm"
-                      variant={task.status === 'completed' ? 'secondary' : 'default'}
-                      disabled={task.status === 'in_progress' || analysisInProgress}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        runAnalysis(task.id);
-                      }}
-                    >
-                      {task.status === 'in_progress' && <Loader2 className="h-3 w-3 animate-spin mr-1" />}
-                      {task.status === 'completed' ? 'View' : 'Run'}
-                    </Button>
                   </div>
                 </div>
+                
+                <div className="text-center space-y-1">
+                  <h4 className="font-semibold text-sm text-gray-900 dark:text-gray-100">{task.title}</h4>
+                  <p className="text-xs text-muted-foreground">{task.estimatedTime}</p>
+                </div>
+                
+                <Button
+                  size="sm"
+                  className={`w-full transition-all ${
+                    task.status === 'completed' 
+                      ? 'bg-green-600 hover:bg-green-700 text-white' 
+                      : task.status === 'in_progress'
+                      ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                      : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white'
+                  }`}
+                  disabled={task.status === 'in_progress' || analysisInProgress}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    runAnalysis(task.id);
+                  }}
+                >
+                  {task.status === 'in_progress' && <Loader2 className="h-3 w-3 animate-spin mr-2" />}
+                  {task.status === 'completed' ? (
+                    <>
+                      <CheckCircle className="h-3 w-3 mr-2" />
+                      View Results
+                    </>
+                  ) : task.status === 'in_progress' ? (
+                    'Processing...'
+                  ) : (
+                    <>
+                      <Play className="h-3 w-3 mr-2" />
+                      Start Analysis
+                    </>
+                  )}
+                </Button>
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+            </div>
+          ))}
+        </div>
+      </div>
 
-      {/* Main Analysis Display - Increased Height */}
-      <Card className="h-[700px]">
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <span>Analysis Results</span>
-            {selectedTask && (
-              <Badge variant="outline">
-                {tasks.find(t => t.id === selectedTask)?.title}
-              </Badge>
-            )}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ScrollArea className="h-[620px]">
-            {renderAnalysisContent()}
-          </ScrollArea>
-        </CardContent>
-      </Card>
+      {/* Main Analysis Display - Enhanced Design */}
+      <div className="relative">
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 rounded-2xl"></div>
+        <Card className="relative h-[700px] border-0 shadow-xl bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm rounded-2xl overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 border-b">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-blue-100 dark:bg-blue-900/50 rounded-lg">
+                  <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                </div>
+                <div>
+                  <CardTitle className="text-xl font-bold text-gray-900 dark:text-gray-100">
+                    Analysis Results
+                  </CardTitle>
+                  <p className="text-sm text-muted-foreground">
+                    Detailed insights from AI analysis
+                  </p>
+                </div>
+              </div>
+              {selectedTask && (
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="px-3 py-1 bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-700">
+                    {tasks.find(t => t.id === selectedTask)?.title}
+                  </Badge>
+                  {tasks.find(t => t.id === selectedTask)?.status === 'completed' && (
+                    <Badge className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                      <CheckCircle className="h-3 w-3 mr-1" />
+                      Complete
+                    </Badge>
+                  )}
+                </div>
+              )}
+            </div>
+          </CardHeader>
+          <CardContent className="p-0">
+            <ScrollArea className="h-[600px] p-6">
+              {renderAnalysisContent()}
+            </ScrollArea>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Navigation */}
-      <div className="flex justify-between">
-        <Button variant="outline" onClick={onPrevious}>
+      <div className="flex justify-between items-center p-6 bg-gradient-to-r from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+        <Button 
+          variant="outline" 
+          onClick={onPrevious}
+          className="flex items-center gap-2 px-6 py-3 hover:bg-gray-100 dark:hover:bg-gray-800"
+        >
+          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
           Previous: Project Info
         </Button>
-        <Button onClick={onNext} disabled={completedTasks === 0}>
-          Next: Finalize Project
+        
+        <div className="flex items-center gap-4">
           {completedTasks > 0 && (
-            <Badge variant="secondary" className="ml-2">
-              {completedTasks} Complete
-            </Badge>
+            <div className="text-center">
+              <div className="text-sm text-muted-foreground">Analysis Progress</div>
+              <div className="text-lg font-semibold text-green-600 dark:text-green-400">
+                {completedTasks} of {totalTasks} Complete
+              </div>
+            </div>
           )}
-        </Button>
+          
+          <Button 
+            onClick={onNext} 
+            disabled={completedTasks === 0}
+            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Next: Finalize Project
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+            {completedTasks > 0 && (
+              <Badge className="ml-2 bg-white/20 text-white border-white/30">
+                {completedTasks} Complete
+              </Badge>
+            )}
+          </Button>
+        </div>
       </div>
     </div>
   );
