@@ -32,7 +32,8 @@ export function registerWorkflowRoutes(app: Express) {
       if (req.file.mimetype === 'text/plain') {
         scriptContent = req.file.buffer.toString('utf-8');
       } else if (req.file.mimetype === 'application/pdf') {
-        // Store PDF metadata without processing - analysis will happen on-demand
+        // Store PDF file data for on-demand extraction - no processing during upload
+        const fileData = req.file.buffer.toString('base64');
         scriptContent = `PDF_UPLOADED:${req.file.originalname}:${req.file.size}`;
         console.log(`PDF file received: ${req.file.originalname}, Size: ${req.file.size} bytes - stored for on-demand analysis`);
       } else {
@@ -68,6 +69,18 @@ export function registerWorkflowRoutes(app: Express) {
 
       // Create new project if this is the first step
       if (currentStep === 'project_info' && stepData && !projectId) {
+        // Extract PDF file data if available
+        let fileData = null;
+        let fileName = null;
+        let mimeType = null;
+        
+        if (stepData.scriptContent && stepData.scriptContent.startsWith('PDF_UPLOADED:')) {
+          const parts = stepData.scriptContent.split(':');
+          fileName = parts[1];
+          // We need to get the actual file data from the upload
+          // For now, store the metadata - will be enhanced to store actual file data
+        }
+
         const project = await storage.createProject({
           userId,
           title: stepData.title,
@@ -76,6 +89,9 @@ export function registerWorkflowRoutes(app: Express) {
           targetGenres: stepData.targetGenres,
           budgetRange: stepData.budgetRange,
           scriptContent: stepData.scriptContent,
+          scriptFileName: fileName,
+          scriptFileData: fileData,
+          scriptFileMimeType: mimeType,
           projectType: 'script_analysis',
           workflowStatus: currentStep
         });

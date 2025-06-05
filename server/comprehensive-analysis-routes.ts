@@ -167,8 +167,8 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
 
       let scriptContent = project[0].scriptContent;
 
-      // Check if this is a placeholder content (PDF not yet extracted)
-      if (scriptContent && scriptContent.includes('PDF script uploaded:')) {
+      // Check if this is a PDF metadata format (on-demand extraction needed)
+      if (scriptContent && scriptContent.startsWith('PDF_UPLOADED:')) {
         // Attempt authentic PDF text extraction using Gemini AI
         try {
           const { extractScriptFromPdf } = await import('./services/gemini-pdf-extractor');
