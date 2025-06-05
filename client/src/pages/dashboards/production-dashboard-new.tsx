@@ -482,9 +482,9 @@ export default function ProductionDashboard() {
                               </Badge>
                               {project.workflowStatus && (
                                 <Badge variant="outline" className="text-xs">
-                                  Step {project.workflowStatus === 'project_info' ? '1' : 
-                                        project.workflowStatus === 'script_analysis' ? '2' :
-                                        project.workflowStatus === 'review_results' ? '3' : '4'}/4
+                                  {project.workflowStatus === 'project_info' ? 'Setup' : 
+                                   project.workflowStatus === 'analysis_dashboard' ? 'Analysis' : 
+                                   'Complete'}
                                 </Badge>
                               )}
                             </div>
