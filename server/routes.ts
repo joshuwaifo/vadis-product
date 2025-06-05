@@ -15,6 +15,15 @@ import { registerWorkflowRoutes } from "./workflow-routes";
 import { registerComprehensiveAnalysisRoutes } from "./comprehensive-analysis-routes";
 import { registerScriptGenerationRoutes } from "./script-generation-routes";
 
+// Simple authentication middleware
+function requireAuth(req: any, res: any, next: any) {
+  if (req.session?.user) {
+    next();
+  } else {
+    res.status(401).json({ error: "Authentication required" });
+  }
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Demo request submission endpoint
   app.post("/api/demo-request", async (req, res) => {
@@ -452,6 +461,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error starting video generation:", error);
       res.status(500).json({ error: "Failed to start video generation" });
+    }
+  });
+
+  // Project History API endpoints
+  app.get("/api/projects/:id/history", requireAuth, async (req, res) => {
+    try {
+      const projectId = parseInt(req.params.id);
+      const history = await storage.getProjectHistory(projectId);
+      res.json(history);
+    } catch (error) {
+      console.error("Error fetching project history:", error);
+      res.status(500).json({ error: "Failed to fetch project history" });
     }
   });
 
