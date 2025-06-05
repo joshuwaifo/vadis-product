@@ -70,9 +70,9 @@ export function getAIClient(provider: AIProvider) {
  */
 function getGeminiClient(model: string) {
   if (!genAIInstance) {
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.GOOGLE_API_KEY;
     if (!apiKey) {
-      throw new Error("GEMINI_API_KEY environment variable is not set");
+      throw new Error("GOOGLE_API_KEY environment variable is not set");
     }
     genAIInstance = new GoogleGenerativeAI(apiKey);
   }
