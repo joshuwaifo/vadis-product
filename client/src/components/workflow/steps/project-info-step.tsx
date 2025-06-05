@@ -109,9 +109,7 @@ export default function ProjectInfoStep({ projectId, onNext, onSave, isLoading }
     const file = event.target.files?.[0];
     if (file) {
       setUploadedFile(file);
-      setIsUploading(true);
       uploadMutation.mutate(file);
-      setIsUploading(false);
     }
   };
 
@@ -333,9 +331,9 @@ export default function ProjectInfoStep({ projectId, onNext, onSave, isLoading }
 
         <Button
           onClick={form.handleSubmit(handleNext)}
-          disabled={isLoading || !scriptContent}
+          disabled={isLoading || uploadMutation.isPending || !scriptContent}
         >
-          {isLoading ? 'Processing...' : 'Continue to Analysis'}
+          {isLoading || uploadMutation.isPending ? 'Processing...' : 'Continue to Analysis'}
           <ArrowRight className="w-4 h-4 ml-2" />
         </Button>
       </div>
