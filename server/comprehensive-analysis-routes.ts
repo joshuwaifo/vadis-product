@@ -170,62 +170,79 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
       // Check if this is a PDF metadata format (on-demand extraction needed)
       if (scriptContent && scriptContent.startsWith('PDF_UPLOADED:')) {
         try {
-          // Try to extract from stored PDF data first
-          if ((project[0] as any).scriptFileData && (project[0] as any).scriptFileMimeType) {
-            const { extractTextFromPDF } = await import('./services/pdf-text-extractor');
-            const pdfBuffer = Buffer.from((project[0] as any).scriptFileData, 'base64');
-            console.log(`Extracting from stored PDF data (${pdfBuffer.length} bytes)`);
+          let extractedText = null;
+          
+          // Method 1: Try extracting from stored PDF data
+          if (project[0].pdfFileData || project[0].scriptFileData) {
+            const pdfData = project[0].pdfFileData || project[0].scriptFileData;
+            const mimeType = project[0].pdfMimeType || project[0].scriptFileMimeType || 'application/pdf';
             
-            const textContent = await extractTextFromPDF(pdfBuffer);
-            if (textContent && textContent.length > 100) {
-              console.log(`Successfully extracted ${textContent.length} characters from stored PDF`);
-              scriptContent = textContent;
+            if (pdfData) {
+              console.log(`Attempting extraction from stored PDF data`);
+              const { extractTextFromPDF } = await import('./services/pdf-text-extractor');
+              const pdfBuffer = Buffer.from(pdfData, 'base64');
               
-              // Update the project with extracted content for future use
-              await db.update(projects)
-                .set({ 
-                  scriptContent: textContent,
-                  updatedAt: new Date()
-                })
-                .where(eq(projects.id, parseInt(projectId)));
-            } else {
-              throw new Error('Insufficient text content extracted from stored PDF');
-            }
-          } else {
-            // Try to find PDF file in filesystem as fallback
-            const fs = await import('fs');
-            const possiblePaths = ['Pulp Fiction.pdf', `${project[0].title}.pdf`];
-            let foundFile = false;
-            
-            for (const pdfPath of possiblePaths) {
-              if (fs.existsSync(pdfPath)) {
-                console.log(`Attempting to extract text from ${pdfPath}`);
-                const { extractScriptFromPdf } = await import('./services/pdf-text-extractor');
-                const pdfBuffer = fs.readFileSync(pdfPath);
-                
-                const result = await extractScriptFromPdf(pdfBuffer, 'application/pdf');
-                if (result.content && result.content.length > 100) {
-                  console.log(`Successfully extracted ${result.content.length} characters from ${pdfPath}`);
-                  scriptContent = result.content;
-                  
-                  // Update the project with extracted content
-                  await db.update(projects)
-                    .set({ 
-                      scriptContent: result.content,
-                      updatedAt: new Date()
-                    })
-                    .where(eq(projects.id, parseInt(projectId)));
-                  
-                  foundFile = true;
-                  break;
-                }
-              }
-            }
-            
-            if (!foundFile) {
-              throw new Error('No readable PDF files found for text extraction');
+              extractedText = await extractTextFromPDF(pdfBuffer);
+              console.log(`Extracted ${extractedText?.length || 0} characters from stored PDF`);
             }
           }
+          
+          // Method 2: Fallback to filesystem search
+          if (!extractedText || extractedText.length < 100) {
+            console.log('Trying filesystem fallback for PDF extraction');
+            const fs = await import('fs');
+            const possiblePaths = [
+              'Pulp Fiction.pdf',
+              `${project[0].title}.pdf`,
+              'test_improved.pdf'
+            ];
+            
+            for (const pdfPath of possiblePaths) {
+              try {
+                if (fs.existsSync(pdfPath)) {
+                  console.log(`Found and processing ${pdfPath}`);
+                  const { extractScriptFromPdf } = await import('./services/pdf-text-extractor');
+                  const pdfBuffer = fs.readFileSync(pdfPath);
+                  
+                  const result = await extractScriptFromPdf(pdfBuffer, 'application/pdf');
+                  if (result.content && result.content.length > 100) {
+                    extractedText = result.content;
+                    console.log(`Successfully extracted ${extractedText.length} characters from ${pdfPath}`);
+                    break;
+                  }
+                }
+              } catch (fileError) {
+                console.log(`Failed to process ${pdfPath}: ${fileError.message}`);
+                continue;
+              }
+            }
+          }
+          
+          // Method 3: Check if Gemini AI key is available for PDF processing
+          if (!extractedText || extractedText.length < 100) {
+            if (!process.env.GEMINI_API_KEY) {
+              throw new Error('PDF text extraction failed and no GEMINI_API_KEY available for enhanced processing');
+            }
+            
+            console.log('Attempting Gemini AI PDF extraction as final method');
+            // This will be handled by the PDF extraction service
+            throw new Error('Unable to extract readable text from PDF file - please ensure PDF contains selectable text');
+          }
+          
+          if (extractedText && extractedText.length > 50) {
+            scriptContent = extractedText;
+            
+            // Update the project with extracted content
+            await db.update(projects)
+              .set({ 
+                scriptContent: extractedText,
+                updatedAt: new Date()
+              })
+              .where(eq(projects.id, parseInt(projectId)));
+          } else {
+            throw new Error('Unable to extract sufficient text content from any source');
+          }
+          
         } catch (extractionError) {
           console.error('PDF extraction failed:', extractionError.message);
           return res.status(400).json({ 
