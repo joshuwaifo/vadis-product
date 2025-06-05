@@ -14,7 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { 
   Upload, FileText, ArrowRight, Save, X, 
-  Film, DollarSign, Target, BookOpen
+  Film, DollarSign, Target, BookOpen, Eye
 } from "lucide-react";
 
 const projectInfoSchema = z.object({
@@ -164,45 +164,45 @@ export default function ProjectInfoStep({ projectId, onNext, onSave, isLoading }
         </CardHeader>
       </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Project Details Form */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <BookOpen className="w-5 h-5" />
-              <span>Project Details</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {projectLoading ? (
-              <div className="space-y-4">
-                <div className="animate-pulse bg-gray-200 h-8 rounded"></div>
-                <div className="animate-pulse bg-gray-200 h-4 rounded w-3/4"></div>
-                <div className="animate-pulse bg-gray-200 h-4 rounded w-1/2"></div>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {project && (
-                  <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg mb-4">
-                    <div className="space-y-2">
-                      <p className="text-sm font-medium text-blue-800">Project Status</p>
-                      <div className="flex items-center space-x-2">
-                        <Badge variant="outline">{project.status || 'Draft'}</Badge>
-                        {project.workflowStatus && (
-                          <Badge variant="secondary">
-                            Step: {project.workflowStatus.replace('_', ' ')}
-                          </Badge>
-                        )}
-                      </div>
-                      {project.createdAt && (
-                        <p className="text-xs text-blue-600">
-                          Created: {new Date(project.createdAt).toLocaleDateString()}
-                        </p>
+      {/* Project Details - Full Width */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <BookOpen className="w-5 h-5" />
+            <span>Project Details</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {projectLoading ? (
+            <div className="space-y-4">
+              <div className="animate-pulse bg-gray-200 h-8 rounded"></div>
+              <div className="animate-pulse bg-gray-200 h-4 rounded w-3/4"></div>
+              <div className="animate-pulse bg-gray-200 h-4 rounded w-1/2"></div>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {project && (
+                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg mb-4">
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium text-blue-800">Project Status</p>
+                    <div className="flex items-center space-x-2">
+                      <Badge variant="outline">{project.status || 'Draft'}</Badge>
+                      {project.workflowStatus && (
+                        <Badge variant="secondary">
+                          Step: {project.workflowStatus.replace('_', ' ')}
+                        </Badge>
                       )}
                     </div>
+                    {project.createdAt && (
+                      <p className="text-xs text-blue-600">
+                        Created: {new Date(project.createdAt).toLocaleDateString()}
+                      </p>
+                    )}
                   </div>
-                )}
-                
+                </div>
+              )}
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(handleNext)} className="space-y-4">
                     <FormField
@@ -218,117 +218,126 @@ export default function ProjectInfoStep({ projectId, onNext, onSave, isLoading }
                         </FormItem>
                       )}
                     />
-                    
-                    {project?.logline && (
-                      <div className="space-y-2">
-                        <FormLabel>Logline</FormLabel>
-                        <div className="p-3 bg-gray-50 border rounded-md">
-                          <p className="text-sm text-gray-700">{project.logline}</p>
-                        </div>
-                      </div>
-                    )}
-                    
-                    {project?.synopsis && (
-                      <div className="space-y-2">
-                        <FormLabel>Synopsis</FormLabel>
-                        <div className="p-3 bg-gray-50 border rounded-md max-h-32 overflow-y-auto">
-                          <p className="text-sm text-gray-700">{project.synopsis}</p>
-                        </div>
-                      </div>
-                    )}
                   </form>
                 </Form>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Script Upload */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <FileText className="w-5 h-5" />
-              <span>Script Upload</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {projectLoading ? (
-              <div className="space-y-4">
-                <div className="animate-pulse bg-gray-200 h-8 rounded"></div>
-                <div className="animate-pulse bg-gray-200 h-4 rounded w-3/4"></div>
-                <div className="animate-pulse bg-gray-200 h-4 rounded w-1/2"></div>
-              </div>
-            ) : !uploadedFile ? (
-              <div>
-                <div 
-                  className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-gray-400 transition-colors"
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-lg font-medium text-gray-700 mb-2">
-                    Upload Your Script
-                  </p>
-                  <p className="text-gray-500 mb-4">
-                    Drag and drop or click to select
-                  </p>
-                  <p className="text-sm text-gray-400">
-                    Supports PDF, DOC, DOCX, and TXT files
-                  </p>
-                </div>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept=".pdf,.doc,.docx,.txt"
-                  onChange={handleFileUpload}
-                  className="hidden"
-                />
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <FileText className="w-8 h-8 text-green-600" />
-                    <div>
-                      <p className="font-medium text-green-800">{uploadedFile.name}</p>
-                      {uploadedFile.size ? (
-                        <p className="text-sm text-green-600">
-                          {(uploadedFile.size / 1024 / 1024).toFixed(2)} MB
-                        </p>
-                      ) : (
-                        <p className="text-sm text-green-600">Previously uploaded</p>
-                      )}
+                
+                {project?.logline && (
+                  <div className="space-y-2">
+                    <FormLabel>Logline</FormLabel>
+                    <div className="p-3 bg-gray-50 border rounded-md">
+                      <p className="text-sm text-gray-700">{project.logline}</p>
                     </div>
                   </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleRemoveFile}
-                  >
-                    <X className="w-4 h-4" />
-                  </Button>
-                </div>
-
-                {scriptContent && (
-                  <div className="p-4 bg-gray-50 border rounded-lg">
-                    <p className="text-sm font-medium text-gray-700 mb-2">
-                      Script Preview ({scriptContent.length} characters)
-                    </p>
-                    <p className="text-sm text-gray-600 line-clamp-4">
-                      {scriptContent.substring(0, 200)}...
-                    </p>
+                )}
+                
+                {project?.synopsis && (
+                  <div className="space-y-2">
+                    <FormLabel>Synopsis</FormLabel>
+                    <div className="p-3 bg-gray-50 border rounded-md max-h-32 overflow-y-auto">
+                      <p className="text-sm text-gray-700">{project.synopsis}</p>
+                    </div>
                   </div>
                 )}
               </div>
-            )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
-            {isUploading && (
-              <div className="mt-4 text-center">
-                <p className="text-sm text-gray-600">Processing script...</p>
+      {/* Script Upload */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <FileText className="w-5 h-5" />
+            <span>Script Upload</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {projectLoading ? (
+            <div className="space-y-4">
+              <div className="animate-pulse bg-gray-200 h-8 rounded"></div>
+              <div className="animate-pulse bg-gray-200 h-4 rounded w-3/4"></div>
+              <div className="animate-pulse bg-gray-200 h-4 rounded w-1/2"></div>
+            </div>
+          ) : !uploadedFile ? (
+            <div>
+              <div 
+                className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-gray-400 transition-colors"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-lg font-medium text-gray-700 mb-2">
+                  Upload Your Script
+                </p>
+                <p className="text-gray-500 mb-4">
+                  Drag and drop or click to select
+                </p>
+                <p className="text-sm text-gray-400">
+                  Supports PDF, DOC, DOCX, and TXT files
+                </p>
               </div>
-            )}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".pdf,.doc,.docx,.txt"
+                onChange={handleFileUpload}
+                className="hidden"
+              />
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-lg">
+                <div className="flex items-center space-x-3">
+                  <FileText className="w-8 h-8 text-green-600" />
+                  <div>
+                    <p className="font-medium text-green-800">{uploadedFile.name}</p>
+                    {uploadedFile.size ? (
+                      <p className="text-sm text-green-600">
+                        {(uploadedFile.size / 1024 / 1024).toFixed(2)} MB
+                      </p>
+                    ) : (
+                      <p className="text-sm text-green-600">Previously uploaded</p>
+                    )}
+                  </div>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleRemoveFile}
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {isUploading && (
+            <div className="mt-4 text-center">
+              <p className="text-sm text-gray-600">Processing script...</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Script Preview Viewer */}
+      {scriptContent && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Eye className="w-5 h-5" />
+              <span>Script Preview</span>
+              <Badge variant="secondary">{scriptContent.length} characters</Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="bg-white border rounded-lg p-6 max-h-96 overflow-y-auto">
+              <pre className="whitespace-pre-wrap text-sm text-gray-800 font-mono leading-relaxed">
+                {scriptContent.substring(0, 5000)}{scriptContent.length > 5000 && '\n\n... (content continues)'}
+              </pre>
+            </div>
           </CardContent>
         </Card>
-      </div>
+      )}
 
       {/* Action Buttons */}
       <div className="flex items-center justify-between pt-6">
