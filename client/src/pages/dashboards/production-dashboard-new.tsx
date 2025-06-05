@@ -507,14 +507,14 @@ export default function ProductionDashboard() {
                           {project.description || `${project.timeline || 'New'} project in ${project.status} stage`}
                         </p>
                         
-                        <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
-                          <Link to={nextAction.link} className="flex-1">
+                        <div className="flex flex-col gap-2">
+                          <Link to={nextAction.link} className="w-full">
                             <Button variant={nextAction.variant} size="sm" className="w-full h-9">
                               <nextAction.icon className="w-4 h-4 mr-2" />
                               {nextAction.action}
                             </Button>
                           </Link>
-                          <div className="flex gap-2 flex-shrink-0">
+                          <div className="flex gap-2 justify-between">
                             <ProjectHistoryDialog projectId={project.id} projectTitle={project.title} />
                             <Button 
                               variant="outline" 
