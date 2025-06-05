@@ -37,7 +37,7 @@ export async function extractScenesWithChunking(scriptText: string): Promise<Scr
   const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-8b" });
   
   // Split script into chunks to ensure complete processing
-  const chunks = chunkScript(scriptText, 15000); // Smaller chunks for better processing
+  const chunks = chunkScript(scriptText, 25000); // Larger chunks to capture more scenes
   const allScenes: ExtractedScene[] = [];
   
   console.log(`Processing script in ${chunks.length} chunks for comprehensive scene extraction`);
@@ -47,23 +47,24 @@ export async function extractScenesWithChunking(scriptText: string): Promise<Scr
     console.log(`Processing chunk ${i + 1}/${chunks.length} (${chunk.length} characters)`);
     
     try {
-      const prompt = `Analyze this screenplay text and extract ALL scenes with the following information for each:
-1. Scene number (sequential)
-2. Scene title/heading (e.g., "INT. JACK RABBIT SLIM'S - NIGHT")
-3. Brief plot summary (2-3 sentences describing what happens in the scene)
-4. Location and time of day
-5. Main characters present
-6. Full scene content
+      const prompt = `You are a script analysis assistant. I will provide you with a movie script in standard Hollywood format. Your task is to identify and extract each scene, then return ONLY the following three pieces of information for each scene:
+
+1. **Scene Number** (if explicitly numbered, or assign sequential numbers starting from 1)
+2. **Scene Title** (create a concise, descriptive title based on the scene heading/location)
+3. **Plot Summary** (2-3 sentences maximum describing what happens in the scene)
+
+**Guidelines:**
+- A new scene typically begins with a scene heading (INT./EXT. LOCATION - TIME)
+- Keep plot summaries concise but capture the key action, dialogue purpose, or story development
+- Focus on what happens, not how it's written
+- If scenes aren't pre-numbered, number them sequentially
+- For scene titles, use the location and key action (e.g., "Kitchen Argument," "Car Chase Downtown," "Office Meeting")
 
 Format as JSON array:
 [{
   "sceneNumber": 1,
-  "title": "INT. DINER - MORNING",
-  "plotSummary": "Vincent and Jules discuss their upcoming job while eating breakfast at a diner.",
-  "location": "DINER",
-  "timeOfDay": "MORNING",
-  "characters": ["VINCENT", "JULES"],
-  "content": "full scene text here..."
+  "title": "Apartment Bedroom - Morning",
+  "plotSummary": "Sarah wakes up late and rushes to get ready for an important job interview. She spills coffee on her outfit and has to change clothes."
 }]
 
 Script text:
@@ -78,17 +79,17 @@ ${chunk}`;
         const jsonMatch = text.match(/\[[\s\S]*\]/);
         if (jsonMatch) {
           const scenes = JSON.parse(jsonMatch[0]);
-          scenes.forEach((scene: any, index: number) => {
+          scenes.forEach((scene: any) => {
             allScenes.push({
-              sceneNumber: allScenes.length + 1,
+              sceneNumber: scene.sceneNumber || allScenes.length + 1,
               title: scene.title || `Scene ${allScenes.length + 1}`,
-              plotSummary: scene.plotSummary || scene.summary || 'Scene description not available',
-              location: scene.location || 'UNSPECIFIED',
-              timeOfDay: scene.timeOfDay || 'UNSPECIFIED',
-              characters: scene.characters || [],
-              content: scene.content || chunk.substring(0, 500),
-              pageStart: Math.floor((allScenes.length * 120) / chunks.length) + 1,
-              pageEnd: Math.floor(((allScenes.length + 1) * 120) / chunks.length) + 1,
+              plotSummary: scene.plotSummary || 'Scene description not available',
+              location: 'UNSPECIFIED',
+              timeOfDay: 'UNSPECIFIED',
+              characters: [],
+              content: scene.plotSummary || 'Scene content',
+              pageStart: 1,
+              pageEnd: 1,
               duration: 2
             });
           });

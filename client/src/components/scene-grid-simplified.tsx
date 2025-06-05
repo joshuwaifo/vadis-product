@@ -36,17 +36,14 @@ export function SceneGridSimplified({ projectId }: SceneGridSimplifiedProps) {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <Card key={i} className="h-48">
-            <CardHeader className="pb-3">
-              <Skeleton className="h-6 w-20" />
-              <Skeleton className="h-4 w-full" />
-            </CardHeader>
-            <CardContent>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+        {Array.from({ length: 8 }).map((_, i) => (
+          <Card key={i} className="h-32">
+            <CardContent className="p-4">
+              <Skeleton className="h-4 w-16 mb-2" />
               <Skeleton className="h-4 w-full mb-2" />
-              <Skeleton className="h-4 w-3/4 mb-2" />
-              <Skeleton className="h-4 w-1/2" />
+              <Skeleton className="h-3 w-full" />
+              <Skeleton className="h-3 w-3/4" />
             </CardContent>
           </Card>
         ))}
@@ -71,47 +68,31 @@ export function SceneGridSimplified({ projectId }: SceneGridSimplifiedProps) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">Scene Breakdown</h3>
-        <Badge variant="secondary">{scenes.length} scenes</Badge>
+        <h3 className="text-lg font-semibold">Scenes</h3>
+        <Badge variant="secondary">{scenes.length} total</Badge>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
         {scenes.map((scene) => (
-          <Card key={scene.id} className="h-fit hover:shadow-md transition-shadow cursor-pointer">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <Badge variant="outline" className="text-xs font-mono">
-                  Scene {scene.sceneNumber}
+          <Card key={scene.id} className="h-32 hover:shadow-md transition-shadow cursor-pointer border border-gray-200 dark:border-gray-700">
+            <CardContent className="p-4 h-full flex flex-col">
+              <div className="flex items-center justify-between mb-2">
+                <Badge variant="outline" className="text-xs px-2 py-1">
+                  {scene.sceneNumber}
                 </Badge>
-                {scene.duration && (
-                  <span className="text-xs text-muted-foreground">
-                    ~{scene.duration}min
-                  </span>
-                )}
               </div>
-              <CardTitle className="text-sm font-medium leading-tight">
-                {scene.description || `Scene ${scene.sceneNumber}`}
-              </CardTitle>
-            </CardHeader>
-            
-            <CardContent className="pt-0">
-              <ScrollArea className="h-20">
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {scene.plotSummary || 'No plot summary available'}
-                </p>
-              </ScrollArea>
               
-              {scene.location && scene.timeOfDay && (
-                <div className="mt-3 pt-3 border-t">
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <span className="font-medium">{scene.location}</span>
-                    <span>•</span>
-                    <span>{scene.timeOfDay}</span>
-                  </div>
-                </div>
-              )}
+              <h4 className="text-sm font-medium mb-2 line-clamp-1">
+                {scene.description || `Scene ${scene.sceneNumber}`}
+              </h4>
+              
+              <div className="flex-1 overflow-hidden">
+                <p className="text-xs text-muted-foreground line-clamp-3 leading-relaxed">
+                  {scene.plotSummary || 'Plot summary not available'}
+                </p>
+              </div>
             </CardContent>
           </Card>
         ))}

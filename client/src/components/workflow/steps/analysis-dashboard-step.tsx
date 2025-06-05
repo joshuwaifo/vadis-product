@@ -365,55 +365,35 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
             {results.scenes && results.scenes.length > 0 && (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h4 className="text-lg font-semibold">All Scenes</h4>
+                  <h4 className="text-lg font-semibold">Scenes</h4>
                   <Badge variant="outline" className="text-xs">
-                    {results.scenes.length} scenes extracted
+                    {results.scenes.length} total
                   </Badge>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
                   {results.scenes.map((scene: any, index: number) => (
-                    <Card key={index} className="hover:shadow-md transition-shadow duration-200 border-l-4 border-l-blue-500">
-                      <CardContent className="p-4">
-                        <div className="flex justify-between items-start mb-3">
-                          <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
-                            Scene {scene.sceneNumber}
+                    <Card key={index} className="h-32 hover:shadow-md transition-shadow cursor-pointer border border-gray-200 dark:border-gray-700">
+                      <CardContent className="p-4 h-full flex flex-col">
+                        <div className="flex items-center justify-between mb-2">
+                          <Badge variant="outline" className="text-xs px-2 py-1">
+                            {scene.sceneNumber}
                           </Badge>
-                          <div className="text-right">
-                            <div className="text-sm font-medium">{scene.duration}min</div>
-                            <div className="text-xs text-muted-foreground">Pages {scene.pageStart}-{scene.pageEnd}</div>
-                          </div>
                         </div>
                         
-                        <h5 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">
-                          {scene.location} - {scene.timeOfDay}
-                        </h5>
+                        <h4 className="text-sm font-medium mb-2 line-clamp-1">
+                          {scene.description || `Scene ${scene.sceneNumber}`}
+                        </h4>
                         
-                        <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                          {scene.description}
-                        </p>
-                        
-                        {scene.characters && scene.characters.length > 0 && (
-                          <div className="flex flex-wrap gap-1 mb-2">
-                            {scene.characters.slice(0, 3).map((character: string, idx: number) => (
-                              <Badge key={idx} variant="outline" className="text-xs">
-                                {character}
-                              </Badge>
-                            ))}
-                            {scene.characters.length > 3 && (
-                              <Badge variant="outline" className="text-xs">
-                                +{scene.characters.length - 3} more
-                              </Badge>
-                            )}
-                          </div>
-                        )}
-                        
-
+                        <div className="flex-1 overflow-hidden">
+                          <p className="text-xs text-muted-foreground line-clamp-3 leading-relaxed">
+                            {scene.plotSummary || 'Plot summary not available'}
+                          </p>
+                        </div>
                       </CardContent>
                     </Card>
                   ))}
                 </div>
-
               </div>
             )}
           </div>
