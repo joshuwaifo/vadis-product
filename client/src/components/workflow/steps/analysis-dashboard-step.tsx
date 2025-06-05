@@ -430,192 +430,194 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
 
   return (
     <div className="w-full min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8 space-y-6">
-      {/* Analysis Tools at Top */}
-      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 rounded-xl p-6 border border-blue-200/50 dark:border-blue-800/50">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent flex items-center gap-3">
-              <div className="p-2 bg-blue-100 dark:bg-blue-900/50 rounded-lg">
-                <Play className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+      <div className="w-full px-6 lg:px-8 py-8">
+        {/* Two-Panel Layout: Analysis Tools Left, Results Right */}
+        <div className="flex gap-6 min-h-[calc(100vh-8rem)]">
+          
+          {/* Left Panel: Analysis Suite */}
+          <div className="w-96 flex-shrink-0 space-y-6">
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 rounded-xl p-6 border border-blue-200/50 dark:border-blue-800/50">
+              <div className="mb-6">
+                <h2 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent flex items-center gap-3">
+                  <div className="p-2 bg-blue-100 dark:bg-blue-900/50 rounded-lg">
+                    <Play className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  AI Analysis Suite
+                </h2>
+                <p className="text-muted-foreground mt-1 text-sm">
+                  Powerful AI tools to analyze every aspect of your screenplay
+                </p>
               </div>
-              AI Analysis Suite
-            </h2>
-            <p className="text-muted-foreground mt-1">
-              Powerful AI tools to analyze every aspect of your screenplay
-            </p>
-          </div>
-          <div className="text-right">
-            <div className="flex items-center gap-3 p-4 bg-white/80 dark:bg-gray-900/80 rounded-lg border border-white/50 dark:border-gray-700/50 backdrop-blur-sm">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{completedTasks}</div>
-                <div className="text-xs text-muted-foreground">Completed</div>
+              
+              {/* Progress Summary */}
+              <div className="mb-6 p-4 bg-white/80 dark:bg-gray-900/80 rounded-lg border border-white/50 dark:border-gray-700/50 backdrop-blur-sm">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium">Progress</span>
+                  <span className="text-sm text-muted-foreground">{completedTasks}/{totalTasks}</span>
+                </div>
+                <Progress value={progressPercentage} className="h-2" />
+                <div className="text-xs text-center mt-1 text-muted-foreground">{Math.round(progressPercentage)}% Complete</div>
               </div>
-              <div className="w-px h-8 bg-border"></div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-gray-400">{totalTasks}</div>
-                <div className="text-xs text-muted-foreground">Total</div>
-              </div>
-              <div className="ml-2">
-                <Progress value={progressPercentage} className="w-20 h-2" />
-                <div className="text-xs text-center mt-1 text-muted-foreground">{Math.round(progressPercentage)}%</div>
+              
+              {/* Analysis Tools Grid */}
+              <div className="space-y-3">
+                {tasks.map((task) => (
+                  <div
+                    key={task.id}
+                    className={`group relative p-4 rounded-xl transition-all duration-300 cursor-pointer ${
+                      selectedTask === task.id 
+                        ? 'bg-white dark:bg-gray-900 border-2 border-blue-400 shadow-lg shadow-blue-100 dark:shadow-blue-900/50' 
+                        : 'bg-white/70 dark:bg-gray-900/70 border border-gray-200 dark:border-gray-700 hover:bg-white dark:hover:bg-gray-900 hover:border-blue-300 dark:hover:border-blue-600 hover:shadow-md'
+                    } backdrop-blur-sm`}
+                    onClick={() => setSelectedTask(task.id)}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className={`relative p-3 rounded-lg transition-colors ${
+                        task.status === 'completed' ? 'bg-green-100 dark:bg-green-900/30' :
+                        task.status === 'in_progress' ? 'bg-blue-100 dark:bg-blue-900/30' :
+                        task.status === 'error' ? 'bg-red-100 dark:bg-red-900/30' :
+                        'bg-gray-100 dark:bg-gray-800'
+                      }`}>
+                        <task.icon className={`h-5 w-5 ${
+                          task.status === 'completed' ? 'text-green-600 dark:text-green-400' :
+                          task.status === 'in_progress' ? 'text-blue-600 dark:text-blue-400' :
+                          task.status === 'error' ? 'text-red-600 dark:text-red-400' :
+                          'text-gray-600 dark:text-gray-400'
+                        }`} />
+                        <div className="absolute -top-1 -right-1">
+                          {getStatusIcon(task.status)}
+                        </div>
+                      </div>
+                      
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-semibold text-sm text-gray-900 dark:text-gray-100 truncate">{task.title}</h4>
+                        <p className="text-xs text-muted-foreground">{task.estimatedTime}</p>
+                      </div>
+                    </div>
+                    
+                    <Button
+                      size="sm"
+                      className={`w-full mt-3 transition-all ${
+                        task.status === 'completed' 
+                          ? 'bg-green-600 hover:bg-green-700 text-white' 
+                          : task.status === 'in_progress'
+                          ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                          : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white'
+                      }`}
+                      disabled={task.status === 'in_progress' || analysisInProgress}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        runAnalysis(task.id);
+                      }}
+                    >
+                      {task.status === 'in_progress' && <Loader2 className="h-3 w-3 animate-spin mr-2" />}
+                      {task.status === 'completed' ? (
+                        <>
+                          <CheckCircle className="h-3 w-3 mr-2" />
+                          View Results
+                        </>
+                      ) : task.status === 'in_progress' ? (
+                        'Processing...'
+                      ) : (
+                        <>
+                          <Play className="h-3 w-3 mr-2" />
+                          Start Analysis
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
+
+          {/* Right Panel: Analysis Results (Wider) */}
+          <div className="flex-1 min-w-0">
+            <div className="relative h-[calc(100vh-12rem)]">
+              <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 rounded-2xl"></div>
+              <Card className="relative h-full border-0 shadow-xl bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm rounded-2xl overflow-hidden">
+                <CardHeader className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 border-b">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-blue-100 dark:bg-blue-900/50 rounded-lg">
+                        <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-xl font-bold text-gray-900 dark:text-gray-100">
+                          Analysis Results
+                        </CardTitle>
+                        <p className="text-sm text-muted-foreground">
+                          Detailed insights from AI analysis
+                        </p>
+                      </div>
+                    </div>
+                    {selectedTask && (
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="px-3 py-1 bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-700">
+                          {tasks.find(t => t.id === selectedTask)?.title}
+                        </Badge>
+                        {tasks.find(t => t.id === selectedTask)?.status === 'completed' && (
+                          <Badge className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                            <CheckCircle className="h-3 w-3 mr-1" />
+                            Complete
+                          </Badge>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </CardHeader>
+                <CardContent className="p-0 h-[calc(100%-4rem)]">
+                  <ScrollArea className="h-full p-6">
+                    {renderAnalysisContent()}
+                  </ScrollArea>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
         </div>
-        
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {tasks.map((task) => (
-            <div
-              key={task.id}
-              className={`group relative p-6 rounded-xl transition-all duration-300 cursor-pointer ${
-                selectedTask === task.id 
-                  ? 'bg-white dark:bg-gray-900 border-2 border-blue-400 shadow-lg shadow-blue-100 dark:shadow-blue-900/50 scale-105' 
-                  : 'bg-white/70 dark:bg-gray-900/70 border border-gray-200 dark:border-gray-700 hover:bg-white dark:hover:bg-gray-900 hover:border-blue-300 dark:hover:border-blue-600 hover:shadow-md hover:scale-102'
-              } backdrop-blur-sm`}
-              onClick={() => setSelectedTask(task.id)}
+
+        {/* Navigation - Full Width */}
+        <div className="w-full mt-6">
+          <div className="flex justify-between items-center p-6 bg-gradient-to-r from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+            <Button 
+              variant="outline" 
+              onClick={onPrevious}
+              className="flex items-center gap-2 px-6 py-3 hover:bg-gray-100 dark:hover:bg-gray-800"
             >
-              <div className="flex flex-col items-center space-y-4">
-                <div className={`relative p-4 rounded-xl transition-colors ${
-                  task.status === 'completed' ? 'bg-green-100 dark:bg-green-900/30' :
-                  task.status === 'in_progress' ? 'bg-blue-100 dark:bg-blue-900/30' :
-                  task.status === 'error' ? 'bg-red-100 dark:bg-red-900/30' :
-                  'bg-gray-100 dark:bg-gray-800'
-                }`}>
-                  <task.icon className={`h-7 w-7 ${
-                    task.status === 'completed' ? 'text-green-600 dark:text-green-400' :
-                    task.status === 'in_progress' ? 'text-blue-600 dark:text-blue-400' :
-                    task.status === 'error' ? 'text-red-600 dark:text-red-400' :
-                    'text-gray-600 dark:text-gray-400'
-                  }`} />
-                  <div className="absolute -top-1 -right-1">
-                    {getStatusIcon(task.status)}
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              Previous: Project Info
+            </Button>
+            
+            <div className="flex items-center gap-4">
+              {completedTasks > 0 && (
+                <div className="text-center">
+                  <div className="text-sm text-muted-foreground">Analysis Progress</div>
+                  <div className="text-lg font-semibold text-green-600 dark:text-green-400">
+                    {completedTasks} of {totalTasks} Complete
                   </div>
                 </div>
-                
-                <div className="text-center space-y-1">
-                  <h4 className="font-semibold text-sm text-gray-900 dark:text-gray-100">{task.title}</h4>
-                  <p className="text-xs text-muted-foreground">{task.estimatedTime}</p>
-                </div>
-                
-                <Button
-                  size="sm"
-                  className={`w-full transition-all ${
-                    task.status === 'completed' 
-                      ? 'bg-green-600 hover:bg-green-700 text-white' 
-                      : task.status === 'in_progress'
-                      ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                      : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white'
-                  }`}
-                  disabled={task.status === 'in_progress' || analysisInProgress}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    runAnalysis(task.id);
-                  }}
-                >
-                  {task.status === 'in_progress' && <Loader2 className="h-3 w-3 animate-spin mr-2" />}
-                  {task.status === 'completed' ? (
-                    <>
-                      <CheckCircle className="h-3 w-3 mr-2" />
-                      View Results
-                    </>
-                  ) : task.status === 'in_progress' ? (
-                    'Processing...'
-                  ) : (
-                    <>
-                      <Play className="h-3 w-3 mr-2" />
-                      Start Analysis
-                    </>
-                  )}
-                </Button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Main Analysis Display - Enhanced Design */}
-      <div className="relative">
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 rounded-2xl"></div>
-        <Card className="relative h-[700px] border-0 shadow-xl bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm rounded-2xl overflow-hidden">
-          <CardHeader className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 border-b">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-100 dark:bg-blue-900/50 rounded-lg">
-                  <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                </div>
-                <div>
-                  <CardTitle className="text-xl font-bold text-gray-900 dark:text-gray-100">
-                    Analysis Results
-                  </CardTitle>
-                  <p className="text-sm text-muted-foreground">
-                    Detailed insights from AI analysis
-                  </p>
-                </div>
-              </div>
-              {selectedTask && (
-                <div className="flex items-center gap-2">
-                  <Badge variant="outline" className="px-3 py-1 bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-700">
-                    {tasks.find(t => t.id === selectedTask)?.title}
-                  </Badge>
-                  {tasks.find(t => t.id === selectedTask)?.status === 'completed' && (
-                    <Badge className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
-                      <CheckCircle className="h-3 w-3 mr-1" />
-                      Complete
-                    </Badge>
-                  )}
-                </div>
               )}
+              
+              <Button 
+                onClick={onNext} 
+                disabled={completedTasks === 0}
+                className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Next: Finalize Project
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+                {completedTasks > 0 && (
+                  <Badge className="ml-2 bg-white/20 text-white border-white/30">
+                    {completedTasks} Complete
+                  </Badge>
+                )}
+              </Button>
             </div>
-          </CardHeader>
-          <CardContent className="p-0">
-            <ScrollArea className="h-[600px] p-6">
-              {renderAnalysisContent()}
-            </ScrollArea>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Navigation */}
-      <div className="flex justify-between items-center p-6 bg-gradient-to-r from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
-        <Button 
-          variant="outline" 
-          onClick={onPrevious}
-          className="flex items-center gap-2 px-6 py-3 hover:bg-gray-100 dark:hover:bg-gray-800"
-        >
-          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-          Previous: Project Info
-        </Button>
-        
-        <div className="flex items-center gap-4">
-          {completedTasks > 0 && (
-            <div className="text-center">
-              <div className="text-sm text-muted-foreground">Analysis Progress</div>
-              <div className="text-lg font-semibold text-green-600 dark:text-green-400">
-                {completedTasks} of {totalTasks} Complete
-              </div>
-            </div>
-          )}
-          
-          <Button 
-            onClick={onNext} 
-            disabled={completedTasks === 0}
-            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Next: Finalize Project
-            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-            {completedTasks > 0 && (
-              <Badge className="ml-2 bg-white/20 text-white border-white/30">
-                {completedTasks} Complete
-              </Badge>
-            )}
-          </Button>
+          </div>
         </div>
-      </div>
       </div>
     </div>
   );
