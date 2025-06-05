@@ -107,9 +107,9 @@ export function registerWorkflowRoutes(app: Express) {
           targetGenres: stepData.targetGenres,
           budgetRange: stepData.budgetRange,
           scriptContent: stepData.scriptContent,
-          scriptFileName: fileName,
-          scriptFileData: fileData,
-          scriptFileMimeType: mimeType,
+          pdfFileName: fileName,
+          pdfFileData: fileData,
+          pdfMimeType: mimeType,
           projectType: 'script_analysis',
           workflowStatus: currentStep
         });
