@@ -56,7 +56,7 @@ import {
   type CreatorUser
 } from "@shared/schema";
 import { db } from "./db";
-import { eq } from "drizzle-orm";
+import { eq, desc, sql } from "drizzle-orm";
 
 export interface IStorage {
   // User authentication (legacy)
@@ -1080,6 +1080,35 @@ export class DatabaseStorage implements IStorage {
       return result;
     } catch (error) {
       console.error('Error getting characters:', error);
+      return [];
+    }
+  }
+
+  // Project History
+  async createProjectHistory(history: InsertProjectHistory): Promise<ProjectHistory> {
+    try {
+      const [created] = await db
+        .insert(projectHistory)
+        .values(history)
+        .returning();
+      return created;
+    } catch (error) {
+      console.error('Error creating project history:', error);
+      throw error;
+    }
+  }
+
+  async getProjectHistory(projectId: number): Promise<ProjectHistory[]> {
+    try {
+      const result = await db
+        .select()
+        .from(projectHistory)
+        .where(eq(projectHistory.projectId, projectId))
+        .orderBy(desc(projectHistory.createdAt));
+      
+      return result;
+    } catch (error) {
+      console.error('Error getting project history:', error);
       return [];
     }
   }

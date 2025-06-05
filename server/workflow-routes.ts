@@ -400,11 +400,15 @@ export function registerWorkflowRoutes(app: Express) {
 // Helper function to log user actions
 async function logUserAction(userId: number, projectId: number | null, action: string, details: any) {
   try {
-    // This would be implemented with a proper action logging system
+    if (projectId) {
+      await storage.createProjectHistory({
+        userId,
+        projectId,
+        action,
+        details
+      });
+    }
     console.log(`User Action Log - User: ${userId}, Project: ${projectId}, Action: ${action}`, details);
-    
-    // For now, we'll just log to console
-    // In a real implementation, this would save to a user_action_logs table
   } catch (error) {
     console.error("Failed to log user action:", error);
   }
