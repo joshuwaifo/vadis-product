@@ -32,11 +32,26 @@ export function registerWorkflowRoutes(app: Express) {
       if (req.file.mimetype === 'text/plain') {
         scriptContent = req.file.buffer.toString('utf-8');
       } else if (req.file.mimetype === 'application/pdf') {
-        // For PDF files, store file info and defer processing to analysis step
-        scriptContent = `PDF script uploaded: ${req.file.originalname} (${Math.round(req.file.size / 1024)} KB)\n\nThis PDF will be processed during the script analysis phase. The AI analysis tools will extract and analyze the script content automatically.`;
+        // Extract PDF content immediately using Gemini AI
+        try {
+          console.log(`Processing uploaded PDF file with Gemini AI...`);
+          const { extractScriptFromPdf } = await import('./services/gemini-pdf-extractor');
+          const extractedData = await extractScriptFromPdf(req.file.buffer, req.file.mimetype);
+          
+          if (extractedData.content && extractedData.content.length > 100) {
+            scriptContent = extractedData.content;
+            console.log(`Successfully extracted ${scriptContent.length} characters from PDF using Gemini AI`);
+            console.log(`Sample text extracted from PDF: ${scriptContent.substring(0, 100)}...`);
+          } else {
+            throw new Error('PDF extraction returned insufficient content');
+          }
+        } catch (pdfError) {
+          console.error('Gemini PDF extraction failed:', pdfError);
+          // Fallback to placeholder if extraction fails
+          scriptContent = `PDF script uploaded: ${req.file.originalname} (${Math.round(req.file.size / 1024)} KB)\n\nPDF processing failed. Please ensure the PDF contains readable text or try re-uploading.`;
+        }
         
         console.log(`PDF file received: ${req.file.originalname}, Size: ${req.file.size} bytes`);
-        console.log('PDF content will be processed during analysis phase');
       } else {
         // For DOC, DOCX files
         throw new Error('Document format not fully supported. Please convert to PDF or plain text.');

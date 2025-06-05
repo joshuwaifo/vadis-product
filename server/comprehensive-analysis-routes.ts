@@ -241,16 +241,30 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
         }
       }
 
-      // Use enhanced regex-based scene extraction for reliable full script processing
-      let extractedScenes;
-      
+      // Use proper scene extraction workflow based on demo app
       console.log(`Processing script content of ${scriptContent.length} characters`);
       
-      // Import and use the regex-based extractor
-      const { extractScenesWithRegex } = await import('./services/regex-scene-extractor');
-      extractedScenes = extractScenesWithRegex(scriptContent);
+      // Import the proper scene extractor
+      const { analyzeScript } = await import('./services/scene-extractor');
+      const analysisResult = analyzeScript(scriptContent);
       
-      console.log(`Regex extractor found ${extractedScenes.length} scenes`);
+      console.log(`Scene extractor found ${analysisResult.totalScenes} scenes from script analysis`);
+      
+      // Convert to the expected format
+      const extractedScenes = analysisResult.scenes.map(scene => ({
+        id: `scene-${scene.sceneNumber}`,
+        sceneNumber: scene.sceneNumber,
+        location: scene.location || 'UNSPECIFIED',
+        timeOfDay: scene.timeOfDay || 'UNSPECIFIED', 
+        description: scene.heading,
+        characters: scene.characters || [],
+        content: scene.content,
+        pageStart: scene.pageStart || 1,
+        pageEnd: scene.pageEnd || 1,
+        duration: scene.duration || 1,
+        vfxNeeds: [],
+        productPlacementOpportunities: []
+      }));
       
       // Save scenes to database
       const savedScenes = await Promise.all(
