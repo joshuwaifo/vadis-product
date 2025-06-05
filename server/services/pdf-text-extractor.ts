@@ -17,42 +17,47 @@ interface PDFExtractionResult {
 export async function extractTextFromPDF(pdfBuffer: Buffer): Promise<string> {
   console.log(`Starting PDF text extraction from buffer (${pdfBuffer.length} bytes)`);
   
-  // Method 1: Use Gemini AI for comprehensive extraction (most reliable for complete scripts)
+  // Method 1: Use Gemini AI with enhanced extraction strategy
   try {
     if (!process.env.GEMINI_API_KEY) {
       throw new Error('GEMINI_API_KEY not available');
     }
     
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-1.5-pro",
+      generationConfig: {
+        maxOutputTokens: 8192, // Maximum possible output
+        temperature: 0.1 // Low temperature for precise extraction
+      }
+    });
     
     // Convert PDF buffer to base64 for Gemini
     const base64Data = pdfBuffer.toString('base64');
     
-    const estimatedPages = Math.floor(pdfBuffer.length / 2000); // More conservative estimate
+    const estimatedPages = Math.floor(pdfBuffer.length / 2000);
     
-    const prompt = `You are a professional script digitization service. Extract the COMPLETE text content from this PDF screenplay document with absolute precision. This is a ${estimatedPages}-page professional film script that must be extracted in its entirety.
+    const prompt = `COMPLETE SCREENPLAY EXTRACTION TASK
 
-MANDATORY EXTRACTION PROTOCOL:
-- Extract text from EVERY SINGLE PAGE without exception (page 1 through page ${estimatedPages})
-- Include EVERY scene heading (INT./EXT./FADE IN/FADE OUT/CUT TO/MONTAGE/etc.)
-- Include EVERY character name (usually in ALL CAPS)
-- Include EVERY line of dialogue word-for-word
-- Include EVERY action line and stage direction
-- Include ALL parentheticals and voice-over directions
-- Include ALL scene transitions and camera directions
-- Include ALL page breaks and scene numbers if present
-- Preserve the exact screenplay formatting structure
+You are processing a ${estimatedPages}-page film screenplay PDF. Your task is to extract the ENTIRE script content with perfect accuracy.
 
-CRITICAL REQUIREMENTS:
-- This is NOT a summary task - extract the complete raw text
-- Do NOT skip any pages, scenes, or dialogue
-- Do NOT truncate long scenes or monologues
-- Do NOT paraphrase or rewrite any content
-- Process the ENTIRE document from first page to last page
-- The output should be the complete screenplay text (typically 20,000-30,000 words for a feature film)
+EXTRACTION PROTOCOL:
+1. Process ALL pages from beginning to end
+2. Extract ALL scene headings (INT./EXT./FADE IN/FADE OUT/CUT TO)
+3. Extract ALL character names (typically in CAPS)
+4. Extract ALL dialogue lines verbatim
+5. Extract ALL action descriptions and stage directions
+6. Extract ALL parentheticals and voice-over text
+7. Extract ALL scene transitions and camera directions
 
-Return the complete extracted screenplay text exactly as it appears, with proper scene breaks and formatting preserved.`;
+OUTPUT REQUIREMENTS:
+- Return the complete screenplay text
+- Maintain original formatting structure
+- Include all content from every page
+- Do not summarize, truncate, or skip any text
+- This should be the full script (typically 15,000-40,000 words)
+
+Begin extraction now - output the complete screenplay text:`;
     
     const result = await model.generateContent([
       {
@@ -67,11 +72,33 @@ Return the complete extracted screenplay text exactly as it appears, with proper
     const response = await result.response;
     const extractedText = response.text();
     
-    if (extractedText && extractedText.length > 5000) {
-      console.log(`Successfully extracted ${extractedText.length} characters using Gemini AI`);
+    // Check if we got a substantial extraction
+    if (extractedText && extractedText.length > 10000) {
+      console.log(`Successfully extracted ${extractedText.length} characters using Gemini AI (enhanced)`);
       return extractedText;
     } else {
-      console.log(`Gemini AI extracted only ${extractedText?.length || 0} characters, trying pdf-parse fallback...`);
+      console.log(`Gemini AI extracted only ${extractedText?.length || 0} characters, trying multi-pass extraction...`);
+      
+      // Try a different approach with explicit instruction
+      const fallbackPrompt = `Extract the complete text from this screenplay PDF. Return every single word from the document, including all scene headers, character names, dialogue, and action descriptions. Do not skip any content. Output the full screenplay text now:`;
+      
+      const fallbackResult = await model.generateContent([
+        {
+          inlineData: {
+            data: base64Data,
+            mimeType: "application/pdf"
+          }
+        },
+        fallbackPrompt
+      ]);
+      
+      const fallbackResponse = await fallbackResult.response;
+      const fallbackText = fallbackResponse.text();
+      
+      if (fallbackText && fallbackText.length > extractedText?.length) {
+        console.log(`Fallback extraction succeeded with ${fallbackText.length} characters`);
+        return fallbackText;
+      }
     }
   } catch (error) {
     console.error('Gemini AI extraction failed:', error.message);
