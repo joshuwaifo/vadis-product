@@ -192,7 +192,7 @@ export default function ProjectWorkflowWizard({
       case 'analysis_dashboard':
         return (
           <AnalysisDashboardStep
-            projectId={workflow?.projectId || 0}
+            workflow={workflow}
             onNext={handleNext}
             onPrevious={handlePrevious}
           />
