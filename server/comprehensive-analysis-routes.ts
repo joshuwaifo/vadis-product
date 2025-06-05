@@ -291,6 +291,7 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
               location: scene.location,
               timeOfDay: scene.timeOfDay,
               description: scene.description,
+              plotSummary: scene.plotSummary,
               characters: scene.characters,
               content: scene.content,
               pageStart: scene.pageStart,
