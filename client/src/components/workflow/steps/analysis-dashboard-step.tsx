@@ -10,6 +10,8 @@ import {
   Film, Users, Star, MapPin, Zap, Package, DollarSign, FileText,
   Play, CheckCircle, Clock, AlertCircle, Loader2, RefreshCw
 } from 'lucide-react';
+import { apiRequest } from '@/lib/queryClient';
+import { useToast } from '@/hooks/use-toast';
 // Define types directly in this file since the server types are not accessible from client
 interface AnalysisTask {
   id: string;
@@ -134,7 +136,7 @@ export default function AnalysisDashboardStep({
       // Update task statuses based on existing results
       const newStatuses: Record<string, AnalysisTask['status']> = {};
       ANALYSIS_TASKS.forEach(task => {
-        newStatuses[task.id] = existingResults[task.id] ? 'completed' : 'not_started';
+        newStatuses[task.id] = (existingResults as any)[task.id] ? 'completed' : 'not_started';
       });
       setTaskStatuses(newStatuses);
     }
@@ -183,7 +185,7 @@ export default function AnalysisDashboardStep({
   };
 
   const handleRunAnalysis = (taskId: string) => {
-    if (!project?.scriptContent) {
+    if (!(project as any)?.scriptContent) {
       toast({
         title: "No Script Content",
         description: "Please upload a script in the previous step before running analysis.",

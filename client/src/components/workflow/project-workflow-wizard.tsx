@@ -193,22 +193,12 @@ export default function ProjectWorkflowWizard({
             isLoading={isLoading}
           />
         );
-      case 'script_analysis':
+      case 'analysis_dashboard':
         return (
-          <ScriptAnalysisStep
+          <AnalysisDashboardStep
             projectId={workflow?.projectId || 0}
             onNext={handleNext}
-            onSave={handleSave}
-            isLoading={isLoading}
-          />
-        );
-      case 'review_results':
-        return (
-          <ReviewResultsStep
-            projectId={workflow?.projectId || 0}
-            onNext={handleNext}
-            onSave={handleSave}
-            isLoading={isLoading}
+            onPrevious={handlePrevious}
           />
         );
       case 'finalize_project':
