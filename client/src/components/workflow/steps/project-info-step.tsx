@@ -93,7 +93,7 @@ export default function ProjectInfoStep({ projectId, onNext, onSave, isLoading }
       setScriptContent(data.content);
       toast({
         title: "Script uploaded",
-        description: `Successfully processed ${data.fileName}`
+        description: `Successfully uploaded ${data.fileName} - ready for analysis`
       });
     },
     onError: () => {
