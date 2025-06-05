@@ -343,8 +343,8 @@ export default function ScriptGenerationWizard({
               </div>
 
               {/* Export button when content is available */}
-              {streamedContent.length > 1000 && (
-                <div className="pt-4">
+              {streamedContent.length > 500 && (
+                <div className="pt-4 space-y-2">
                   <Button
                     onClick={() => {
                       setGeneratedScript(streamedContent);
@@ -355,6 +355,19 @@ export default function ScriptGenerationWizard({
                   >
                     <Download className="w-4 h-4 mr-2" />
                     Export Current Progress to PDF
+                  </Button>
+                  
+                  <Button
+                    onClick={() => {
+                      setGeneratedScript(streamedContent);
+                      setCurrentStep('review');
+                      setIsGenerating(false);
+                    }}
+                    variant="secondary"
+                    className="w-full"
+                  >
+                    <FileText className="w-4 h-4 mr-2" />
+                    View Complete Script
                   </Button>
                 </div>
               )}
