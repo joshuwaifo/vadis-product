@@ -9,8 +9,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { CheckCircle, Circle, Clock, ArrowRight, ArrowLeft, Save } from "lucide-react";
 
 import ProjectInfoStep from "./steps/project-info-step";
-import ScriptAnalysisStep from "./steps/script-analysis-step";
-import ReviewResultsStep from "./steps/review-results-step";
+import AnalysisDashboardStep from "./steps/analysis-dashboard-step";
 import FinalizeProjectStep from "./steps/finalize-project-step";
 
 interface WorkflowStep {
@@ -42,15 +41,9 @@ const WORKFLOW_STEPS: WorkflowStep[] = [
     status: 'pending'
   },
   {
-    id: 'script_analysis',
-    title: 'Script Analysis Tools',
-    description: 'Choose analysis features and run AI analysis',
-    status: 'pending'
-  },
-  {
-    id: 'review_results',
-    title: 'Review Results',
-    description: 'Review and edit analysis results',
+    id: 'analysis_dashboard',
+    title: 'Analysis Dashboard',
+    description: 'Run and manage script analysis tools',
     status: 'pending'
   },
   {
