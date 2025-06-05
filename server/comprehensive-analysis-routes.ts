@@ -169,32 +169,31 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
 
       // Check if this is a PDF metadata format (on-demand extraction needed)
       if (scriptContent && scriptContent.startsWith('PDF_UPLOADED:')) {
-        // Extract PDF content using stored file data or uploaded file
+        // Try multiple PDF extraction methods for reliable text extraction
         try {
-          const { extractScriptFromPdf } = await import('./services/gemini-pdf-extractor');
-          
-          console.log(`Performing on-demand PDF extraction for project: ${project[0].title}`);
-          
           let extractedData = null;
           
-          // First try to use stored file data if available
+          // Method 1: Use direct PDF parsing for stored file data
           if ((project[0] as any).pdf_file_data && (project[0] as any).pdf_mime_type) {
             try {
+              const { extractTextFromPDF } = await import('./services/pdf-text-extractor');
               const pdfBuffer = Buffer.from((project[0] as any).pdf_file_data, 'base64');
               console.log(`Extracting from stored PDF data (${pdfBuffer.length} bytes)`);
-              extractedData = await extractScriptFromPdf(pdfBuffer, (project[0] as any).pdf_mime_type);
               
-              if (extractedData.content && extractedData.content.length > 100) {
-                console.log(`Successfully extracted ${extractedData.content.length} characters from stored PDF`);
-                scriptContent = extractedData.content;
+              const textContent = await extractTextFromPDF(pdfBuffer);
+              if (textContent && textContent.length > 100) {
+                console.log(`Successfully extracted ${textContent.length} characters from stored PDF`);
+                scriptContent = textContent;
                 
                 // Update the project with extracted content for future use
                 await db.update(projects)
                   .set({ 
-                    scriptContent: extractedData.content,
+                    scriptContent: textContent,
                     updatedAt: new Date()
                   })
                   .where(eq(projects.id, parseInt(projectId)));
+                
+                extractedData = { content: textContent };
               }
             } catch (storageError) {
               console.error('Failed to extract from stored PDF data:', storageError.message);
