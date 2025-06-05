@@ -173,16 +173,27 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
         try {
           const { extractScriptFromPdf } = await import('./services/gemini-pdf-extractor');
           const fs = await import('fs');
+          const path = await import('path');
           
           console.log(`Attempting authentic PDF extraction for project: ${project[0].title}`);
           
-          // Look for PDF files that might contain the script
+          // Look for the actual uploaded PDF file first - prioritize larger files
           const possiblePaths = [
-            'test.pdf',
-            'test_improved.pdf',
+            'Pulp Fiction.pdf',
             `${project[0].title}.pdf`,
-            'Pulp Fiction.pdf'
-          ];
+            'test_improved.pdf'
+          ].filter(filePath => {
+            try {
+              if (fs.existsSync(filePath)) {
+                const stats = fs.statSync(filePath);
+                // Only consider files larger than 10KB to avoid test files
+                return stats.size > 10000;
+              }
+              return false;
+            } catch (e) {
+              return false;
+            }
+          });
           
           let extractedData = null;
           
@@ -230,29 +241,16 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
         }
       }
 
-      // Use basic scene parsing as primary method for full script processing
+      // Use enhanced regex-based scene extraction for reliable full script processing
       let extractedScenes;
       
       console.log(`Processing script content of ${scriptContent.length} characters`);
       
-      // First try the robust basic parser that handles full scripts
-      extractedScenes = parseBasicScenes(scriptContent);
+      // Import and use the regex-based extractor
+      const { extractScenesWithRegex } = await import('./services/regex-scene-extractor');
+      extractedScenes = extractScenesWithRegex(scriptContent);
       
-      console.log(`Basic parser extracted ${extractedScenes.length} scenes`);
-      
-      // If basic parser finds insufficient scenes, try AI extraction with chunking
-      if (extractedScenes.length < 10) {
-        try {
-          console.log('Attempting AI extraction as basic parser found few scenes...');
-          const aiScenes = await extractScenes(scriptContent);
-          if (aiScenes.length > extractedScenes.length) {
-            extractedScenes = aiScenes;
-            console.log(`AI extraction found ${aiScenes.length} scenes`);
-          }
-        } catch (aiError) {
-          console.log('AI extraction failed, using basic parser results:', aiError.message);
-        }
-      }
+      console.log(`Regex extractor found ${extractedScenes.length} scenes`);
       
       // Save scenes to database
       const savedScenes = await Promise.all(
