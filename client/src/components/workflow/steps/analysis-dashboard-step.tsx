@@ -471,99 +471,64 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
   return (
     <div className="w-full min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-[1800px] mx-auto px-6 lg:px-8 py-8">
-        {/* Two-Panel Layout: Analysis Tools Left, Results Right */}
-        <div className="flex gap-6 min-h-[calc(100vh-8rem)]">
+        {/* Modern Grid Layout */}
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
           
-          {/* Left Panel: Analysis Suite */}
-          <div className="w-96 flex-shrink-0 space-y-6">
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 rounded-xl p-6 border border-blue-200/50 dark:border-blue-800/50">
-              <div className="mb-6">
-                <h2 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent flex items-center gap-3">
-                  <div className="p-2 bg-blue-100 dark:bg-blue-900/50 rounded-lg">
-                    <Play className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                  </div>
-                  AI Analysis Suite
+          {/* Analysis Tools - Compact Cards */}
+          <div className="xl:col-span-1 space-y-4">
+            <div className="bg-white dark:bg-gray-900 rounded-lg p-6 border border-gray-200 dark:border-gray-700 shadow-sm">
+              <div className="mb-4">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                  <Film className="h-5 w-5 text-blue-600" />
+                  Analysis Tools
                 </h2>
-                <p className="text-muted-foreground mt-1 text-sm">
-                  Powerful AI tools to analyze every aspect of your screenplay
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  Extract insights from your script
                 </p>
               </div>
               
-              {/* Progress Summary */}
-              <div className="mb-6 p-4 bg-white/80 dark:bg-gray-900/80 rounded-lg border border-white/50 dark:border-gray-700/50 backdrop-blur-sm">
+              {/* Progress Bar */}
+              <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm font-medium">Progress</span>
-                  <span className="text-sm text-muted-foreground">{completedTasks}/{totalTasks}</span>
+                  <span className="text-sm text-gray-600">{completedTasks}/{totalTasks}</span>
                 </div>
                 <Progress value={progressPercentage} className="h-2" />
-                <div className="text-xs text-center mt-1 text-muted-foreground">{Math.round(progressPercentage)}% Complete</div>
               </div>
               
-              {/* Analysis Tools Grid */}
-              <div className="space-y-3">
+              {/* Analysis Tools List */}
+              <div className="space-y-2">
                 {tasks.map((task) => (
                   <div
                     key={task.id}
-                    className={`group relative p-4 rounded-xl transition-all duration-300 cursor-pointer ${
+                    className={`p-3 rounded-lg border transition-all cursor-pointer ${
                       selectedTask === task.id 
-                        ? 'bg-white dark:bg-gray-900 border-2 border-blue-400 shadow-lg shadow-blue-100 dark:shadow-blue-900/50' 
-                        : 'bg-white/70 dark:bg-gray-900/70 border border-gray-200 dark:border-gray-700 hover:bg-white dark:hover:bg-gray-900 hover:border-blue-300 dark:hover:border-blue-600 hover:shadow-md'
-                    } backdrop-blur-sm`}
+                        ? 'border-blue-500 bg-blue-50 dark:bg-blue-950/30' 
+                        : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                    }`}
                     onClick={() => setSelectedTask(task.id)}
                   >
-                    <div className="flex items-center space-x-3">
-                      <div className={`relative p-3 rounded-lg transition-colors ${
-                        task.status === 'completed' ? 'bg-green-100 dark:bg-green-900/30' :
-                        task.status === 'in_progress' ? 'bg-blue-100 dark:bg-blue-900/30' :
-                        task.status === 'error' ? 'bg-red-100 dark:bg-red-900/30' :
-                        'bg-gray-100 dark:bg-gray-800'
-                      }`}>
-                        <task.icon className={`h-5 w-5 ${
-                          task.status === 'completed' ? 'text-green-600 dark:text-green-400' :
-                          task.status === 'in_progress' ? 'text-blue-600 dark:text-blue-400' :
-                          task.status === 'error' ? 'text-red-600 dark:text-red-400' :
-                          'text-gray-600 dark:text-gray-400'
-                        }`} />
-                        <div className="absolute -top-1 -right-1">
-                          {getStatusIcon(task.status)}
-                        </div>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <task.icon className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                        <span className="text-sm font-medium">{task.title}</span>
                       </div>
-                      
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-semibold text-sm text-gray-900 dark:text-gray-100 truncate">{task.title}</h4>
-                        <p className="text-xs text-muted-foreground">{task.estimatedTime}</p>
-                      </div>
+                      {getStatusIcon(task.status)}
                     </div>
                     
                     <Button
                       size="sm"
-                      className={`w-full mt-3 transition-all ${
-                        task.status === 'completed' 
-                          ? 'bg-green-600 hover:bg-green-700 text-white' 
-                          : task.status === 'in_progress'
-                          ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                          : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white'
-                      }`}
+                      variant={task.status === 'completed' ? 'default' : 'outline'}
+                      className="w-full text-xs"
                       disabled={task.status === 'in_progress' || analysisInProgress}
                       onClick={(e) => {
                         e.stopPropagation();
                         runAnalysis(task.id);
                       }}
                     >
-                      {task.status === 'in_progress' && <Loader2 className="h-3 w-3 animate-spin mr-2" />}
-                      {task.status === 'completed' ? (
-                        <>
-                          <CheckCircle className="h-3 w-3 mr-2" />
-                          View Results
-                        </>
-                      ) : task.status === 'in_progress' ? (
-                        'Processing...'
-                      ) : (
-                        <>
-                          <Play className="h-3 w-3 mr-2" />
-                          Start Analysis
-                        </>
-                      )}
+                      {task.status === 'in_progress' && <Loader2 className="h-3 w-3 animate-spin mr-1" />}
+                      {task.status === 'completed' ? 'View Results' : 
+                       task.status === 'in_progress' ? 'Processing...' : 'Start Analysis'}
                     </Button>
                   </div>
                 ))}
@@ -571,48 +536,36 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
             </div>
           </div>
 
-          {/* Right Panel: Analysis Results (Wider) */}
-          <div className="flex-1 min-w-0">
-            <div className="relative h-[calc(100vh-12rem)]">
-              <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 rounded-2xl"></div>
-              <Card className="relative h-full border-0 shadow-xl bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm rounded-2xl overflow-hidden">
-                <CardHeader className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 border-b">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-blue-100 dark:bg-blue-900/50 rounded-lg">
-                        <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                      </div>
-                      <div>
-                        <CardTitle className="text-xl font-bold text-gray-900 dark:text-gray-100">
-                          Analysis Results
-                        </CardTitle>
-                        <p className="text-sm text-muted-foreground">
-                          Detailed insights from AI analysis
-                        </p>
-                      </div>
+          {/* Results Panel - Takes remaining space */}
+          <div className="xl:col-span-3">
+            <Card className="h-[calc(100vh-12rem)] border border-gray-200 dark:border-gray-700">
+              <CardHeader className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <FileText className="h-5 w-5 text-blue-600" />
+                    <div>
+                      <CardTitle className="text-lg font-semibold">Analysis Results</CardTitle>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        {selectedTask ? tasks.find(t => t.id === selectedTask)?.title || 'Select a tool to view results' : 'Select a tool to view results'}
+                      </p>
                     </div>
-                    {selectedTask && (
-                      <div className="flex items-center gap-2">
-                        <Badge variant="outline" className="px-3 py-1 bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-700">
-                          {tasks.find(t => t.id === selectedTask)?.title}
-                        </Badge>
-                        {tasks.find(t => t.id === selectedTask)?.status === 'completed' && (
-                          <Badge className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
-                            <CheckCircle className="h-3 w-3 mr-1" />
-                            Complete
-                          </Badge>
-                        )}
-                      </div>
-                    )}
                   </div>
-                </CardHeader>
-                <CardContent className="p-0 h-[calc(100%-4rem)]">
-                  <ScrollArea className="h-full p-6">
+                  {selectedTask && tasks.find(t => t.id === selectedTask)?.status === 'completed' && (
+                    <Badge className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                      <CheckCircle className="h-3 w-3 mr-1" />
+                      Complete
+                    </Badge>
+                  )}
+                </div>
+              </CardHeader>
+              <CardContent className="p-0 h-[calc(100%-5rem)]">
+                <ScrollArea className="h-full">
+                  <div className="p-6">
                     {renderAnalysisContent()}
-                  </ScrollArea>
-                </CardContent>
-              </Card>
-            </div>
+                  </div>
+                </ScrollArea>
+              </CardContent>
+            </Card>
           </div>
         </div>
 

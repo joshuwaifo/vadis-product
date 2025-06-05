@@ -133,6 +133,7 @@ export const characterRelationships = pgTable("character_relationships", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Analysis tables for script analysis workflow
 export const actorSuggestions = pgTable("actor_suggestions", {
   id: serial("id").primaryKey(),
   projectId: integer("project_id").references(() => projects.id).notNull(),
@@ -277,6 +278,8 @@ export const sceneVariations = pgTable("scene_variations", {
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
+
+
 
 // Zod schemas for validation
 export const insertUserSchema = createInsertSchema(users).pick({
