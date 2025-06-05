@@ -158,11 +158,21 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
       ));
       
       console.error('Analysis error:', error);
-      toast({
-        title: "Analysis Failed",
-        description: `Failed to complete ${tasks.find(t => t.id === taskId)?.title}. Please try again.`,
-        variant: "destructive"
-      });
+      
+      // Check if this is a script extraction error
+      if (error?.response?.data?.requiresExtraction) {
+        toast({
+          title: "Script Text Extraction Required",
+          description: error.response.data.message || "Please upload your script file to extract text content for analysis.",
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Analysis Failed",
+          description: `Failed to complete ${tasks.find(t => t.id === taskId)?.title}. Please try again.`,
+          variant: "destructive"
+        });
+      }
     }
   });
 

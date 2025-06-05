@@ -104,12 +104,41 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
 
       // Check if this is a placeholder content (PDF not yet extracted)
       if (scriptContent && scriptContent.includes('PDF script uploaded:')) {
-        return res.status(400).json({ 
-          error: 'Script content extraction required',
-          message: 'The uploaded PDF file needs text extraction to enable scene analysis. Please re-upload your script file to extract the actual screenplay content for AI analysis.',
-          requiresExtraction: true,
-          instructions: 'Navigate to the Project Info step and upload your script file again to extract the text content automatically.'
-        });
+        // Attempt automatic text extraction from available PDF files
+        try {
+          const { pdfTextExtractor } = await import('../services/pdf-text-extractor');
+          
+          console.log(`Attempting automatic PDF extraction for project: ${project[0].title}`);
+          const extractionResult = await pdfTextExtractor.findAndExtractScript(project[0].title);
+          
+          if (extractionResult && extractionResult.text.length > 100) {
+            // Clean and prepare the extracted text
+            const cleanedText = pdfTextExtractor.cleanScriptText(extractionResult.text);
+            
+            console.log(`Successfully extracted ${cleanedText.length} characters from PDF using ${extractionResult.extractionMethod}`);
+            
+            // Update the project with extracted content
+            await db.update(projects)
+              .set({ 
+                scriptContent: cleanedText,
+                updatedAt: new Date()
+              })
+              .where(eq(projects.id, parseInt(projectId)));
+            
+            // Use the extracted content for analysis
+            scriptContent = cleanedText;
+          } else {
+            throw new Error('Insufficient content extracted from PDF');
+          }
+        } catch (extractionError) {
+          console.error('Automatic PDF extraction failed:', extractionError.message);
+          return res.status(400).json({ 
+            error: 'Script content extraction required',
+            message: 'Unable to automatically extract text from the PDF file. The uploaded file may be image-based or corrupted. Please provide a text-based PDF for analysis.',
+            requiresExtraction: true,
+            details: extractionError.message
+          });
+        }
       }
 
       // Extract scenes using AI or fallback to basic parsing for actual script content
