@@ -68,8 +68,12 @@ export default function ProjectInfoStep({ projectId, onNext, onSave, isLoading }
       
       if (project.scriptContent) {
         setScriptContent(project.scriptContent);
-        // Indicate that script is already uploaded
-        setUploadedFile({ name: "Previously uploaded script" } as File);
+        // Create a proper file representation with actual filename and size
+        const fileName = project.scriptFileName || project.pdfFileName || "Uploaded Script";
+        setUploadedFile({ 
+          name: fileName,
+          size: project.scriptContent.length || 0  // Use content length as approximate size
+        } as File);
       }
     }
   }, [project, form]);
