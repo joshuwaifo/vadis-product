@@ -35,6 +35,14 @@ const ANALYSIS_TASKS: AnalysisTask[] = [
     estimatedTime: '2-3 min'
   },
   {
+    id: 'storyboard_view',
+    title: 'Storyboard View',
+    description: 'Visual storyboard representation of all scenes',
+    status: 'not_started',
+    icon: Maximize2,
+    estimatedTime: '1-2 min'
+  },
+  {
     id: 'character_analysis',
     title: 'Character Analysis',
     description: 'Analyze characters and their relationships',
@@ -357,14 +365,14 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
             {results.scenes && results.scenes.length > 0 && (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h4 className="text-lg font-semibold">Scene Preview</h4>
+                  <h4 className="text-lg font-semibold">All Scenes</h4>
                   <Badge variant="outline" className="text-xs">
-                    Showing {Math.min(6, results.scenes.length)} of {results.scenes.length}
+                    {results.scenes.length} scenes extracted
                   </Badge>
                 </div>
                 
-                <div className="grid grid-cols-2 gap-4">
-                  {results.scenes.slice(0, 6).map((scene: any, index: number) => (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {results.scenes.map((scene: any, index: number) => (
                     <Card key={index} className="hover:shadow-md transition-shadow duration-200 border-l-4 border-l-blue-500">
                       <CardContent className="p-4">
                         <div className="flex justify-between items-start mb-3">
@@ -400,34 +408,37 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
                           </div>
                         )}
                         
-                        {(scene.vfxNeeds?.length > 0 || scene.productPlacementOpportunities?.length > 0) && (
-                          <div className="flex gap-2 text-xs">
-                            {scene.vfxNeeds?.length > 0 && (
-                              <span className="text-purple-600 dark:text-purple-400">VFX</span>
-                            )}
-                            {scene.productPlacementOpportunities?.length > 0 && (
-                              <span className="text-green-600 dark:text-green-400">Product Placement</span>
-                            )}
-                          </div>
-                        )}
+
                       </CardContent>
                     </Card>
                   ))}
                 </div>
-                
-                {results.scenes.length > 6 && (
-                  <div className="text-center pt-4">
-                    <Button 
-                      variant="outline" 
-                      onClick={() => setShowStoryboard(true)}
-                      className="hover:bg-blue-50 hover:border-blue-300 dark:hover:bg-blue-950/30"
-                    >
-                      View All {results.scenes.length} Scenes in Storyboard
-                    </Button>
-                  </div>
-                )}
+
               </div>
             )}
+          </div>
+        );
+
+      case 'storyboard_view':
+        return (
+          <div className="space-y-6">
+            <div className="text-center">
+              <h3 className="text-xl font-semibold mb-4">Storyboard View</h3>
+              <p className="text-muted-foreground mb-6">
+                Visual representation of all scenes in your script
+              </p>
+              
+              {/* Storyboard grid would go here */}
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-950/30 dark:to-indigo-900/30 rounded-xl p-8 border-2 border-dashed border-blue-200 dark:border-blue-800">
+                <Maximize2 className="h-16 w-16 text-blue-500 mx-auto mb-4" />
+                <h4 className="text-lg font-semibold text-blue-700 dark:text-blue-300 mb-2">
+                  Storyboard Feature Coming Soon
+                </h4>
+                <p className="text-blue-600 dark:text-blue-400">
+                  Visual storyboard representation will be available here
+                </p>
+              </div>
+            </div>
           </div>
         );
       
