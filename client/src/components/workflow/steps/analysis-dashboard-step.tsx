@@ -116,12 +116,24 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
     enabled: !!workflow?.projectId
   });
 
+  // Debug workflow data
+  console.log('Workflow data:', workflow);
+  console.log('Project ID from workflow:', workflow?.projectId);
+
   const analysisInProgress = tasks.some(task => task.status === 'in_progress');
 
   // Create mutation for running individual analysis
   const runAnalysisMutation = useMutation({
     mutationFn: async ({ taskId }: { taskId: string }) => {
-      if (!workflow?.projectId) throw new Error('Project ID is required');
+      // Use project ID from either workflow or project data
+      const projectId = workflow?.projectId || project?.id;
+      
+      if (!projectId) {
+        console.error('No project ID available:', { workflow, project });
+        throw new Error('Project ID is required for analysis');
+      }
+      
+      console.log('Starting analysis for task:', taskId, 'Project ID:', projectId);
       
       // Update task status to in_progress
       setTasks(prev => prev.map(task => 
@@ -130,7 +142,7 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
 
       try {
         const response = await apiRequest(`/api/script-analysis/${taskId}`, 'POST', {
-          projectId: workflow.projectId
+          projectId: projectId
         });
         
         if (!response.ok) {
@@ -449,7 +461,7 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
 
   return (
     <div className="w-full min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="w-full px-6 lg:px-8 py-8">
+      <div className="max-w-[1800px] mx-auto px-6 lg:px-8 py-8">
         {/* Two-Panel Layout: Analysis Tools Left, Results Right */}
         <div className="flex gap-6 min-h-[calc(100vh-8rem)]">
           
