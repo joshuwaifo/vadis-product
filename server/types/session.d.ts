@@ -1,11 +1,12 @@
-import "express-session";
+import 'express-session';
 
-declare module "express-session" {
+declare module 'express-session' {
   interface SessionData {
-    user?: {
-      id: number;
-      email: string;
-      role: string;
+    uploadedPdfData?: {
+      buffer: string;
+      fileName: string;
+      mimeType: string;
+      size: number;
     };
   }
 }

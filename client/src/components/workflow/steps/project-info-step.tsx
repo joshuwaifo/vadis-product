@@ -118,8 +118,6 @@ export default function ProjectInfoStep({ projectId, onNext, onSave, isLoading }
   const handleRemoveFile = () => {
     setUploadedFile(null);
     setScriptContent("");
-    setFileData(null);
-    setMimeType(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -144,8 +142,6 @@ export default function ProjectInfoStep({ projectId, onNext, onSave, isLoading }
       ...data, 
       scriptContent, 
       uploadedFile: uploadedFile?.name,
-      fileData,
-      mimeType,
       fileName: uploadedFile?.name
     });
   };
