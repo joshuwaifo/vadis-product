@@ -721,6 +721,11 @@ export class DatabaseStorage implements IStorage {
     return updated || undefined;
   }
 
+  async deleteProject(id: number): Promise<boolean> {
+    const result = await db.delete(projects).where(eq(projects.id, id));
+    return (result.rowCount || 0) > 0;
+  }
+
   async publishProject(id: number): Promise<Project | undefined> {
     return this.updateProject(id, { status: 'published' });
   }
