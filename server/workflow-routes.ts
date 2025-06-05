@@ -1,8 +1,8 @@
 import type { Express } from "express";
 import { storage } from "./storage";
 import { PROJECT_WORKFLOW_STEPS } from "./types/project-workflow";
+import { extractScriptFromPdf } from "./services/pdf-service";
 import multer from "multer";
-// Note: PDF parsing will be handled by existing services
 
 // Configure multer for file uploads
 const upload = multer({ 
@@ -31,20 +31,26 @@ export function registerWorkflowRoutes(app: Express) {
       // Extract text based on file type
       if (req.file.mimetype === 'text/plain') {
         scriptContent = req.file.buffer.toString('utf-8');
+      } else if (req.file.mimetype === 'application/pdf') {
+        try {
+          // Use the existing AI-powered PDF service for extraction
+          const parsedScript = await extractScriptFromPdf(req.file.buffer, req.file.mimetype);
+          scriptContent = parsedScript.content;
+          
+          if (!scriptContent || scriptContent.trim().length < 10) {
+            throw new Error('No readable text found in PDF');
+          }
+        } catch (pdfError) {
+          console.error('PDF parsing error:', pdfError);
+          throw new Error('Failed to extract text from PDF file. Please ensure the PDF contains readable text.');
+        }
       } else {
-        // For PDF, DOC, DOCX - use existing services or simple text extraction
-        scriptContent = `Script file uploaded: ${req.file.originalname}\nFile size: ${req.file.size} bytes\nPlease use the existing script analysis tools for full processing.`;
+        // For DOC, DOCX files
+        throw new Error('Document format not fully supported. Please convert to PDF or plain text.');
       }
 
-      // Log user action
-      const userId = (req.session as any).user?.id;
-      if (userId) {
-        await logUserAction(userId, null, 'script_uploaded', {
-          fileName: req.file.originalname,
-          fileSize: req.file.size,
-          contentLength: scriptContent.length
-        });
-      }
+      // Log script upload
+      console.log(`Script uploaded: ${req.file.originalname}, Size: ${req.file.size}, Content length: ${scriptContent.length}`);
 
       res.json({
         success: true,
