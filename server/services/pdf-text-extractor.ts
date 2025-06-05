@@ -4,7 +4,7 @@
  */
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.js';
+import * as pdfjsLib from 'pdfjs-dist';
 
 interface PDFExtractionResult {
   text: string;
@@ -18,6 +18,11 @@ interface PDFExtractionResult {
 async function extractWithPDFJS(pdfBuffer: Buffer): Promise<string> {
   try {
     console.log('Attempting PDF.js extraction...');
+    
+    // Set up worker path for PDF.js
+    if (typeof pdfjsLib.GlobalWorkerOptions !== 'undefined') {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'pdfjs-dist/build/pdf.worker.js';
+    }
     
     const loadingTask = pdfjsLib.getDocument({
       data: new Uint8Array(pdfBuffer),
@@ -33,14 +38,23 @@ async function extractWithPDFJS(pdfBuffer: Buffer): Promise<string> {
       const page = await pdf.getPage(pageNum);
       const textContent = await page.getTextContent();
       
-      // Extract text items and reconstruct with spacing
-      const pageText = textContent.items
-        .map((item: any) => item.str)
-        .join(' ')
-        .replace(/\s+/g, ' ')
-        .trim();
+      // Extract text items and reconstruct with proper spacing
+      let pageText = '';
+      let lastY = 0;
       
-      fullText += pageText + '\n\n';
+      textContent.items.forEach((item: any) => {
+        const currentY = item.transform[5];
+        
+        // Add line breaks for significant Y position changes (new lines)
+        if (lastY !== 0 && Math.abs(currentY - lastY) > 5) {
+          pageText += '\n';
+        }
+        
+        pageText += item.str + ' ';
+        lastY = currentY;
+      });
+      
+      fullText += pageText.trim() + '\n\n';
       
       if (pageNum % 10 === 0) {
         console.log(`Processed ${pageNum}/${pdf.numPages} pages...`);
