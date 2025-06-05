@@ -169,95 +169,68 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
 
       // Check if this is a PDF metadata format (on-demand extraction needed)
       if (scriptContent && scriptContent.startsWith('PDF_UPLOADED:')) {
-        // Try multiple PDF extraction methods for reliable text extraction
         try {
-          let extractedData = null;
-          
-          // Method 1: Use direct PDF parsing for stored file data
-          if ((project[0] as any).pdf_file_data && (project[0] as any).pdf_mime_type) {
-            try {
-              const { extractTextFromPDF } = await import('./services/pdf-text-extractor');
-              const pdfBuffer = Buffer.from((project[0] as any).pdf_file_data, 'base64');
-              console.log(`Extracting from stored PDF data (${pdfBuffer.length} bytes)`);
+          // Try to extract from stored PDF data first
+          if ((project[0] as any).scriptFileData && (project[0] as any).scriptFileMimeType) {
+            const { extractTextFromPDF } = await import('./services/pdf-text-extractor');
+            const pdfBuffer = Buffer.from((project[0] as any).scriptFileData, 'base64');
+            console.log(`Extracting from stored PDF data (${pdfBuffer.length} bytes)`);
+            
+            const textContent = await extractTextFromPDF(pdfBuffer);
+            if (textContent && textContent.length > 100) {
+              console.log(`Successfully extracted ${textContent.length} characters from stored PDF`);
+              scriptContent = textContent;
               
-              const textContent = await extractTextFromPDF(pdfBuffer);
-              if (textContent && textContent.length > 100) {
-                console.log(`Successfully extracted ${textContent.length} characters from stored PDF`);
-                scriptContent = textContent;
-                
-                // Update the project with extracted content for future use
-                await db.update(projects)
-                  .set({ 
-                    scriptContent: textContent,
-                    updatedAt: new Date()
-                  })
-                  .where(eq(projects.id, parseInt(projectId)));
-                
-                extractedData = { content: textContent };
-              }
-            } catch (storageError) {
-              console.error('Failed to extract from stored PDF data:', storageError.message);
+              // Update the project with extracted content for future use
+              await db.update(projects)
+                .set({ 
+                  scriptContent: textContent,
+                  updatedAt: new Date()
+                })
+                .where(eq(projects.id, parseInt(projectId)));
+            } else {
+              throw new Error('Insufficient text content extracted from stored PDF');
             }
-          }
-          
-          // Fallback to file system if stored data extraction failed
-          if (!extractedData || !extractedData.content) {
+          } else {
+            // Try to find PDF file in filesystem as fallback
             const fs = await import('fs');
-            const possiblePaths = [
-              'Pulp Fiction.pdf',
-              `${project[0].title}.pdf`,
-              'test_improved.pdf'
-            ].filter(filePath => {
-              try {
-                if (fs.existsSync(filePath)) {
-                  const stats = fs.statSync(filePath);
-                  return stats.size > 10000;
-                }
-                return false;
-              } catch (e) {
-                return false;
-              }
-            });
+            const possiblePaths = ['Pulp Fiction.pdf', `${project[0].title}.pdf`];
+            let foundFile = false;
             
             for (const pdfPath of possiblePaths) {
-              try {
-                if (fs.existsSync(pdfPath)) {
-                  console.log(`Attempting to extract text from ${pdfPath} using Gemini AI`);
-                  const pdfBuffer = fs.readFileSync(pdfPath);
+              if (fs.existsSync(pdfPath)) {
+                console.log(`Attempting to extract text from ${pdfPath}`);
+                const { extractScriptFromPdf } = await import('./services/pdf-text-extractor');
+                const pdfBuffer = fs.readFileSync(pdfPath);
+                
+                const result = await extractScriptFromPdf(pdfBuffer, 'application/pdf');
+                if (result.content && result.content.length > 100) {
+                  console.log(`Successfully extracted ${result.content.length} characters from ${pdfPath}`);
+                  scriptContent = result.content;
                   
-                  extractedData = await extractScriptFromPdf(pdfBuffer, 'application/pdf');
+                  // Update the project with extracted content
+                  await db.update(projects)
+                    .set({ 
+                      scriptContent: result.content,
+                      updatedAt: new Date()
+                    })
+                    .where(eq(projects.id, parseInt(projectId)));
                   
-                  if (extractedData.content && extractedData.content.length > 100) {
-                    console.log(`Successfully extracted ${extractedData.content.length} characters from ${pdfPath}`);
-                    
-                    // Update the project with extracted content
-                    await db.update(projects)
-                      .set({ 
-                        scriptContent: extractedData.content,
-                        updatedAt: new Date()
-                      })
-                      .where(eq(projects.id, parseInt(projectId)));
-                    
-                    // Use the extracted content for analysis
-                    scriptContent = extractedData.content;
-                    break;
-                  }
+                  foundFile = true;
+                  break;
                 }
-              } catch (pdfError) {
-                console.log(`Failed to extract from ${pdfPath}: ${pdfError.message}`);
-                continue;
               }
             }
             
-            if (!extractedData || !extractedData.content) {
-              throw new Error('No readable PDF files found for authentic text extraction');
+            if (!foundFile) {
+              throw new Error('No readable PDF files found for text extraction');
             }
           }
         } catch (extractionError) {
-          console.error('Authentic PDF extraction failed:', extractionError.message);
+          console.error('PDF extraction failed:', extractionError.message);
           return res.status(400).json({ 
-            error: 'Authentic script content required',
-            message: 'Unable to extract text from the PDF file using Gemini AI. Please ensure the PDF contains readable text and try uploading again.',
+            error: 'PDF extraction failed',
+            message: 'Unable to extract text from the PDF file. Please ensure the PDF contains readable text and try uploading again.',
             requiresExtraction: true,
             details: extractionError.message
           });

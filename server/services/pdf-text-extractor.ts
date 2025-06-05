@@ -1,166 +1,115 @@
 /**
  * PDF Text Extraction Service
- * 
- * Handles extraction of text content from PDF files for script analysis.
- * Supports multiple extraction methods with fallback handling.
+ * Provides robust PDF text extraction with fallback methods
  */
 
-import fs from 'fs';
-import path from 'path';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 interface PDFExtractionResult {
   text: string;
-  pageCount: number;
-  metadata?: any;
-  extractionMethod: string;
+  method: 'pdf-parse' | 'gemini-ai' | 'fallback';
+  success: boolean;
 }
 
 /**
- * Extract text from PDF buffer using pdf-parse library
+ * Extract text from PDF buffer using multiple methods
  */
 export async function extractTextFromPDF(pdfBuffer: Buffer): Promise<string> {
+  console.log(`Starting PDF text extraction from buffer (${pdfBuffer.length} bytes)`);
+  
+  // Method 1: Try pdf-parse first
   try {
     const pdfParse = (await import('pdf-parse')).default;
+    const pdfData = await pdfParse(pdfBuffer);
+    const extractedText = pdfData?.text || "";
     
-    const data = await pdfParse(pdfBuffer, {
-      // Options to improve text extraction
-      normalizeWhitespace: false,
-      disableCombineTextItems: false
-    });
-    
-    if (!data.text || data.text.length < 50) {
-      throw new Error('Extracted text is too short or empty');
+    if (extractedText.length > 100) {
+      console.log(`Successfully extracted ${extractedText.length} characters using pdf-parse`);
+      return extractedText;
     }
-    
-    return data.text;
   } catch (error) {
-    throw new Error(`PDF text extraction failed: ${(error as Error).message}`);
+    console.log('pdf-parse extraction failed, trying Gemini AI...');
   }
-}
-
-export class PDFTextExtractor {
   
-  /**
-   * Extract text from PDF file using pdf-parse library
-   */
-  async extractWithPdfParse(filePath: string): Promise<PDFExtractionResult> {
-    try {
-      const pdfBuffer = fs.readFileSync(filePath);
-      const text = await extractTextFromPDF(pdfBuffer);
-      
-      return {
-        text,
-        pageCount: 1, // Simplified for now
-        metadata: {},
-        extractionMethod: 'pdf-parse'
-      };
-    } catch (error) {
-      throw new Error(`PDF-Parse extraction failed: ${(error as Error).message}`);
+  // Method 2: Use Gemini AI for PDF processing
+  try {
+    if (!process.env.GEMINI_API_KEY) {
+      throw new Error('GEMINI_API_KEY not available');
     }
-  }
-
-  /**
-   * Basic text extraction fallback method
-   */
-  async extractBasicText(filePath: string): Promise<PDFExtractionResult> {
-    try {
-      // Simple PDF content extraction attempt
-      const buffer = fs.readFileSync(filePath);
-      const text = buffer.toString('utf8');
-      
-      // Look for readable text patterns
-      const extractedText = text.replace(/[^\x20-\x7E\n\r]/g, '');
-      
-      if (extractedText.length < 100) {
-        throw new Error('Insufficient text content extracted');
-      }
-      
-      return {
-        text: extractedText,
-        pageCount: 1,
-        extractionMethod: 'basic-fallback'
-      };
-    } catch (error) {
-      throw new Error(`Basic extraction failed: ${error.message}`);
-    }
-  }
-
-  /**
-   * Main extraction method with fallback handling
-   */
-  async extractText(filePath: string): Promise<PDFExtractionResult> {
-    if (!fs.existsSync(filePath)) {
-      throw new Error(`PDF file not found: ${filePath}`);
-    }
-
-    const extractionMethods = [
-      () => this.extractWithPdfParse(filePath),
-      () => this.extractBasicText(filePath)
-    ];
-
-    let lastError: Error | null = null;
-
-    for (const method of extractionMethods) {
-      try {
-        const result = await method();
-        
-        // Validate extraction quality
-        if (result.text && result.text.length > 100) {
-          console.log(`Successfully extracted ${result.text.length} characters using ${result.extractionMethod}`);
-          return result;
+    
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    
+    // Convert PDF buffer to base64 for Gemini
+    const base64Data = pdfBuffer.toString('base64');
+    
+    const prompt = `Extract all text content from this PDF document. If it appears to be a film script or screenplay, preserve the formatting with scene headings (INT./EXT.), character names, and dialogue. Return only the extracted text content.`;
+    
+    const result = await model.generateContent([
+      {
+        inlineData: {
+          data: base64Data,
+          mimeType: "application/pdf"
         }
-      } catch (error) {
-        console.log(`Extraction method failed: ${error.message}`);
-        lastError = error;
-        continue;
-      }
+      },
+      prompt
+    ]);
+    
+    const response = await result.response;
+    const extractedText = response.text();
+    
+    if (extractedText && extractedText.length > 50) {
+      console.log(`Successfully extracted ${extractedText.length} characters using Gemini AI`);
+      return extractedText;
     }
-
-    throw new Error(`All PDF extraction methods failed. Last error: ${lastError?.message}`);
+  } catch (error) {
+    console.error('Gemini AI extraction failed:', error.message);
   }
-
-  /**
-   * Find and extract from available PDF files
-   */
-  async findAndExtractScript(projectTitle?: string): Promise<PDFExtractionResult> {
-    const possiblePaths = [
-      'test.pdf',
-      'test_improved.pdf',
-      'Pulp Fiction.pdf',
-      ...(projectTitle ? [`${projectTitle}.pdf`] : [])
-    ];
-
-    for (const pdfPath of possiblePaths) {
-      try {
-        if (fs.existsSync(pdfPath)) {
-          console.log(`Attempting to extract text from ${pdfPath}`);
-          const result = await this.extractText(pdfPath);
-          return result;
-        }
-      } catch (error) {
-        console.log(`Failed to extract from ${pdfPath}: ${error.message}`);
-        continue;
-      }
-    }
-
-    throw new Error('No readable PDF files found for text extraction');
-  }
-
-  /**
-   * Clean and format extracted script text
-   */
-  cleanScriptText(rawText: string): string {
-    return rawText
-      // Remove excessive whitespace
-      .replace(/\s{3,}/g, '\n\n')
-      // Normalize line breaks
-      .replace(/\r\n/g, '\n')
-      // Remove page numbers and headers/footers
-      .replace(/^\d+\s*$/gm, '')
-      // Clean up common PDF artifacts
-      .replace(/[^\x20-\x7E\n]/g, '')
-      .trim();
-  }
+  
+  // Method 3: Fallback error
+  throw new Error('Unable to extract text from PDF using any available method');
 }
 
-export const pdfTextExtractor = new PDFTextExtractor();
+/**
+ * Extract script content from PDF with comprehensive error handling
+ */
+export async function extractScriptFromPdf(pdfBuffer: Buffer, mimeType: string) {
+  try {
+    console.log(`Processing PDF file (${pdfBuffer.length} bytes, type: ${mimeType})`);
+    
+    // Extract text content
+    const extractedText = await extractTextFromPDF(pdfBuffer);
+    
+    if (!extractedText || extractedText.length < 50) {
+      throw new Error('Insufficient text content extracted from PDF');
+    }
+    
+    // Basic script title extraction
+    const lines = extractedText.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+    let title = "Untitled Script";
+    
+    // Look for title in first few lines
+    for (let i = 0; i < Math.min(10, lines.length); i++) {
+      const line = lines[i];
+      if (line.length > 3 && line.length < 100 && 
+          !line.match(/^(INT\.|EXT\.|FADE|COPYRIGHT|BY\s+|WRITTEN)/i) &&
+          !line.match(/^\d+/) &&
+          line.match(/[A-Z]/)) {
+        title = line;
+        break;
+      }
+    }
+    
+    console.log(`Extracted script "${title}" with ${extractedText.length} characters`);
+    
+    return {
+      title,
+      content: extractedText,
+      success: true
+    };
+    
+  } catch (error) {
+    console.error('Script extraction error:', error);
+    throw new Error(`Failed to extract script content: ${error.message}`);
+  }
+}
