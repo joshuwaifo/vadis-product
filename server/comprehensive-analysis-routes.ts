@@ -178,11 +178,11 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
           let extractedData = null;
           
           // First try to use stored file data if available
-          if (project[0].pdfFileData && project[0].pdfMimeType) {
+          if ((project[0] as any).pdf_file_data && (project[0] as any).pdf_mime_type) {
             try {
-              const pdfBuffer = Buffer.from(project[0].pdfFileData, 'base64');
+              const pdfBuffer = Buffer.from((project[0] as any).pdf_file_data, 'base64');
               console.log(`Extracting from stored PDF data (${pdfBuffer.length} bytes)`);
-              extractedData = await extractScriptFromPdf(pdfBuffer, project[0].pdfMimeType);
+              extractedData = await extractScriptFromPdf(pdfBuffer, (project[0] as any).pdf_mime_type);
               
               if (extractedData.content && extractedData.content.length > 100) {
                 console.log(`Successfully extracted ${extractedData.content.length} characters from stored PDF`);
