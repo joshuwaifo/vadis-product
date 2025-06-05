@@ -731,7 +731,10 @@ export class DatabaseStorage implements IStorage {
   async deleteProject(id: number): Promise<boolean> {
     try {
       // Delete related data first due to foreign key constraints
-      // Only delete from tables that actually exist in the database
+      // Delete project history records first
+      await db.delete(projectHistory).where(eq(projectHistory.projectId, id));
+      
+      // Delete other related records
       await db.delete(scenes).where(eq(scenes.projectId, id));
       await db.delete(characters).where(eq(characters.projectId, id));
       await db.delete(financialPlans).where(eq(financialPlans.projectId, id));
