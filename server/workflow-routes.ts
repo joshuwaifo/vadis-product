@@ -48,7 +48,9 @@ export function registerWorkflowRoutes(app: Express) {
         success: true,
         content: scriptContent,
         fileName: req.file.originalname,
-        fileSize: req.file.size
+        fileSize: req.file.size,
+        fileData: req.file.mimetype === 'application/pdf' ? req.file.buffer.toString('base64') : null,
+        mimeType: req.file.mimetype
       });
 
     } catch (error) {
@@ -69,16 +71,14 @@ export function registerWorkflowRoutes(app: Express) {
 
       // Create new project if this is the first step
       if (currentStep === 'project_info' && stepData && !projectId) {
-        // Extract PDF file data if available
-        let fileData = null;
-        let fileName = null;
-        let mimeType = null;
+        // Extract PDF file data if available from the step data
+        let fileData = stepData.fileData || null;
+        let fileName = stepData.fileName || null;
+        let mimeType = stepData.mimeType || null;
         
         if (stepData.scriptContent && stepData.scriptContent.startsWith('PDF_UPLOADED:')) {
           const parts = stepData.scriptContent.split(':');
-          fileName = parts[1];
-          // We need to get the actual file data from the upload
-          // For now, store the metadata - will be enhanced to store actual file data
+          fileName = fileName || parts[1];
         }
 
         const project = await storage.createProject({
