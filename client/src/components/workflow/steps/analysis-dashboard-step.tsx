@@ -128,13 +128,27 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
         task.id === taskId ? { ...task, status: 'in_progress' as const } : task
       ));
 
-      const response = await apiRequest(`/api/script-analysis/${taskId}`, 'POST', {
-        projectId: workflow.projectId
-      });
-      
-      return response.json();
+      try {
+        const response = await apiRequest(`/api/script-analysis/${taskId}`, 'POST', {
+          projectId: workflow.projectId
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        console.log('Analysis response data:', data);
+        return data;
+      } catch (error) {
+        console.error('API request failed:', error);
+        throw error;
+      }
     },
     onSuccess: (data, { taskId }) => {
+      console.log('Analysis successful for task:', taskId, 'Data:', data);
+      
       // Update task status to completed
       setTasks(prev => prev.map(task => 
         task.id === taskId ? { ...task, status: 'completed' as const, completedAt: new Date() } : task
@@ -152,27 +166,32 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
       });
     },
     onError: (error, { taskId }) => {
+      console.error('Full analysis error:', error);
+      console.error('Error details:', {
+        message: error?.message,
+        stack: error?.stack,
+        response: error?.response
+      });
+      
       // Update task status to error
       setTasks(prev => prev.map(task => 
         task.id === taskId ? { ...task, status: 'error' as const } : task
       ));
       
-      console.error('Analysis error:', error);
+      // Parse error message
+      let errorMessage = 'An unexpected error occurred during analysis.';
       
-      // Check if this is a script extraction error
-      if (error?.response?.data?.requiresExtraction) {
-        toast({
-          title: "Script Text Extraction Required",
-          description: error.response.data.message || "Please upload your script file to extract text content for analysis.",
-          variant: "destructive"
-        });
-      } else {
-        toast({
-          title: "Analysis Failed",
-          description: `Failed to complete ${tasks.find(t => t.id === taskId)?.title}. Please try again.`,
-          variant: "destructive"
-        });
+      if (error?.message) {
+        errorMessage = error.message;
+      } else if (typeof error === 'string') {
+        errorMessage = error;
       }
+      
+      toast({
+        title: "Analysis Failed",
+        description: `${tasks.find(t => t.id === taskId)?.title}: ${errorMessage}`,
+        variant: "destructive"
+      });
     }
   });
 
