@@ -12,13 +12,14 @@ import {
 } from 'lucide-react';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
+
 // Define types directly in this file since the server types are not accessible from client
 interface AnalysisTask {
   id: string;
   title: string;
   description: string;
   status: 'not_started' | 'in_progress' | 'completed' | 'error';
-  icon: string;
+  icon: React.ComponentType<{ className?: string }>;
   estimatedTime: string;
   completedAt?: Date;
 }
@@ -26,10 +27,10 @@ interface AnalysisTask {
 const ANALYSIS_TASKS: AnalysisTask[] = [
   {
     id: 'scene_extraction',
-    title: 'Scene Extraction & Breakdown',
+    title: 'Scene Extraction',
     description: 'Extract and analyze individual scenes from the script',
     status: 'not_started',
-    icon: 'Film',
+    icon: Film,
     estimatedTime: '2-3 min'
   },
   {
@@ -37,7 +38,7 @@ const ANALYSIS_TASKS: AnalysisTask[] = [
     title: 'Character Analysis',
     description: 'Analyze characters and their relationships',
     status: 'not_started',
-    icon: 'Users',
+    icon: Users,
     estimatedTime: '3-4 min'
   },
   {
@@ -45,388 +46,388 @@ const ANALYSIS_TASKS: AnalysisTask[] = [
     title: 'Casting Suggestions',
     description: 'AI-powered actor recommendations for each character',
     status: 'not_started',
-    icon: 'Star',
+    icon: Star,
     estimatedTime: '4-5 min'
   },
   {
     id: 'location_analysis',
     title: 'Location Analysis',
-    description: 'Identify filming locations and logistics',
+    description: 'Identify and suggest filming locations',
     status: 'not_started',
-    icon: 'MapPin',
+    icon: MapPin,
     estimatedTime: '3-4 min'
   },
   {
     id: 'vfx_analysis',
-    title: 'VFX Requirements',
-    description: 'Analyze visual effects needs and complexity',
+    title: 'VFX Analysis',
+    description: 'Identify visual effects requirements and complexity',
     status: 'not_started',
-    icon: 'Zap',
-    estimatedTime: '3-4 min'
+    icon: Zap,
+    estimatedTime: '4-5 min'
   },
   {
     id: 'product_placement',
     title: 'Product Placement',
-    description: 'Identify brand integration opportunities',
+    description: 'Identify opportunities for brand partnerships',
     status: 'not_started',
-    icon: 'Package',
+    icon: Package,
     estimatedTime: '2-3 min'
   },
   {
     id: 'financial_planning',
     title: 'Financial Planning',
-    description: 'Budget estimation and revenue projections',
+    description: 'Generate budget estimates and financial projections',
     status: 'not_started',
-    icon: 'DollarSign',
-    estimatedTime: '4-5 min'
+    icon: DollarSign,
+    estimatedTime: '5-6 min'
   },
   {
     id: 'project_summary',
     title: 'Project Summary',
-    description: 'Comprehensive reader\'s report and summary',
+    description: 'Generate comprehensive project overview and reader\'s report',
     status: 'not_started',
-    icon: 'FileText',
+    icon: FileText,
     estimatedTime: '3-4 min'
   }
 ];
 
 interface AnalysisDashboardStepProps {
-  projectId: number;
+  workflow?: {
+    projectId: number;
+    currentStep: string;
+    steps: any[];
+  };
   onNext: () => void;
   onPrevious: () => void;
 }
 
-const iconMap = {
-  Film,
-  Users,
-  Star,
-  MapPin,
-  Zap,
-  Package,
-  DollarSign,
-  FileText
-};
-
-export default function AnalysisDashboardStep({ 
-  projectId, 
-  onNext, 
-  onPrevious 
-}: AnalysisDashboardStepProps) {
-  const [selectedTask, setSelectedTask] = useState<string>('scene_extraction');
-  const [taskStatuses, setTaskStatuses] = useState<Record<string, AnalysisTask['status']>>({});
+export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: AnalysisDashboardStepProps) {
+  const [tasks, setTasks] = useState<AnalysisTask[]>([...ANALYSIS_TASKS]);
+  const [selectedTask, setSelectedTask] = useState<string | null>(null);
   const [analysisResults, setAnalysisResults] = useState<Record<string, any>>({});
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Load project data
+  // Fetch project data
   const { data: project } = useQuery({
-    queryKey: ['/api/projects', projectId],
-    enabled: !!projectId
+    queryKey: [`/api/projects/${workflow?.projectId}`],
+    enabled: !!workflow?.projectId
   });
 
-  // Load existing analysis results
-  const { data: existingResults } = useQuery({
-    queryKey: ['/api/projects', projectId, 'analysis-results'],
-    enabled: !!projectId
-  });
+  const analysisInProgress = tasks.some(task => task.status === 'in_progress');
 
-  useEffect(() => {
-    if (existingResults) {
-      setAnalysisResults(existingResults);
-      // Update task statuses based on existing results
-      const newStatuses: Record<string, AnalysisTask['status']> = {};
-      ANALYSIS_TASKS.forEach(task => {
-        newStatuses[task.id] = (existingResults as any)[task.id] ? 'completed' : 'not_started';
+  // Create mutation for running individual analysis
+  const runAnalysisMutation = useMutation({
+    mutationFn: async ({ taskId }: { taskId: string }) => {
+      if (!workflow?.projectId) throw new Error('Project ID is required');
+      
+      // Update task status to in_progress
+      setTasks(prev => prev.map(task => 
+        task.id === taskId ? { ...task, status: 'in_progress' as const } : task
+      ));
+
+      const response = await apiRequest(`/api/script-analysis/${taskId}`, 'POST', {
+        projectId: workflow.projectId
       });
-      setTaskStatuses(newStatuses);
-    }
-  }, [existingResults]);
-
-  // Run analysis mutation
-  const runAnalysis = useMutation({
-    mutationFn: async ({ taskId, projectId }: { taskId: string; projectId: number }) => {
-      const endpoint = getAnalysisEndpoint(taskId);
-      return apiRequest(endpoint, 'POST', { projectId });
-    },
-    onMutate: ({ taskId }) => {
-      setTaskStatuses(prev => ({ ...prev, [taskId]: 'in_progress' }));
+      
+      return response.json();
     },
     onSuccess: (data, { taskId }) => {
-      setTaskStatuses(prev => ({ ...prev, [taskId]: 'completed' }));
+      // Update task status to completed
+      setTasks(prev => prev.map(task => 
+        task.id === taskId ? { ...task, status: 'completed' as const, completedAt: new Date() } : task
+      ));
+      
+      // Store results
       setAnalysisResults(prev => ({ ...prev, [taskId]: data }));
+      
+      // Auto-select the completed task to show results
+      setSelectedTask(taskId);
+      
       toast({
         title: "Analysis Complete",
-        description: `${ANALYSIS_TASKS.find(t => t.id === taskId)?.title} has been completed successfully.`
+        description: `${tasks.find(t => t.id === taskId)?.title} has been completed successfully.`
       });
-      queryClient.invalidateQueries({ queryKey: ['/api/projects', projectId, 'analysis-results'] });
     },
     onError: (error, { taskId }) => {
-      setTaskStatuses(prev => ({ ...prev, [taskId]: 'error' }));
+      // Update task status to error
+      setTasks(prev => prev.map(task => 
+        task.id === taskId ? { ...task, status: 'error' as const } : task
+      ));
+      
+      console.error('Analysis error:', error);
       toast({
         title: "Analysis Failed",
-        description: `Failed to complete ${ANALYSIS_TASKS.find(t => t.id === taskId)?.title}. Please try again.`,
+        description: `Failed to complete ${tasks.find(t => t.id === taskId)?.title}. Please try again.`,
         variant: "destructive"
       });
     }
   });
 
-  const getAnalysisEndpoint = (taskId: string): string => {
-    const endpointMap: Record<string, string> = {
-      scene_extraction: '/api/script-analysis/scene_extraction',
-      character_analysis: '/api/script-analysis/character_analysis',
-      casting_suggestions: '/api/script-analysis/casting_suggestions',
-      location_analysis: '/api/script-analysis/location_analysis',
-      vfx_analysis: '/api/script-analysis/vfx_analysis',
-      product_placement: '/api/script-analysis/product_placement',
-      financial_planning: '/api/script-analysis/financial_planning',
-      project_summary: '/api/script-analysis/project_summary'
-    };
-    return endpointMap[taskId] || '/api/script-analysis/scene_extraction';
+  const runAnalysis = (taskId: string) => {
+    runAnalysisMutation.mutate({ taskId });
   };
 
-  const handleRunAnalysis = (taskId: string) => {
-    if (!(project as any)?.scriptContent) {
-      toast({
-        title: "No Script Content",
-        description: "Please upload a script in the previous step before running analysis.",
-        variant: "destructive"
-      });
-      return;
-    }
-    runAnalysis.mutate({ taskId, projectId });
-  };
-
-  const getStatusIcon = (status: AnalysisTask['status']) => {
+  const getStatusIcon = (status: string) => {
     switch (status) {
       case 'completed':
-        return <CheckCircle className="w-4 h-4 text-green-500" />;
+        return <CheckCircle className="h-4 w-4 text-green-500" />;
       case 'in_progress':
-        return <Loader2 className="w-4 h-4 animate-spin text-blue-500" />;
+        return <Loader2 className="h-4 w-4 text-blue-500 animate-spin" />;
       case 'error':
-        return <AlertCircle className="w-4 h-4 text-red-500" />;
+        return <AlertCircle className="h-4 w-4 text-red-500" />;
       default:
-        return <Clock className="w-4 h-4 text-gray-400" />;
+        return <Clock className="h-4 w-4 text-gray-400" />;
     }
   };
 
-  const getStatusBadgeVariant = (status: AnalysisTask['status']) => {
-    switch (status) {
-      case 'completed':
-        return 'default';
-      case 'in_progress':
-        return 'secondary';
-      case 'error':
-        return 'destructive';
+  const renderAnalysisContent = () => {
+    if (!selectedTask) {
+      return (
+        <div className="flex flex-col items-center justify-center h-full text-center">
+          <Play className="h-16 w-16 text-muted-foreground mb-4" />
+          <h3 className="text-lg font-semibold mb-2">Select an Analysis Tool</h3>
+          <p className="text-muted-foreground">
+            Choose an analysis tool from above to run AI-powered analysis on your script.
+          </p>
+        </div>
+      );
+    }
+
+    const task = tasks.find(t => t.id === selectedTask);
+    const results = analysisResults[selectedTask];
+
+    if (!task) return null;
+
+    if (task.status === 'in_progress') {
+      return (
+        <div className="flex flex-col items-center justify-center h-full text-center">
+          <Loader2 className="h-16 w-16 text-primary animate-spin mb-4" />
+          <h3 className="text-lg font-semibold mb-2">Running {task.title}</h3>
+          <p className="text-muted-foreground mb-4">
+            AI is analyzing your script. This may take {task.estimatedTime}.
+          </p>
+          <Progress value={50} className="w-64" />
+        </div>
+      );
+    }
+
+    if (task.status === 'error') {
+      return (
+        <div className="flex flex-col items-center justify-center h-full text-center">
+          <AlertCircle className="h-16 w-16 text-red-500 mb-4" />
+          <h3 className="text-lg font-semibold mb-2">Analysis Failed</h3>
+          <p className="text-muted-foreground mb-4">
+            There was an error running {task.title}. Please try again.
+          </p>
+          <Button onClick={() => runAnalysis(selectedTask)} variant="outline">
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Retry Analysis
+          </Button>
+        </div>
+      );
+    }
+
+    if (task.status === 'completed' && results) {
+      return (
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-semibold">{task.title} Results</h3>
+              <p className="text-sm text-muted-foreground">
+                Completed {task.completedAt?.toLocaleString()}
+              </p>
+            </div>
+            <Badge variant="secondary" className="bg-green-100 text-green-800">
+              <CheckCircle className="h-3 w-3 mr-1" />
+              Completed
+            </Badge>
+          </div>
+          
+          <Separator />
+          
+          <div className="space-y-4">
+            {renderTaskResults(selectedTask, results)}
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="flex flex-col items-center justify-center h-full text-center">
+        <task.icon className="h-16 w-16 text-muted-foreground mb-4" />
+        <h3 className="text-lg font-semibold mb-2">{task.title}</h3>
+        <p className="text-muted-foreground mb-4">{task.description}</p>
+        <p className="text-sm text-muted-foreground mb-4">
+          Estimated time: {task.estimatedTime}
+        </p>
+        <Button onClick={() => runAnalysis(selectedTask)}>
+          <Play className="h-4 w-4 mr-2" />
+          Run Analysis
+        </Button>
+      </div>
+    );
+  };
+
+  const renderTaskResults = (taskId: string, results: any) => {
+    switch (taskId) {
+      case 'scene_extraction':
+        return (
+          <div className="space-y-4">
+            <div className="grid grid-cols-3 gap-4 text-center">
+              <div>
+                <div className="text-2xl font-bold">{results.totalScenes || 0}</div>
+                <div className="text-sm text-muted-foreground">Total Scenes</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold">{results.estimatedDuration || 0}</div>
+                <div className="text-sm text-muted-foreground">Est. Minutes</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold">{results.scenes?.length || 0}</div>
+                <div className="text-sm text-muted-foreground">Extracted</div>
+              </div>
+            </div>
+            {results.scenes && results.scenes.length > 0 && (
+              <div className="space-y-3">
+                <h4 className="font-semibold">Scene Breakdown</h4>
+                {results.scenes.slice(0, 5).map((scene: any, index: number) => (
+                  <Card key={index} className="p-4">
+                    <div className="flex justify-between items-start mb-2">
+                      <Badge variant="outline">Scene {scene.sceneNumber}</Badge>
+                      <span className="text-sm text-muted-foreground">{scene.duration}min</span>
+                    </div>
+                    <h5 className="font-medium">{scene.location} - {scene.timeOfDay}</h5>
+                    <p className="text-sm text-muted-foreground mt-1">{scene.description}</p>
+                    {scene.characters && scene.characters.length > 0 && (
+                      <div className="mt-2">
+                        <span className="text-xs text-muted-foreground">Characters: </span>
+                        <span className="text-xs">{scene.characters.join(', ')}</span>
+                      </div>
+                    )}
+                  </Card>
+                ))}
+                {results.scenes.length > 5 && (
+                  <p className="text-sm text-muted-foreground text-center">
+                    And {results.scenes.length - 5} more scenes...
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+        );
+      
       default:
-        return 'outline';
+        return (
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <pre className="text-sm overflow-auto max-h-96">
+              {JSON.stringify(results, null, 2)}
+            </pre>
+          </div>
+        );
     }
   };
 
-  const completedTasks = Object.values(taskStatuses).filter(status => status === 'completed').length;
-  const totalTasks = ANALYSIS_TASKS.length;
+  const completedTasks = tasks.filter(task => task.status === 'completed').length;
+  const totalTasks = tasks.length;
   const progressPercentage = (completedTasks / totalTasks) * 100;
-
-  const selectedTaskData = ANALYSIS_TASKS.find(task => task.id === selectedTask);
-  const selectedTaskStatus = taskStatuses[selectedTask] || 'not_started';
-  const selectedTaskResult = analysisResults[selectedTask];
 
   return (
     <div className="space-y-6">
-      {/* Progress Overview */}
+      {/* Analysis Tools at Top */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <span>Analysis Progress</span>
-            <Badge variant="secondary">{completedTasks}/{totalTasks} Complete</Badge>
-          </CardTitle>
-          <CardDescription>
-            Complete the analysis tasks below to generate comprehensive insights for your project.
-          </CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <Play className="h-5 w-5" />
+                Analysis Tools
+              </CardTitle>
+              <CardDescription>
+                Select analysis tasks to run on your script
+              </CardDescription>
+            </div>
+            <div className="text-right">
+              <div className="text-sm text-muted-foreground">Progress</div>
+              <div className="text-lg font-semibold">{completedTasks}/{totalTasks}</div>
+              <Progress value={progressPercentage} className="w-24" />
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
-          <Progress value={progressPercentage} className="w-full" />
-          <p className="text-sm text-muted-foreground mt-2">
-            {progressPercentage === 100 ? 'All analyses complete!' : `${Math.round(progressPercentage)}% complete`}
-          </p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {tasks.map((task) => (
+              <div
+                key={task.id}
+                className={`p-4 rounded-lg border cursor-pointer transition-all text-center ${
+                  selectedTask === task.id 
+                    ? 'border-primary bg-primary/5' 
+                    : 'border-border hover:border-primary/50'
+                }`}
+                onClick={() => setSelectedTask(task.id)}
+              >
+                <div className="flex flex-col items-center space-y-3">
+                  <div className="flex items-center justify-center w-12 h-12 bg-background rounded-lg border">
+                    <task.icon className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-sm">{task.title}</h4>
+                    <p className="text-xs text-muted-foreground">{task.estimatedTime}</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {getStatusIcon(task.status)}
+                    <Button
+                      size="sm"
+                      variant={task.status === 'completed' ? 'secondary' : 'default'}
+                      disabled={task.status === 'in_progress' || analysisInProgress}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        runAnalysis(task.id);
+                      }}
+                    >
+                      {task.status === 'in_progress' && <Loader2 className="h-3 w-3 animate-spin mr-1" />}
+                      {task.status === 'completed' ? 'View' : 'Run'}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Left Sidebar - Analysis Tasks */}
-        <div className="lg:col-span-1">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Analysis Tools</CardTitle>
-              <CardDescription>Select an analysis to run or view results</CardDescription>
-            </CardHeader>
-            <CardContent className="p-0">
-              <ScrollArea className="h-[600px]">
-                <div className="space-y-1 p-4">
-                  {ANALYSIS_TASKS.map((task) => {
-                    const IconComponent = iconMap[task.icon as keyof typeof iconMap];
-                    const status = taskStatuses[task.id] || 'not_started';
-                    
-                    return (
-                      <Button
-                        key={task.id}
-                        variant={selectedTask === task.id ? "default" : "ghost"}
-                        className="w-full justify-start h-auto p-3"
-                        onClick={() => setSelectedTask(task.id)}
-                      >
-                        <div className="flex items-start space-x-3 w-full">
-                          <div className="flex items-center space-x-2 flex-shrink-0">
-                            <IconComponent className="w-4 h-4" />
-                            {getStatusIcon(status)}
-                          </div>
-                          <div className="text-left flex-1 min-w-0">
-                            <div className="font-medium text-sm truncate">{task.title}</div>
-                            <div className="text-xs text-muted-foreground mt-1">{task.estimatedTime}</div>
-                          </div>
-                        </div>
-                      </Button>
-                    );
-                  })}
-                </div>
-              </ScrollArea>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Main Content Area */}
-        <div className="lg:col-span-3">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  {selectedTaskData && (
-                    <>
-                      {React.createElement(iconMap[selectedTaskData.icon as keyof typeof iconMap], { className: "w-5 h-5" })}
-                      <div>
-                        <CardTitle>{selectedTaskData.title}</CardTitle>
-                        <CardDescription>{selectedTaskData.description}</CardDescription>
-                      </div>
-                    </>
-                  )}
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Badge variant={getStatusBadgeVariant(selectedTaskStatus)}>
-                    {selectedTaskStatus.replace('_', ' ').toUpperCase()}
-                  </Badge>
-                  {selectedTaskStatus === 'not_started' && (
-                    <Button 
-                      onClick={() => handleRunAnalysis(selectedTask)}
-                      disabled={runAnalysis.isPending}
-                      size="sm"
-                    >
-                      {runAnalysis.isPending ? (
-                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                      ) : (
-                        <Play className="w-4 h-4 mr-2" />
-                      )}
-                      Run Analysis
-                    </Button>
-                  )}
-                  {selectedTaskStatus === 'completed' && (
-                    <Button 
-                      onClick={() => handleRunAnalysis(selectedTask)}
-                      disabled={runAnalysis.isPending}
-                      variant="outline"
-                      size="sm"
-                    >
-                      <RefreshCw className="w-4 h-4 mr-2" />
-                      Regenerate
-                    </Button>
-                  )}
-                  {selectedTaskStatus === 'error' && (
-                    <Button 
-                      onClick={() => handleRunAnalysis(selectedTask)}
-                      disabled={runAnalysis.isPending}
-                      variant="destructive"
-                      size="sm"
-                    >
-                      <RefreshCw className="w-4 h-4 mr-2" />
-                      Retry
-                    </Button>
-                  )}
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              {selectedTaskStatus === 'not_started' && (
-                <div className="text-center py-12">
-                  <div className="mx-auto w-12 h-12 bg-muted rounded-full flex items-center justify-center mb-4">
-                    {selectedTaskData && React.createElement(iconMap[selectedTaskData.icon as keyof typeof iconMap], { className: "w-6 h-6 text-muted-foreground" })}
-                  </div>
-                  <h3 className="text-lg font-medium mb-2">Ready to Start Analysis</h3>
-                  <p className="text-muted-foreground mb-4">
-                    Click "Run Analysis" to begin {selectedTaskData?.title.toLowerCase()}.
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Estimated time: {selectedTaskData?.estimatedTime}
-                  </p>
-                </div>
-              )}
-
-              {selectedTaskStatus === 'in_progress' && (
-                <div className="text-center py-12">
-                  <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-blue-500" />
-                  <h3 className="text-lg font-medium mb-2">Analysis in Progress</h3>
-                  <p className="text-muted-foreground">
-                    Running {selectedTaskData?.title.toLowerCase()}...
-                  </p>
-                </div>
-              )}
-
-              {selectedTaskStatus === 'error' && (
-                <div className="text-center py-12">
-                  <AlertCircle className="w-12 h-12 mx-auto mb-4 text-red-500" />
-                  <h3 className="text-lg font-medium mb-2">Analysis Failed</h3>
-                  <p className="text-muted-foreground mb-4">
-                    There was an error running {selectedTaskData?.title.toLowerCase()}.
-                  </p>
-                  <Button onClick={() => handleRunAnalysis(selectedTask)} variant="destructive">
-                    <RefreshCw className="w-4 h-4 mr-2" />
-                    Try Again
-                  </Button>
-                </div>
-              )}
-
-              {selectedTaskStatus === 'completed' && selectedTaskResult && (
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-medium">Analysis Results</h3>
-                    <Badge variant="default">
-                      <CheckCircle className="w-3 h-3 mr-1" />
-                      Complete
-                    </Badge>
-                  </div>
-                  
-                  {/* Render results based on task type */}
-                  <div className="bg-muted/50 rounded-lg p-4">
-                    <pre className="whitespace-pre-wrap text-sm text-foreground font-mono">
-                      {JSON.stringify(selectedTaskResult, null, 2)}
-                    </pre>
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+      {/* Main Analysis Display - Increased Height */}
+      <Card className="h-[700px]">
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between">
+            <span>Analysis Results</span>
+            {selectedTask && (
+              <Badge variant="outline">
+                {tasks.find(t => t.id === selectedTask)?.title}
+              </Badge>
+            )}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ScrollArea className="h-[620px]">
+            {renderAnalysisContent()}
+          </ScrollArea>
+        </CardContent>
+      </Card>
 
       {/* Navigation */}
-      <div className="flex items-center justify-between pt-6">
+      <div className="flex justify-between">
         <Button variant="outline" onClick={onPrevious}>
-          Previous
+          Previous: Project Info
         </Button>
-        <div className="flex items-center space-x-4">
-          <span className="text-sm text-muted-foreground">
-            Complete analyses as needed, then proceed to finalize your project
-          </span>
-          <Button onClick={onNext}>
-            Next: Finalize Project
-          </Button>
-        </div>
+        <Button onClick={onNext} disabled={completedTasks === 0}>
+          Next: Finalize Project
+          {completedTasks > 0 && (
+            <Badge variant="secondary" className="ml-2">
+              {completedTasks} Complete
+            </Badge>
+          )}
+        </Button>
       </div>
     </div>
   );

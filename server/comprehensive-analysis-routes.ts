@@ -14,11 +14,19 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
   // Scene extraction and breakdown
   app.post('/api/script-analysis/scene_extraction', async (req: Request, res: Response) => {
     try {
-      const { projectId, scriptContent } = req.body;
+      const { projectId } = req.body;
       
-      if (!projectId || !scriptContent) {
-        return res.status(400).json({ error: 'Project ID and script content are required' });
+      if (!projectId) {
+        return res.status(400).json({ error: 'Project ID is required' });
       }
+
+      // Get project and script content from database
+      const project = await db.select().from(projects).where(eq(projects.id, parseInt(projectId))).limit(1);
+      if (!project.length || !project[0].scriptContent) {
+        return res.status(400).json({ error: 'Project not found or no script content available' });
+      }
+
+      const scriptContent = project[0].scriptContent;
 
       // Extract scenes using AI
       const extractedScenes = await extractScenes(scriptContent);
