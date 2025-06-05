@@ -257,11 +257,11 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
       // Use proper scene extraction workflow based on demo app
       console.log(`Processing script content of ${scriptContent.length} characters`);
       
-      // Import the proper scene extractor
-      const { analyzeScript } = await import('./services/scene-extractor');
-      const analysisResult = analyzeScript(scriptContent);
+      // Import the enhanced scene extractor for comprehensive processing
+      const { extractScenesWithChunking } = await import('./services/enhanced-scene-extractor');
+      const analysisResult = await extractScenesWithChunking(scriptContent);
       
-      console.log(`Scene extractor found ${analysisResult.totalScenes} scenes from script analysis`);
+      console.log(`Enhanced scene extractor found ${analysisResult.totalScenes} scenes from script analysis`);
       
       // Convert to the expected format
       const extractedScenes = analysisResult.scenes.map(scene => ({
@@ -269,7 +269,8 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
         sceneNumber: scene.sceneNumber,
         location: scene.location || 'UNSPECIFIED',
         timeOfDay: scene.timeOfDay || 'UNSPECIFIED', 
-        description: scene.heading,
+        description: scene.title || `Scene ${scene.sceneNumber}`,
+        plotSummary: scene.plotSummary || 'Scene summary not available',
         characters: scene.characters || [],
         content: scene.content,
         pageStart: scene.pageStart || 1,

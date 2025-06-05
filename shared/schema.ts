@@ -100,6 +100,7 @@ export const scenes = pgTable("scenes", {
   location: text("location").notNull(),
   timeOfDay: text("time_of_day"),
   description: text("description"),
+  plotSummary: text("plot_summary"), // New field for scene plot summary
   characters: text("characters").array(),
   content: text("content"),
   pageStart: integer("page_start"),

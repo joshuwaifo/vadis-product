@@ -38,12 +38,12 @@ export async function extractTextFromPDF(pdfBuffer: Buffer): Promise<string> {
     }
     
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-8b" });
     
     // Convert PDF buffer to base64 for Gemini
     const base64Data = pdfBuffer.toString('base64');
     
-    const prompt = `Extract all text content from this PDF document. If it appears to be a film script or screenplay, preserve the formatting with scene headings (INT./EXT.), character names, and dialogue. Return only the extracted text content.`;
+    const prompt = `Extract ALL text content from this PDF document completely. This is a film script/screenplay - extract EVERY scene, dialogue, and stage direction from ALL pages. Preserve formatting with scene headings (INT./EXT.), character names, and dialogue. Do not truncate or summarize - extract the complete text content from the entire document.`;
     
     const result = await model.generateContent([
       {
