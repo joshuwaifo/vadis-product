@@ -8,10 +8,11 @@ import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
   Film, Users, Star, MapPin, Zap, Package, DollarSign, FileText,
-  Play, CheckCircle, Clock, AlertCircle, Loader2, RefreshCw
+  Play, CheckCircle, Clock, AlertCircle, Loader2, RefreshCw, Maximize2
 } from 'lucide-react';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
+import StoryboardSceneView from '@/components/script/StoryboardSceneView';
 
 // Define types directly in this file since the server types are not accessible from client
 interface AnalysisTask {
@@ -105,6 +106,7 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
   const [tasks, setTasks] = useState<AnalysisTask[]>([...ANALYSIS_TASKS]);
   const [selectedTask, setSelectedTask] = useState<string | null>(null);
   const [analysisResults, setAnalysisResults] = useState<Record<string, any>>({});
+  const [showStoryboard, setShowStoryboard] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -285,44 +287,105 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
     switch (taskId) {
       case 'scene_extraction':
         return (
-          <div className="space-y-4">
-            <div className="grid grid-cols-3 gap-4 text-center">
-              <div>
-                <div className="text-2xl font-bold">{results.totalScenes || 0}</div>
-                <div className="text-sm text-muted-foreground">Total Scenes</div>
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div className="grid grid-cols-3 gap-6 text-center flex-1">
+                <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/30 dark:to-blue-900/30 rounded-xl p-4">
+                  <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">{results.totalScenes || 0}</div>
+                  <div className="text-sm text-muted-foreground">Total Scenes</div>
+                </div>
+                <div className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950/30 dark:to-green-900/30 rounded-xl p-4">
+                  <div className="text-3xl font-bold text-green-600 dark:text-green-400">{results.estimatedDuration || 0}</div>
+                  <div className="text-sm text-muted-foreground">Est. Minutes</div>
+                </div>
+                <div className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950/30 dark:to-purple-900/30 rounded-xl p-4">
+                  <div className="text-3xl font-bold text-purple-600 dark:text-purple-400">{results.scenes?.length || 0}</div>
+                  <div className="text-sm text-muted-foreground">Extracted</div>
+                </div>
               </div>
-              <div>
-                <div className="text-2xl font-bold">{results.estimatedDuration || 0}</div>
-                <div className="text-sm text-muted-foreground">Est. Minutes</div>
-              </div>
-              <div>
-                <div className="text-2xl font-bold">{results.scenes?.length || 0}</div>
-                <div className="text-sm text-muted-foreground">Extracted</div>
-              </div>
+              
+              {results.scenes && results.scenes.length > 0 && (
+                <Button 
+                  onClick={() => setShowStoryboard(true)}
+                  className="ml-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-3"
+                >
+                  <Maximize2 className="h-4 w-4 mr-2" />
+                  Storyboard View
+                </Button>
+              )}
             </div>
+
             {results.scenes && results.scenes.length > 0 && (
-              <div className="space-y-3">
-                <h4 className="font-semibold">Scene Breakdown</h4>
-                {results.scenes.slice(0, 5).map((scene: any, index: number) => (
-                  <Card key={index} className="p-4">
-                    <div className="flex justify-between items-start mb-2">
-                      <Badge variant="outline">Scene {scene.sceneNumber}</Badge>
-                      <span className="text-sm text-muted-foreground">{scene.duration}min</span>
-                    </div>
-                    <h5 className="font-medium">{scene.location} - {scene.timeOfDay}</h5>
-                    <p className="text-sm text-muted-foreground mt-1">{scene.description}</p>
-                    {scene.characters && scene.characters.length > 0 && (
-                      <div className="mt-2">
-                        <span className="text-xs text-muted-foreground">Characters: </span>
-                        <span className="text-xs">{scene.characters.join(', ')}</span>
-                      </div>
-                    )}
-                  </Card>
-                ))}
-                {results.scenes.length > 5 && (
-                  <p className="text-sm text-muted-foreground text-center">
-                    And {results.scenes.length - 5} more scenes...
-                  </p>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-lg font-semibold">Scene Preview</h4>
+                  <Badge variant="outline" className="text-xs">
+                    Showing {Math.min(6, results.scenes.length)} of {results.scenes.length}
+                  </Badge>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  {results.scenes.slice(0, 6).map((scene: any, index: number) => (
+                    <Card key={index} className="hover:shadow-md transition-shadow duration-200 border-l-4 border-l-blue-500">
+                      <CardContent className="p-4">
+                        <div className="flex justify-between items-start mb-3">
+                          <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
+                            Scene {scene.sceneNumber}
+                          </Badge>
+                          <div className="text-right">
+                            <div className="text-sm font-medium">{scene.duration}min</div>
+                            <div className="text-xs text-muted-foreground">Pages {scene.pageStart}-{scene.pageEnd}</div>
+                          </div>
+                        </div>
+                        
+                        <h5 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                          {scene.location} - {scene.timeOfDay}
+                        </h5>
+                        
+                        <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                          {scene.description}
+                        </p>
+                        
+                        {scene.characters && scene.characters.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mb-2">
+                            {scene.characters.slice(0, 3).map((character: string, idx: number) => (
+                              <Badge key={idx} variant="outline" className="text-xs">
+                                {character}
+                              </Badge>
+                            ))}
+                            {scene.characters.length > 3 && (
+                              <Badge variant="outline" className="text-xs">
+                                +{scene.characters.length - 3} more
+                              </Badge>
+                            )}
+                          </div>
+                        )}
+                        
+                        {(scene.vfxNeeds?.length > 0 || scene.productPlacementOpportunities?.length > 0) && (
+                          <div className="flex gap-2 text-xs">
+                            {scene.vfxNeeds?.length > 0 && (
+                              <span className="text-purple-600 dark:text-purple-400">VFX</span>
+                            )}
+                            {scene.productPlacementOpportunities?.length > 0 && (
+                              <span className="text-green-600 dark:text-green-400">Product Placement</span>
+                            )}
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+                
+                {results.scenes.length > 6 && (
+                  <div className="text-center pt-4">
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setShowStoryboard(true)}
+                      className="hover:bg-blue-50 hover:border-blue-300 dark:hover:bg-blue-950/30"
+                    >
+                      View All {results.scenes.length} Scenes in Storyboard
+                    </Button>
+                  </div>
                 )}
               </div>
             )}
@@ -343,6 +406,17 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
   const completedTasks = tasks.filter(task => task.status === 'completed').length;
   const totalTasks = tasks.length;
   const progressPercentage = (completedTasks / totalTasks) * 100;
+
+  // Show storyboard view if enabled
+  if (showStoryboard && selectedTask === 'scene_extraction' && analysisResults.scene_extraction?.scenes) {
+    return (
+      <StoryboardSceneView
+        scenes={analysisResults.scene_extraction.scenes}
+        onClose={() => setShowStoryboard(false)}
+        projectTitle={project?.title || 'Script Analysis'}
+      />
+    );
+  }
 
   return (
     <div className="space-y-6">
