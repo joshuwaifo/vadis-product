@@ -4,6 +4,7 @@
  */
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { extractPDFTextPaginated } from './paginated-pdf-extractor';
 
 interface PDFExtractionResult {
   text: string;
@@ -17,7 +18,22 @@ interface PDFExtractionResult {
 export async function extractTextFromPDF(pdfBuffer: Buffer): Promise<string> {
   console.log(`Starting PDF text extraction from buffer (${pdfBuffer.length} bytes)`);
   
-  // Method 1: Use Gemini AI with enhanced extraction strategy
+  // Method 1: Use paginated extraction for complete coverage
+  try {
+    console.log('Attempting paginated PDF extraction for complete content capture...');
+    const paginatedText = await extractPDFTextPaginated(pdfBuffer);
+    
+    if (paginatedText && paginatedText.length > 50000) {
+      console.log(`Paginated extraction successful: ${paginatedText.length} characters`);
+      return paginatedText;
+    } else {
+      console.log(`Paginated extraction yielded ${paginatedText?.length || 0} characters, trying single-pass method...`);
+    }
+  } catch (error) {
+    console.error('Paginated extraction failed:', error.message);
+  }
+
+  // Method 2: Fallback to single-pass Gemini AI extraction
   try {
     if (!process.env.GEMINI_API_KEY) {
       throw new Error('GEMINI_API_KEY not available');
@@ -25,39 +41,26 @@ export async function extractTextFromPDF(pdfBuffer: Buffer): Promise<string> {
     
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-2.0-flash-exp",
+      model: "gemini-1.5-flash",
       generationConfig: {
-        maxOutputTokens: 8192, // Maximum possible output
-        temperature: 0.1 // Low temperature for precise extraction
+        maxOutputTokens: 8192,
+        temperature: 0.1
       }
     });
     
-    // Convert PDF buffer to base64 for Gemini
     const base64Data = pdfBuffer.toString('base64');
-    
     const estimatedPages = Math.floor(pdfBuffer.length / 2000);
     
-    const prompt = `COMPLETE SCREENPLAY EXTRACTION TASK
+    const prompt = `Extract ALL text content from this ${estimatedPages}-page screenplay PDF. This is a professional film script that must be digitized completely.
 
-You are processing a ${estimatedPages}-page film screenplay PDF. Your task is to extract the ENTIRE script content with perfect accuracy.
+CRITICAL REQUIREMENTS:
+- Extract EVERY SINGLE WORD from all ${estimatedPages} pages
+- Include ALL scene headers, character names, dialogue, and action lines
+- Do NOT summarize or paraphrase - extract verbatim text
+- Do NOT skip any pages or scenes
+- Output the complete raw screenplay text (expect 150,000+ characters)
 
-EXTRACTION PROTOCOL:
-1. Process ALL pages from beginning to end
-2. Extract ALL scene headings (INT./EXT./FADE IN/FADE OUT/CUT TO)
-3. Extract ALL character names (typically in CAPS)
-4. Extract ALL dialogue lines verbatim
-5. Extract ALL action descriptions and stage directions
-6. Extract ALL parentheticals and voice-over text
-7. Extract ALL scene transitions and camera directions
-
-OUTPUT REQUIREMENTS:
-- Return the complete screenplay text
-- Maintain original formatting structure
-- Include all content from every page
-- Do not summarize, truncate, or skip any text
-- This should be the full script (typically 15,000-40,000 words)
-
-Begin extraction now - output the complete screenplay text:`;
+This is a full-length feature screenplay. Extract the complete text now:`;
     
     const result = await model.generateContent([
       {
@@ -72,36 +75,12 @@ Begin extraction now - output the complete screenplay text:`;
     const response = await result.response;
     const extractedText = response.text();
     
-    // Check if we got a substantial extraction
     if (extractedText && extractedText.length > 10000) {
-      console.log(`Successfully extracted ${extractedText.length} characters using Gemini AI (enhanced)`);
+      console.log(`Single-pass Gemini extraction: ${extractedText.length} characters`);
       return extractedText;
-    } else {
-      console.log(`Gemini AI extracted only ${extractedText?.length || 0} characters, trying multi-pass extraction...`);
-      
-      // Try a different approach with explicit instruction
-      const fallbackPrompt = `Extract the complete text from this screenplay PDF. Return every single word from the document, including all scene headers, character names, dialogue, and action descriptions. Do not skip any content. Output the full screenplay text now:`;
-      
-      const fallbackResult = await model.generateContent([
-        {
-          inlineData: {
-            data: base64Data,
-            mimeType: "application/pdf"
-          }
-        },
-        fallbackPrompt
-      ]);
-      
-      const fallbackResponse = await fallbackResult.response;
-      const fallbackText = fallbackResponse.text();
-      
-      if (fallbackText && fallbackText.length > extractedText?.length) {
-        console.log(`Fallback extraction succeeded with ${fallbackText.length} characters`);
-        return fallbackText;
-      }
     }
   } catch (error) {
-    console.error('Gemini AI extraction failed:', error.message);
+    console.error('Single-pass Gemini extraction failed:', error.message);
   }
   
   // Method 2: Try pdf-parse as fallback
