@@ -1,0 +1,83 @@
+11:51:22 AM [express] serving on port 5000
+Login attempt for email: productiondemo@vadis-media.com
+Login successful for user: productiondemo@vadis-media.com Role: production
+11:52:00 AM [express] POST /api/auth/login 200 in 178ms :: {"success":true,"user":{"id":1,"email":"pr…
+Error fetching dashboard stats: error: column "script_file_name" does not exist
+    at file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1345:74
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async NeonPreparedQuery.execute (/home/runner/workspace/node_modules/src/neon-serverless/session.ts:102:18)
+    at async DatabaseStorage.getProjectsByUser (/home/runner/workspace/server/storage.ts:712:12)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:217:24) {
+  length: 117,
+  severity: 'ERROR',
+  code: '42703',
+  detail: undefined,
+  hint: undefined,
+  position: '108',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_relation.c',
+  line: '3722',
+  routine: 'errorMissingColumn'
+}
+Error fetching projects: error: column "script_file_name" does not exist
+    at file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1345:74
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async NeonPreparedQuery.execute (/home/runner/workspace/node_modules/src/neon-serverless/session.ts:102:18)
+    at async DatabaseStorage.getProjectsByUser (/home/runner/workspace/server/storage.ts:712:12)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:92:24) {
+  length: 117,
+  severity: 'ERROR',
+  code: '42703',
+  detail: undefined,
+  hint: undefined,
+  position: '108',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_relation.c',
+  line: '3722',
+  routine: 'errorMissingColumn'
+}
+11:52:00 AM [express] GET /api/auth/me 304 in 41ms :: {"user":{"id":1,"email":"productiondemo@vadis-m…
+11:52:01 AM [express] GET /api/dashboard/stats 500 in 215ms :: {"error":"Failed to fetch dashboard st…
+11:52:01 AM [express] GET /api/projects 500 in 200ms :: {"error":"Failed to fetch projects"}
+PDF file received: Pulp Fiction.pdf, Size: 339829 bytes - metadata stored for on-demand analysis
+Script uploaded: Pulp Fiction.pdf, Size: 339829, Content length: 36
+11:52:34 AM [express] POST /api/upload/script 200 in 1328ms :: {"success":true,"content":"PDF_UPLOADE…
+Workflow creation error: error: column "script_file_name" of relation "projects" does not exist
+    at file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1345:74
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async NeonPreparedQuery.execute (/home/runner/workspace/node_modules/src/neon-serverless/session.ts:102:18)
+    at async DatabaseStorage.createProject (/home/runner/workspace/server/storage.ts:699:23)
+    at async <anonymous> (/home/runner/workspace/server/workflow-routes.ts:102:25) {
+  length: 138,
+  severity: 'ERROR',
+  code: '42703',
+  detail: undefined,
+  hint: undefined,
+  position: '125',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_target.c',
+  line: '1066',
+  routine: 'checkInsertTargets'
+}
+11:52:39 AM [express] POST /api/projects/workflow 500 in 281ms :: {"error":"Failed to create project …
