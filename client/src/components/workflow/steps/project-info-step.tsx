@@ -70,9 +70,10 @@ export default function ProjectInfoStep({ projectId, onNext, onSave, isLoading }
         setScriptContent(project.scriptContent);
         // Create a proper file representation with actual filename and size
         const fileName = project.scriptFileName || project.pdfFileName || "Uploaded Script";
+        const fileSize = project.scriptFileSize || project.pdfFileSize || project.scriptContent.length || 0;
         setUploadedFile({ 
           name: fileName,
-          size: project.scriptContent.length || 0  // Use content length as approximate size
+          size: fileSize
         } as File);
       }
     }

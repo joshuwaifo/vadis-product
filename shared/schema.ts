@@ -63,6 +63,7 @@ export const projects = pgTable("projects", {
   scriptFileName: text("script_file_name"), // Original uploaded file name
   scriptFileData: text("script_file_data"), // Base64 encoded PDF data for on-demand extraction
   scriptFileMimeType: text("script_file_mime_type"), // MIME type of uploaded file
+  scriptFileSize: integer("script_file_size"), // Script file size in bytes
   pdfFileName: text("pdf_file_name"), // PDF file name
   pdfFileData: text("pdf_file_data"), // Base64 encoded PDF data
   pdfFileSize: integer("pdf_file_size"), // PDF file size in bytes

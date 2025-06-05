@@ -110,9 +110,11 @@ export function registerWorkflowRoutes(app: Express) {
           scriptFileName: fileName,
           scriptFileData: fileData,
           scriptFileMimeType: mimeType,
+          scriptFileSize: stepData.scriptContent?.length || 0,
           pdfFileName: fileName,
           pdfFileData: fileData,
           pdfMimeType: mimeType,
+          pdfFileSize: stepData.scriptContent?.length || 0,
           projectType: 'script_analysis',
           workflowStatus: currentStep
         });
