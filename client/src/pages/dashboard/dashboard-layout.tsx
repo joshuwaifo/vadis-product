@@ -230,7 +230,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       )}
 
       {/* Main Content Area */}
-      <main className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
+      <main className="w-full">
         {children}
       </main>
     </div>

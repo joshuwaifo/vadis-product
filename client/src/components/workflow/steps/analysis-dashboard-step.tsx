@@ -419,7 +419,8 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
   }
 
   return (
-    <div className="space-y-6">
+    <div className="w-full min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8 space-y-6">
       {/* Analysis Tools at Top */}
       <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 rounded-xl p-6 border border-blue-200/50 dark:border-blue-800/50">
         <div className="flex items-center justify-between mb-6">
@@ -604,6 +605,7 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
             )}
           </Button>
         </div>
+      </div>
       </div>
     </div>
   );
