@@ -386,9 +386,11 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
                         </h4>
                         
                         <div className="flex-1 overflow-hidden">
-                          <p className="text-xs text-muted-foreground line-clamp-3 leading-relaxed">
-                            {scene.plotSummary || 'Plot summary not available'}
-                          </p>
+                          <ScrollArea className="h-16">
+                            <p className="text-xs text-muted-foreground leading-relaxed pr-2">
+                              {scene.plotSummary || 'Plot summary not available'}
+                            </p>
+                          </ScrollArea>
                         </div>
                       </CardContent>
                     </Card>
