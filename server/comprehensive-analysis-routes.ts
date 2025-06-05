@@ -12,16 +12,35 @@ function parseBasicScenes(scriptContent: string) {
   const scenes = [];
   let currentScene = null;
   let sceneNumber = 1;
+  let currentPageStart = 1;
+  
+  // More comprehensive scene header patterns
+  const scenePatterns = [
+    /^(INT\.|INTERIOR)\s+(.+?)\s*[-–—]\s*(.+?)$/i,
+    /^(EXT\.|EXTERIOR)\s+(.+?)\s*[-–—]\s*(.+?)$/i,
+    /^(INT\.|INTERIOR)\s+(.+?)\s*-\s*(.+?)$/i,
+    /^(EXT\.|EXTERIOR)\s+(.+?)\s*-\s*(.+?)$/i,
+    /^(INT\.|INTERIOR)\s+(.+?)$/i,
+    /^(EXT\.|EXTERIOR)\s+(.+?)$/i,
+    /^SCENE\s+\d+/i,
+    /^\d+\.\s+(INT\.|EXT\.)/i
+  ];
   
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i].trim();
     
-    // Look for scene headers (INT./EXT. patterns)
-    const sceneHeaderMatch = line.match(/^(INT\.|EXT\.)\s+(.+?)\s*-\s*(.+?)$/i);
+    // Check for scene headers using multiple patterns
+    let sceneHeaderMatch = null;
+    for (const pattern of scenePatterns) {
+      sceneHeaderMatch = line.match(pattern);
+      if (sceneHeaderMatch) break;
+    }
     
-    if (sceneHeaderMatch) {
+    if (sceneHeaderMatch || (line.toUpperCase().startsWith('FADE IN') && sceneNumber === 1)) {
       // Save previous scene if exists
       if (currentScene) {
+        currentScene.pageEnd = Math.floor(i / 55) + 1;
+        currentScene.duration = Math.max(1, Math.floor(currentScene.content.split('\n').length / 8));
         scenes.push({
           ...currentScene,
           content: currentScene.content.trim()
@@ -29,8 +48,26 @@ function parseBasicScenes(scriptContent: string) {
       }
       
       // Start new scene
-      const location = sceneHeaderMatch[2].trim();
-      const timeOfDay = sceneHeaderMatch[3].trim();
+      let location = 'UNKNOWN LOCATION';
+      let timeOfDay = 'UNSPECIFIED';
+      
+      if (sceneHeaderMatch) {
+        if (sceneHeaderMatch[2]) {
+          location = sceneHeaderMatch[2].trim();
+        }
+        if (sceneHeaderMatch[3]) {
+          timeOfDay = sceneHeaderMatch[3].trim();
+        } else if (sceneHeaderMatch[2]) {
+          // Try to extract time from location if not separate
+          const timeMatch = sceneHeaderMatch[2].match(/(.+?)\s*[-–—]\s*(.+)/);
+          if (timeMatch) {
+            location = timeMatch[1].trim();
+            timeOfDay = timeMatch[2].trim();
+          }
+        }
+      }
+      
+      currentPageStart = Math.floor(i / 55) + 1;
       
       currentScene = {
         id: `scene-${sceneNumber}`,
@@ -40,9 +77,9 @@ function parseBasicScenes(scriptContent: string) {
         description: `Scene at ${location} during ${timeOfDay}`,
         characters: [],
         content: line + '\n',
-        pageStart: Math.floor(i / 55) + 1, // Approximate page numbers
-        pageEnd: Math.floor(i / 55) + 1,
-        duration: Math.floor(Math.random() * 5) + 2, // 2-6 minutes
+        pageStart: currentPageStart,
+        pageEnd: currentPageStart,
+        duration: 2,
         vfxNeeds: [],
         productPlacementOpportunities: []
       };
@@ -50,11 +87,25 @@ function parseBasicScenes(scriptContent: string) {
       // Add content to current scene
       currentScene.content += line + '\n';
       
-      // Extract character names (ALL CAPS followed by dialogue)
-      if (line.match(/^[A-Z][A-Z\s]+$/)) {
-        const characterName = line.trim();
-        if (!currentScene.characters.includes(characterName) && characterName.length < 30) {
-          currentScene.characters.push(characterName);
+      // Extract character names - more comprehensive patterns
+      const characterPatterns = [
+        /^([A-Z][A-Z\s',.-]+)$/,  // All caps names
+        /^([A-Z][A-Z\s]+)\s*\([^)]*\)$/,  // Names with parentheticals
+        /^([A-Z][A-Z\s]+):$/,  // Names with colons
+        /^([A-Z]{2,}[A-Z\s]*)$/  // At least 2 consecutive caps
+      ];
+      
+      for (const pattern of characterPatterns) {
+        const match = line.match(pattern);
+        if (match) {
+          const characterName = match[1].trim();
+          if (characterName.length >= 2 && characterName.length <= 25 && 
+              !currentScene.characters.includes(characterName) &&
+              !characterName.match(/^(INT|EXT|FADE|CUT|DISSOLVE|INTERIOR|EXTERIOR|SCENE|ACT)/) &&
+              characterName !== line.toUpperCase()) {
+            currentScene.characters.push(characterName);
+          }
+          break;
         }
       }
     }
@@ -62,17 +113,31 @@ function parseBasicScenes(scriptContent: string) {
   
   // Add the last scene
   if (currentScene) {
+    currentScene.pageEnd = Math.floor(lines.length / 55) + 1;
+    currentScene.duration = Math.max(1, Math.floor(currentScene.content.split('\n').length / 8));
     scenes.push({
       ...currentScene,
       content: currentScene.content.trim()
     });
   }
   
-  // Update page ranges based on content length
-  scenes.forEach((scene, index) => {
-    const contentLines = scene.content.split('\n').length;
-    scene.pageEnd = scene.pageStart + Math.floor(contentLines / 55);
-    scene.duration = Math.max(2, Math.floor(contentLines / 10)); // Estimate duration from content
+  // Generate better descriptions based on content analysis
+  scenes.forEach((scene) => {
+    const content = scene.content.toLowerCase();
+    let description = `Scene at ${scene.location}`;
+    
+    if (scene.timeOfDay && scene.timeOfDay !== 'UNSPECIFIED') {
+      description += ` during ${scene.timeOfDay}`;
+    }
+    
+    // Add action context if found
+    if (content.includes('fight') || content.includes('action')) {
+      description += ' - Action sequence';
+    } else if (content.includes('dialogue') || scene.characters.length > 1) {
+      description += ` - Dialogue between ${scene.characters.slice(0, 3).join(', ')}`;
+    }
+    
+    scene.description = description;
   });
   
   return scenes;
@@ -165,14 +230,28 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
         }
       }
 
-      // Extract scenes using AI or fallback to basic parsing for actual script content
+      // Use basic scene parsing as primary method for full script processing
       let extractedScenes;
-      try {
-        extractedScenes = await extractScenes(scriptContent);
-      } catch (aiError) {
-        console.log('AI extraction failed, using fallback parser:', aiError.message);
-        // Fallback to basic scene parsing
-        extractedScenes = parseBasicScenes(scriptContent);
+      
+      console.log(`Processing script content of ${scriptContent.length} characters`);
+      
+      // First try the robust basic parser that handles full scripts
+      extractedScenes = parseBasicScenes(scriptContent);
+      
+      console.log(`Basic parser extracted ${extractedScenes.length} scenes`);
+      
+      // If basic parser finds insufficient scenes, try AI extraction with chunking
+      if (extractedScenes.length < 10) {
+        try {
+          console.log('Attempting AI extraction as basic parser found few scenes...');
+          const aiScenes = await extractScenes(scriptContent);
+          if (aiScenes.length > extractedScenes.length) {
+            extractedScenes = aiScenes;
+            console.log(`AI extraction found ${aiScenes.length} scenes`);
+          }
+        } catch (aiError) {
+          console.log('AI extraction failed, using basic parser results:', aiError.message);
+        }
       }
       
       // Save scenes to database

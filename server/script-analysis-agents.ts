@@ -153,7 +153,7 @@ export async function extractScenes(
   try {
     const response = await generateContent(provider, prompt, {
       responseFormat: 'json',
-      maxTokens: 8000
+      maxTokens: 16000 // Increased for full script processing
     });
 
     const parsed = extractJsonFromText(response);
