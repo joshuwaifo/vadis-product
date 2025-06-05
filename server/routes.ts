@@ -207,6 +207,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get project history/activity log
+  app.get("/api/projects/:id/history", async (req, res) => {
+    try {
+      // Check if user is authenticated
+      if (!req.session.user) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const projectId = parseInt(req.params.id);
+      const project = await storage.getProject(projectId);
+      
+      if (!project) {
+        return res.status(404).json({ error: "Project not found" });
+      }
+
+      // Check if user has access to this project
+      if (project.userId !== req.session.user.id) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+
+      const history = await storage.getProjectHistory(projectId);
+      res.json(history);
+    } catch (error) {
+      console.error("Error fetching project history:", error);
+      res.status(500).json({ error: "Failed to fetch project history" });
+    }
+  });
+
   app.get("/api/dashboard/stats", async (req, res) => {
     try {
       // Check if user is authenticated

@@ -28,6 +28,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 import DashboardLayout from "../dashboard/dashboard-layout";
+import ProjectHistoryDialog from "@/components/project-history-dialog";
 
 
 interface Project {
@@ -513,16 +514,19 @@ export default function ProductionDashboard() {
                               {nextAction.action}
                             </Button>
                           </Link>
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => handleDeleteProject(project.id, project.title)}
-                            disabled={deleteProjectMutation.isPending}
-                            className="border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950 dark:hover:border-red-700"
-                          >
-                            <Trash2 className="w-4 h-4 mr-2" />
-                            {deleteProjectMutation.isPending ? 'Deleting...' : 'Delete'}
-                          </Button>
+                          <div className="flex gap-2">
+                            <ProjectHistoryDialog projectId={project.id} projectTitle={project.title} />
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => handleDeleteProject(project.id, project.title)}
+                              disabled={deleteProjectMutation.isPending}
+                              className="border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950 dark:hover:border-red-700"
+                            >
+                              <Trash2 className="w-4 h-4 mr-2" />
+                              {deleteProjectMutation.isPending ? 'Deleting...' : 'Delete'}
+                            </Button>
+                          </div>
                         </div>
                         
                         {project.scriptContent && (

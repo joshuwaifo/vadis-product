@@ -48,6 +48,9 @@ import {
   type InsertSceneVariation,
   type UserRole,
   type ProductionUser,
+  projectHistory,
+  type ProjectHistory,
+  type InsertProjectHistory,
   type BrandUser,
   type FinancierUser,
   type CreatorUser
@@ -133,6 +136,10 @@ export interface IStorage {
   // Additional getter methods for analysis results
   getScenes(projectId: number): Promise<Scene[]>;
   getCharacters(projectId: number): Promise<Character[]>;
+  
+  // Project History
+  createProjectHistory(history: InsertProjectHistory): Promise<ProjectHistory>;
+  getProjectHistory(projectId: number): Promise<ProjectHistory[]>;
 }
 
 // DEPRECATED: MemStorage class - kept for testing purposes only

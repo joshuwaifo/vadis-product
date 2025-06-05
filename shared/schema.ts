@@ -401,5 +401,20 @@ export type FinancialPlan = typeof financialPlans.$inferSelect;
 export type InsertSceneVariation = z.infer<typeof insertSceneVariationSchema>;
 export type SceneVariation = typeof sceneVariations.$inferSelect;
 
+// Project history/activity log table
+export const projectHistory = pgTable("project_history", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  projectId: integer("project_id").references(() => projects.id),
+  action: text("action").notNull(), // project_created, workflow_step_updated, script_uploaded, analysis_completed, etc.
+  details: jsonb("details"), // Additional details about the action
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Project history schemas
+export const insertProjectHistorySchema = createInsertSchema(projectHistory);
+export type InsertProjectHistory = z.infer<typeof insertProjectHistorySchema>;
+export type ProjectHistory = typeof projectHistory.$inferSelect;
+
 export type UserRole = keyof typeof userRoles;
 export type LoginData = z.infer<typeof loginSchema>;
