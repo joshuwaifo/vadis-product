@@ -66,10 +66,10 @@ export function registerWorkflowRoutes(app: Express) {
         return res.status(401).json({ error: "Authentication required" });
       }
 
-      const { currentStep, stepData } = req.body;
+      const { currentStep, stepData, projectId } = req.body;
 
       // Create new project if this is the first step
-      if (currentStep === 'project_info' && stepData) {
+      if (currentStep === 'project_info' && stepData && !projectId) {
         const project = await storage.createProject({
           userId,
           title: stepData.title,
@@ -79,8 +79,7 @@ export function registerWorkflowRoutes(app: Express) {
           budgetRange: stepData.budgetRange,
           scriptContent: stepData.scriptContent,
           projectType: 'script_analysis',
-          workflowStatus: currentStep,
-          lastSavedStep: currentStep
+          workflowStatus: currentStep
         });
 
         // Log user action
@@ -94,6 +93,41 @@ export function registerWorkflowRoutes(app: Express) {
           project,
           workflow: {
             projectId: project.id,
+            currentStep,
+            steps: PROJECT_WORKFLOW_STEPS
+          }
+        });
+      } 
+      // Update existing project workflow step
+      else if (projectId && currentStep) {
+        // Validate that this is a valid workflow step
+        const validSteps = PROJECT_WORKFLOW_STEPS.map(step => step.id);
+        if (!validSteps.includes(currentStep)) {
+          return res.status(400).json({ error: "Invalid workflow step" });
+        }
+
+        // Update project with new workflow status
+        const updateData: any = { workflowStatus: currentStep };
+        if (stepData) {
+          Object.assign(updateData, stepData);
+        }
+
+        await storage.updateProject(projectId, updateData);
+
+        // Log user action
+        await logUserAction(userId, projectId, 'workflow_step_updated', {
+          step: currentStep,
+          stepData: stepData ? Object.keys(stepData) : []
+        });
+
+        // Get updated project
+        const project = await storage.getProject(projectId);
+
+        res.json({
+          success: true,
+          project,
+          workflow: {
+            projectId: projectId,
             currentStep,
             steps: PROJECT_WORKFLOW_STEPS
           }

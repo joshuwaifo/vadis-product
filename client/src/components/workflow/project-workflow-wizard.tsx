@@ -107,15 +107,11 @@ export default function ProjectWorkflowWizard({
   // Save workflow progress
   const saveWorkflowMutation = useMutation({
     mutationFn: async (data: { currentStep: string; stepData?: any }) => {
-      const response = await apiRequest(
-        activeProjectId ? `/api/projects/${activeProjectId}/workflow` : '/api/projects/workflow',
-        activeProjectId ? "PUT" : "POST",
-        {
-          currentStep: data.currentStep,
-          stepData: data.stepData,
-          projectId: workflow?.projectId || activeProjectId
-        }
-      );
+      const response = await apiRequest('/api/projects/workflow', "POST", {
+        currentStep: data.currentStep,
+        stepData: data.stepData,
+        projectId: workflow?.projectId || activeProjectId
+      });
       return response.json();
     },
     onSuccess: (data) => {
