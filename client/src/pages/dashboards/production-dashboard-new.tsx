@@ -507,21 +507,21 @@ export default function ProductionDashboard() {
                           {project.description || `${project.timeline || 'New'} project in ${project.status} stage`}
                         </p>
                         
-                        <div className="flex flex-col sm:flex-row gap-2">
+                        <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
                           <Link to={nextAction.link} className="flex-1">
-                            <Button variant={nextAction.variant} size="sm" className="w-full">
+                            <Button variant={nextAction.variant} size="sm" className="w-full h-9">
                               <nextAction.icon className="w-4 h-4 mr-2" />
                               {nextAction.action}
                             </Button>
                           </Link>
-                          <div className="flex gap-2">
+                          <div className="flex gap-2 flex-shrink-0">
                             <ProjectHistoryDialog projectId={project.id} projectTitle={project.title} />
                             <Button 
                               variant="outline" 
                               size="sm"
                               onClick={() => handleDeleteProject(project.id, project.title)}
                               disabled={deleteProjectMutation.isPending}
-                              className="border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950 dark:hover:border-red-700"
+                              className="h-9 border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950 dark:hover:border-red-700"
                             >
                               <Trash2 className="w-4 h-4 mr-2" />
                               {deleteProjectMutation.isPending ? 'Deleting...' : 'Delete'}
