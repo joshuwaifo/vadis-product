@@ -147,7 +147,14 @@ export default function ProjectInfoStep({ projectId, onNext, onSave, isLoading }
       return;
     }
     
-    onNext({ ...data, scriptContent, uploadedFile: uploadedFile?.name });
+    onNext({ 
+      ...data, 
+      scriptContent, 
+      uploadedFile: uploadedFile?.name,
+      fileData,
+      mimeType,
+      fileName: uploadedFile?.name
+    });
   };
 
   return (
