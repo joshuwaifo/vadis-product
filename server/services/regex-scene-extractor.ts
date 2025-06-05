@@ -1,6 +1,6 @@
 /**
- * Regex-based scene extraction for screenplay PDFs
- * Handles complete document processing without token limits
+ * Regex-based scene extraction for screenplay content
+ * Designed to handle full-length scripts without token limitations
  */
 
 export interface ExtractedScene {
@@ -18,174 +18,188 @@ export interface ExtractedScene {
   productPlacementOpportunities: string[];
 }
 
-/**
- * Extract scenes from screenplay text using regex patterns
- */
 export function extractScenesWithRegex(scriptContent: string): ExtractedScene[] {
   const scenes: ExtractedScene[] = [];
-  
-  // Comprehensive scene heading patterns for screenplays
-  const sceneHeadingPatterns = [
-    // Standard format: INT./EXT. LOCATION - TIME
-    /^(INT\.|EXT\.|INTERIOR|EXTERIOR)\s+(.+?)\s*[-–—]\s*(.+?)$/gim,
-    // Alternative format: INT./EXT. LOCATION TIME
-    /^(INT\.|EXT\.|INTERIOR|EXTERIOR)\s+(.+?)\s+(DAY|NIGHT|MORNING|AFTERNOON|EVENING|DAWN|DUSK|CONTINUOUS|LATER|MOMENTS LATER)$/gim,
-    // Simple format: INT./EXT. LOCATION
-    /^(INT\.|EXT\.|INTERIOR|EXTERIOR)\s+(.+?)$/gim,
-  ];
-  
-  // Split content into lines for processing
   const lines = scriptContent.split('\n');
   let currentScene: Partial<ExtractedScene> | null = null;
-  let sceneCounter = 0;
-  let currentPageEstimate = 1;
-  let lineCounter = 0;
+  let sceneNumber = 1;
+  let lineIndex = 0;
+  
+  // Enhanced regex patterns for scene headers
+  const sceneHeaderPatterns = [
+    // Standard format: INT./EXT. LOCATION - TIME
+    /^(INT\.|INTERIOR|EXT\.|EXTERIOR)\s+([^-\n]+?)\s*[-–—]\s*(.+?)$/i,
+    // Without dash: INT./EXT. LOCATION TIME
+    /^(INT\.|INTERIOR|EXT\.|EXTERIOR)\s+(.+?)\s+(DAY|NIGHT|MORNING|AFTERNOON|EVENING|DAWN|DUSK|LATER|CONTINUOUS|SAME TIME)$/i,
+    // Just location: INT./EXT. LOCATION
+    /^(INT\.|INTERIOR|EXT\.|EXTERIOR)\s+(.+?)$/i,
+    // Numbered scenes: 1. INT./EXT.
+    /^\d+\.\s*(INT\.|INTERIOR|EXT\.|EXTERIOR)\s+(.+?)(?:\s*[-–—]\s*(.+?))?$/i,
+    // SCENE format
+    /^SCENE\s+\d+/i
+  ];
+  
+  // Character name patterns
+  const characterPatterns = [
+    /^([A-Z][A-Z\s'.-]{1,25})$/,  // Basic all-caps
+    /^([A-Z][A-Z\s'.-]+)\s*\([^)]*\)$/,  // With parentheticals
+    /^([A-Z][A-Z\s'.-]+):$/,  // With colon
+  ];
+  
+  // Action/scene transition patterns
+  const transitionPatterns = [
+    /^(FADE IN|FADE OUT|CUT TO|DISSOLVE TO|SMASH CUT|JUMP CUT):/i,
+    /^(FADE IN|FADE OUT)\.?$/i
+  ];
   
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i].trim();
-    lineCounter++;
+    lineIndex = i;
     
-    // Estimate page numbers (approximately 55 lines per page in standard screenplay format)
-    currentPageEstimate = Math.ceil(lineCounter / 55);
+    // Skip empty lines
+    if (!line) {
+      if (currentScene) {
+        currentScene.content += '\n';
+      }
+      continue;
+    }
     
-    if (!line) continue;
+    // Check for scene headers
+    let isSceneHeader = false;
+    let headerMatch: RegExpMatchArray | null = null;
     
-    // Check if this line is a scene heading
-    let isSceneHeading = false;
-    let location = '';
-    let timeOfDay = '';
-    
-    for (const pattern of sceneHeadingPatterns) {
-      pattern.lastIndex = 0; // Reset regex
-      const match = pattern.exec(line);
-      
-      if (match) {
-        isSceneHeading = true;
-        
-        if (match[3]) {
-          // Format: INT./EXT. LOCATION - TIME
-          location = match[2].trim();
-          timeOfDay = match[3].trim();
-        } else if (match[2] && /^(DAY|NIGHT|MORNING|AFTERNOON|EVENING|DAWN|DUSK|CONTINUOUS|LATER|MOMENTS LATER)$/i.test(match[2].split(' ').pop() || '')) {
-          // Format: INT./EXT. LOCATION TIME
-          const parts = match[2].trim().split(' ');
-          timeOfDay = parts.pop() || '';
-          location = parts.join(' ');
-        } else {
-          // Format: INT./EXT. LOCATION
-          location = match[2].trim();
-          timeOfDay = 'UNSPECIFIED';
-        }
+    for (const pattern of sceneHeaderPatterns) {
+      headerMatch = line.match(pattern);
+      if (headerMatch) {
+        isSceneHeader = true;
         break;
       }
     }
     
-    if (isSceneHeading) {
-      // Save previous scene if exists
+    // Also check for FADE IN as first scene
+    if (!isSceneHeader && sceneNumber === 1) {
+      for (const pattern of transitionPatterns) {
+        if (pattern.test(line)) {
+          isSceneHeader = true;
+          break;
+        }
+      }
+    }
+    
+    if (isSceneHeader) {
+      // Save previous scene
       if (currentScene) {
-        scenes.push(finalizeScene(currentScene, currentPageEstimate - 1));
+        currentScene.pageEnd = Math.floor(i / 55) + 1;
+        currentScene.duration = Math.max(1, Math.floor((currentScene.content?.split('\n').length || 0) / 10));
+        scenes.push(currentScene as ExtractedScene);
       }
       
-      // Start new scene
-      sceneCounter++;
+      // Parse new scene
+      let location = 'UNKNOWN LOCATION';
+      let timeOfDay = 'UNSPECIFIED';
+      
+      if (headerMatch) {
+        if (headerMatch[2]) {
+          location = headerMatch[2].trim();
+        }
+        if (headerMatch[3]) {
+          timeOfDay = headerMatch[3].trim();
+        } else if (headerMatch[2]) {
+          // Try to extract time from combined location/time
+          const timeMatch = location.match(/(.+?)\s+(DAY|NIGHT|MORNING|AFTERNOON|EVENING|DAWN|DUSK|LATER|CONTINUOUS|SAME TIME)$/i);
+          if (timeMatch) {
+            location = timeMatch[1].trim();
+            timeOfDay = timeMatch[2].trim();
+          }
+        }
+      }
+      
       currentScene = {
-        id: `scene_${sceneCounter}`,
-        sceneNumber: sceneCounter,
-        location: location,
-        timeOfDay: timeOfDay.toUpperCase(),
-        description: line,
+        id: `scene-${sceneNumber}`,
+        sceneNumber: sceneNumber++,
+        location,
+        timeOfDay,
+        description: `Scene at ${location}${timeOfDay !== 'UNSPECIFIED' ? ` during ${timeOfDay}` : ''}`,
         characters: [],
         content: line + '\n',
-        pageStart: currentPageEstimate,
-        pageEnd: currentPageEstimate,
-        duration: 1,
+        pageStart: Math.floor(i / 55) + 1,
+        pageEnd: Math.floor(i / 55) + 1,
+        duration: 2,
         vfxNeeds: [],
         productPlacementOpportunities: []
       };
     } else if (currentScene) {
       // Add content to current scene
       currentScene.content += line + '\n';
-      currentScene.pageEnd = currentPageEstimate;
       
-      // Extract character names (usually in ALL CAPS, centered or left-aligned)
-      const characterMatch = line.match(/^([A-Z][A-Z\s]{2,}[A-Z])$/);
-      if (characterMatch && characterMatch[1].length < 30) {
-        const character = characterMatch[1].trim();
-        if (!currentScene.characters?.includes(character)) {
-          currentScene.characters?.push(character);
-        }
-      }
-      
-      // Detect potential VFX needs
-      const vfxKeywords = [
-        'explosion', 'fire', 'crash', 'special effect', 'cgi', 'green screen',
-        'composite', 'digital', 'effect', 'supernatural', 'magic', 'flying',
-        'transformation', 'monster', 'creature', 'blood', 'gore', 'battle'
-      ];
-      
-      for (const keyword of vfxKeywords) {
-        if (line.toLowerCase().includes(keyword) && !currentScene.vfxNeeds?.includes(keyword)) {
-          currentScene.vfxNeeds?.push(keyword);
-        }
-      }
-      
-      // Detect product placement opportunities
-      const productKeywords = [
-        'car', 'phone', 'computer', 'laptop', 'watch', 'brand', 'logo',
-        'restaurant', 'store', 'shop', 'drink', 'food', 'clothing', 'shoes'
-      ];
-      
-      for (const keyword of productKeywords) {
-        if (line.toLowerCase().includes(keyword) && !currentScene.productPlacementOpportunities?.includes(keyword)) {
-          currentScene.productPlacementOpportunities?.push(keyword);
+      // Extract character names
+      for (const pattern of characterPatterns) {
+        const match = line.match(pattern);
+        if (match) {
+          const characterName = match[1].trim();
+          
+          // Validate character name
+          if (characterName.length >= 2 && 
+              characterName.length <= 25 &&
+              !currentScene.characters?.includes(characterName) &&
+              !characterName.match(/^(INT|EXT|FADE|CUT|DISSOLVE|INTERIOR|EXTERIOR|SCENE|ACT|THE|END|TITLE)/) &&
+              !characterName.match(/^\d+/) &&
+              characterName.split(' ').length <= 4) {
+            
+            currentScene.characters = currentScene.characters || [];
+            currentScene.characters.push(characterName);
+          }
+          break;
         }
       }
     }
   }
   
-  // Add the last scene
+  // Add final scene
   if (currentScene) {
-    scenes.push(finalizeScene(currentScene, currentPageEstimate));
+    currentScene.pageEnd = Math.floor(lines.length / 55) + 1;
+    currentScene.duration = Math.max(1, Math.floor((currentScene.content?.split('\n').length || 0) / 10));
+    scenes.push(currentScene as ExtractedScene);
   }
   
-  console.log(`Regex extraction completed: ${scenes.length} scenes found from ${currentPageEstimate} estimated pages`);
-  return scenes;
-}
-
-/**
- * Finalize scene data and calculate duration
- */
-function finalizeScene(sceneData: Partial<ExtractedScene>, endPage: number): ExtractedScene {
-  const pageCount = Math.max(1, (sceneData.pageEnd || endPage) - (sceneData.pageStart || 1) + 1);
+  // Post-process scenes for better descriptions
+  scenes.forEach(scene => {
+    const content = scene.content.toLowerCase();
+    let description = `Scene at ${scene.location}`;
+    
+    if (scene.timeOfDay && scene.timeOfDay !== 'UNSPECIFIED') {
+      description += ` during ${scene.timeOfDay}`;
+    }
+    
+    // Add context based on content
+    if (content.includes('fight') || content.includes('action') || content.includes('chase')) {
+      description += ' - Action sequence';
+    } else if (content.includes('dialogue') || scene.characters.length > 1) {
+      description += ` - Dialogue scene`;
+      if (scene.characters.length > 0) {
+        description += ` featuring ${scene.characters.slice(0, 2).join(' and ')}`;
+        if (scene.characters.length > 2) {
+          description += ` and ${scene.characters.length - 2} others`;
+        }
+      }
+    } else if (content.includes('montage')) {
+      description += ' - Montage sequence';
+    } else if (content.includes('flashback')) {
+      description += ' - Flashback sequence';
+    }
+    
+    scene.description = description;
+    
+    // Estimate duration more accurately
+    const contentLines = scene.content.split('\n').filter(line => line.trim()).length;
+    const dialogueLines = scene.characters.length * 3; // rough estimate
+    const actionLines = contentLines - dialogueLines;
+    
+    // 1 page ≈ 1 minute, dialogue is faster, action is slower
+    scene.duration = Math.max(1, Math.round(
+      (dialogueLines * 0.5) + (actionLines * 1.2)
+    ));
+  });
   
-  return {
-    id: sceneData.id || 'unknown',
-    sceneNumber: sceneData.sceneNumber || 0,
-    location: sceneData.location || 'UNKNOWN LOCATION',
-    timeOfDay: sceneData.timeOfDay || 'UNSPECIFIED',
-    description: sceneData.description || '',
-    characters: sceneData.characters || [],
-    content: sceneData.content || '',
-    pageStart: sceneData.pageStart || 1,
-    pageEnd: sceneData.pageEnd || endPage,
-    duration: Math.max(1, Math.round(pageCount * 1.2)), // Estimate 1.2 minutes per page
-    vfxNeeds: sceneData.vfxNeeds || [],
-    productPlacementOpportunities: sceneData.productPlacementOpportunities || []
-  };
-}
-
-/**
- * Clean and normalize screenplay text
- */
-export function cleanScreenplayText(text: string): string {
-  return text
-    .replace(/\r\n/g, '\n')
-    .replace(/\r/g, '\n')
-    // Remove page numbers and headers/footers
-    .replace(/^\s*\d+\s*$/gm, '')
-    .replace(/^\s*(CONTINUED|CONT'D|MORE)\s*$/gm, '')
-    // Normalize spacing
-    .replace(/\n{4,}/g, '\n\n\n')
-    .replace(/[ \t]{3,}/g, '  ')
-    .trim();
+  return scenes;
 }
