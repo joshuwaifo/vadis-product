@@ -1,0 +1,59 @@
+3:09:09 PM [express] GET /api/dashboard/stats 304 in 256ms :: {"totalProjects":1,"publishedProjects"…
+3:09:10 PM [express] GET /api/projects 200 in 261ms :: [{"id":10,"userId":1,"title":"The Matrix","pr…
+Error deleting project: error: update or delete on table "projects" violates foreign key constraint "project_history_project_id_fkey" on table "project_history"
+    at file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1345:74
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async DatabaseStorage.deleteProject (/home/runner/workspace/server/storage.ts:740:22)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:180:7) {
+  length: 321,
+  severity: 'ERROR',
+  code: '23503',
+  detail: 'Key (id)=(10) is still referenced from table "project_history".',
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: 'public',
+  table: 'project_history',
+  column: undefined,
+  dataType: undefined,
+  constraint: 'project_history_project_id_fkey',
+  file: 'ri_triggers.c',
+  line: '2621',
+  routine: 'ri_ReportViolation'
+}
+Error deleting project: error: update or delete on table "projects" violates foreign key constraint "project_history_project_id_fkey" on table "project_history"
+    at file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1345:74
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async DatabaseStorage.deleteProject (/home/runner/workspace/server/storage.ts:740:22)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:180:7) {
+  length: 321,
+  severity: 'ERROR',
+  code: '23503',
+  detail: 'Key (id)=(10) is still referenced from table "project_history".',
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: 'public',
+  table: 'project_history',
+  column: undefined,
+  dataType: undefined,
+  constraint: 'project_history_project_id_fkey',
+  file: 'ri_triggers.c',
+  line: '2621',
+  routine: 'ri_ReportViolation'
+}
+3:09:17 PM [express] DELETE /api/projects/10 500 in 410ms :: {"error":"Failed to delete project"}
+PDF file received: Pulp Fiction.pdf, Size: 339829 bytes - metadata stored for on-demand analysis
+Script uploaded: Pulp Fiction.pdf, Size: 339829, Content length: 36
+3:09:37 PM [express] POST /api/upload/script 200 in 1432ms :: {"success":true,"content":"PDF_UPLOADE…
+User Action Log - User: 1, Project: 11, Action: project_created { title: 'Pulp Fiction', step: 'project_info' }
+3:09:39 PM [express] POST /api/projects/workflow 200 in 423ms :: {"success":true,"project":{"id":11,…
+3:09:43 PM [express] GET /api/projects/11 200 in 284ms :: {"id":11,"userId":1,"title":"Pulp Fiction"…
+Attempting extraction from stored PDF data
+Warning: Please use the `legacy` build in Node.js environments.
+PDF extraction failed: DOMMatrix is not defined
+3:10:21 PM [express] POST /api/script-analysis/scene_extraction 400 in 519ms :: {"error":"PDF extrac…

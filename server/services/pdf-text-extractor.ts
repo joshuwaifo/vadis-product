@@ -4,7 +4,6 @@
  */
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import * as pdfjsLib from 'pdfjs-dist';
 
 interface PDFExtractionResult {
   text: string;
@@ -13,95 +12,34 @@ interface PDFExtractionResult {
 }
 
 /**
- * Extract text using PDF.js with enhanced text processing
- */
-async function extractWithPDFJS(pdfBuffer: Buffer): Promise<string> {
-  try {
-    console.log('Attempting PDF.js extraction...');
-    
-    // Set up worker path for PDF.js
-    if (typeof pdfjsLib.GlobalWorkerOptions !== 'undefined') {
-      pdfjsLib.GlobalWorkerOptions.workerSrc = 'pdfjs-dist/build/pdf.worker.js';
-    }
-    
-    const loadingTask = pdfjsLib.getDocument({
-      data: new Uint8Array(pdfBuffer),
-      verbosity: 0
-    });
-    
-    const pdf = await loadingTask.promise;
-    let fullText = '';
-    
-    console.log(`PDF has ${pdf.numPages} pages`);
-    
-    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-      const page = await pdf.getPage(pageNum);
-      const textContent = await page.getTextContent();
-      
-      // Extract text items and reconstruct with proper spacing
-      let pageText = '';
-      let lastY = 0;
-      
-      textContent.items.forEach((item: any) => {
-        const currentY = item.transform[5];
-        
-        // Add line breaks for significant Y position changes (new lines)
-        if (lastY !== 0 && Math.abs(currentY - lastY) > 5) {
-          pageText += '\n';
-        }
-        
-        pageText += item.str + ' ';
-        lastY = currentY;
-      });
-      
-      fullText += pageText.trim() + '\n\n';
-      
-      if (pageNum % 10 === 0) {
-        console.log(`Processed ${pageNum}/${pdf.numPages} pages...`);
-      }
-    }
-    
-    console.log(`PDF.js extracted ${fullText.length} characters from ${pdf.numPages} pages`);
-    return fullText.trim();
-    
-  } catch (error) {
-    console.log('PDF.js extraction failed:', error.message);
-    throw error;
-  }
-}
-
-/**
  * Extract text from PDF buffer using multiple methods
  */
 export async function extractTextFromPDF(pdfBuffer: Buffer): Promise<string> {
   console.log(`Starting PDF text extraction from buffer (${pdfBuffer.length} bytes)`);
   
-  // Method 1: Try PDF.js first (most reliable for text extraction)
-  try {
-    const extractedText = await extractWithPDFJS(pdfBuffer);
-    if (extractedText.length > 500) {
-      console.log(`Successfully extracted ${extractedText.length} characters using PDF.js`);
-      return extractedText;
-    }
-  } catch (error) {
-    console.log('PDF.js extraction failed, trying pdf-parse...');
-  }
-  
-  // Method 2: Try pdf-parse as backup
+  // Method 1: Try pdf-parse first (most reliable server-side method)
   try {
     const pdfParse = (await import('pdf-parse')).default;
-    const pdfData = await pdfParse(pdfBuffer);
+    const pdfData = await pdfParse(pdfBuffer, {
+      // Enhanced options for better text extraction
+      normalizeWhitespace: false,
+      disableCombineTextItems: false,
+      max: 0 // Extract all pages
+    });
+    
     const extractedText = pdfData?.text || "";
     
-    if (extractedText.length > 500) {
+    if (extractedText.length > 1000) {
       console.log(`Successfully extracted ${extractedText.length} characters using pdf-parse`);
       return extractedText;
+    } else {
+      console.log(`pdf-parse extracted only ${extractedText.length} characters, trying enhanced method...`);
     }
   } catch (error) {
-    console.log('pdf-parse extraction failed, trying Gemini AI...');
+    console.log('pdf-parse extraction failed:', error.message);
   }
   
-  // Method 3: Use Gemini AI for complex PDFs
+  // Method 2: Use Gemini AI for comprehensive extraction
   try {
     if (!process.env.GEMINI_API_KEY) {
       throw new Error('GEMINI_API_KEY not available');
@@ -115,15 +53,17 @@ export async function extractTextFromPDF(pdfBuffer: Buffer): Promise<string> {
     
     const prompt = `Extract ALL text content from this PDF document completely and accurately. This is a film script/screenplay - extract EVERY scene, dialogue, and stage direction from ALL pages without exception. 
 
-Key requirements:
-- Extract the complete text from every single page
-- Preserve all scene headings (INT./EXT./FADE IN/FADE OUT)
-- Include all character names and dialogue
+CRITICAL REQUIREMENTS:
+- Extract the complete text from every single page (all ${Math.floor(pdfBuffer.length / 1000)} pages estimated)
+- Preserve all scene headings (INT./EXT./FADE IN/FADE OUT/CUT TO)
+- Include all character names and dialogue verbatim
+- Include all stage directions and action descriptions
 - Maintain proper script formatting structure
-- Do not truncate, summarize, or skip any content
-- Output the raw extracted text exactly as it appears
+- Do not truncate, summarize, or skip any content whatsoever
+- Process the entire document from first page to last page
+- Output the raw extracted text exactly as it appears in the PDF
 
-Return only the extracted text content with no additional commentary.`;
+Return ONLY the complete extracted text content with no additional commentary, headers, or explanations.`;
     
     const result = await model.generateContent([
       {
@@ -146,7 +86,7 @@ Return only the extracted text content with no additional commentary.`;
     console.error('Gemini AI extraction failed:', error.message);
   }
   
-  // Method 4: Fallback error
+  // Method 3: Fallback error
   throw new Error('Unable to extract text from PDF using any available method');
 }
 
