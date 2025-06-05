@@ -63,6 +63,10 @@ export const projects = pgTable("projects", {
   scriptFileName: text("script_file_name"), // Original uploaded file name
   scriptFileData: text("script_file_data"), // Base64 encoded PDF data for on-demand extraction
   scriptFileMimeType: text("script_file_mime_type"), // MIME type of uploaded file
+  pdfFileName: text("pdf_file_name"), // PDF file name
+  pdfFileData: text("pdf_file_data"), // Base64 encoded PDF data
+  pdfFileSize: integer("pdf_file_size"), // PDF file size in bytes
+  pdfMimeType: text("pdf_mime_type"), // PDF MIME type
   status: text("status").default("draft"), // draft, in_progress, completed, published
   workflowStatus: text("workflow_status").default("project_info"), // project_info, script_analysis, review_results, finalize_project
   isPublished: boolean("is_published").default(false),
