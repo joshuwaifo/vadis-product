@@ -95,6 +95,7 @@ export default function ScriptGenerationWizard({
 
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();
+      let buffer = '';
 
       if (!reader) {
         throw new Error('No response body');
@@ -103,15 +104,55 @@ export default function ScriptGenerationWizard({
       while (true) {
         const { done, value } = await reader.read();
         
-        if (done) break;
+        if (done) {
+          // Process any remaining buffer content
+          if (buffer.trim()) {
+            try {
+              if (buffer.startsWith('data: ')) {
+                const data = JSON.parse(buffer.slice(6));
+                if (data.type === 'complete') {
+                  setGeneratedScript(data.script);
+                  setStreamedContent(data.script);
+                  setCurrentStep('review');
+                  setIsGenerating(false);
+                  
+                  toast({
+                    title: "Script Generated Successfully",
+                    description: "Your AI-powered screenplay is ready for review.",
+                  });
+                }
+              }
+            } catch (e) {
+              // If buffer parsing fails, still transition to review state if we have content
+              console.log('Final buffer parse failed, transitioning to review anyway');
+              if (streamedContent.length > 0) {
+                setGeneratedScript(streamedContent);
+                setCurrentStep('review');
+                setIsGenerating(false);
+                
+                toast({
+                  title: "Script Generated Successfully",
+                  description: "Your AI-powered screenplay is ready for review.",
+                });
+              }
+            }
+          }
+          break;
+        }
 
-        const chunk = decoder.decode(value);
-        const lines = chunk.split('\n');
+        const chunk = decoder.decode(value, { stream: true });
+        buffer += chunk;
+        
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || ''; // Keep the last incomplete line in buffer
 
         for (const line of lines) {
           if (line.startsWith('data: ')) {
             try {
-              const data = JSON.parse(line.slice(6));
+              const jsonStr = line.slice(6);
+              if (!jsonStr.trim()) continue;
+              
+              const data = JSON.parse(jsonStr);
               
               console.log('Received streaming data:', data.type);
               
@@ -135,6 +176,7 @@ export default function ScriptGenerationWizard({
               }
             } catch (parseError) {
               console.log('Parse error:', parseError, 'for line:', line);
+              // Continue processing other lines even if one fails
             }
           }
         }
@@ -299,6 +341,23 @@ export default function ScriptGenerationWizard({
                 </div>
                 <Progress value={(tokenCount / 32000) * 100} className="h-2" />
               </div>
+
+              {/* Export button when content is available */}
+              {streamedContent.length > 1000 && (
+                <div className="pt-4">
+                  <Button
+                    onClick={() => {
+                      setGeneratedScript(streamedContent);
+                      handleExportPDF();
+                    }}
+                    variant="outline"
+                    className="w-full"
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    Export Current Progress to PDF
+                  </Button>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
