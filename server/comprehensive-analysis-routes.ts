@@ -5,6 +5,80 @@ import { projects, scenes, characters, actorSuggestions, vfxNeeds, productPlacem
 import { eq } from "drizzle-orm";
 
 /**
+ * Basic scene parser as fallback when AI is unavailable
+ */
+function parseBasicScenes(scriptContent: string) {
+  const lines = scriptContent.split('\n');
+  const scenes = [];
+  let currentScene = null;
+  let sceneNumber = 1;
+  
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    
+    // Look for scene headers (INT./EXT. patterns)
+    const sceneHeaderMatch = line.match(/^(INT\.|EXT\.)\s+(.+?)\s*-\s*(.+?)$/i);
+    
+    if (sceneHeaderMatch) {
+      // Save previous scene if exists
+      if (currentScene) {
+        scenes.push({
+          ...currentScene,
+          content: currentScene.content.trim()
+        });
+      }
+      
+      // Start new scene
+      const location = sceneHeaderMatch[2].trim();
+      const timeOfDay = sceneHeaderMatch[3].trim();
+      
+      currentScene = {
+        id: `scene-${sceneNumber}`,
+        sceneNumber: sceneNumber++,
+        location,
+        timeOfDay,
+        description: `Scene at ${location} during ${timeOfDay}`,
+        characters: [],
+        content: line + '\n',
+        pageStart: Math.floor(i / 55) + 1, // Approximate page numbers
+        pageEnd: Math.floor(i / 55) + 1,
+        duration: Math.floor(Math.random() * 5) + 2, // 2-6 minutes
+        vfxNeeds: [],
+        productPlacementOpportunities: []
+      };
+    } else if (currentScene) {
+      // Add content to current scene
+      currentScene.content += line + '\n';
+      
+      // Extract character names (ALL CAPS followed by dialogue)
+      if (line.match(/^[A-Z][A-Z\s]+$/)) {
+        const characterName = line.trim();
+        if (!currentScene.characters.includes(characterName) && characterName.length < 30) {
+          currentScene.characters.push(characterName);
+        }
+      }
+    }
+  }
+  
+  // Add the last scene
+  if (currentScene) {
+    scenes.push({
+      ...currentScene,
+      content: currentScene.content.trim()
+    });
+  }
+  
+  // Update page ranges based on content length
+  scenes.forEach((scene, index) => {
+    const contentLines = scene.content.split('\n').length;
+    scene.pageEnd = scene.pageStart + Math.floor(contentLines / 55);
+    scene.duration = Math.max(2, Math.floor(contentLines / 10)); // Estimate duration from content
+  });
+  
+  return scenes;
+}
+
+/**
  * Comprehensive script analysis routes based on ANNEX C technical roadmap
  * Handles all AI-powered analysis features for the Vadis platform
  */
@@ -28,8 +102,15 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
 
       const scriptContent = project[0].scriptContent;
 
-      // Extract scenes using AI
-      const extractedScenes = await extractScenes(scriptContent);
+      // Extract scenes using AI or fallback to basic parsing
+      let extractedScenes;
+      try {
+        extractedScenes = await extractScenes(scriptContent);
+      } catch (aiError) {
+        console.log('AI extraction failed, using fallback parser:', aiError.message);
+        // Fallback to basic scene parsing
+        extractedScenes = parseBasicScenes(scriptContent);
+      }
       
       // Save scenes to database
       const savedScenes = await Promise.all(
@@ -64,7 +145,15 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
 
     } catch (error) {
       console.error('Scene extraction error:', error);
-      res.status(500).json({ error: 'Failed to extract scenes from script' });
+      console.error('Error details:', {
+        message: error.message,
+        stack: error.stack,
+        projectId
+      });
+      res.status(500).json({ 
+        error: 'Failed to extract scenes from script',
+        details: error.message 
+      });
     }
   });
 
