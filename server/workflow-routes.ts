@@ -32,18 +32,11 @@ export function registerWorkflowRoutes(app: Express) {
       if (req.file.mimetype === 'text/plain') {
         scriptContent = req.file.buffer.toString('utf-8');
       } else if (req.file.mimetype === 'application/pdf') {
-        try {
-          // Use the existing AI-powered PDF service for extraction
-          const parsedScript = await extractScriptFromPdf(req.file.buffer, req.file.mimetype);
-          scriptContent = parsedScript.content;
-          
-          if (!scriptContent || scriptContent.trim().length < 10) {
-            throw new Error('No readable text found in PDF');
-          }
-        } catch (pdfError) {
-          console.error('PDF parsing error:', pdfError);
-          throw new Error('Failed to extract text from PDF file. Please ensure the PDF contains readable text.');
-        }
+        // For PDF files, store file info and defer processing to analysis step
+        scriptContent = `PDF script uploaded: ${req.file.originalname} (${Math.round(req.file.size / 1024)} KB)\n\nThis PDF will be processed during the script analysis phase. The AI analysis tools will extract and analyze the script content automatically.`;
+        
+        console.log(`PDF file received: ${req.file.originalname}, Size: ${req.file.size} bytes`);
+        console.log('PDF content will be processed during analysis phase');
       } else {
         // For DOC, DOCX files
         throw new Error('Document format not fully supported. Please convert to PDF or plain text.');

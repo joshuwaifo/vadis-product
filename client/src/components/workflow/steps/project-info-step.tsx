@@ -319,25 +319,7 @@ export default function ProjectInfoStep({ projectId, onNext, onSave, isLoading }
         </CardContent>
       </Card>
 
-      {/* Script Preview Viewer */}
-      {scriptContent && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Eye className="w-5 h-5" />
-              <span>Script Preview</span>
-              <Badge variant="secondary">{scriptContent.length} characters</Badge>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="bg-white border rounded-lg p-6 max-h-96 overflow-y-auto">
-              <pre className="whitespace-pre-wrap text-sm text-gray-800 font-mono leading-relaxed">
-                {scriptContent.substring(0, 5000)}{scriptContent.length > 5000 && '\n\n... (content continues)'}
-              </pre>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+
 
       {/* Action Buttons */}
       <div className="flex items-center justify-between pt-6">
