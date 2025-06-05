@@ -215,7 +215,7 @@ export default function ProjectWorkflowWizard({
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-6">
+    <div className="w-full p-6 space-y-6">
       {/* Progress Header */}
       <Card>
         <CardHeader>
