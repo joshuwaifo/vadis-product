@@ -17,7 +17,7 @@ interface ExtractedScene {
   content: string;
 }
 
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY!);
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
 async function extractTextFromPdf(fileBuffer: Buffer): Promise<string> {
   try {

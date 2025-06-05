@@ -83,7 +83,7 @@ This is a full-length feature screenplay. Extract the complete text now:`;
     console.error('Single-pass Gemini extraction failed:', error.message);
   }
   
-  // Method 2: Try pdf-parse as fallback
+  // Method 3: Try pdf-parse as final fallback
   try {
     const pdfParse = (await import('pdf-parse')).default;
     const pdfData = await pdfParse(pdfBuffer);
@@ -98,7 +98,7 @@ This is a full-length feature screenplay. Extract the complete text now:`;
     console.log('pdf-parse extraction failed:', error.message);
   }
   
-  // Method 3: Fallback error
+  // Final fallback error
   throw new Error('Unable to extract text from PDF using any available method');
 }
 
