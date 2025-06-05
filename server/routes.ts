@@ -427,6 +427,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Analysis results endpoint for project dashboard
+  app.get("/api/projects/:projectId/analysis-results", async (req, res) => {
+    try {
+      if (!req.session.user) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const projectId = parseInt(req.params.projectId);
+      const project = await storage.getProject(projectId);
+      
+      if (!project) {
+        return res.status(404).json({ error: "Project not found" });
+      }
+
+      if (project.userId !== req.session.user.id) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+
+      // Return empty results for now - in a real implementation this would
+      // fetch stored analysis results from the database
+      res.json({});
+    } catch (error) {
+      console.error("Error fetching analysis results:", error);
+      res.status(500).json({ error: "Failed to fetch analysis results" });
+    }
+  });
+
   // Register script analysis routes
   registerScriptAnalysisRoutes(app);
   registerWorkflowRoutes(app);
