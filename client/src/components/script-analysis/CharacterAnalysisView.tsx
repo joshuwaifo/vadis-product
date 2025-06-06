@@ -108,93 +108,235 @@ export default function CharacterAnalysisView({
     };
   };
 
+  // Advanced positioning algorithm for better character distribution
+  const getAdvancedCharacterPosition = (index: number, total: number, character: Character) => {
+    const svgWidth = 1000;
+    const svgHeight = 600;
+    const padding = 80;
+    
+    // Use force-directed positioning based on character importance
+    if (character.importance === 'lead') {
+      // Place lead characters in the center area
+      const leadIndex = leadCharacters.findIndex(c => c.name === character.name);
+      const leadTotal = leadCharacters.length;
+      const angle = (leadIndex / Math.max(leadTotal, 1)) * 2 * Math.PI;
+      const radius = 120;
+      return {
+        x: svgWidth / 2 + radius * Math.cos(angle),
+        y: svgHeight / 2 + radius * Math.sin(angle)
+      };
+    } else if (character.importance === 'supporting') {
+      // Place supporting characters in a middle ring
+      const supportingIndex = supportingCharacters.findIndex(c => c.name === character.name);
+      const supportingTotal = supportingCharacters.length;
+      const angle = (supportingIndex / Math.max(supportingTotal, 1)) * 2 * Math.PI;
+      const radius = 200;
+      return {
+        x: svgWidth / 2 + radius * Math.cos(angle),
+        y: svgHeight / 2 + radius * Math.sin(angle)
+      };
+    } else {
+      // Place minor characters in outer positions
+      const minorIndex = minorCharacters.findIndex(c => c.name === character.name);
+      const minorTotal = Math.min(minorCharacters.length, 8);
+      const angle = (minorIndex / Math.max(minorTotal, 1)) * 2 * Math.PI;
+      const radius = 280;
+      return {
+        x: Math.max(padding, Math.min(svgWidth - padding, svgWidth / 2 + radius * Math.cos(angle))),
+        y: Math.max(padding, Math.min(svgHeight - padding, svgHeight / 2 + radius * Math.sin(angle)))
+      };
+    }
+  };
+
   const renderNetworkGraph = () => {
-    const mainCharacters = [...leadCharacters, ...supportingCharacters.slice(0, 6)];
+    // Include all significant characters (lead + all supporting, limited minor characters)
+    const allSignificantCharacters = [
+      ...leadCharacters, 
+      ...supportingCharacters,
+      ...minorCharacters.filter(char => char.screenTime > 5).slice(0, 8)
+    ];
     
     return (
       <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border">
-        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-          <Users className="h-5 w-5" />
-          Character Relationship Network
-        </h3>
-        
-        <svg width="100%" height="500" viewBox="0 0 800 500" className="mx-auto">
-          {/* Render relationships first (behind nodes) */}
-          {relationships.map((rel, index) => {
-            const fromIndex = mainCharacters.findIndex(c => c.name === rel.from);
-            const toIndex = mainCharacters.findIndex(c => c.name === rel.to);
-            
-            if (fromIndex === -1 || toIndex === -1) return null;
-            
-            const fromPos = getCharacterPosition(fromIndex, mainCharacters.length);
-            const toPos = getCharacterPosition(toIndex, mainCharacters.length);
-            
-            return (
-              <line
-                key={index}
-                x1={fromPos.x}
-                y1={fromPos.y}
-                x2={toPos.x}
-                y2={toPos.y}
-                stroke={getRelationshipStrengthColor(rel.strength)}
-                strokeWidth={getRelationshipStrengthWidth(rel.strength)}
-                opacity={0.7}
-              />
-            );
-          })}
-          
-          {/* Render character nodes */}
-          {mainCharacters.map((character, index) => {
-            const pos = getCharacterPosition(index, mainCharacters.length);
-            const isSelected = selectedCharacter?.name === character.name;
-            
-            return (
-              <g key={character.name}>
-                <circle
-                  cx={pos.x}
-                  cy={pos.y}
-                  r={character.importance === 'lead' ? 25 : 20}
-                  className={`cursor-pointer transition-all ${
-                    isSelected 
-                      ? 'fill-blue-600 stroke-blue-800 stroke-2' 
-                      : 'fill-blue-400 hover:fill-blue-500 stroke-blue-600 stroke-1'
-                  }`}
-                  onClick={() => setSelectedCharacter(character)}
-                />
-                <text
-                  x={pos.x}
-                  y={pos.y - 35}
-                  textAnchor="middle"
-                  className="text-sm font-medium fill-gray-700 dark:fill-gray-300 cursor-pointer"
-                  onClick={() => setSelectedCharacter(character)}
-                >
-                  {character.name.split(' ')[0]}
-                </text>
-              </g>
-            );
-          })}
-        </svg>
-        
-        <div className="mt-4 text-sm text-gray-600 dark:text-gray-400">
-          <div className="flex items-center gap-4 justify-center">
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-0.5 bg-red-500"></div>
-              <span>Strong (8-10)</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-0.5 bg-orange-500"></div>
-              <span>Medium (6-7)</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-0.5 bg-yellow-500"></div>
-              <span>Weak (4-5)</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-0.5 bg-gray-400"></div>
-              <span>Minimal (1-3)</span>
-            </div>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold flex items-center gap-2">
+            <Users className="h-5 w-5" />
+            Character Relationship Network
+          </h3>
+          <div className="text-sm text-gray-500">
+            {allSignificantCharacters.length} characters • {relationships.length} relationships
           </div>
         </div>
+        
+        {allSignificantCharacters.length === 0 ? (
+          <div className="text-center py-12 text-gray-500">
+            <Users className="h-12 w-12 mx-auto mb-3 opacity-50" />
+            <p>No character relationships found</p>
+          </div>
+        ) : (
+          <div className="relative">
+            <svg width="100%" height="600" viewBox="0 0 1000 600" className="mx-auto border rounded-lg bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-900 dark:to-gray-800">
+              {/* Background grid */}
+              <defs>
+                <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
+                  <path d="M 50 0 L 0 0 0 50" fill="none" stroke="#e5e7eb" strokeWidth="1" opacity="0.3"/>
+                </pattern>
+              </defs>
+              <rect width="100%" height="100%" fill="url(#grid)" />
+              
+              {/* Render relationships first (behind nodes) */}
+              {relationships.map((rel, index) => {
+                const fromIndex = allSignificantCharacters.findIndex(c => c.name === rel.from);
+                const toIndex = allSignificantCharacters.findIndex(c => c.name === rel.to);
+                
+                if (fromIndex === -1 || toIndex === -1) return null;
+                
+                const fromPos = getAdvancedCharacterPosition(fromIndex, allSignificantCharacters.length, allSignificantCharacters[fromIndex]);
+                const toPos = getAdvancedCharacterPosition(toIndex, allSignificantCharacters.length, allSignificantCharacters[toIndex]);
+                
+                return (
+                  <g key={index}>
+                    <line
+                      x1={fromPos.x}
+                      y1={fromPos.y}
+                      x2={toPos.x}
+                      y2={toPos.y}
+                      stroke={getRelationshipStrengthColor(rel.strength)}
+                      strokeWidth={getRelationshipStrengthWidth(rel.strength)}
+                      opacity={0.8}
+                      strokeDasharray={rel.strength < 4 ? "5,5" : "none"}
+                    />
+                    {/* Relationship label */}
+                    <text
+                      x={(fromPos.x + toPos.x) / 2}
+                      y={(fromPos.y + toPos.y) / 2}
+                      textAnchor="middle"
+                      className="text-xs fill-gray-600 dark:fill-gray-400 pointer-events-none"
+                      opacity={rel.strength >= 6 ? 0.8 : 0.5}
+                    >
+                      {rel.type}
+                    </text>
+                  </g>
+                );
+              })}
+              
+              {/* Render character nodes */}
+              {allSignificantCharacters.map((character, index) => {
+                const pos = getAdvancedCharacterPosition(index, allSignificantCharacters.length, character);
+                const isSelected = selectedCharacter?.name === character.name;
+                const nodeSize = character.importance === 'lead' ? 35 : character.importance === 'supporting' ? 28 : 20;
+                
+                return (
+                  <g key={character.name}>
+                    {/* Node shadow */}
+                    <circle
+                      cx={pos.x + 2}
+                      cy={pos.y + 2}
+                      r={nodeSize}
+                      fill="rgba(0,0,0,0.1)"
+                    />
+                    
+                    {/* Main node */}
+                    <circle
+                      cx={pos.x}
+                      cy={pos.y}
+                      r={nodeSize}
+                      className={`cursor-pointer transition-all ${
+                        isSelected 
+                          ? 'fill-blue-600 stroke-blue-800 stroke-3' 
+                          : character.importance === 'lead'
+                            ? 'fill-yellow-400 hover:fill-yellow-500 stroke-yellow-600 stroke-2'
+                            : character.importance === 'supporting'
+                              ? 'fill-blue-400 hover:fill-blue-500 stroke-blue-600 stroke-2'
+                              : 'fill-gray-400 hover:fill-gray-500 stroke-gray-600 stroke-1'
+                      }`}
+                      onClick={() => setSelectedCharacter(character)}
+                    />
+                    
+                    {/* Character name */}
+                    <text
+                      x={pos.x}
+                      y={pos.y - nodeSize - 8}
+                      textAnchor="middle"
+                      className="text-xs font-medium fill-gray-700 dark:fill-gray-300 cursor-pointer"
+                      onClick={() => setSelectedCharacter(character)}
+                    >
+                      {character.name.length > 12 ? 
+                        character.name.split(' ')[0] : 
+                        character.name
+                      }
+                    </text>
+                    
+                    {/* Screen time indicator */}
+                    <text
+                      x={pos.x}
+                      y={pos.y + 5}
+                      textAnchor="middle"
+                      className="text-xs fill-white font-medium pointer-events-none"
+                    >
+                      {character.screenTime}m
+                    </text>
+                    
+                    {/* Importance indicator */}
+                    {character.importance === 'lead' && (
+                      <text
+                        x={pos.x + nodeSize - 5}
+                        y={pos.y - nodeSize + 10}
+                        textAnchor="middle"
+                        className="text-xs fill-yellow-600"
+                      >
+                        ★
+                      </text>
+                    )}
+                  </g>
+                );
+              })}
+            </svg>
+            
+            {/* Enhanced legend */}
+            <div className="mt-6 grid grid-cols-2 gap-6">
+              <div>
+                <h4 className="font-medium mb-3">Relationship Strength</h4>
+                <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-0.5 bg-red-500"></div>
+                    <span>Strong (8-10) - Core relationships</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-0.5 bg-orange-500"></div>
+                    <span>Medium (6-7) - Important dynamics</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-0.5 bg-yellow-500"></div>
+                    <span>Weak (4-5) - Minor interactions</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-1 bg-gray-400 border-dashed border border-gray-300"></div>
+                    <span>Minimal (1-3) - Brief encounters</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div>
+                <h4 className="font-medium mb-3">Character Importance</h4>
+                <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-yellow-400 rounded-full border-2 border-yellow-600"></div>
+                    <span>Lead Characters ★</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-blue-400 rounded-full border-2 border-blue-600"></div>
+                    <span>Supporting Characters</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-gray-400 rounded-full border border-gray-600"></div>
+                    <span>Minor Characters (5+ min screen time)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   };
