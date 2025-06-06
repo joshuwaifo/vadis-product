@@ -116,33 +116,33 @@ export default function CharacterAnalysisView({
     const centerY = svgHeight / 2;
     const padding = 100;
     
-    // Use circular positioning with different radii for character importance
+    // Use circular positioning with increased radii for better spacing
     if (character.importance === 'lead') {
-      // Place lead characters in inner circle
+      // Place lead characters in inner circle with more spacing
       const leadIndex = leadCharacters.findIndex(c => c.name === character.name);
       const leadTotal = leadCharacters.length;
       const angle = (leadIndex / Math.max(leadTotal, 1)) * 2 * Math.PI - Math.PI / 2;
-      const radius = 120;
+      const radius = 150; // Increased from 120
       return {
         x: centerX + radius * Math.cos(angle),
         y: centerY + radius * Math.sin(angle)
       };
     } else if (character.importance === 'supporting') {
-      // Place supporting characters in middle circle
+      // Place supporting characters in middle circle with more spacing
       const supportingIndex = supportingCharacters.findIndex(c => c.name === character.name);
       const supportingTotal = supportingCharacters.length;
       const angle = (supportingIndex / Math.max(supportingTotal, 1)) * 2 * Math.PI - Math.PI / 2;
-      const radius = 200;
+      const radius = 280; // Increased from 200
       return {
         x: centerX + radius * Math.cos(angle),
         y: centerY + radius * Math.sin(angle)
       };
     } else {
-      // Place minor characters in outer circle
+      // Place minor characters in outer circle with more spacing
       const minorIndex = minorCharacters.findIndex(c => c.name === character.name);
       const minorTotal = Math.min(minorCharacters.length, 8);
       const angle = (minorIndex / Math.max(minorTotal, 1)) * 2 * Math.PI - Math.PI / 2;
-      const radius = 270;
+      const radius = 380; // Increased from 270
       return {
         x: Math.max(padding, Math.min(svgWidth - padding, centerX + radius * Math.cos(angle))),
         y: Math.max(padding, Math.min(svgHeight - padding, centerY + radius * Math.sin(angle)))
