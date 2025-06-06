@@ -648,28 +648,13 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
                     }`}
                     onClick={() => setSelectedTask(task.id)}
                   >
-                    <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <task.icon className="h-4 w-4 text-gray-600 dark:text-gray-400" />
                         <span className="text-sm font-medium">{task.title}</span>
                       </div>
                       {getStatusIcon(task.status)}
                     </div>
-                    
-                    <Button
-                      size="sm"
-                      variant={task.status === 'completed' ? 'default' : 'outline'}
-                      className="w-full text-xs"
-                      disabled={task.status === 'in_progress' || analysisInProgress}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        runAnalysis(task.id);
-                      }}
-                    >
-                      {task.status === 'in_progress' && <Loader2 className="h-3 w-3 animate-spin mr-1" />}
-                      {task.status === 'completed' ? 'Reanalyze' : 
-                       task.status === 'in_progress' ? 'Processing...' : 'Start Analysis'}
-                    </Button>
                   </div>
                 ))}
               </div>
