@@ -667,7 +667,7 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
                       }}
                     >
                       {task.status === 'in_progress' && <Loader2 className="h-3 w-3 animate-spin mr-1" />}
-                      {task.status === 'completed' ? 'View Results' : 
+                      {task.status === 'completed' ? 'Reanalyze' : 
                        task.status === 'in_progress' ? 'Processing...' : 'Start Analysis'}
                     </Button>
                   </div>
