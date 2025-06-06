@@ -108,57 +108,45 @@ export default function CharacterAnalysisView({
     };
   };
 
-  // Advanced positioning algorithm for better character distribution
+  // Advanced positioning algorithm with circular arrangement for better spacing
   const getAdvancedCharacterPosition = (index: number, total: number, character: Character) => {
     const svgWidth = 1000;
     const svgHeight = 600;
+    const centerX = svgWidth / 2;
+    const centerY = svgHeight / 2;
     const padding = 100;
     
-    // Strategic positioning for optimal connection line visibility
+    // Use circular positioning with different radii for character importance
     if (character.importance === 'lead') {
+      // Place lead characters in inner circle
       const leadIndex = leadCharacters.findIndex(c => c.name === character.name);
       const leadTotal = leadCharacters.length;
-      
-      // Arrange lead characters in a line or strategic positions
-      if (leadTotal === 1) {
-        return { x: svgWidth / 2, y: svgHeight / 2 };
-      } else if (leadTotal === 2) {
-        return leadIndex === 0 
-          ? { x: svgWidth / 3, y: svgHeight / 2 }
-          : { x: (2 * svgWidth) / 3, y: svgHeight / 2 };
-      } else {
-        // For 3+ leads, use a triangular arrangement
-        const angle = (leadIndex / leadTotal) * 2 * Math.PI - Math.PI / 2;
-        const radius = 80;
-        return {
-          x: svgWidth / 2 + radius * Math.cos(angle),
-          y: svgHeight / 2 + radius * Math.sin(angle)
-        };
-      }
+      const angle = (leadIndex / Math.max(leadTotal, 1)) * 2 * Math.PI - Math.PI / 2;
+      const radius = 120;
+      return {
+        x: centerX + radius * Math.cos(angle),
+        y: centerY + radius * Math.sin(angle)
+      };
     } else if (character.importance === 'supporting') {
-      // Place supporting characters in strategic outer ring
+      // Place supporting characters in middle circle
       const supportingIndex = supportingCharacters.findIndex(c => c.name === character.name);
       const supportingTotal = supportingCharacters.length;
       const angle = (supportingIndex / Math.max(supportingTotal, 1)) * 2 * Math.PI - Math.PI / 2;
-      const radius = 180;
+      const radius = 200;
       return {
-        x: Math.max(padding, Math.min(svgWidth - padding, svgWidth / 2 + radius * Math.cos(angle))),
-        y: Math.max(padding, Math.min(svgHeight - padding, svgHeight / 2 + radius * Math.sin(angle)))
+        x: centerX + radius * Math.cos(angle),
+        y: centerY + radius * Math.sin(angle)
       };
     } else {
-      // Place minor characters in corners and edges for clear separation
+      // Place minor characters in outer circle
       const minorIndex = minorCharacters.findIndex(c => c.name === character.name);
-      const positions = [
-        { x: 150, y: 120 },                    // Top-left
-        { x: svgWidth - 150, y: 120 },         // Top-right
-        { x: 150, y: svgHeight - 120 },        // Bottom-left
-        { x: svgWidth - 150, y: svgHeight - 120 }, // Bottom-right
-        { x: svgWidth / 2, y: 80 },            // Top-center
-        { x: svgWidth / 2, y: svgHeight - 80 }, // Bottom-center
-        { x: 80, y: svgHeight / 2 },           // Left-center
-        { x: svgWidth - 80, y: svgHeight / 2 }  // Right-center
-      ];
-      return positions[minorIndex % positions.length];
+      const minorTotal = Math.min(minorCharacters.length, 8);
+      const angle = (minorIndex / Math.max(minorTotal, 1)) * 2 * Math.PI - Math.PI / 2;
+      const radius = 270;
+      return {
+        x: Math.max(padding, Math.min(svgWidth - padding, centerX + radius * Math.cos(angle))),
+        y: Math.max(padding, Math.min(svgHeight - padding, centerY + radius * Math.sin(angle)))
+      };
     }
   };
 
