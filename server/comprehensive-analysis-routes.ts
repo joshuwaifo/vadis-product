@@ -257,6 +257,10 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
       // Use proper scene extraction workflow based on demo app
       console.log(`Processing script content of ${scriptContent.length} characters`);
       
+      // Clear existing scenes for this project to prevent duplication
+      await db.delete(scenes).where(eq(scenes.projectId, parseInt(projectId)));
+      console.log(`Cleared existing scenes for project ${projectId}`);
+
       // Import the enhanced scene extractor for comprehensive processing
       const { extractScenesWithChunking } = await import('./services/enhanced-scene-extractor');
       const analysisResult = await extractScenesWithChunking(scriptContent);
@@ -371,6 +375,10 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
           message: 'Please ensure your script contains adequate character dialogue and descriptions.'
         });
       }
+
+      // Clear existing characters for this project to prevent duplication
+      await db.delete(characters).where(eq(characters.projectId, parseInt(projectId)));
+      console.log(`Cleared existing characters for project ${projectId}`);
 
       // Get existing scenes for this project to use in character analysis
       const existingScenes = await db
