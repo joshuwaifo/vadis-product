@@ -304,20 +304,28 @@ export async function suggestActors(
   scriptTitle: string = 'Untitled Script',
   provider: AIProvider = 'gpt-4o'
 ): Promise<CastingAnalysis> {
+  // Prioritize lead and supporting characters, but include all characters
+  const prioritizedCharacters = characters.sort((a, b) => {
+    const importanceOrder = { 'lead': 0, 'supporting': 1, 'minor': 2 };
+    return importanceOrder[a.importance] - importanceOrder[b.importance];
+  });
+
   const prompt = `
-You are an expert casting director AI. Based on the provided character analysis data (including demographics, relationships, personality traits, and story arcs), suggest optimal casting choices for each character.
+You are an expert casting director AI. Based on the provided character analysis data, suggest optimal casting choices for ALL characters listed below.
+
+**CRITICAL REQUIREMENT: You MUST provide casting suggestions for ALL ${characters.length} characters. Do not skip any character.**
 
 **Character Analysis Data:**
 Script Title: ${scriptTitle}
-Characters: ${JSON.stringify(characters, null, 2)}
+Characters (ALL MUST BE CAST): ${JSON.stringify(prioritizedCharacters, null, 2)}
 Relationships: ${JSON.stringify(relationships, null, 2)}
 
 **Your Task:**
-1. Analyze each character's profile (age, personality, relationships, story importance)
+1. Analyze EVERY character's profile (age, personality, relationships, story importance)
 2. Consider character dynamics and on-screen chemistry requirements
-3. Provide casting recommendations with detailed justifications
+3. Provide casting recommendations with detailed justifications for ALL ${characters.length} characters
 
-**For Each Character, Provide:**
+**For EACH AND EVERY Character, Provide:**
 
 **PRIMARY RECOMMENDATION:**
 - Actor Name & Brief Bio (2-3 sentences about their career/style)
@@ -341,41 +349,43 @@ For each alternative:
 - Note any potential on-screen chemistry based on past collaborations or similar projects
 - Overall ensemble rationale
 
-Return as JSON with this exact structure:
+**MANDATORY: Create an entry for EVERY character listed above. The response must include exactly ${characters.length} character suggestions.**
+
+Return as JSON with this exact structure, ensuring ALL characters are included:
 {
   "scriptTitle": "${scriptTitle}",
   "characterSuggestions": [
-    {
-      "characterName": "CHARACTER_NAME",
+    ${prioritizedCharacters.map(char => `{
+      "characterName": "${char.name}",
       "primaryChoice": {
-        "actorName": "Actor Name",
-        "bio": "Brief 2-3 sentence bio about their career and acting style",
-        "fitAnalysis": "Detailed analysis of why they fit this character perfectly",
-        "chemistryFactor": "How they work with other characters/actors in this story",
-        "recentWork": ["Recent Film 1", "Recent Film 2", "Recent Film 3"],
-        "fitScore": 95,
-        "availability": "Available 2024",
-        "estimatedFee": "$3-5M"
+        "actorName": "[Actor Name for ${char.name}]",
+        "bio": "Brief bio about their career and acting style",
+        "fitAnalysis": "Why this actor suits ${char.name}",
+        "chemistryFactor": "How they work with other characters",
+        "recentWork": ["Recent work 1", "Recent work 2", "Recent work 3"],
+        "fitScore": [score 1-100],
+        "availability": "Available [year]",
+        "estimatedFee": "$[amount]"
       },
       "alternatives": [
         {
-          "actorName": "Alternative Actor 1",
-          "age": 35,
-          "strengthsForRole": "What makes them good for this role",
-          "potentialChemistry": "How they'd work with the ensemble",
-          "notableWork": ["Notable Film 1", "Notable Film 2"],
-          "fitScore": 88,
+          "actorName": "[Alternative actor name]",
+          "age": [age],
+          "strengthsForRole": "Strengths for ${char.name}",
+          "potentialChemistry": "Chemistry with ensemble",
+          "notableWork": ["Notable work 1", "Notable work 2"],
+          "fitScore": [score],
           "availability": "Available",
-          "estimatedFee": "$2-4M"
+          "estimatedFee": "$[amount]"
         }
       ]
-    }
+    }`).join(',\n    ')}
   ],
   "ensembleChemistry": {
     "keyRelationships": [
       {
         "characters": ["Character A", "Character B"],
-        "relationshipType": "romantic/family/antagonistic/partnership",
+        "relationshipType": "relationship type",
         "chemistryAnalysis": "Why these actors work well together",
         "primaryActors": ["Actor A", "Actor B"]
       }
@@ -386,6 +396,8 @@ Return as JSON with this exact structure:
 }
 
 Focus on current, relevant actors (active in 2020s), realistic availability, and authentic chemistry analysis based on their acting styles and past work.
+
+**REMINDER: You must provide casting suggestions for ALL ${characters.length} characters: ${prioritizedCharacters.map(c => c.name).join(', ')}**
   `;
 
   try {
