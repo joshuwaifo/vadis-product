@@ -367,27 +367,27 @@ export default function CharacterAnalysisView({
                     <h4 className="font-medium mb-2">Demographics</h4>
                     <div className="grid grid-cols-2 gap-3 text-sm">
                       <div>
-                        <span className="text-gray-500">Age:</span> {selectedCharacter.demographics.ageRange}
+                        <span className="text-gray-500">Age:</span> {selectedCharacter.demographics?.ageRange || selectedCharacter.age || 'Unknown'}
                       </div>
                       <div>
-                        <span className="text-gray-500">Gender:</span> {selectedCharacter.demographics.gender}
+                        <span className="text-gray-500">Gender:</span> {selectedCharacter.demographics?.gender || selectedCharacter.gender || 'Unknown'}
                       </div>
-                      {selectedCharacter.demographics.ethnicity && (
+                      {selectedCharacter.demographics?.ethnicity && (
                         <div>
                           <span className="text-gray-500">Ethnicity:</span> {selectedCharacter.demographics.ethnicity}
                         </div>
                       )}
-                      {selectedCharacter.demographics.occupation && (
+                      {(selectedCharacter.demographics?.occupation || (selectedCharacter as any).occupation) && (
                         <div>
-                          <span className="text-gray-500">Occupation:</span> {selectedCharacter.demographics.occupation}
+                          <span className="text-gray-500">Occupation:</span> {selectedCharacter.demographics?.occupation || (selectedCharacter as any).occupation}
                         </div>
                       )}
-                      {selectedCharacter.demographics.socioeconomicStatus && (
+                      {selectedCharacter.demographics?.socioeconomicStatus && (
                         <div>
                           <span className="text-gray-500">Class:</span> {selectedCharacter.demographics.socioeconomicStatus}
                         </div>
                       )}
-                      {selectedCharacter.demographics.education && (
+                      {selectedCharacter.demographics?.education && (
                         <div>
                           <span className="text-gray-500">Education:</span> {selectedCharacter.demographics.education}
                         </div>
