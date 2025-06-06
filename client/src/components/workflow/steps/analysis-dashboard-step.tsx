@@ -386,28 +386,7 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
           </div>
         );
 
-      case 'storyboard_view':
-        return (
-          <div className="space-y-6">
-            <div className="text-center">
-              <h3 className="text-xl font-semibold mb-4">Storyboard View</h3>
-              <p className="text-muted-foreground mb-6">
-                Visual representation of all scenes in your script
-              </p>
-              
-              {/* Storyboard grid would go here */}
-              <div className="bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-950/30 dark:to-indigo-900/30 rounded-xl p-8 border-2 border-dashed border-blue-200 dark:border-blue-800">
-                <Maximize2 className="h-16 w-16 text-blue-500 mx-auto mb-4" />
-                <h4 className="text-lg font-semibold text-blue-700 dark:text-blue-300 mb-2">
-                  Storyboard Feature Coming Soon
-                </h4>
-                <p className="text-blue-600 dark:text-blue-400">
-                  Visual storyboard representation will be available here
-                </p>
-              </div>
-            </div>
-          </div>
-        );
+
       
       default:
         return (
