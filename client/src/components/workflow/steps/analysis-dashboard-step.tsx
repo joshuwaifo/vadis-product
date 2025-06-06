@@ -173,12 +173,46 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
           ? { ...task, status: 'completed' as const, completedAt: new Date() }
           : task
       ));
+      
+      // Convert character relationships to network graph format
+      const networkRelationships: any[] = [];
+      const relationshipExplanations: string[] = [];
+      
+      existingCharacters.forEach((char: any) => {
+        if (char.relationships && Array.isArray(char.relationships)) {
+          char.relationships.forEach((rel: any) => {
+            // Create bidirectional relationship for network graph
+            const networkRel = {
+              from: char.name,
+              to: rel.character,
+              type: rel.relationship,
+              strength: rel.strength || 5,
+              description: `${char.name} and ${rel.character}: ${rel.relationship}`
+            };
+            
+            // Avoid duplicate relationships
+            const exists = networkRelationships.some(r => 
+              (r.from === networkRel.from && r.to === networkRel.to) ||
+              (r.from === networkRel.to && r.to === networkRel.from)
+            );
+            
+            if (!exists) {
+              networkRelationships.push(networkRel);
+              relationshipExplanations.push(
+                `${char.name} has a ${rel.relationship} relationship with ${rel.character} (strength: ${rel.strength}/10)`
+              );
+            }
+          });
+        }
+      });
+      
       setAnalysisResults(prev => ({
         ...prev,
         character_analysis: {
           success: true,
           characters: existingCharacters,
-          relationships: existingCharacters.flatMap((char: any) => char.relationships || []),
+          relationships: networkRelationships,
+          relationshipExplanations: relationshipExplanations,
           totalCharacters: existingCharacters.length
         }
       }));
