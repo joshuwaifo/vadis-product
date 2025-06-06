@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
-
+import StoryboardSceneView from '@/components/script/StoryboardSceneView';
 
 // Define types directly in this file since the server types are not accessible from client
 interface AnalysisTask {
@@ -34,7 +34,14 @@ const ANALYSIS_TASKS: AnalysisTask[] = [
     icon: Film,
     estimatedTime: '2-3 min'
   },
-
+  {
+    id: 'storyboard_view',
+    title: 'Storyboard View',
+    description: 'Visual storyboard representation of all scenes',
+    status: 'not_started',
+    icon: Maximize2,
+    estimatedTime: '1-2 min'
+  },
   {
     id: 'character_analysis',
     title: 'Character Analysis',
@@ -107,7 +114,7 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
   const [tasks, setTasks] = useState<AnalysisTask[]>([...ANALYSIS_TASKS]);
   const [selectedTask, setSelectedTask] = useState<string | null>(null);
   const [analysisResults, setAnalysisResults] = useState<Record<string, any>>({});
-
+  const [showStoryboard, setShowStoryboard] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -344,7 +351,15 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
                 </div>
               </div>
               
-
+              {results.scenes && results.scenes.length > 0 && (
+                <Button 
+                  onClick={() => setShowStoryboard(true)}
+                  className="ml-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-3"
+                >
+                  <Maximize2 className="h-4 w-4 mr-2" />
+                  Storyboard View
+                </Button>
+              )}
             </div>
 
             {results.scenes && results.scenes.length > 0 && (
@@ -386,7 +401,29 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
           </div>
         );
 
-
+      case 'storyboard_view':
+        return (
+          <div className="space-y-6">
+            <div className="text-center">
+              <h3 className="text-xl font-semibold mb-4">Storyboard View</h3>
+              <p className="text-muted-foreground mb-6">
+                Visual representation of all scenes in your script
+              </p>
+              
+              {/* Storyboard grid would go here */}
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-950/30 dark:to-indigo-900/30 rounded-xl p-8 border-2 border-dashed border-blue-200 dark:border-blue-800">
+                <Maximize2 className="h-16 w-16 text-blue-500 mx-auto mb-4" />
+                <h4 className="text-lg font-semibold text-blue-700 dark:text-blue-300 mb-2">
+                  Storyboard Feature Coming Soon
+                </h4>
+                <p className="text-blue-600 dark:text-blue-400">
+                  Visual storyboard representation will be available here
+                </p>
+              </div>
+            </div>
+          </div>
+        );
+      
       default:
         return (
           <div className="bg-gray-50 p-4 rounded-lg">
@@ -402,7 +439,16 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
   const totalTasks = tasks.length;
   const progressPercentage = (completedTasks / totalTasks) * 100;
 
-
+  // Show storyboard view if enabled
+  if (showStoryboard && selectedTask === 'scene_extraction' && analysisResults.scene_extraction?.scenes) {
+    return (
+      <StoryboardSceneView
+        scenes={analysisResults.scene_extraction.scenes}
+        onClose={() => setShowStoryboard(false)}
+        projectTitle={project?.title || 'Script Analysis'}
+      />
+    );
+  }
 
   return (
     <div className="w-full min-h-screen bg-gray-50 dark:bg-gray-900">
