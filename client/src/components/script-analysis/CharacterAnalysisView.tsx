@@ -398,11 +398,15 @@ export default function CharacterAnalysisView({
                   <div>
                     <h4 className="font-medium mb-2">Personality Traits</h4>
                     <div className="flex flex-wrap gap-2">
-                      {selectedCharacter.personality.map((trait) => (
-                        <Badge key={trait} variant="outline">
-                          {trait}
-                        </Badge>
-                      ))}
+                      {selectedCharacter.personality && selectedCharacter.personality.length > 0 ? (
+                        selectedCharacter.personality.map((trait) => (
+                          <Badge key={trait} variant="outline">
+                            {trait}
+                          </Badge>
+                        ))
+                      ) : (
+                        <span className="text-sm text-gray-500">No personality traits available</span>
+                      )}
                     </div>
                   </div>
 
@@ -413,7 +417,7 @@ export default function CharacterAnalysisView({
                     </p>
                   </div>
 
-                  {selectedCharacter.relationships.length > 0 && (
+                  {selectedCharacter.relationships && selectedCharacter.relationships.length > 0 && (
                     <div>
                       <h4 className="font-medium mb-2">Key Relationships</h4>
                       <div className="space-y-2">
