@@ -83,25 +83,25 @@ export default function CharacterAnalysisView({
   };
 
   const getRelationshipStrengthColor = (strength: number) => {
-    if (strength >= 8) return 'stroke-red-500';
-    if (strength >= 6) return 'stroke-orange-500';
-    if (strength >= 4) return 'stroke-yellow-500';
-    return 'stroke-gray-400';
+    if (strength >= 8) return '#ef4444'; // red-500
+    if (strength >= 6) return '#f97316'; // orange-500
+    if (strength >= 4) return '#eab308'; // yellow-500
+    return '#9ca3af'; // gray-400
   };
 
   const getRelationshipStrengthWidth = (strength: number) => {
-    if (strength >= 8) return 'stroke-[4px]';
-    if (strength >= 6) return 'stroke-[3px]';
-    if (strength >= 4) return 'stroke-[2px]';
-    return 'stroke-[1px]';
+    if (strength >= 8) return 4;
+    if (strength >= 6) return 3;
+    if (strength >= 4) return 2;
+    return 1;
   };
 
   // Simple network graph positioning
   const getCharacterPosition = (index: number, total: number) => {
     const angle = (index / total) * 2 * Math.PI;
-    const radius = 120;
-    const centerX = 200;
-    const centerY = 150;
+    const radius = 180;
+    const centerX = 400;
+    const centerY = 250;
     return {
       x: centerX + radius * Math.cos(angle),
       y: centerY + radius * Math.sin(angle)
@@ -118,7 +118,7 @@ export default function CharacterAnalysisView({
           Character Relationship Network
         </h3>
         
-        <svg width="400" height="300" className="mx-auto">
+        <svg width="100%" height="500" viewBox="0 0 800 500" className="mx-auto">
           {/* Render relationships first (behind nodes) */}
           {relationships.map((rel, index) => {
             const fromIndex = mainCharacters.findIndex(c => c.name === rel.from);
@@ -136,7 +136,8 @@ export default function CharacterAnalysisView({
                 y1={fromPos.y}
                 x2={toPos.x}
                 y2={toPos.y}
-                className={`${getRelationshipStrengthColor(rel.strength)} ${getRelationshipStrengthWidth(rel.strength)}`}
+                stroke={getRelationshipStrengthColor(rel.strength)}
+                strokeWidth={getRelationshipStrengthWidth(rel.strength)}
                 opacity={0.7}
               />
             );
@@ -459,12 +460,14 @@ export default function CharacterAnalysisView({
       )}
 
       {viewMode === 'graph' && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div>
+        <div className="space-y-6">
+          {/* Network Graph - Full Width */}
+          <div className="w-full">
             {renderNetworkGraph()}
           </div>
           
-          <div className="space-y-4">
+          {/* Relationship Explanations - Full Width */}
+          <div className="w-full">
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg">Relationship Explanations</CardTitle>
