@@ -480,7 +480,13 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-                  {results.scenes.map((scene: any, index: number) => (
+                  {results.scenes
+                    .sort((a: any, b: any) => {
+                      const aNum = parseInt(a.sceneNumber) || 0;
+                      const bNum = parseInt(b.sceneNumber) || 0;
+                      return aNum - bNum;
+                    })
+                    .map((scene: any, index: number) => (
                     <Card key={index} className="h-48 hover:shadow-md transition-shadow cursor-pointer border border-gray-200 dark:border-gray-700">
                       <CardContent className="p-4 h-full flex flex-col">
                         <div className="flex items-center justify-between mb-2">
