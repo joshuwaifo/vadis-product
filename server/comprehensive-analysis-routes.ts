@@ -426,11 +426,22 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
     }
   });
 
-  // AI Casting Director
+  // AI Casting Director - Enhanced with comprehensive analysis
   app.post('/api/script-analysis/casting_suggestions', async (req: Request, res: Response) => {
     try {
-      const { projectId, scriptContent } = req.body;
+      const { projectId } = req.body;
+      console.log(`Starting casting analysis for project ${projectId}`);
       
+      // Get project details
+      const project = await db
+        .select()
+        .from(projects)
+        .where(eq(projects.id, parseInt(projectId)));
+
+      if (!project.length) {
+        return res.status(404).json({ error: 'Project not found' });
+      }
+
       // Get existing characters for this project
       const projectCharacters = await db
         .select()
@@ -438,20 +449,45 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
         .where(eq(characters.projectId, parseInt(projectId)));
 
       if (projectCharacters.length === 0) {
-        return res.status(400).json({ error: 'No characters found. Please run character analysis first.' });
+        return res.status(400).json({ 
+          error: 'No characters found for casting analysis', 
+          message: 'Please run character analysis first to generate casting suggestions.',
+          requiresCharacterAnalysis: true
+        });
       }
 
-      const castingSuggestions = await suggestActors(projectCharacters, scriptContent);
+      console.log(`Found ${projectCharacters.length} characters for casting analysis`);
+
+      // Get character relationships data (assuming it's stored or can be retrieved)
+      const relationships = projectCharacters.flatMap(char => 
+        char.relationships || []
+      );
+
+      // Perform comprehensive casting analysis
+      const { suggestActors } = await import('./script-analysis-agents');
+      const castingAnalysis = await suggestActors(
+        projectCharacters as any[], 
+        relationships,
+        project[0].title || 'Untitled Script',
+        'gpt-4o'
+      );
       
-      // Save casting suggestions
+      console.log(`Casting analysis complete for ${castingAnalysis.characterSuggestions.length} characters`);
+
+      // Save casting suggestions to database
       const savedSuggestions = await Promise.all(
-        castingSuggestions.map(async (suggestion) => {
+        castingAnalysis.characterSuggestions.map(async (suggestion) => {
           const [saved] = await db
             .insert(actorSuggestions)
             .values({
               projectId: parseInt(projectId),
               characterName: suggestion.characterName,
-              suggestions: suggestion.suggestions
+              actorName: suggestion.primaryChoice.actorName,
+              reasoning: suggestion.primaryChoice.fitAnalysis,
+              fitScore: suggestion.primaryChoice.fitScore,
+              availability: suggestion.primaryChoice.availability,
+              estimatedFee: suggestion.primaryChoice.estimatedFee,
+              workingRelationships: []
             })
             .returning();
           return saved;
@@ -460,12 +496,79 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
 
       res.json({
         success: true,
-        castingSuggestions: savedSuggestions
+        castingAnalysis,
+        savedToDatabase: savedSuggestions.length,
+        message: `Generated comprehensive casting analysis for ${castingAnalysis.characterSuggestions.length} characters`
       });
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Casting suggestions error:', error);
-      res.status(500).json({ error: 'Failed to generate casting suggestions' });
+      res.status(500).json({ 
+        error: 'Failed to generate casting suggestions',
+        message: error.message || 'An unexpected error occurred during casting analysis.'
+      });
+    }
+  });
+
+  // Analyze user-suggested actor for a character
+  app.post('/api/script-analysis/analyze_user_actor', async (req: Request, res: Response) => {
+    try {
+      const { projectId, characterName, suggestedActor } = req.body;
+      
+      if (!projectId || !characterName || !suggestedActor) {
+        return res.status(400).json({ 
+          error: 'Missing required parameters',
+          message: 'Please provide projectId, characterName, and suggestedActor'
+        });
+      }
+
+      // Get character details
+      const character = await db
+        .select()
+        .from(characters)
+        .where(
+          and(
+            eq(characters.projectId, parseInt(projectId)),
+            eq(characters.name, characterName)
+          )
+        );
+
+      if (!character.length) {
+        return res.status(404).json({ error: 'Character not found' });
+      }
+
+      // Get all characters for context
+      const allCharacters = await db
+        .select()
+        .from(characters)
+        .where(eq(characters.projectId, parseInt(projectId)));
+
+      // Get relationships
+      const relationships = allCharacters.flatMap(char => char.relationships || []);
+
+      // Analyze user's actor choice
+      const { analyzeUserActorChoice } = await import('./script-analysis-agents');
+      const analysis = await analyzeUserActorChoice(
+        character[0] as any,
+        suggestedActor,
+        allCharacters as any[],
+        relationships,
+        'gpt-4o'
+      );
+
+      res.json({
+        success: true,
+        analysis,
+        characterName,
+        suggestedActor
+      });
+
+    } catch (error: any) {
+      console.error('User actor analysis error:', error);
+      res.status(500).json({ 
+        error: 'Failed to analyze actor suggestion',
+        message: error.message || 'An unexpected error occurred during actor analysis.'
+      });
     }
   });
 

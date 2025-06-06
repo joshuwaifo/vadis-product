@@ -53,14 +53,41 @@ export interface Character {
 
 export interface ActorSuggestion {
   characterName: string;
-  suggestions: Array<{
+  primaryChoice: {
     actorName: string;
-    reasoning: string;
+    bio: string;
+    fitAnalysis: string;
+    chemistryFactor: string;
+    recentWork: string[];
     fitScore: number; // 1-100
     availability: string;
     estimatedFee: string;
-    workingRelationships: string[];
+  };
+  alternatives: Array<{
+    actorName: string;
+    age: number;
+    strengthsForRole: string;
+    potentialChemistry: string;
+    notableWork: string[];
+    fitScore: number;
+    availability: string;
+    estimatedFee: string;
   }>;
+}
+
+export interface CastingAnalysis {
+  scriptTitle: string;
+  characterSuggestions: ActorSuggestion[];
+  ensembleChemistry: {
+    keyRelationships: Array<{
+      characters: string[];
+      relationshipType: string;
+      chemistryAnalysis: string;
+      primaryActors: string[];
+    }>;
+    overallSynergy: string;
+    castingRationale: string;
+  };
 }
 
 export interface VFXNeed {
@@ -269,48 +296,178 @@ export async function analyzeCharacters(
 }
 
 /**
- * Suggest actors for characters
+ * Enhanced casting director AI that provides comprehensive casting analysis
  */
 export async function suggestActors(
   characters: Character[],
-  provider: AIProvider = 'gemini-1.5-pro'
-): Promise<ActorSuggestion[]> {
+  relationships: any[],
+  scriptTitle: string = 'Untitled Script',
+  provider: AIProvider = 'gpt-4o'
+): Promise<CastingAnalysis> {
   const prompt = `
-    Based on these character descriptions, suggest appropriate actors for each role.
-    Consider age, physical characteristics, acting range, and current availability.
-    Also consider actors who have good working relationships with each other.
+You are an expert casting director AI. Based on the provided character analysis data (including demographics, relationships, personality traits, and story arcs), suggest optimal casting choices for each character.
 
-    Characters:
-    ${JSON.stringify(characters, null, 2)}
+**Character Analysis Data:**
+Script Title: ${scriptTitle}
+Characters: ${JSON.stringify(characters, null, 2)}
+Relationships: ${JSON.stringify(relationships, null, 2)}
 
-    Return as JSON array with this structure:
-    [
+**Your Task:**
+1. Analyze each character's profile (age, personality, relationships, story importance)
+2. Consider character dynamics and on-screen chemistry requirements
+3. Provide casting recommendations with detailed justifications
+
+**For Each Character, Provide:**
+
+**PRIMARY RECOMMENDATION:**
+- Actor Name & Brief Bio (2-3 sentences about their career/style)
+- **Fit Analysis:** Why this actor suits the character (physical, acting style, experience)
+- **Chemistry Factor:** How they work with other cast members based on relationships
+- **Recent Work:** 2-3 relevant recent performances
+
+**ALTERNATIVE OPTIONS (3-4 actors):**
+For each alternative:
+- Actor name and current age
+- Strengths for this specific role
+- Potential chemistry with other cast members
+- 2-3 notable works that demonstrate their suitability
+- Fit score (1-100)
+- Availability status
+- Estimated fee range
+
+**CASTING SYNERGY ANALYSIS:**
+- Highlight key relationships (protagonist/antagonist, romantic pairs, family dynamics)
+- Explain why your primary recommendations work well together
+- Note any potential on-screen chemistry based on past collaborations or similar projects
+- Overall ensemble rationale
+
+Return as JSON with this exact structure:
+{
+  "scriptTitle": "${scriptTitle}",
+  "characterSuggestions": [
+    {
+      "characterName": "CHARACTER_NAME",
+      "primaryChoice": {
+        "actorName": "Actor Name",
+        "bio": "Brief 2-3 sentence bio about their career and acting style",
+        "fitAnalysis": "Detailed analysis of why they fit this character perfectly",
+        "chemistryFactor": "How they work with other characters/actors in this story",
+        "recentWork": ["Recent Film 1", "Recent Film 2", "Recent Film 3"],
+        "fitScore": 95,
+        "availability": "Available 2024",
+        "estimatedFee": "$3-5M"
+      },
+      "alternatives": [
+        {
+          "actorName": "Alternative Actor 1",
+          "age": 35,
+          "strengthsForRole": "What makes them good for this role",
+          "potentialChemistry": "How they'd work with the ensemble",
+          "notableWork": ["Notable Film 1", "Notable Film 2"],
+          "fitScore": 88,
+          "availability": "Available",
+          "estimatedFee": "$2-4M"
+        }
+      ]
+    }
+  ],
+  "ensembleChemistry": {
+    "keyRelationships": [
       {
-        "characterName": "CHARACTER_NAME",
-        "suggestions": [
-          {
-            "actorName": "Actor Name",
-            "reasoning": "Why this actor fits the role",
-            "fitScore": 85,
-            "availability": "Available 2024",
-            "estimatedFee": "$2-5M",
-            "workingRelationships": ["Actor B", "Actor C"]
-          }
-        ]
+        "characters": ["Character A", "Character B"],
+        "relationshipType": "romantic/family/antagonistic/partnership",
+        "chemistryAnalysis": "Why these actors work well together",
+        "primaryActors": ["Actor A", "Actor B"]
       }
-    ]
+    ],
+    "overallSynergy": "How the entire cast works together as an ensemble",
+    "castingRationale": "The strategic thinking behind these casting choices"
+  }
+}
+
+Focus on current, relevant actors (active in 2020s), realistic availability, and authentic chemistry analysis based on their acting styles and past work.
   `;
 
   try {
     const response = await generateContent(provider, prompt, {
       responseFormat: 'json',
-      maxTokens: 4000
+      maxTokens: 12000
     });
 
-    return extractJsonFromText(response) || [];
+    const parsed = extractJsonFromText(response);
+    return parsed || {
+      scriptTitle,
+      characterSuggestions: [],
+      ensembleChemistry: {
+        keyRelationships: [],
+        overallSynergy: "No casting analysis available",
+        castingRationale: "Analysis failed"
+      }
+    };
   } catch (error) {
-    console.error('Error suggesting actors:', error);
-    throw new Error('Failed to suggest actors');
+    console.error('Error in casting analysis:', error);
+    throw new Error('Failed to generate casting suggestions');
+  }
+}
+
+/**
+ * Analyze a user-suggested actor for a specific character
+ */
+export async function analyzeUserActorChoice(
+  character: Character,
+  suggestedActor: string,
+  otherCharacters: Character[],
+  relationships: any[],
+  provider: AIProvider = 'gpt-4o'
+): Promise<{
+  suitabilityAssessment: string;
+  chemistryImpact: string;
+  castingAdjustments: string;
+  comparisonWithOriginal: string;
+  fitScore: number;
+}> {
+  const prompt = `
+As an expert casting director, analyze this user's actor suggestion:
+
+**Character:** ${character.name}
+**Character Details:** ${JSON.stringify(character, null, 2)}
+**Suggested Actor:** ${suggestedActor}
+**Other Characters:** ${JSON.stringify(otherCharacters, null, 2)}
+**Relationships:** ${JSON.stringify(relationships, null, 2)}
+
+Provide a comprehensive analysis:
+
+1. **Suitability Assessment:** How well does ${suggestedActor} fit ${character.name}?
+2. **Chemistry Impact:** How does this choice affect dynamics with other characters?
+3. **Casting Adjustments:** Should other roles be reconsidered to maintain ensemble balance?
+4. **Comparison:** How does this compare to what a casting director would typically recommend?
+
+Return as JSON:
+{
+  "suitabilityAssessment": "Detailed analysis of actor fit",
+  "chemistryImpact": "How this affects ensemble dynamics",
+  "castingAdjustments": "Recommended adjustments to other casting",
+  "comparisonWithOriginal": "How this compares to typical casting for this character type",
+  "fitScore": 85
+}
+  `;
+
+  try {
+    const response = await generateContent(provider, prompt, {
+      responseFormat: 'json',
+      maxTokens: 3000
+    });
+
+    return extractJsonFromText(response) || {
+      suitabilityAssessment: "Analysis unavailable",
+      chemistryImpact: "Impact unknown",
+      castingAdjustments: "No adjustments suggested",
+      comparisonWithOriginal: "Comparison unavailable",
+      fitScore: 50
+    };
+  } catch (error) {
+    console.error('Error analyzing user actor choice:', error);
+    throw new Error('Failed to analyze actor suggestion');
   }
 }
 

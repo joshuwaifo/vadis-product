@@ -14,6 +14,7 @@ import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import StoryboardSceneView from '@/components/script/StoryboardSceneView';
 import CharacterAnalysisView from '@/components/script-analysis/CharacterAnalysisView';
+import CastingAnalysisView from '@/components/script-analysis/CastingAnalysisView';
 
 // Define types directly in this file since the server types are not accessible from client
 interface AnalysisTask {
@@ -443,6 +444,27 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
                 </p>
               </div>
             </div>
+          </div>
+        );
+
+      case 'casting_suggestions':
+        return (
+          <div className="space-y-6">
+            {results.castingAnalysis ? (
+              <CastingAnalysisView
+                castingData={results.castingAnalysis}
+                projectId={workflowProjectId || projectId}
+                onRefresh={() => runAnalysis('casting_suggestions')}
+              />
+            ) : (
+              <div className="text-center py-8">
+                <Star className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-semibold mb-2">No Casting Analysis Available</h3>
+                <p className="text-muted-foreground">
+                  Run character analysis first to generate casting suggestions.
+                </p>
+              </div>
+            )}
           </div>
         );
       
