@@ -83,10 +83,10 @@ export default function CharacterAnalysisView({
   };
 
   const getRelationshipStrengthColor = (strength: number) => {
-    if (strength >= 8) return '#ef4444'; // red-500
-    if (strength >= 6) return '#f97316'; // orange-500
-    if (strength >= 4) return '#eab308'; // yellow-500
-    return '#9ca3af'; // gray-400
+    if (strength >= 8) return '#dc2626'; // Strong - Red
+    if (strength >= 6) return '#2563eb'; // Medium - Blue  
+    if (strength >= 4) return '#16a34a'; // Weak - Green
+    return '#9333ea'; // Minimal - Purple
   };
 
   const getRelationshipStrengthWidth = (strength: number) => {
@@ -112,39 +112,53 @@ export default function CharacterAnalysisView({
   const getAdvancedCharacterPosition = (index: number, total: number, character: Character) => {
     const svgWidth = 1000;
     const svgHeight = 600;
-    const padding = 80;
+    const padding = 100;
     
-    // Use force-directed positioning based on character importance
+    // Strategic positioning for optimal connection line visibility
     if (character.importance === 'lead') {
-      // Place lead characters in the center area
       const leadIndex = leadCharacters.findIndex(c => c.name === character.name);
       const leadTotal = leadCharacters.length;
-      const angle = (leadIndex / Math.max(leadTotal, 1)) * 2 * Math.PI;
-      const radius = 120;
-      return {
-        x: svgWidth / 2 + radius * Math.cos(angle),
-        y: svgHeight / 2 + radius * Math.sin(angle)
-      };
+      
+      // Arrange lead characters in a line or strategic positions
+      if (leadTotal === 1) {
+        return { x: svgWidth / 2, y: svgHeight / 2 };
+      } else if (leadTotal === 2) {
+        return leadIndex === 0 
+          ? { x: svgWidth / 3, y: svgHeight / 2 }
+          : { x: (2 * svgWidth) / 3, y: svgHeight / 2 };
+      } else {
+        // For 3+ leads, use a triangular arrangement
+        const angle = (leadIndex / leadTotal) * 2 * Math.PI - Math.PI / 2;
+        const radius = 80;
+        return {
+          x: svgWidth / 2 + radius * Math.cos(angle),
+          y: svgHeight / 2 + radius * Math.sin(angle)
+        };
+      }
     } else if (character.importance === 'supporting') {
-      // Place supporting characters in a middle ring
+      // Place supporting characters in strategic outer ring
       const supportingIndex = supportingCharacters.findIndex(c => c.name === character.name);
       const supportingTotal = supportingCharacters.length;
-      const angle = (supportingIndex / Math.max(supportingTotal, 1)) * 2 * Math.PI;
-      const radius = 200;
-      return {
-        x: svgWidth / 2 + radius * Math.cos(angle),
-        y: svgHeight / 2 + radius * Math.sin(angle)
-      };
-    } else {
-      // Place minor characters in outer positions
-      const minorIndex = minorCharacters.findIndex(c => c.name === character.name);
-      const minorTotal = Math.min(minorCharacters.length, 8);
-      const angle = (minorIndex / Math.max(minorTotal, 1)) * 2 * Math.PI;
-      const radius = 280;
+      const angle = (supportingIndex / Math.max(supportingTotal, 1)) * 2 * Math.PI - Math.PI / 2;
+      const radius = 180;
       return {
         x: Math.max(padding, Math.min(svgWidth - padding, svgWidth / 2 + radius * Math.cos(angle))),
         y: Math.max(padding, Math.min(svgHeight - padding, svgHeight / 2 + radius * Math.sin(angle)))
       };
+    } else {
+      // Place minor characters in corners and edges for clear separation
+      const minorIndex = minorCharacters.findIndex(c => c.name === character.name);
+      const positions = [
+        { x: 150, y: 120 },                    // Top-left
+        { x: svgWidth - 150, y: 120 },         // Top-right
+        { x: 150, y: svgHeight - 120 },        // Bottom-left
+        { x: svgWidth - 150, y: svgHeight - 120 }, // Bottom-right
+        { x: svgWidth / 2, y: 80 },            // Top-center
+        { x: svgWidth / 2, y: svgHeight - 80 }, // Bottom-center
+        { x: 80, y: svgHeight / 2 },           // Left-center
+        { x: svgWidth - 80, y: svgHeight / 2 }  // Right-center
+      ];
+      return positions[minorIndex % positions.length];
     }
   };
 
@@ -298,19 +312,19 @@ export default function CharacterAnalysisView({
                 <h4 className="font-medium mb-3">Relationship Strength</h4>
                 <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
                   <div className="flex items-center gap-2">
-                    <div className="w-4 h-0.5 bg-red-500"></div>
+                    <div className="w-4 h-1 bg-red-600"></div>
                     <span>Strong (8-10) - Core relationships</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-4 h-0.5 bg-orange-500"></div>
+                    <div className="w-4 h-0.5 bg-blue-600"></div>
                     <span>Medium (6-7) - Important dynamics</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-4 h-0.5 bg-yellow-500"></div>
+                    <div className="w-4 h-0.5 bg-green-600"></div>
                     <span>Weak (4-5) - Minor interactions</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-4 h-1 bg-gray-400 border-dashed border border-gray-300"></div>
+                    <div className="w-4 h-0.5 bg-purple-600 border-dashed border border-purple-300"></div>
                     <span>Minimal (1-3) - Brief encounters</span>
                   </div>
                 </div>
