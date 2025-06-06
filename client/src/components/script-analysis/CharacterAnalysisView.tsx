@@ -108,49 +108,47 @@ export default function CharacterAnalysisView({
     };
   };
 
-  // Advanced positioning algorithm with circular arrangement for better spacing
+  // Polygon-based positioning algorithm for optimal character arrangement
   const getAdvancedCharacterPosition = (index: number, total: number, character: Character) => {
     const svgWidth = 1000;
     const svgHeight = 600;
     const centerX = svgWidth / 2;
     const centerY = svgHeight / 2;
-    const padding = 100;
     
-    // Use circular positioning with original radii and better angle spacing
-    if (character.importance === 'lead') {
-      // Place lead characters in inner circle
-      const leadIndex = leadCharacters.findIndex(c => c.name === character.name);
-      const leadTotal = leadCharacters.length;
-      // Add slight offset to prevent perfect vertical alignment
-      const angle = (leadIndex / Math.max(leadTotal, 1)) * 2 * Math.PI + (Math.PI / 8);
-      const radius = 120;
-      return {
-        x: centerX + radius * Math.cos(angle),
-        y: centerY + radius * Math.sin(angle)
-      };
-    } else if (character.importance === 'supporting') {
-      // Place supporting characters in middle circle
-      const supportingIndex = supportingCharacters.findIndex(c => c.name === character.name);
-      const supportingTotal = supportingCharacters.length;
-      // Offset supporting characters to avoid alignment with lead characters
-      const angle = (supportingIndex / Math.max(supportingTotal, 1)) * 2 * Math.PI + (Math.PI / 6);
-      const radius = 200;
-      return {
-        x: centerX + radius * Math.cos(angle),
-        y: centerY + radius * Math.sin(angle)
-      };
-    } else {
-      // Place minor characters in outer circle
-      const minorIndex = minorCharacters.findIndex(c => c.name === character.name);
-      const minorTotal = Math.min(minorCharacters.length, 8);
-      // Offset minor characters for better distribution
-      const angle = (minorIndex / Math.max(minorTotal, 1)) * 2 * Math.PI + (Math.PI / 4);
-      const radius = 280;
-      return {
-        x: Math.max(padding, Math.min(svgWidth - padding, centerX + radius * Math.cos(angle))),
-        y: Math.max(padding, Math.min(svgHeight - padding, centerY + radius * Math.sin(angle)))
-      };
+    // Get all significant characters for polygon arrangement
+    const allSignificantCharacters = [
+      ...leadCharacters, 
+      ...supportingCharacters,
+      ...minorCharacters.filter(char => char.screenTime > 5).slice(0, 8)
+    ];
+    
+    const characterIndex = allSignificantCharacters.findIndex(c => c.name === character.name);
+    const totalCharacters = allSignificantCharacters.length;
+    
+    if (totalCharacters === 1) {
+      return { x: centerX, y: centerY };
     }
+    
+    // Calculate polygon arrangement
+    // Start from top and go clockwise
+    const angle = (characterIndex / totalCharacters) * 2 * Math.PI - (Math.PI / 2);
+    
+    // Dynamic radius based on number of characters for optimal spacing
+    let radius;
+    if (totalCharacters <= 3) {
+      radius = 150;
+    } else if (totalCharacters <= 6) {
+      radius = 180;
+    } else if (totalCharacters <= 8) {
+      radius = 220;
+    } else {
+      radius = 260;
+    }
+    
+    return {
+      x: centerX + radius * Math.cos(angle),
+      y: centerY + radius * Math.sin(angle)
+    };
   };
 
   const renderNetworkGraph = () => {
@@ -188,6 +186,21 @@ export default function CharacterAnalysisView({
                 </pattern>
               </defs>
               <rect width="100%" height="100%" fill="url(#grid)" />
+              
+              {/* Polygon outline */}
+              {allSignificantCharacters.length > 2 && (
+                <polygon
+                  points={allSignificantCharacters.map((char, idx) => {
+                    const pos = getAdvancedCharacterPosition(idx, allSignificantCharacters.length, char);
+                    return `${pos.x},${pos.y}`;
+                  }).join(' ')}
+                  fill="none"
+                  stroke="#cbd5e1"
+                  strokeWidth="1"
+                  opacity="0.4"
+                  strokeDasharray="5,5"
+                />
+              )}
               
               {/* Render relationships first (behind nodes) */}
               {relationships.map((rel, index) => {
