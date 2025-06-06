@@ -232,10 +232,10 @@ export default function CharacterAnalysisView({
             <User className="h-4 w-4 text-gray-500" />
             <span>{character.demographics?.gender || character.gender || 'Unknown gender'}</span>
           </div>
-          {(character.demographics?.occupation || character.occupation) && (
+          {(character.demographics?.occupation || (character as any).occupation) && (
             <div className="flex items-center gap-2">
               <Briefcase className="h-4 w-4 text-gray-500" />
-              <span>{character.demographics?.occupation || character.occupation}</span>
+              <span>{character.demographics?.occupation || (character as any).occupation}</span>
             </div>
           )}
           <div className="flex items-center gap-2">
