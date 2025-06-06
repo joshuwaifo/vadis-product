@@ -62,21 +62,28 @@ export default function CastingAnalysisView({ castingData, projectId, onRefresh 
   const analyzeUserActor = async (characterName: string, actorName: string) => {
     setIsAnalyzing(true);
     try {
-      const response = await apiRequest('/api/script-analysis/analyze_user_actor', {
+      const response = await fetch('/api/script-analysis/analyze_user_actor', {
         method: 'POST',
-        body: {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
           projectId,
           characterName,
           suggestedActor: actorName
-        }
+        })
       });
 
-      if (response.success) {
-        setUserAnalysis(response.analysis);
+      const data = await response.json();
+
+      if (data.success) {
+        setUserAnalysis(data.analysis);
         toast({
           title: "Actor Analysis Complete",
           description: `Analysis for ${actorName} as ${characterName} is ready.`
         });
+      } else {
+        throw new Error(data.message || 'Failed to analyze actor');
       }
     } catch (error: any) {
       toast({

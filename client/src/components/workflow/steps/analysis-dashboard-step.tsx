@@ -453,7 +453,7 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
             {results.castingAnalysis ? (
               <CastingAnalysisView
                 castingData={results.castingAnalysis}
-                projectId={workflowProjectId || projectId}
+                projectId={workflow?.projectId || project?.id}
                 onRefresh={() => runAnalysis('casting_suggestions')}
               />
             ) : (
