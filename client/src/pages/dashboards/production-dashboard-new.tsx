@@ -232,7 +232,7 @@ export default function ProductionDashboard() {
           };
         }
         return {
-          action: "Start Analysis",
+          action: "Continue Analysis",
           icon: Play,
           description: "Begin comprehensive script analysis",
           link: `/dashboard/script-analysis-workflow?projectId=${project.id}`,
