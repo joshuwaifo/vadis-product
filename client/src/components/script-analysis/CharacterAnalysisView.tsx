@@ -333,7 +333,7 @@ export default function CharacterAnalysisView({
                     >
                       <div className="font-medium text-sm">{character.name}</div>
                       <div className="text-xs text-gray-600 dark:text-gray-400">
-                        {character.demographics.occupation || character.demographics.ageRange}
+                        {character.demographics?.occupation || character.demographics?.ageRange || character.age || 'Character'}
                       </div>
                     </div>
                   ))}
