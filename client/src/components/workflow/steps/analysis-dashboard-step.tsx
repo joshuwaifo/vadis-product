@@ -130,6 +130,78 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
   console.log('Workflow data:', workflow);
   console.log('Project ID from workflow:', workflow?.projectId);
 
+  // Load existing analysis results from database
+  const { data: existingScenes } = useQuery({
+    queryKey: [`/api/projects/${workflow?.projectId}/scenes`],
+    enabled: !!workflow?.projectId
+  });
+
+  const { data: existingCharacters } = useQuery({
+    queryKey: [`/api/projects/${workflow?.projectId}/characters`],
+    enabled: !!workflow?.projectId
+  });
+
+  const { data: existingCasting } = useQuery({
+    queryKey: [`/api/projects/${workflow?.projectId}/casting`],
+    enabled: !!workflow?.projectId
+  });
+
+  // Update task status and results based on existing data
+  useEffect(() => {
+    if (existingScenes?.length > 0) {
+      setTasks(prev => prev.map(task => 
+        task.id === 'scene_extraction' 
+          ? { ...task, status: 'completed' as const, completedAt: new Date() }
+          : task
+      ));
+      setAnalysisResults(prev => ({
+        ...prev,
+        scene_extraction: {
+          success: true,
+          scenes: existingScenes,
+          totalScenes: existingScenes.length,
+          estimatedDuration: existingScenes.reduce((total: number, scene: any) => total + (scene.duration || 0), 0)
+        }
+      }));
+    }
+  }, [existingScenes]);
+
+  useEffect(() => {
+    if (existingCharacters?.length > 0) {
+      setTasks(prev => prev.map(task => 
+        task.id === 'character_analysis' 
+          ? { ...task, status: 'completed' as const, completedAt: new Date() }
+          : task
+      ));
+      setAnalysisResults(prev => ({
+        ...prev,
+        character_analysis: {
+          success: true,
+          characters: existingCharacters,
+          relationships: existingCharacters.flatMap((char: any) => char.relationships || []),
+          totalCharacters: existingCharacters.length
+        }
+      }));
+    }
+  }, [existingCharacters]);
+
+  useEffect(() => {
+    if (existingCasting?.length > 0) {
+      setTasks(prev => prev.map(task => 
+        task.id === 'casting_suggestions' 
+          ? { ...task, status: 'completed' as const, completedAt: new Date() }
+          : task
+      ));
+      setAnalysisResults(prev => ({
+        ...prev,
+        casting_suggestions: {
+          success: true,
+          castingAnalysis: existingCasting
+        }
+      }));
+    }
+  }, [existingCasting]);
+
   const analysisInProgress = tasks.some(task => task.status === 'in_progress');
 
   // Create mutation for running individual analysis

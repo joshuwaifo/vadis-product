@@ -244,6 +244,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get project scenes
+  app.get("/api/projects/:id/scenes", async (req, res) => {
+    try {
+      if (!req.session.user) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const projectId = parseInt(req.params.id);
+      const scenes = await storage.getScenes(projectId);
+      res.json(scenes);
+    } catch (error) {
+      console.error("Error fetching scenes:", error);
+      res.status(500).json({ error: "Failed to fetch scenes" });
+    }
+  });
+
+  // Get project characters
+  app.get("/api/projects/:id/characters", async (req, res) => {
+    try {
+      if (!req.session.user) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const projectId = parseInt(req.params.id);
+      const characters = await storage.getCharacters(projectId);
+      res.json(characters);
+    } catch (error) {
+      console.error("Error fetching characters:", error);
+      res.status(500).json({ error: "Failed to fetch characters" });
+    }
+  });
+
+  // Get project casting analysis
+  app.get("/api/projects/:id/casting", async (req, res) => {
+    try {
+      if (!req.session.user) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const projectId = parseInt(req.params.id);
+      // For now, return empty array since casting data structure needs to be implemented
+      res.json([]);
+    } catch (error) {
+      console.error("Error fetching casting:", error);
+      res.status(500).json({ error: "Failed to fetch casting data" });
+    }
+  });
+
   app.get("/api/dashboard/stats", async (req, res) => {
     try {
       // Check if user is authenticated
