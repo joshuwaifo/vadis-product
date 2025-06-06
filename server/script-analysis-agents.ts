@@ -28,13 +28,25 @@ export interface Character {
   description: string;
   age: string;
   gender: string;
+  ethnicity?: string;
+  occupation?: string;
   personality: string[];
   importance: 'lead' | 'supporting' | 'minor';
   screenTime: number; // estimated minutes
+  demographics: {
+    ageRange: string;
+    gender: string;
+    ethnicity?: string;
+    socioeconomicStatus?: string;
+    education?: string;
+    occupation?: string;
+  };
+  bio: string; // short character biography
   relationships: Array<{
     character: string;
     relationship: string;
     strength: number; // 1-10
+    description: string; // brief explanation of the relationship
   }>;
   characterArc: string;
 }
@@ -165,37 +177,48 @@ export async function extractScenes(
 }
 
 /**
- * Analyze characters and their relationships
+ * Analyze characters and their relationships with enhanced demographics and relationship mapping
  */
 export async function analyzeCharacters(
   scenes: Scene[],
-  provider: AIProvider = 'gemini-1.5-pro'
-): Promise<{ characters: Character[], relationships: any[] }> {
+  provider: AIProvider = 'gpt-4o'
+): Promise<{ characters: Character[], relationships: any[], relationshipExplanations: string[] }> {
   const sceneText = scenes.map(s => s.content).join('\n\n');
   
   const prompt = `
-    Analyze the characters in this script and their relationships. Provide:
+    Analyze the characters in this script with detailed demographics and relationships. Provide:
     
-    1. Character analysis with personality, importance, screen time estimates
-    2. Relationship mapping between characters with strength ratings
-    3. Character development arcs
+    1. Character analysis with demographics, personality, importance, and screen time estimates
+    2. Detailed relationship mapping between characters with strength ratings and explanations
+    3. Character development arcs and short biographies
+    4. Explanations of key character relationships
 
-    Return as JSON with this structure:
+    Return as JSON with this exact structure:
     {
       "characters": [
         {
           "name": "CHARACTER_NAME",
           "description": "Physical and personality description",
-          "age": "Age range",
+          "age": "Age range (e.g., '25-30')",
           "gender": "Gender",
           "personality": ["trait1", "trait2", "trait3"],
           "importance": "lead|supporting|minor",
           "screenTime": 45,
+          "demographics": {
+            "ageRange": "25-30",
+            "gender": "Male/Female/Other",
+            "ethnicity": "Ethnicity if specified",
+            "socioeconomicStatus": "Working class/Middle class/Upper class",
+            "education": "Education level if apparent",
+            "occupation": "Job or role"
+          },
+          "bio": "A concise 1-2 sentence biography of the character",
           "relationships": [
             {
               "character": "OTHER_CHARACTER",
-              "relationship": "relationship type",
-              "strength": 8
+              "relationship": "brother/friend/enemy/lover/colleague",
+              "strength": 8,
+              "description": "Brief explanation of their relationship"
             }
           ],
           "characterArc": "Character development description"
@@ -206,10 +229,22 @@ export async function analyzeCharacters(
           "from": "CHARACTER1",
           "to": "CHARACTER2", 
           "type": "relationship_type",
-          "strength": 7
+          "strength": 7,
+          "description": "Explanation of this relationship"
         }
+      ],
+      "relationshipExplanations": [
+        "Character A is Character B's brother and they have a complex relationship due to...",
+        "Character C and Character D are former lovers who now work together reluctantly..."
       ]
     }
+
+    Focus on identifying:
+    - Main characters (leads with most screen time and story importance)
+    - Supporting characters (significant but secondary roles)
+    - Minor characters (brief appearances)
+    - Demographic details when evident from dialogue/description
+    - Relationship dynamics and their explanations
 
     Script content:
     ${sceneText}
@@ -218,13 +253,14 @@ export async function analyzeCharacters(
   try {
     const response = await generateContent(provider, prompt, {
       responseFormat: 'json',
-      maxTokens: 6000
+      maxTokens: 8000
     });
 
     const parsed = extractJsonFromText(response);
     return {
       characters: parsed?.characters || [],
-      relationships: parsed?.relationshipGraph || []
+      relationships: parsed?.relationshipGraph || [],
+      relationshipExplanations: parsed?.relationshipExplanations || []
     };
   } catch (error) {
     console.error('Error analyzing characters:', error);
