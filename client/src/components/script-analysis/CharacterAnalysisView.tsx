@@ -224,7 +224,10 @@ export default function CharacterAnalysisView({
               {allSignificantCharacters.map((character, index) => {
                 const pos = getAdvancedCharacterPosition(index, allSignificantCharacters.length, character);
                 const isSelected = selectedCharacter?.name === character.name;
-                const nodeSize = character.importance === 'lead' ? 35 : character.importance === 'supporting' ? 28 : 20;
+                // Dynamic node size based on screen time and importance
+                const baseSize = character.importance === 'lead' ? 30 : character.importance === 'supporting' ? 25 : 18;
+                const screenTimeMultiplier = Math.min(1.5, 1 + (character.screenTime / 100));
+                const nodeSize = baseSize * screenTimeMultiplier;
                 
                 return (
                   <g key={character.name}>
@@ -267,15 +270,11 @@ export default function CharacterAnalysisView({
                       }
                     </text>
                     
-                    {/* Screen time indicator */}
-                    <text
-                      x={pos.x}
-                      y={pos.y + 5}
-                      textAnchor="middle"
-                      className="text-xs fill-white font-medium pointer-events-none"
-                    >
-                      {character.screenTime}m
-                    </text>
+                    {/* Add title element for hover tooltip */}
+                    <title>
+                      {character.name} • {character.screenTime} minutes • {character.importance} character
+                      {character.demographics?.occupation && ` • ${character.demographics.occupation}`}
+                    </title>
                     
                     {/* Importance indicator */}
                     {character.importance === 'lead' && (
@@ -318,11 +317,14 @@ export default function CharacterAnalysisView({
               </div>
               
               <div>
-                <h4 className="font-medium mb-3">Character Importance</h4>
+                <h4 className="font-medium mb-3">Character Types & Visual Guide</h4>
                 <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
                   <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 bg-yellow-400 rounded-full border-2 border-yellow-600"></div>
-                    <span>Lead Characters ★</span>
+                    <div className="relative">
+                      <div className="w-4 h-4 bg-yellow-400 rounded-full border-2 border-yellow-600"></div>
+                      <div className="absolute -top-0.5 -right-0.5 text-yellow-600 text-xs">★</div>
+                    </div>
+                    <span>Lead Characters</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-4 h-4 bg-blue-400 rounded-full border-2 border-blue-600"></div>
@@ -330,7 +332,19 @@ export default function CharacterAnalysisView({
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 bg-gray-400 rounded-full border border-gray-600"></div>
-                    <span>Minor Characters (5+ min screen time)</span>
+                    <span>Minor Characters</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1">
+                      <div className="w-3 h-3 bg-blue-400 rounded-full"></div>
+                      <div className="w-4 h-4 bg-blue-400 rounded-full"></div>
+                      <div className="w-5 h-5 bg-blue-400 rounded-full"></div>
+                    </div>
+                    <span>Node size = screen time</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="text-gray-400">💭</div>
+                    <span>Hover for character details</span>
                   </div>
                 </div>
               </div>
