@@ -226,16 +226,16 @@ export default function CharacterAnalysisView({
         <div className="grid grid-cols-2 gap-3 text-sm">
           <div className="flex items-center gap-2">
             <Calendar className="h-4 w-4 text-gray-500" />
-            <span>{character.demographics.ageRange}</span>
+            <span>{character.demographics?.ageRange || character.age || 'Unknown age'}</span>
           </div>
           <div className="flex items-center gap-2">
             <User className="h-4 w-4 text-gray-500" />
-            <span>{character.demographics.gender}</span>
+            <span>{character.demographics?.gender || character.gender || 'Unknown gender'}</span>
           </div>
-          {character.demographics.occupation && (
+          {(character.demographics?.occupation || character.occupation) && (
             <div className="flex items-center gap-2">
               <Briefcase className="h-4 w-4 text-gray-500" />
-              <span>{character.demographics.occupation}</span>
+              <span>{character.demographics?.occupation || character.occupation}</span>
             </div>
           )}
           <div className="flex items-center gap-2">
@@ -246,7 +246,7 @@ export default function CharacterAnalysisView({
         
         <div className="mt-3">
           <div className="flex flex-wrap gap-1">
-            {character.personality.slice(0, 3).map((trait) => (
+            {(character.personality || []).slice(0, 3).map((trait) => (
               <Badge key={trait} variant="outline" className="text-xs">
                 {trait}
               </Badge>
