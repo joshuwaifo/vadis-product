@@ -116,33 +116,36 @@ export default function CharacterAnalysisView({
     const centerY = svgHeight / 2;
     const padding = 100;
     
-    // Use circular positioning with increased radii for better spacing
+    // Use circular positioning with original radii and better angle spacing
     if (character.importance === 'lead') {
-      // Place lead characters in inner circle with more spacing
+      // Place lead characters in inner circle
       const leadIndex = leadCharacters.findIndex(c => c.name === character.name);
       const leadTotal = leadCharacters.length;
-      const angle = (leadIndex / Math.max(leadTotal, 1)) * 2 * Math.PI - Math.PI / 2;
-      const radius = 150; // Increased from 120
+      // Add slight offset to prevent perfect vertical alignment
+      const angle = (leadIndex / Math.max(leadTotal, 1)) * 2 * Math.PI + (Math.PI / 8);
+      const radius = 120;
       return {
         x: centerX + radius * Math.cos(angle),
         y: centerY + radius * Math.sin(angle)
       };
     } else if (character.importance === 'supporting') {
-      // Place supporting characters in middle circle with more spacing
+      // Place supporting characters in middle circle
       const supportingIndex = supportingCharacters.findIndex(c => c.name === character.name);
       const supportingTotal = supportingCharacters.length;
-      const angle = (supportingIndex / Math.max(supportingTotal, 1)) * 2 * Math.PI - Math.PI / 2;
-      const radius = 280; // Increased from 200
+      // Offset supporting characters to avoid alignment with lead characters
+      const angle = (supportingIndex / Math.max(supportingTotal, 1)) * 2 * Math.PI + (Math.PI / 6);
+      const radius = 200;
       return {
         x: centerX + radius * Math.cos(angle),
         y: centerY + radius * Math.sin(angle)
       };
     } else {
-      // Place minor characters in outer circle with more spacing
+      // Place minor characters in outer circle
       const minorIndex = minorCharacters.findIndex(c => c.name === character.name);
       const minorTotal = Math.min(minorCharacters.length, 8);
-      const angle = (minorIndex / Math.max(minorTotal, 1)) * 2 * Math.PI - Math.PI / 2;
-      const radius = 380; // Increased from 270
+      // Offset minor characters for better distribution
+      const angle = (minorIndex / Math.max(minorTotal, 1)) * 2 * Math.PI + (Math.PI / 4);
+      const radius = 280;
       return {
         x: Math.max(padding, Math.min(svgWidth - padding, centerX + radius * Math.cos(angle))),
         y: Math.max(padding, Math.min(svgHeight - padding, centerY + radius * Math.sin(angle)))
