@@ -329,13 +329,66 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
   // Character analysis
   app.post('/api/script-analysis/character_analysis', async (req: Request, res: Response) => {
     try {
-      const { projectId, scriptContent } = req.body;
+      const { projectId } = req.body;
+      console.log(`Starting character analysis for project ${projectId}`);
       
-      const analyzedCharacters = await analyzeCharacters(scriptContent);
+      // Get project and script content
+      const project = await db
+        .select()
+        .from(projects)
+        .where(eq(projects.id, parseInt(projectId)));
+
+      if (!project.length) {
+        return res.status(404).json({ error: 'Project not found' });
+      }
+
+      let scriptContent = project[0].scriptContent;
+
+      // Handle PDF extraction if needed
+      if (scriptContent && scriptContent.startsWith('PDF_UPLOADED:')) {
+        try {
+          if (project[0].scriptFileData) {
+            console.log('Extracting text from stored PDF for character analysis');
+            const { extractTextFromPDF } = await import('./services/pdf-text-extractor');
+            const pdfBuffer = Buffer.from(project[0].scriptFileData, 'base64');
+            scriptContent = await extractTextFromPDF(pdfBuffer);
+            console.log(`Extracted ${scriptContent?.length || 0} characters for analysis`);
+          }
+        } catch (extractError) {
+          console.error('PDF extraction failed for character analysis:', extractError);
+          return res.status(400).json({ 
+            error: 'PDF extraction failed', 
+            message: 'Unable to extract text from the PDF file for character analysis.',
+            requiresExtraction: true,
+            details: extractError.message
+          });
+        }
+      }
+
+      if (!scriptContent || scriptContent.length < 100) {
+        return res.status(400).json({ 
+          error: 'Insufficient script content for character analysis',
+          message: 'Please ensure your script contains adequate character dialogue and descriptions.'
+        });
+      }
+
+      // Get existing scenes for this project to use in character analysis
+      const existingScenes = await db
+        .select()
+        .from(scenes)
+        .where(eq(scenes.projectId, parseInt(projectId)));
+
+      console.log(`Found ${existingScenes.length} existing scenes for character analysis`);
+
+      // Perform enhanced character analysis with demographics and relationships
+      const { analyzeCharacters } = await import('./script-analysis-agents');
+      const analysisResult = await analyzeCharacters(existingScenes.length > 0 ? existingScenes : [], 'gpt-4o');
       
-      // Save characters to database
+      console.log(`Character analysis complete: ${analysisResult.characters.length} characters, ${analysisResult.relationships.length} relationships`);
+
+      // Save characters to database with enhanced demographics
       const savedCharacters = await Promise.all(
-        analyzedCharacters.map(async (character) => {
+        analysisResult.characters.map(async (character) => {
           const [savedCharacter] = await db
             .insert(characters)
             .values({
@@ -357,13 +410,19 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
 
       res.json({
         success: true,
-        characters: savedCharacters,
-        totalCharacters: savedCharacters.length
+        characters: analysisResult.characters,
+        relationships: analysisResult.relationships,
+        relationshipExplanations: analysisResult.relationshipExplanations,
+        totalCharacters: analysisResult.characters.length,
+        savedToDatabase: savedCharacters.length
       });
 
     } catch (error) {
       console.error('Character analysis error:', error);
-      res.status(500).json({ error: 'Failed to analyze characters' });
+      res.status(500).json({ 
+        error: 'Failed to analyze characters',
+        message: error.message || 'An unexpected error occurred during character analysis.'
+      });
     }
   });
 

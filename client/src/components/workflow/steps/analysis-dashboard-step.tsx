@@ -13,6 +13,7 @@ import {
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import StoryboardSceneView from '@/components/script/StoryboardSceneView';
+import CharacterAnalysisView from '@/components/script-analysis/CharacterAnalysisView';
 
 // Define types directly in this file since the server types are not accessible from client
 interface AnalysisTask {
@@ -396,6 +397,27 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
                     </Card>
                   ))}
                 </div>
+              </div>
+            )}
+          </div>
+        );
+
+      case 'character_analysis':
+        return (
+          <div className="space-y-6">
+            {results.characters && results.characters.length > 0 ? (
+              <CharacterAnalysisView
+                characters={results.characters}
+                relationships={results.relationships || []}
+                relationshipExplanations={results.relationshipExplanations || []}
+              />
+            ) : (
+              <div className="text-center py-8">
+                <Users className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-semibold mb-2">No Characters Found</h3>
+                <p className="text-muted-foreground">
+                  The analysis didn't find any characters in the script. Please ensure your script contains character dialogue and scene descriptions.
+                </p>
               </div>
             )}
           </div>
