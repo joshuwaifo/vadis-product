@@ -36,14 +36,7 @@ const ANALYSIS_TASKS: AnalysisTask[] = [
     icon: Film,
     estimatedTime: '2-3 min'
   },
-  {
-    id: 'storyboard_view',
-    title: 'Storyboard View',
-    description: 'Visual storyboard representation of all scenes',
-    status: 'not_started',
-    icon: Maximize2,
-    estimatedTime: '1-2 min'
-  },
+
   {
     id: 'character_analysis',
     title: 'Character Analysis',
