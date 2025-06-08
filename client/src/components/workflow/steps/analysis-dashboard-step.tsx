@@ -139,6 +139,11 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
     enabled: !!workflow?.projectId
   });
 
+  const { data: castingAnalysis } = useQuery({
+    queryKey: [`/api/projects/${workflow?.projectId}/casting/analysis`],
+    enabled: !!workflow?.projectId
+  });
+
   // Update task status and results based on existing data
   useEffect(() => {
     if (existingScenes?.length > 0) {
@@ -213,7 +218,7 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
   }, [existingCharacters]);
 
   useEffect(() => {
-    if (existingCasting?.length > 0) {
+    if (castingAnalysis) {
       setTasks(prev => prev.map(task => 
         task.id === 'casting_suggestions' 
           ? { ...task, status: 'completed' as const, completedAt: new Date() }
@@ -223,11 +228,11 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
         ...prev,
         casting_suggestions: {
           success: true,
-          castingAnalysis: existingCasting
+          castingAnalysis: castingAnalysis
         }
       }));
     }
-  }, [existingCasting]);
+  }, [castingAnalysis]);
 
   const analysisInProgress = tasks.some(task => task.status === 'in_progress');
 

@@ -8,8 +8,13 @@ import {
   insertDemoRequestSchema, 
   insertProjectSchema,
   loginSchema,
-  userRoles
+  userRoles,
+  projects,
+  characters,
+  actorSuggestions
 } from "@shared/schema";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
 import { registerScriptAnalysisRoutes } from "./script-analysis-routes";
 import { registerWorkflowRoutes } from "./workflow-routes";
 import { registerComprehensiveAnalysisRoutes } from "./comprehensive-analysis-routes";
@@ -289,6 +294,81 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching casting:", error);
       res.status(500).json({ error: "Failed to fetch casting data" });
+    }
+  });
+
+  // Get full casting analysis with character suggestions
+  app.get("/api/projects/:id/casting/analysis", async (req, res) => {
+    try {
+      if (!req.session.user) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const projectId = parseInt(req.params.id);
+      
+      // Get project details
+      const project = await db
+        .select()
+        .from(projects)
+        .where(eq(projects.id, projectId));
+
+      if (project.length === 0) {
+        return res.status(404).json({ error: 'Project not found' });
+      }
+
+      // Get characters for this project
+      const projectCharacters = await db
+        .select()
+        .from(characters)
+        .where(eq(characters.projectId, projectId));
+
+      // Get casting suggestions
+      const castingSuggestions = await db
+        .select()
+        .from(actorSuggestions)
+        .where(eq(actorSuggestions.projectId, projectId));
+
+      if (projectCharacters.length === 0 || castingSuggestions.length === 0) {
+        return res.json(null); // No casting analysis available
+      }
+
+      // Reconstruct casting analysis format
+      const characterSuggestions = projectCharacters.map(character => {
+        const suggestion = castingSuggestions.find(cs => cs.characterName === character.name);
+        if (!suggestion) return null;
+
+        return {
+          characterName: character.name,
+          suggestedActors: [{
+            actorName: suggestion.actorName,
+            age: 0, // Default value
+            bio: '',
+            fitAnalysis: suggestion.reasoning || '',
+            chemistryFactor: '',
+            recentWork: [],
+            fitScore: suggestion.fitScore || 0,
+            availability: suggestion.availability || '',
+            estimatedFee: suggestion.estimatedFee || '',
+            controversyLevel: 'low' as const,
+            fanRating: 0
+          }]
+        };
+      }).filter(Boolean);
+
+      const castingAnalysis = {
+        scriptTitle: project[0].title || 'Untitled Script',
+        characterSuggestions,
+        ensembleChemistry: {
+          keyRelationships: [],
+          overallSynergy: 'Comprehensive ensemble analysis will be generated with AI casting suggestions.',
+          castingRationale: 'Actor selections are based on character fit, availability, and budget considerations.'
+        }
+      };
+
+      res.json(castingAnalysis);
+    } catch (error) {
+      console.error("Error fetching casting analysis:", error);
+      res.status(500).json({ error: "Failed to fetch casting analysis" });
     }
   });
 
