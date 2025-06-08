@@ -479,6 +479,40 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
         project[0].title || 'Untitled Script',
         'gpt-4o'
       );
+
+      // Fetch actor profile images
+      const { tmdbService } = await import('./tmdb-service');
+      if (tmdbService) {
+        console.log('Fetching actor profile images...');
+        
+        // Collect all actor names for batch processing
+        const allActorNames = new Set<string>();
+        
+        castingAnalysis.characterSuggestions.forEach(suggestion => {
+          allActorNames.add(suggestion.primaryChoice.actorName);
+          suggestion.alternatives.forEach(alt => {
+            allActorNames.add(alt.actorName);
+          });
+        });
+
+        // Fetch all actor profiles
+        const actorProfiles = await tmdbService.getActorProfiles(Array.from(allActorNames));
+
+        // Add profile images to casting suggestions
+        castingAnalysis.characterSuggestions.forEach(suggestion => {
+          const primaryProfile = actorProfiles[suggestion.primaryChoice.actorName];
+          suggestion.primaryChoice.profileImageUrl = primaryProfile?.profileImageUrl || 
+            tmdbService.generatePlaceholderAvatar(suggestion.primaryChoice.actorName);
+          
+          suggestion.alternatives.forEach(alt => {
+            const altProfile = actorProfiles[alt.actorName];
+            (alt as any).profileImageUrl = altProfile?.profileImageUrl || 
+              tmdbService.generatePlaceholderAvatar(alt.actorName);
+          });
+        });
+
+        console.log('Actor profile images added to casting suggestions');
+      }
       
       console.log(`Casting analysis complete for ${castingAnalysis.characterSuggestions.length} characters`);
 

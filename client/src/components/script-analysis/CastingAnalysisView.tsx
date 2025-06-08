@@ -22,6 +22,7 @@ interface CastingAnalysisData {
       fitScore: number;
       availability: string;
       estimatedFee: string;
+      profileImageUrl?: string;
     };
     alternatives: Array<{
       actorName: string;
@@ -32,6 +33,7 @@ interface CastingAnalysisData {
       fitScore: number;
       availability: string;
       estimatedFee: string;
+      profileImageUrl?: string;
     }>;
   }>;
   ensembleChemistry: {
@@ -200,52 +202,67 @@ export default function CastingAnalysisView({ castingData, projectId, onRefresh 
                 {/* Primary Choice */}
                 <div className="space-y-4">
                   <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                        {character.primaryChoice.actorName}
-                      </h4>
-                      <p className="text-gray-600 dark:text-gray-400 mb-3">
-                        {character.primaryChoice.bio}
-                      </p>
+                    <div className="flex items-start space-x-4 flex-1">
+                      {/* Actor Profile Image */}
+                      <div className="flex-shrink-0">
+                        <img
+                          src={character.primaryChoice.profileImageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(character.primaryChoice.actorName)}&size=120&background=6366f1&color=ffffff&bold=true`}
+                          alt={character.primaryChoice.actorName}
+                          className="w-20 h-20 rounded-full object-cover border-2 border-gray-200 dark:border-gray-700"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(character.primaryChoice.actorName)}&size=120&background=6366f1&color=ffffff&bold=true`;
+                          }}
+                        />
+                      </div>
                       
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        <div>
-                          <h5 className="font-medium text-gray-900 dark:text-white mb-1">Fit Analysis</h5>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
-                            {character.primaryChoice.fitAnalysis}
-                          </p>
-                        </div>
-                        <div>
-                          <h5 className="font-medium text-gray-900 dark:text-white mb-1">Chemistry Factor</h5>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
-                            {character.primaryChoice.chemistryFactor}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400">
-                        <div className="flex items-center space-x-1">
-                          <Calendar className="w-4 h-4" />
-                          <span>{character.primaryChoice.availability}</span>
-                        </div>
-                        <div className="flex items-center space-x-1">
-                          <DollarSign className="w-4 h-4" />
-                          <span>{character.primaryChoice.estimatedFee}</span>
-                        </div>
-                      </div>
-
-                      {character.primaryChoice.recentWork.length > 0 && (
-                        <div className="mt-3">
-                          <h5 className="font-medium text-gray-900 dark:text-white mb-1">Recent Work</h5>
-                          <div className="flex flex-wrap gap-1">
-                            {character.primaryChoice.recentWork.map((work, idx) => (
-                              <Badge key={idx} variant="outline" className="text-xs">
-                                {work}
-                              </Badge>
-                            ))}
+                      <div className="flex-1">
+                        <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                          {character.primaryChoice.actorName}
+                        </h4>
+                        <p className="text-gray-600 dark:text-gray-400 mb-3">
+                          {character.primaryChoice.bio}
+                        </p>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                          <div>
+                            <h5 className="font-medium text-gray-900 dark:text-white mb-1">Fit Analysis</h5>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                              {character.primaryChoice.fitAnalysis}
+                            </p>
+                          </div>
+                          <div>
+                            <h5 className="font-medium text-gray-900 dark:text-white mb-1">Chemistry Factor</h5>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                              {character.primaryChoice.chemistryFactor}
+                            </p>
                           </div>
                         </div>
-                      )}
+
+                        <div className="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400">
+                          <div className="flex items-center space-x-1">
+                            <Calendar className="w-4 h-4" />
+                            <span>{character.primaryChoice.availability}</span>
+                          </div>
+                          <div className="flex items-center space-x-1">
+                            <DollarSign className="w-4 h-4" />
+                            <span>{character.primaryChoice.estimatedFee}</span>
+                          </div>
+                        </div>
+
+                        {character.primaryChoice.recentWork.length > 0 && (
+                          <div className="mt-3">
+                            <h5 className="font-medium text-gray-900 dark:text-white mb-1">Recent Work</h5>
+                            <div className="flex flex-wrap gap-1">
+                              {character.primaryChoice.recentWork.map((work, idx) => (
+                                <Badge key={idx} variant="outline" className="text-xs">
+                                  {work}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
 
