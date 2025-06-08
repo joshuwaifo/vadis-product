@@ -449,11 +449,24 @@ export async function analyzeUserActorChoice(
   relationships: any[],
   provider: AIProvider = 'gpt-4o'
 ): Promise<{
-  suitabilityAssessment: string;
-  chemistryImpact: string;
-  castingAdjustments: string;
-  comparisonWithOriginal: string;
+  actorName: string;
+  age: number;
+  bio: string;
+  fitAnalysis: string;
+  chemistryFactor: string;
+  recentWork: string[];
   fitScore: number;
+  availability: string;
+  estimatedFee: string;
+  profileImageUrl?: string;
+  controversyLevel: 'low' | 'medium' | 'high';
+  fanRating: number;
+  detailedBio?: string;
+  awards?: string[];
+  socialMediaFollowing?: string;
+  marketValue?: string;
+  recommendation: 'excellent' | 'good' | 'poor';
+  alternativeSuggestions?: string[];
 }> {
   const prompt = `
 As an expert casting director, analyze this user's actor suggestion:
@@ -464,36 +477,57 @@ As an expert casting director, analyze this user's actor suggestion:
 **Other Characters:** ${JSON.stringify(otherCharacters, null, 2)}
 **Relationships:** ${JSON.stringify(relationships, null, 2)}
 
-Provide a comprehensive analysis:
+Provide a comprehensive analysis in this exact JSON format:
 
-1. **Suitability Assessment:** How well does ${suggestedActor} fit ${character.name}?
-2. **Chemistry Impact:** How does this choice affect dynamics with other characters?
-3. **Casting Adjustments:** Should other roles be reconsidered to maintain ensemble balance?
-4. **Comparison:** How does this compare to what a casting director would typically recommend?
-
-Return as JSON:
 {
-  "suitabilityAssessment": "Detailed analysis of actor fit",
-  "chemistryImpact": "How this affects ensemble dynamics",
-  "castingAdjustments": "Recommended adjustments to other casting",
-  "comparisonWithOriginal": "How this compares to typical casting for this character type",
-  "fitScore": 85
+  "actorName": "${suggestedActor}",
+  "age": [actor's current age],
+  "bio": "Brief professional biography highlighting their career and strengths",
+  "fitAnalysis": "Detailed analysis of how well ${suggestedActor} fits ${character.name} - consider physical attributes, acting range, past roles, and character requirements",
+  "chemistryFactor": "Analysis of how this casting choice affects ensemble dynamics and chemistry with other characters",
+  "recentWork": ["Recent film/TV project 1", "Recent film/TV project 2", "Recent film/TV project 3"],
+  "fitScore": [score from 1-100 based on overall suitability],
+  "availability": "Current availability status (e.g., 'Available 2024', 'Busy until 2025')",
+  "estimatedFee": "Realistic fee estimate (e.g., '$5 million', '$500K', 'Scale + backend')",
+  "controversyLevel": "low|medium|high",
+  "fanRating": [rating from 1-10 based on current popularity],
+  "detailedBio": "Extended biography with career highlights and acting style",
+  "awards": ["Notable award 1", "Notable award 2"],
+  "socialMediaFollowing": "Social media metrics if notable",
+  "marketValue": "Current market positioning and bankability",
+  "recommendation": "excellent|good|poor",
+  "alternativeSuggestions": ["Alternative actor 1", "Alternative actor 2", "Alternative actor 3"]
 }
+
+Focus on realistic, current information about the actor. If the actor is not well-known or suitable, be honest about limitations while providing constructive analysis.
   `;
 
   try {
     const response = await generateContent(provider, prompt, {
       responseFormat: 'json',
-      maxTokens: 3000
+      maxTokens: 4000
     });
 
-    return extractJsonFromText(response) || {
-      suitabilityAssessment: "Analysis unavailable",
-      chemistryImpact: "Impact unknown",
-      castingAdjustments: "No adjustments suggested",
-      comparisonWithOriginal: "Comparison unavailable",
-      fitScore: 50
-    };
+    const analysis = extractJsonFromText(response);
+    
+    if (!analysis) {
+      return {
+        actorName: suggestedActor,
+        age: 35,
+        bio: "Analysis unavailable for this actor.",
+        fitAnalysis: "Unable to analyze actor suitability at this time.",
+        chemistryFactor: "Chemistry impact cannot be determined.",
+        recentWork: [],
+        fitScore: 50,
+        availability: "Unknown",
+        estimatedFee: "Not available",
+        controversyLevel: "low" as const,
+        fanRating: 5,
+        recommendation: "poor" as const
+      };
+    }
+
+    return analysis;
   } catch (error) {
     console.error('Error analyzing user actor choice:', error);
     throw new Error('Failed to analyze actor suggestion');
