@@ -593,10 +593,10 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
       if (tmdbService) {
         try {
           console.log(`Fetching profile image for actor: ${suggestedActor}`);
-          const profileImageUrl = await tmdbService.getActorProfileImage(suggestedActor);
-          if (profileImageUrl) {
-            analysis.profileImageUrl = profileImageUrl;
-            console.log(`Profile image found for ${suggestedActor}: ${profileImageUrl}`);
+          const actorProfile = await tmdbService.searchActor(suggestedActor);
+          if (actorProfile && actorProfile.profileImageUrl) {
+            analysis.profileImageUrl = actorProfile.profileImageUrl;
+            console.log(`Profile image found for ${suggestedActor}: ${actorProfile.profileImageUrl}`);
           } else {
             console.log(`No profile image found for ${suggestedActor}`);
           }
