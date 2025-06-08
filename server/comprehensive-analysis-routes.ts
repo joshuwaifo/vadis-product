@@ -564,21 +564,20 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
         });
       }
 
-      // Get character details - using SQL template for complex where clause
-      const character = await db
+      // Get character details
+      const allProjectCharacters = await db
         .select()
         .from(characters)
         .where(eq(characters.projectId, parseInt(projectId)));
+
+      const character = allProjectCharacters.filter(char => char.name === characterName);
 
       if (!character.length) {
         return res.status(404).json({ error: 'Character not found' });
       }
 
-      // Get all characters for context
-      const allCharacters = await db
-        .select()
-        .from(characters)
-        .where(eq(characters.projectId, parseInt(projectId)));
+      // Use the already fetched characters
+      const allCharacters = allProjectCharacters;
 
       // Get relationships (using empty array as fallback since relationships field may not exist)
       const relationships: any[] = [];
