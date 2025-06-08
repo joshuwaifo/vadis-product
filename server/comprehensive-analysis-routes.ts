@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { extractScenes, analyzeCharacters, suggestActors, analyzeVFXNeeds, generateProductPlacement, suggestLocations, generateFinancialPlan, generateProjectSummary } from "./script-analysis-agents";
-import { db } from "./db";
+import { db, pool } from "./db";
 import { projects, scenes, characters, actorSuggestions, vfxNeeds, productPlacements, locationSuggestions, financialPlans } from "@shared/schema";
 import { eq, and } from "drizzle-orm";
 
@@ -512,7 +512,7 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
       console.log(`Casting analysis complete for ${castingAnalysis.characterSuggestions.length} characters`);
 
       // Save complete casting analysis to database
-      const savedAnalysis = await db.execute(`
+      const savedAnalysis = await pool.query(`
         INSERT INTO casting_analysis (project_id, script_title, analysis_data)
         VALUES ($1, $2, $3)
         ON CONFLICT (project_id) 
@@ -522,7 +522,7 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
         RETURNING id
       `, [parseInt(projectId), castingAnalysis.scriptTitle, JSON.stringify(castingAnalysis)]);
 
-      console.log('Complete casting analysis saved to database:', savedAnalysis?.id);
+      console.log('Complete casting analysis saved to database:', savedAnalysis.rows[0]?.id);
 
       res.json({
         success: true,

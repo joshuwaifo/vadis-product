@@ -13,7 +13,7 @@ import {
   characters,
   actorSuggestions
 } from "@shared/schema";
-import { db } from "./db";
+import { db, pool } from "./db";
 import { eq } from "drizzle-orm";
 import { registerScriptAnalysisRoutes } from "./script-analysis-routes";
 import { registerWorkflowRoutes } from "./workflow-routes";
@@ -307,7 +307,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const projectId = parseInt(req.params.id);
       
       // Get complete casting analysis from new table
-      const analysisResult = await db.execute(`
+      const analysisResult = await pool.query(`
         SELECT analysis_data 
         FROM casting_analysis 
         WHERE project_id = $1
@@ -320,7 +320,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const castingAnalysis = analysisResult.rows[0].analysis_data;
       
       // Get user's selections if any
-      const selectionsResult = await db.execute(`
+      const selectionsResult = await pool.query(`
         SELECT character_name, selected_actor_name, selection_reason, is_locked
         FROM casting_selections 
         WHERE project_id = $1
@@ -362,7 +362,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Save or update casting selection
-      const result = await db.execute(`
+      const result = await pool.query(`
         INSERT INTO casting_selections (project_id, character_name, selected_actor_name, selection_reason)
         VALUES ($1, $2, $3, $4)
         ON CONFLICT (project_id, character_name) 
