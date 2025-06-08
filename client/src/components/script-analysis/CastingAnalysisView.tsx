@@ -148,8 +148,8 @@ export default function CastingAnalysisView({ castingData, projectId, onRefresh 
     onViewDetails: () => void;
     onSelect: () => void;
   }) => (
-    <Card className={`transition-all duration-200 cursor-pointer hover:shadow-lg ${isSelected ? 'ring-2 ring-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'hover:shadow-md'}`}>
-      <CardContent className="p-4">
+    <Card className={`transition-all duration-200 cursor-pointer hover:shadow-lg h-full flex flex-col ${isSelected ? 'ring-2 ring-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'hover:shadow-md'}`}>
+      <CardContent className="p-4 flex flex-col h-full">
         {/* Actor Photo & Basic Info */}
         <div className="flex items-start space-x-3 mb-4">
           <div className="w-16 h-20 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 flex-shrink-0">
@@ -191,7 +191,7 @@ export default function CastingAnalysisView({ castingData, projectId, onRefresh 
         </div>
 
         {/* Key Info */}
-        <div className="space-y-2 text-sm">
+        <div className="space-y-2 text-sm mb-4">
           <div className="flex justify-between">
             <span className="text-gray-500">Availability:</span>
             <span className="font-medium">{actor.availability}</span>
@@ -202,27 +202,29 @@ export default function CastingAnalysisView({ castingData, projectId, onRefresh 
           </div>
         </div>
 
-        {/* Recent Work */}
-        {actor.recentWork && actor.recentWork.length > 0 && (
-          <div className="mt-3">
-            <p className="text-xs text-gray-500 mb-1">Recent Work:</p>
-            <div className="flex flex-wrap gap-1">
-              {actor.recentWork.slice(0, 2).map((work, idx) => (
-                <Badge key={idx} variant="outline" className="text-xs">
-                  {work}
-                </Badge>
-              ))}
-              {actor.recentWork.length > 2 && (
-                <Badge variant="outline" className="text-xs">
-                  +{actor.recentWork.length - 2} more
-                </Badge>
-              )}
+        {/* Recent Work - grows to fill available space */}
+        <div className="flex-1">
+          {actor.recentWork && actor.recentWork.length > 0 && (
+            <div>
+              <p className="text-xs text-gray-500 mb-1">Recent Work:</p>
+              <div className="flex flex-wrap gap-1">
+                {actor.recentWork.slice(0, 2).map((work, idx) => (
+                  <Badge key={idx} variant="outline" className="text-xs">
+                    {work}
+                  </Badge>
+                ))}
+                {actor.recentWork.length > 2 && (
+                  <Badge variant="outline" className="text-xs">
+                    +{actor.recentWork.length - 2} more
+                  </Badge>
+                )}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
-        {/* Action Buttons */}
-        <div className="flex gap-2 mt-4">
+        {/* Action Buttons - always at bottom */}
+        <div className="flex gap-2 mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
           <Button 
             variant="outline" 
             size="sm" 

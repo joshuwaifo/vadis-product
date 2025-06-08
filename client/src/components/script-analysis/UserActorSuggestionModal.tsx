@@ -236,16 +236,18 @@ export function UserActorSuggestionModal({
               </div>
 
               {/* Recent Work */}
-              <div>
-                <h4 className="font-semibold mb-2">Recent Work</h4>
-                <div className="flex flex-wrap gap-2">
-                  {analysisResult.recentWork.map((work, index) => (
-                    <Badge key={index} variant="outline">
-                      {work}
-                    </Badge>
-                  ))}
+              {analysisResult.recentWork && analysisResult.recentWork.length > 0 && (
+                <div>
+                  <h4 className="font-semibold mb-2">Recent Work</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {analysisResult.recentWork.map((work, index) => (
+                      <Badge key={index} variant="outline">
+                        {work}
+                      </Badge>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Alternative Suggestions */}
               {analysisResult.alternativeSuggestions && analysisResult.alternativeSuggestions.length > 0 && (
