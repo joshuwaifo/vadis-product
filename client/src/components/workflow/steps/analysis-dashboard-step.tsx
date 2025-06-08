@@ -562,11 +562,14 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
       case 'casting_suggestions':
         return (
           <div className="space-y-6">
-            {results.castingAnalysis ? (
+            {castingAnalysis ? (
               <CastingAnalysisView
-                castingData={results.castingAnalysis}
+                castingData={castingAnalysis}
                 projectId={workflow?.projectId || project?.id}
-                onRefresh={() => runAnalysis('casting_suggestions')}
+                onRefresh={() => {
+                  queryClient.invalidateQueries({ queryKey: [`/api/projects/${workflow?.projectId}/casting/analysis`] });
+                  runAnalysis('casting_suggestions');
+                }}
               />
             ) : (
               <div className="text-center py-8">

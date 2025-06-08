@@ -19,7 +19,7 @@ import {
   Eye
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { apiRequest } from '@/lib/queryClient';
+import { apiRequest, queryClient } from '@/lib/queryClient';
 import { ActorDetailModal } from './ActorDetailModal';
 import { UserActorSuggestionModal } from './UserActorSuggestionModal';
 
@@ -133,6 +133,11 @@ export default function CastingAnalysisView({ castingData, projectId, onRefresh 
         ...prev,
         [characterName]: actor
       }));
+
+      // Invalidate casting analysis cache to refresh with new selections
+      queryClient.invalidateQueries({ 
+        queryKey: [`/api/projects/${projectId}/casting/analysis`] 
+      });
       
       toast({
         title: "Actor Selected",
