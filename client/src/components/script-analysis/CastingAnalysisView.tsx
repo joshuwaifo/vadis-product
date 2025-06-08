@@ -5,36 +5,53 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Users, Star, DollarSign, Calendar, ArrowRight, UserPlus, Shuffle } from 'lucide-react';
+import { 
+  Users, 
+  Star, 
+  DollarSign, 
+  Calendar, 
+  ArrowRight, 
+  UserPlus, 
+  Shuffle, 
+  AlertTriangle,
+  Award,
+  TrendingUp,
+  CheckCircle,
+  Plus,
+  Eye
+} from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
+import { ActorDetailModal } from './ActorDetailModal';
+import { UserActorSuggestionModal } from './UserActorSuggestionModal';
+
+interface ActorProfile {
+  actorName: string;
+  age: number;
+  bio: string;
+  fitAnalysis: string;
+  chemistryFactor: string;
+  recentWork: string[];
+  notableWork?: string[];
+  fitScore: number;
+  availability: string;
+  estimatedFee: string;
+  profileImageUrl?: string;
+  controversyLevel: 'low' | 'medium' | 'high';
+  fanRating: number;
+  strengthsForRole?: string;
+  potentialChemistry?: string;
+  detailedBio?: string;
+  awards?: string[];
+  socialMediaFollowing?: string;
+  marketValue?: string;
+}
 
 interface CastingAnalysisData {
   scriptTitle: string;
   characterSuggestions: Array<{
     characterName: string;
-    primaryChoice: {
-      actorName: string;
-      bio: string;
-      fitAnalysis: string;
-      chemistryFactor: string;
-      recentWork: string[];
-      fitScore: number;
-      availability: string;
-      estimatedFee: string;
-      profileImageUrl?: string;
-    };
-    alternatives: Array<{
-      actorName: string;
-      age: number;
-      strengthsForRole: string;
-      potentialChemistry: string;
-      notableWork: string[];
-      fitScore: number;
-      availability: string;
-      estimatedFee: string;
-      profileImageUrl?: string;
-    }>;
+    suggestedActors: ActorProfile[];
   }>;
   ensembleChemistry: {
     keyRelationships: Array<{
@@ -55,46 +72,48 @@ interface CastingAnalysisViewProps {
 }
 
 export default function CastingAnalysisView({ castingData, projectId, onRefresh }: CastingAnalysisViewProps) {
-  const [selectedCharacter, setSelectedCharacter] = useState<string | null>(null);
-  const [customActor, setCustomActor] = useState('');
-  const [userAnalysis, setUserAnalysis] = useState<any>(null);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [selectedActor, setSelectedActor] = useState<ActorProfile | null>(null);
+  const [selectedCharacter, setSelectedCharacter] = useState<string>('');
+  const [selectedActors, setSelectedActors] = useState<Record<string, ActorProfile>>({});
+  const [showUserSuggestionModal, setShowUserSuggestionModal] = useState(false);
+  const [currentCharacterForSuggestion, setCurrentCharacterForSuggestion] = useState<{name: string, description: string} | null>(null);
   const { toast } = useToast();
 
-  const analyzeUserActor = async (characterName: string, actorName: string) => {
-    setIsAnalyzing(true);
-    try {
-      const response = await fetch('/api/script-analysis/analyze_user_actor', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          projectId,
-          characterName,
-          suggestedActor: actorName
-        })
-      });
+  const handleSelectActor = (characterName: string, actor: ActorProfile) => {
+    setSelectedActors(prev => ({
+      ...prev,
+      [characterName]: actor
+    }));
+    
+    toast({
+      title: "Actor Selected",
+      description: `${actor.actorName} selected for ${characterName}`
+    });
+  };
 
-      const data = await response.json();
+  const handleOpenUserSuggestion = (characterName: string, characterData: any) => {
+    setCurrentCharacterForSuggestion({
+      name: characterName,
+      description: characterData?.description || `Character: ${characterName}`
+    });
+    setShowUserSuggestionModal(true);
+  };
 
-      if (data.success) {
-        setUserAnalysis(data.analysis);
-        toast({
-          title: "Actor Analysis Complete",
-          description: `Analysis for ${actorName} as ${characterName} is ready.`
-        });
-      } else {
-        throw new Error(data.message || 'Failed to analyze actor');
+  const handleAddUserSuggestion = (actor: ActorProfile) => {
+    if (currentCharacterForSuggestion) {
+      // Add user-suggested actor to the character's suggested actors list
+      const characterIndex = castingData.characterSuggestions.findIndex(
+        char => char.characterName === currentCharacterForSuggestion.name
+      );
+      
+      if (characterIndex !== -1) {
+        castingData.characterSuggestions[characterIndex].suggestedActors.push(actor);
       }
-    } catch (error: any) {
+      
       toast({
-        title: "Analysis Failed",
-        description: error.message || "Failed to analyze actor suggestion",
-        variant: "destructive"
+        title: "Actor Added",
+        description: `${actor.actorName} added to casting options for ${currentCharacterForSuggestion.name}`
       });
-    } finally {
-      setIsAnalyzing(false);
     }
   };
 
@@ -108,6 +127,19 @@ export default function CastingAnalysisView({ castingData, projectId, onRefresh 
     if (score >= 90) return 'default';
     if (score >= 80) return 'secondary';
     return 'destructive';
+  };
+
+  const getControveryBadge = (level: string) => {
+    switch (level) {
+      case 'low':
+        return <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">Low Risk</Badge>;
+      case 'medium':
+        return <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300">Medium Risk</Badge>;
+      case 'high':
+        return <Badge variant="secondary" className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">High Risk</Badge>;
+      default:
+        return <Badge variant="secondary">Unknown</Badge>;
+    }
   };
 
   return (
@@ -129,14 +161,26 @@ export default function CastingAnalysisView({ castingData, projectId, onRefresh 
       </div>
 
       {/* Casting Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center space-x-2">
               <Users className="w-5 h-5 text-blue-500" />
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Characters Cast</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Characters</p>
                 <p className="text-2xl font-bold">{castingData.characterSuggestions.length}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <CheckCircle className="w-5 h-5 text-green-500" />
+              <div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Selected</p>
+                <p className="text-2xl font-bold">{Object.keys(selectedActors).length}</p>
               </div>
             </div>
           </CardContent>
@@ -151,7 +195,7 @@ export default function CastingAnalysisView({ castingData, projectId, onRefresh 
                 <p className="text-2xl font-bold">
                   {Math.round(
                     castingData.characterSuggestions.reduce((acc, char) => 
-                      acc + char.primaryChoice.fitScore, 0
+                      acc + (char.suggestedActors[0]?.fitScore || 0), 0
                     ) / castingData.characterSuggestions.length
                   )}%
                 </p>
@@ -163,7 +207,7 @@ export default function CastingAnalysisView({ castingData, projectId, onRefresh 
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center space-x-2">
-              <DollarSign className="w-5 h-5 text-green-500" />
+              <Users className="w-5 h-5 text-purple-500" />
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Key Relationships</p>
                 <p className="text-2xl font-bold">{castingData.ensembleChemistry.keyRelationships.length}</p>
