@@ -2,8 +2,6 @@ import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Users, 
@@ -142,6 +140,118 @@ export default function CastingAnalysisView({ castingData, projectId, onRefresh 
     }
   };
 
+  // ActorCard component for side-by-side display
+  const ActorCard = ({ actor, characterName, isSelected, onViewDetails, onSelect }: {
+    actor: ActorProfile;
+    characterName: string;
+    isSelected: boolean;
+    onViewDetails: () => void;
+    onSelect: () => void;
+  }) => (
+    <Card className={`transition-all duration-200 cursor-pointer hover:shadow-lg ${isSelected ? 'ring-2 ring-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'hover:shadow-md'}`}>
+      <CardContent className="p-4">
+        {/* Actor Photo & Basic Info */}
+        <div className="flex items-start space-x-3 mb-4">
+          <div className="w-16 h-20 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 flex-shrink-0">
+            {actor.profileImageUrl ? (
+              <img 
+                src={actor.profileImageUrl} 
+                alt={actor.actorName}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-gray-400">
+                <Users className="w-6 h-6" />
+              </div>
+            )}
+          </div>
+          
+          <div className="flex-1 min-w-0">
+            <h4 className="font-semibold text-gray-900 dark:text-white truncate">
+              {actor.actorName}
+            </h4>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Age {actor.age}
+            </p>
+            
+            {/* Fit Score & Controversy */}
+            <div className="flex items-center gap-2 mt-2">
+              <Badge variant={getScoreBadgeVariant(actor.fitScore)}>
+                {actor.fitScore}% Fit
+              </Badge>
+              {getControveryBadge(actor.controversyLevel)}
+            </div>
+            
+            {/* Fan Rating */}
+            <div className="flex items-center mt-2">
+              <Star className="w-4 h-4 text-yellow-500 mr-1" />
+              <span className="text-sm font-medium">{actor.fanRating}/10</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Key Info */}
+        <div className="space-y-2 text-sm">
+          <div className="flex justify-between">
+            <span className="text-gray-500">Availability:</span>
+            <span className="font-medium">{actor.availability}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-gray-500">Fee:</span>
+            <span className="font-medium text-green-600">{actor.estimatedFee}</span>
+          </div>
+        </div>
+
+        {/* Recent Work */}
+        {actor.recentWork && actor.recentWork.length > 0 && (
+          <div className="mt-3">
+            <p className="text-xs text-gray-500 mb-1">Recent Work:</p>
+            <div className="flex flex-wrap gap-1">
+              {actor.recentWork.slice(0, 2).map((work, idx) => (
+                <Badge key={idx} variant="outline" className="text-xs">
+                  {work}
+                </Badge>
+              ))}
+              {actor.recentWork.length > 2 && (
+                <Badge variant="outline" className="text-xs">
+                  +{actor.recentWork.length - 2} more
+                </Badge>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Action Buttons */}
+        <div className="flex gap-2 mt-4">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={onViewDetails}
+            className="flex-1"
+          >
+            <Eye className="w-3 h-3 mr-1" />
+            Details
+          </Button>
+          <Button 
+            size="sm" 
+            onClick={onSelect}
+            disabled={isSelected}
+            className="flex-1"
+          >
+            {isSelected ? (
+              <>
+                <CheckCircle className="w-3 h-3 mr-1" />
+                Selected
+              </>
+            ) : (
+              'Select'
+            )}
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -224,175 +334,51 @@ export default function CastingAnalysisView({ castingData, projectId, onRefresh 
           <TabsTrigger value="ensemble">Ensemble Chemistry</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="characters" className="space-y-4">
+        <TabsContent value="characters" className="space-y-6">
           {castingData.characterSuggestions.map((character, index) => (
-            <Card key={index} className="overflow-hidden">
-              <CardHeader className="bg-gray-50 dark:bg-gray-800/50">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="text-lg">{character.characterName}</CardTitle>
-                    <CardDescription>Primary Casting Recommendation</CardDescription>
-                  </div>
-                  <Badge 
-                    variant={getScoreBadgeVariant(character.primaryChoice.fitScore)}
-                    className="text-sm"
-                  >
-                    {character.primaryChoice.fitScore}% Fit
-                  </Badge>
+            <Card key={index} className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                    {character.characterName}
+                  </h3>
+                  {selectedActors[character.characterName] ? (
+                    <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 mt-1">
+                      <CheckCircle className="w-3 h-3 mr-1" />
+                      {selectedActors[character.characterName].actorName} Selected
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline" className="mt-1">
+                      {character.suggestedActors.length} Options Available
+                    </Badge>
+                  )}
                 </div>
-              </CardHeader>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => handleOpenUserSuggestion(character.characterName, character)}
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Suggest Actor
+                </Button>
+              </div>
 
-              <CardContent className="p-6">
-                {/* Primary Choice */}
-                <div className="space-y-4">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-start space-x-4 flex-1">
-                      {/* Actor Profile Image */}
-                      <div className="flex-shrink-0">
-                        <img
-                          src={character.primaryChoice.profileImageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(character.primaryChoice.actorName)}&size=120&background=6366f1&color=ffffff&bold=true`}
-                          alt={character.primaryChoice.actorName}
-                          className="w-20 h-20 rounded-full object-cover border-2 border-gray-200 dark:border-gray-700"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(character.primaryChoice.actorName)}&size=120&background=6366f1&color=ffffff&bold=true`;
-                          }}
-                        />
-                      </div>
-                      
-                      <div className="flex-1">
-                        <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                          {character.primaryChoice.actorName}
-                        </h4>
-                        <p className="text-gray-600 dark:text-gray-400 mb-3">
-                          {character.primaryChoice.bio}
-                        </p>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                          <div>
-                            <h5 className="font-medium text-gray-900 dark:text-white mb-1">Fit Analysis</h5>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">
-                              {character.primaryChoice.fitAnalysis}
-                            </p>
-                          </div>
-                          <div>
-                            <h5 className="font-medium text-gray-900 dark:text-white mb-1">Chemistry Factor</h5>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">
-                              {character.primaryChoice.chemistryFactor}
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400">
-                          <div className="flex items-center space-x-1">
-                            <Calendar className="w-4 h-4" />
-                            <span>{character.primaryChoice.availability}</span>
-                          </div>
-                          <div className="flex items-center space-x-1">
-                            <DollarSign className="w-4 h-4" />
-                            <span>{character.primaryChoice.estimatedFee}</span>
-                          </div>
-                        </div>
-
-                        {character.primaryChoice.recentWork.length > 0 && (
-                          <div className="mt-3">
-                            <h5 className="font-medium text-gray-900 dark:text-white mb-1">Recent Work</h5>
-                            <div className="flex flex-wrap gap-1">
-                              {character.primaryChoice.recentWork.map((work, idx) => (
-                                <Badge key={idx} variant="outline" className="text-xs">
-                                  {work}
-                                </Badge>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Alternatives & Custom Actor */}
-                  <div className="border-t pt-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <h5 className="font-medium text-gray-900 dark:text-white">
-                        Alternative Casting Options
-                      </h5>
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button variant="outline" size="sm" onClick={() => setSelectedCharacter(character.characterName)}>
-                            <UserPlus className="w-4 h-4 mr-2" />
-                            Suggest Actor
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                          <DialogHeader>
-                            <DialogTitle>Suggest Actor for {character.characterName}</DialogTitle>
-                            <DialogDescription>
-                              Enter an actor name to get AI analysis of their fit for this role.
-                            </DialogDescription>
-                          </DialogHeader>
-                          <div className="space-y-4">
-                            <Input
-                              placeholder="Enter actor name..."
-                              value={customActor}
-                              onChange={(e) => setCustomActor(e.target.value)}
-                            />
-                            <Button 
-                              onClick={() => {
-                                if (customActor.trim()) {
-                                  analyzeUserActor(character.characterName, customActor);
-                                  setCustomActor('');
-                                }
-                              }}
-                              disabled={isAnalyzing || !customActor.trim()}
-                              className="w-full"
-                            >
-                              {isAnalyzing ? 'Analyzing...' : 'Analyze Actor'}
-                            </Button>
-                          </div>
-                        </DialogContent>
-                      </Dialog>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                      {character.alternatives.map((alt, altIndex) => (
-                        <Card key={altIndex} className="p-3 border border-gray-200 dark:border-gray-700">
-                          <div className="space-y-2">
-                            <div className="flex items-start space-x-2">
-                              <img
-                                src={alt.profileImageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(alt.actorName)}&size=80&background=6366f1&color=ffffff&bold=true`}
-                                alt={alt.actorName}
-                                className="w-12 h-12 rounded-full object-cover border border-gray-200 dark:border-gray-600 flex-shrink-0"
-                                onError={(e) => {
-                                  const target = e.target as HTMLImageElement;
-                                  target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(alt.actorName)}&size=80&background=6366f1&color=ffffff&bold=true`;
-                                }}
-                              />
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center justify-between">
-                                  <h6 className="font-medium text-sm truncate">{alt.actorName}</h6>
-                                  <Badge variant="outline" className="text-xs ml-2">
-                                    {alt.fitScore}%
-                                  </Badge>
-                                </div>
-                                <p className="text-xs text-gray-600 dark:text-gray-400">
-                                  Age: {alt.age}
-                                </p>
-                              </div>
-                            </div>
-                            <p className="text-xs text-gray-600 dark:text-gray-400">
-                              {alt.strengthsForRole}
-                            </p>
-                            <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-                              <span>{alt.availability}</span>
-                              <span>{alt.estimatedFee}</span>
-                            </div>
-                          </div>
-                        </Card>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
+              {/* Side-by-side Actor Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {character.suggestedActors.map((actor, actorIndex) => (
+                  <ActorCard
+                    key={actorIndex}
+                    actor={actor}
+                    characterName={character.characterName}
+                    isSelected={selectedActors[character.characterName]?.actorName === actor.actorName}
+                    onViewDetails={() => {
+                      setSelectedActor(actor);
+                      setSelectedCharacter(character.characterName);
+                    }}
+                    onSelect={() => handleSelectActor(character.characterName, actor)}
+                  />
+                ))}
+              </div>
             </Card>
           ))}
         </TabsContent>
@@ -435,29 +421,23 @@ export default function CastingAnalysisView({ castingData, projectId, onRefresh 
                 </div>
               </div>
 
-              {/* Overall Analysis */}
-              <div>
+              {/* Overall Synergy */}
+              <div className="border-t pt-6">
                 <h4 className="font-semibold text-gray-900 dark:text-white mb-3">
-                  Overall Casting Strategy
+                  Overall Ensemble Synergy
                 </h4>
                 <div className="space-y-4">
-                  <Card className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
-                    <h5 className="font-medium text-blue-900 dark:text-blue-100 mb-2">
-                      Ensemble Synergy
-                    </h5>
-                    <p className="text-sm text-blue-800 dark:text-blue-200">
-                      {castingData.ensembleChemistry.overallSynergy}
-                    </p>
-                  </Card>
-                  
-                  <Card className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
-                    <h5 className="font-medium text-green-900 dark:text-green-100 mb-2">
+                  <p className="text-gray-700 dark:text-gray-300">
+                    {castingData.ensembleChemistry.overallSynergy}
+                  </p>
+                  <div>
+                    <h5 className="font-medium text-gray-900 dark:text-white mb-2">
                       Casting Rationale
                     </h5>
-                    <p className="text-sm text-green-800 dark:text-green-200">
+                    <p className="text-gray-600 dark:text-gray-400">
                       {castingData.ensembleChemistry.castingRationale}
                     </p>
-                  </Card>
+                  </div>
                 </div>
               </div>
             </CardContent>
@@ -465,64 +445,29 @@ export default function CastingAnalysisView({ castingData, projectId, onRefresh 
         </TabsContent>
       </Tabs>
 
-      {/* User Analysis Results */}
-      {userAnalysis && (
-        <Card className="border-orange-200 dark:border-orange-800">
-          <CardHeader className="bg-orange-50 dark:bg-orange-900/20">
-            <CardTitle className="text-orange-900 dark:text-orange-100">
-              Your Actor Suggestion Analysis
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-6 space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <h5 className="font-medium text-gray-900 dark:text-white mb-2">
-                  Suitability Assessment
-                </h5>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {userAnalysis.suitabilityAssessment}
-                </p>
-              </div>
-              <div>
-                <h5 className="font-medium text-gray-900 dark:text-white mb-2">
-                  Chemistry Impact
-                </h5>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {userAnalysis.chemistryImpact}
-                </p>
-              </div>
-            </div>
-            
-            <div className="space-y-3">
-              <div>
-                <h5 className="font-medium text-gray-900 dark:text-white mb-2">
-                  Casting Adjustments
-                </h5>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {userAnalysis.castingAdjustments}
-                </p>
-              </div>
-              
-              <div className="flex items-center justify-between pt-3 border-t">
-                <div>
-                  <h5 className="font-medium text-gray-900 dark:text-white mb-1">
-                    Overall Fit Score
-                  </h5>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {userAnalysis.comparisonWithOriginal}
-                  </p>
-                </div>
-                <Badge 
-                  variant={getScoreBadgeVariant(userAnalysis.fitScore)}
-                  className="text-lg px-3 py-1"
-                >
-                  {userAnalysis.fitScore}%
-                </Badge>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      {/* Modal Components */}
+      <ActorDetailModal
+        actor={selectedActor}
+        characterName={selectedCharacter}
+        isOpen={selectedActor !== null}
+        onClose={() => setSelectedActor(null)}
+        onSelect={(actor) => {
+          handleSelectActor(selectedCharacter, actor);
+          setSelectedActor(null);
+        }}
+      />
+
+      <UserActorSuggestionModal
+        characterName={currentCharacterForSuggestion?.name || ''}
+        characterDescription={currentCharacterForSuggestion?.description || ''}
+        projectId={projectId.toString()}
+        isOpen={showUserSuggestionModal}
+        onClose={() => {
+          setShowUserSuggestionModal(false);
+          setCurrentCharacterForSuggestion(null);
+        }}
+        onAddToList={handleAddUserSuggestion}
+      />
     </div>
   );
 }
