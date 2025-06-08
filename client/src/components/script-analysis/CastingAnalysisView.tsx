@@ -29,7 +29,7 @@ interface ActorProfile {
   bio: string;
   fitAnalysis: string;
   chemistryFactor: string;
-  recentWork: string[];
+  recentWork?: string[];
   notableWork?: string[];
   fitScore: number;
   availability: string;

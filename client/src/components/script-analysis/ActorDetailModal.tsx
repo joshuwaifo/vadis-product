@@ -9,7 +9,8 @@ interface ActorProfile {
   bio: string;
   fitAnalysis: string;
   chemistryFactor: string;
-  recentWork: string[];
+  recentWork?: string[];
+  notableWork?: string[];
   fitScore: number;
   availability: string;
   estimatedFee: string;
@@ -20,6 +21,8 @@ interface ActorProfile {
   awards?: string[];
   socialMediaFollowing?: string;
   marketValue?: string;
+  strengthsForRole?: string;
+  potentialChemistry?: string;
 }
 
 interface ActorDetailModalProps {
@@ -169,16 +172,32 @@ export function ActorDetailModal({ actor, characterName, isOpen, onClose, onSele
             </div>
 
             {/* Recent Work */}
-            <div>
-              <h3 className="text-lg font-semibold mb-2">Recent Work</h3>
-              <div className="flex flex-wrap gap-2">
-                {actor.recentWork.map((work, index) => (
-                  <Badge key={index} variant="outline">
-                    {work}
-                  </Badge>
-                ))}
+            {actor.recentWork && actor.recentWork.length > 0 && (
+              <div>
+                <h3 className="text-lg font-semibold mb-2">Recent Work</h3>
+                <div className="flex flex-wrap gap-2">
+                  {actor.recentWork.map((work, index) => (
+                    <Badge key={index} variant="outline">
+                      {work}
+                    </Badge>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
+
+            {/* Notable Work */}
+            {actor.notableWork && actor.notableWork.length > 0 && (
+              <div>
+                <h3 className="text-lg font-semibold mb-2">Notable Career Highlights</h3>
+                <div className="flex flex-wrap gap-2">
+                  {actor.notableWork.map((work, index) => (
+                    <Badge key={index} variant="secondary">
+                      {work}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Awards */}
             {actor.awards && actor.awards.length > 0 && (
