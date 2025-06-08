@@ -511,31 +511,29 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
       
       console.log(`Casting analysis complete for ${castingAnalysis.characterSuggestions.length} characters`);
 
-      // Save casting suggestions to database - save first actor as primary choice
-      const savedSuggestions = await Promise.all(
-        castingAnalysis.characterSuggestions.map(async (suggestion) => {
-          const primaryActor = suggestion.suggestedActors[0]; // First actor is primary
-          const [saved] = await db
-            .insert(actorSuggestions)
-            .values({
-              projectId: parseInt(projectId),
-              characterName: suggestion.characterName,
-              actorName: primaryActor.actorName,
-              reasoning: primaryActor.fitAnalysis,
-              fitScore: primaryActor.fitScore,
-              availability: primaryActor.availability,
-              estimatedFee: primaryActor.estimatedFee,
-              workingRelationships: []
-            })
-            .returning();
-          return saved;
+      // Save complete casting analysis to database
+      const [savedAnalysis] = await db
+        .insert(castingAnalysis)
+        .values({
+          projectId: parseInt(projectId),
+          scriptTitle: castingAnalysis.scriptTitle,
+          analysisData: castingAnalysis
         })
-      );
+        .onConflictDoUpdate({
+          target: castingAnalysis.projectId,
+          set: {
+            analysisData: castingAnalysis,
+            updatedAt: new Date()
+          }
+        })
+        .returning();
+
+      console.log('Complete casting analysis saved to database:', savedAnalysis?.id);
 
       res.json({
         success: true,
         castingAnalysis,
-        savedToDatabase: savedSuggestions.length,
+        savedToDatabase: true,
         message: `Generated comprehensive casting analysis for ${castingAnalysis.characterSuggestions.length} characters`
       });
 

@@ -136,6 +136,29 @@ export const characterRelationships = pgTable("character_relationships", {
 });
 
 // Analysis tables for script analysis workflow
+
+// Complete casting analysis table - stores full AI analysis
+export const castingAnalysis = pgTable("casting_analysis", {
+  id: serial("id").primaryKey(),
+  projectId: integer("project_id").notNull().references(() => projects.id, { onDelete: "cascade" }),
+  scriptTitle: text("script_title").notNull(),
+  analysisData: jsonb("analysis_data").notNull(), // Complete casting analysis JSON
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// User casting selections table - tracks user choices
+export const castingSelections = pgTable("casting_selections", {
+  id: serial("id").primaryKey(),
+  projectId: integer("project_id").notNull().references(() => projects.id, { onDelete: "cascade" }),
+  characterName: text("character_name").notNull(),
+  selectedActorName: text("selected_actor_name").notNull(),
+  selectionReason: text("selection_reason"), // User's reason for selection
+  isLocked: boolean("is_locked").default(false), // Whether selection is finalized
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 export const actorSuggestions = pgTable("actor_suggestions", {
   id: serial("id").primaryKey(),
   projectId: integer("project_id").references(() => projects.id).notNull(),
@@ -346,6 +369,18 @@ export const insertCharacterRelationshipSchema = createInsertSchema(characterRel
   createdAt: true,
 });
 
+export const insertCastingAnalysisSchema = createInsertSchema(castingAnalysis).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertCastingSelectionSchema = createInsertSchema(castingSelections).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export const insertActorSuggestionSchema = createInsertSchema(actorSuggestions).omit({
   id: true,
   createdAt: true,
@@ -392,6 +427,10 @@ export type InsertCharacter = z.infer<typeof insertCharacterSchema>;
 export type Character = typeof characters.$inferSelect;
 export type InsertCharacterRelationship = z.infer<typeof insertCharacterRelationshipSchema>;
 export type CharacterRelationship = typeof characterRelationships.$inferSelect;
+export type InsertCastingAnalysis = z.infer<typeof insertCastingAnalysisSchema>;
+export type CastingAnalysis = typeof castingAnalysis.$inferSelect;
+export type InsertCastingSelection = z.infer<typeof insertCastingSelectionSchema>;
+export type CastingSelection = typeof castingSelections.$inferSelect;
 export type InsertActorSuggestion = z.infer<typeof insertActorSuggestionSchema>;
 export type ActorSuggestion = typeof actorSuggestions.$inferSelect;
 export type InsertProductPlacement = z.infer<typeof insertProductPlacementSchema>;
