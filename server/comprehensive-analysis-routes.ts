@@ -512,21 +512,15 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
       console.log(`Casting analysis complete for ${castingAnalysis.characterSuggestions.length} characters`);
 
       // Save complete casting analysis to database
-      const [savedAnalysis] = await db
-        .insert(castingAnalysis)
-        .values({
-          projectId: parseInt(projectId),
-          scriptTitle: castingAnalysis.scriptTitle,
-          analysisData: castingAnalysis
-        })
-        .onConflictDoUpdate({
-          target: castingAnalysis.projectId,
-          set: {
-            analysisData: castingAnalysis,
-            updatedAt: new Date()
-          }
-        })
-        .returning();
+      const savedAnalysis = await db.execute(`
+        INSERT INTO casting_analysis (project_id, script_title, analysis_data)
+        VALUES ($1, $2, $3)
+        ON CONFLICT (project_id) 
+        DO UPDATE SET 
+          analysis_data = $3,
+          updated_at = NOW()
+        RETURNING id
+      `, [parseInt(projectId), castingAnalysis.scriptTitle, JSON.stringify(castingAnalysis)]);
 
       console.log('Complete casting analysis saved to database:', savedAnalysis?.id);
 

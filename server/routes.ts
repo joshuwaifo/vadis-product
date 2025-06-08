@@ -306,64 +306,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const projectId = parseInt(req.params.id);
       
-      // Get project details
-      const project = await db
-        .select()
-        .from(projects)
-        .where(eq(projects.id, projectId));
+      // Get complete casting analysis from new table
+      const analysisResult = await db.execute(`
+        SELECT analysis_data 
+        FROM casting_analysis 
+        WHERE project_id = $1
+      `, [projectId]);
 
-      if (project.length === 0) {
-        return res.status(404).json({ error: 'Project not found' });
-      }
-
-      // Get characters for this project
-      const projectCharacters = await db
-        .select()
-        .from(characters)
-        .where(eq(characters.projectId, projectId));
-
-      // Get casting suggestions
-      const castingSuggestions = await db
-        .select()
-        .from(actorSuggestions)
-        .where(eq(actorSuggestions.projectId, projectId));
-
-      if (projectCharacters.length === 0 || castingSuggestions.length === 0) {
+      if (analysisResult.rows.length === 0) {
         return res.json(null); // No casting analysis available
       }
 
-      // Reconstruct casting analysis format
-      const characterSuggestions = projectCharacters.map(character => {
-        const suggestion = castingSuggestions.find(cs => cs.characterName === character.name);
-        if (!suggestion) return null;
+      const castingAnalysis = analysisResult.rows[0].analysis_data;
+      
+      // Get user's selections if any
+      const selectionsResult = await db.execute(`
+        SELECT character_name, selected_actor_name, selection_reason, is_locked
+        FROM casting_selections 
+        WHERE project_id = $1
+      `, [projectId]);
 
-        return {
-          characterName: character.name,
-          suggestedActors: [{
-            actorName: suggestion.actorName,
-            age: 0, // Default value
-            bio: '',
-            fitAnalysis: suggestion.reasoning || '',
-            chemistryFactor: '',
-            recentWork: [],
-            fitScore: suggestion.fitScore || 0,
-            availability: suggestion.availability || '',
-            estimatedFee: suggestion.estimatedFee || '',
-            controversyLevel: 'low' as const,
-            fanRating: 0
-          }]
-        };
-      }).filter(Boolean);
-
-      const castingAnalysis = {
-        scriptTitle: project[0].title || 'Untitled Script',
-        characterSuggestions,
-        ensembleChemistry: {
-          keyRelationships: [],
-          overallSynergy: 'Comprehensive ensemble analysis will be generated with AI casting suggestions.',
-          castingRationale: 'Actor selections are based on character fit, availability, and budget considerations.'
-        }
-      };
+      // Add selection information to the analysis
+      if (selectionsResult.rows.length > 0) {
+        const selections = selectionsResult.rows.reduce((acc, row) => {
+          acc[row.character_name] = {
+            selectedActor: row.selected_actor_name,
+            reason: row.selection_reason,
+            isLocked: row.is_locked
+          };
+          return acc;
+        }, {});
+        
+        castingAnalysis.userSelections = selections;
+      }
 
       res.json(castingAnalysis);
     } catch (error) {
@@ -380,39 +355,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const projectId = parseInt(req.params.id);
-      const { characterName, actorName, fitScore, reasoning, availability, estimatedFee } = req.body;
+      const { characterName, actorName, reasoning } = req.body;
 
       if (!characterName || !actorName) {
         return res.status(400).json({ error: "Character name and actor name are required" });
       }
 
-      // Check if selection already exists
-      const existingSelection = await storage.getCastingSelection(projectId, characterName);
-      
-      if (existingSelection) {
-        // Update existing selection
-        await storage.updateCastingSelection(projectId, characterName, {
-          actorName,
-          fitScore: fitScore || 0,
-          reasoning: reasoning || '',
-          availability: availability || '',
-          estimatedFee: estimatedFee || ''
-        });
-      } else {
-        // Create new selection
-        await storage.saveCastingSelection({
-          projectId,
-          characterName,
-          actorName,
-          fitScore: fitScore || 0,
-          reasoning: reasoning || '',
-          availability: availability || '',
-          estimatedFee: estimatedFee || '',
-          workingRelationships: []
-        });
-      }
+      // Save or update casting selection
+      const result = await db.execute(`
+        INSERT INTO casting_selections (project_id, character_name, selected_actor_name, selection_reason)
+        VALUES ($1, $2, $3, $4)
+        ON CONFLICT (project_id, character_name) 
+        DO UPDATE SET 
+          selected_actor_name = $3,
+          selection_reason = $4,
+          updated_at = NOW()
+        RETURNING *
+      `, [projectId, characterName, actorName, reasoning || null]);
 
-      res.json({ success: true, message: "Casting selection saved" });
+      res.json({ success: true, selection: result.rows[0] });
     } catch (error) {
       console.error("Error saving casting selection:", error);
       res.status(500).json({ error: "Failed to save casting selection" });
