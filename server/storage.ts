@@ -121,6 +121,10 @@ export interface IStorage {
   
   // Script Analysis - Actor Suggestions
   createActorSuggestion(suggestion: InsertActorSuggestion): Promise<ActorSuggestion>;
+  getCastingSuggestions(projectId: number): Promise<ActorSuggestion[]>;
+  getCastingSelection(projectId: number, characterName: string): Promise<ActorSuggestion | null>;
+  saveCastingSelection(selection: InsertActorSuggestion): Promise<ActorSuggestion>;
+  updateCastingSelection(projectId: number, characterName: string, updates: Partial<ActorSuggestion>): Promise<ActorSuggestion | null>;
   
   // Script Analysis - Product Placements
   createProductPlacement(placement: InsertProductPlacement): Promise<ProductPlacement>;

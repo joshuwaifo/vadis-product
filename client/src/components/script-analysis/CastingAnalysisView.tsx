@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -77,16 +77,73 @@ export default function CastingAnalysisView({ castingData, projectId, onRefresh 
   const [currentCharacterForSuggestion, setCurrentCharacterForSuggestion] = useState<{name: string, description: string} | null>(null);
   const { toast } = useToast();
 
-  const handleSelectActor = (characterName: string, actor: ActorProfile) => {
-    setSelectedActors(prev => ({
-      ...prev,
-      [characterName]: actor
-    }));
-    
-    toast({
-      title: "Actor Selected",
-      description: `${actor.actorName} selected for ${characterName}`
-    });
+  // Load existing casting selections on component mount
+  useEffect(() => {
+    const loadCastingSelections = async () => {
+      try {
+        const response = await fetch(`/api/projects/${projectId}/casting`);
+        if (response.ok) {
+          const castingSelections = await response.json();
+          const selectionsMap: Record<string, ActorProfile> = {};
+          
+          castingSelections.forEach((selection: any) => {
+            selectionsMap[selection.characterName] = {
+              actorName: selection.actorName,
+              age: 0, // Default values since database doesn't store all actor details
+              bio: '',
+              fitAnalysis: selection.reasoning,
+              chemistryFactor: '',
+              fitScore: selection.fitScore,
+              availability: selection.availability,
+              estimatedFee: selection.estimatedFee,
+              controversyLevel: 'low' as const,
+              fanRating: 0
+            };
+          });
+          
+          setSelectedActors(selectionsMap);
+        }
+      } catch (error) {
+        console.error('Error loading casting selections:', error);
+      }
+    };
+
+    loadCastingSelections();
+  }, [projectId]);
+
+  const handleSelectActor = async (characterName: string, actor: ActorProfile) => {
+    try {
+      // Save selection to database
+      await apiRequest(`/api/projects/${projectId}/casting/select`, {
+        method: 'POST',
+        body: {
+          characterName,
+          actorName: actor.actorName,
+          fitScore: actor.fitScore,
+          reasoning: actor.fitAnalysis,
+          availability: actor.availability,
+          estimatedFee: actor.estimatedFee
+        }
+      });
+
+      // Update local state
+      setSelectedActors(prev => ({
+        ...prev,
+        [characterName]: actor
+      }));
+      
+      toast({
+        title: "Actor Selected",
+        description: `${actor.actorName} selected for ${characterName} and saved`
+      });
+    } catch (error) {
+      console.error('Error saving casting selection:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save casting selection. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleOpenUserSuggestion = (characterName: string, characterData: any) => {
