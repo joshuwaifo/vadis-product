@@ -113,9 +113,31 @@ export default function CastingAnalysisView({ castingData, projectId, onRefresh 
       };
     });
 
+    // Update overall synergy and rationale text to reflect selected actors
+    let updatedSynergy = castingData.ensembleChemistry.overallSynergy;
+    let updatedRationale = castingData.ensembleChemistry.castingRationale;
+
+    // Replace actor names in the text with selected actors
+    Object.entries(selectedActors).forEach(([characterName, actor]) => {
+      // Find original suggested actor for this character
+      const originalSuggestion = castingData.characterSuggestions.find(
+        cs => cs.characterName === characterName
+      );
+      const originalActor = originalSuggestion?.suggestedActors[0]?.actorName;
+      
+      if (originalActor) {
+        // Replace original actor name with selected actor name in the text
+        const regex = new RegExp(originalActor.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+        updatedSynergy = updatedSynergy.replace(regex, actor.actorName);
+        updatedRationale = updatedRationale.replace(regex, actor.actorName);
+      }
+    });
+
     return {
       ...castingData.ensembleChemistry,
-      keyRelationships: updatedRelationships
+      keyRelationships: updatedRelationships,
+      overallSynergy: updatedSynergy,
+      castingRationale: updatedRationale
     };
   };
 
@@ -578,14 +600,14 @@ export default function CastingAnalysisView({ castingData, projectId, onRefresh 
                 </div>
                 <div className="space-y-4">
                   <p className="text-gray-700 dark:text-gray-300">
-                    {castingData.ensembleChemistry?.overallSynergy || 'No ensemble analysis available'}
+                    {getEnsembleChemistryWithSelections()?.overallSynergy || 'No ensemble analysis available'}
                   </p>
                   <div>
                     <h5 className="font-medium text-gray-900 dark:text-white mb-2">
                       Casting Rationale
                     </h5>
                     <p className="text-gray-600 dark:text-gray-400">
-                      {castingData.ensembleChemistry?.castingRationale || 'No casting rationale available'}
+                      {getEnsembleChemistryWithSelections()?.castingRationale || 'No casting rationale available'}
                     </p>
                   </div>
                 </div>
