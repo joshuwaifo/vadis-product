@@ -56,7 +56,7 @@ import {
   type CreatorUser
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, sql } from "drizzle-orm";
+import { eq, desc, sql, and } from "drizzle-orm";
 
 export interface IStorage {
   // User authentication (legacy)
@@ -940,6 +940,73 @@ export class DatabaseStorage implements IStorage {
       return created;
     } catch (error) {
       console.error('Error creating actor suggestion:', error);
+      throw error;
+    }
+  }
+
+  async getCastingSuggestions(projectId: number): Promise<ActorSuggestion[]> {
+    try {
+      const suggestions = await db
+        .select()
+        .from(actorSuggestions)
+        .where(eq(actorSuggestions.projectId, projectId));
+      return suggestions;
+    } catch (error) {
+      console.error('Error getting casting suggestions:', error);
+      return [];
+    }
+  }
+
+  async getCastingSelection(projectId: number, characterName: string): Promise<ActorSuggestion | null> {
+    try {
+      const [selection] = await db
+        .select()
+        .from(actorSuggestions)
+        .where(
+          and(
+            eq(actorSuggestions.projectId, projectId),
+            eq(actorSuggestions.characterName, characterName)
+          )
+        );
+      return selection || null;
+    } catch (error) {
+      console.error('Error getting casting selection:', error);
+      return null;
+    }
+  }
+
+  async saveCastingSelection(selection: InsertActorSuggestion): Promise<ActorSuggestion> {
+    try {
+      const [created] = await db
+        .insert(actorSuggestions)
+        .values(selection)
+        .returning();
+      return created;
+    } catch (error) {
+      console.error('Error saving casting selection:', error);
+      throw error;
+    }
+  }
+
+  async updateCastingSelection(
+    projectId: number, 
+    characterName: string, 
+    updates: Partial<ActorSuggestion>
+  ): Promise<ActorSuggestion | null> {
+    try {
+      const [updated] = await db
+        .update(actorSuggestions)
+        .set(updates)
+        .where(
+          and(
+            eq(actorSuggestions.projectId, projectId),
+            eq(actorSuggestions.characterName, characterName)
+          )
+        )
+        .returning();
+      return updated || null;
+    } catch (error) {
+      console.error('Error updating casting selection:', error);
       throw error;
     }
   }

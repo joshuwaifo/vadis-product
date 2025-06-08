@@ -284,11 +284,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const projectId = parseInt(req.params.id);
-      // For now, return empty array since casting data structure needs to be implemented
-      res.json([]);
+      const casting = await storage.getCastingSuggestions(projectId);
+      res.json(casting);
     } catch (error) {
       console.error("Error fetching casting:", error);
       res.status(500).json({ error: "Failed to fetch casting data" });
+    }
+  });
+
+  // Save user casting selection
+  app.post("/api/projects/:id/casting/select", async (req, res) => {
+    try {
+      if (!req.session.user) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const projectId = parseInt(req.params.id);
+      const { characterName, actorName, fitScore, reasoning, availability, estimatedFee } = req.body;
+
+      if (!characterName || !actorName) {
+        return res.status(400).json({ error: "Character name and actor name are required" });
+      }
+
+      // Check if selection already exists
+      const existingSelection = await storage.getCastingSelection(projectId, characterName);
+      
+      if (existingSelection) {
+        // Update existing selection
+        await storage.updateCastingSelection(projectId, characterName, {
+          actorName,
+          fitScore: fitScore || 0,
+          reasoning: reasoning || '',
+          availability: availability || '',
+          estimatedFee: estimatedFee || ''
+        });
+      } else {
+        // Create new selection
+        await storage.saveCastingSelection({
+          projectId,
+          characterName,
+          actorName,
+          fitScore: fitScore || 0,
+          reasoning: reasoning || '',
+          availability: availability || '',
+          estimatedFee: estimatedFee || '',
+          workingRelationships: []
+        });
+      }
+
+      res.json({ success: true, message: "Casting selection saved" });
+    } catch (error) {
+      console.error("Error saving casting selection:", error);
+      res.status(500).json({ error: "Failed to save casting selection" });
     }
   });
 
