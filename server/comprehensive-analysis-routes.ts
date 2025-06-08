@@ -489,9 +489,8 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
         const allActorNames = new Set<string>();
         
         castingAnalysis.characterSuggestions.forEach(suggestion => {
-          allActorNames.add(suggestion.primaryChoice.actorName);
-          suggestion.alternatives.forEach(alt => {
-            allActorNames.add(alt.actorName);
+          suggestion.suggestedActors.forEach(actor => {
+            allActorNames.add(actor.actorName);
           });
         });
 
@@ -500,14 +499,10 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
 
         // Add profile images to casting suggestions
         castingAnalysis.characterSuggestions.forEach(suggestion => {
-          const primaryProfile = actorProfiles[suggestion.primaryChoice.actorName];
-          suggestion.primaryChoice.profileImageUrl = primaryProfile?.profileImageUrl || 
-            tmdbService.generatePlaceholderAvatar(suggestion.primaryChoice.actorName);
-          
-          suggestion.alternatives.forEach(alt => {
-            const altProfile = actorProfiles[alt.actorName];
-            (alt as any).profileImageUrl = altProfile?.profileImageUrl || 
-              tmdbService.generatePlaceholderAvatar(alt.actorName);
+          suggestion.suggestedActors.forEach(actor => {
+            const profile = actorProfiles[actor.actorName];
+            actor.profileImageUrl = profile?.profileImageUrl || 
+              tmdbService.generatePlaceholderAvatar(actor.actorName);
           });
         });
 
@@ -516,19 +511,20 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
       
       console.log(`Casting analysis complete for ${castingAnalysis.characterSuggestions.length} characters`);
 
-      // Save casting suggestions to database
+      // Save casting suggestions to database - save first actor as primary choice
       const savedSuggestions = await Promise.all(
         castingAnalysis.characterSuggestions.map(async (suggestion) => {
+          const primaryActor = suggestion.suggestedActors[0]; // First actor is primary
           const [saved] = await db
             .insert(actorSuggestions)
             .values({
               projectId: parseInt(projectId),
               characterName: suggestion.characterName,
-              actorName: suggestion.primaryChoice.actorName,
-              reasoning: suggestion.primaryChoice.fitAnalysis,
-              fitScore: suggestion.primaryChoice.fitScore,
-              availability: suggestion.primaryChoice.availability,
-              estimatedFee: suggestion.primaryChoice.estimatedFee,
+              actorName: primaryActor.actorName,
+              reasoning: primaryActor.fitAnalysis,
+              fitScore: primaryActor.fitScore,
+              availability: primaryActor.availability,
+              estimatedFee: primaryActor.estimatedFee,
               workingRelationships: []
             })
             .returning();

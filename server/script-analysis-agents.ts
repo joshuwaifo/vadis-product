@@ -51,30 +51,31 @@ export interface Character {
   characterArc: string;
 }
 
+export interface ActorProfile {
+  actorName: string;
+  age: number;
+  bio: string;
+  fitAnalysis: string;
+  chemistryFactor: string;
+  recentWork: string[];
+  notableWork?: string[];
+  fitScore: number; // 1-100
+  availability: string;
+  estimatedFee: string;
+  profileImageUrl?: string;
+  controversyLevel: 'low' | 'medium' | 'high'; // New field
+  fanRating: number; // 1-10, New field
+  strengthsForRole?: string;
+  potentialChemistry?: string;
+  detailedBio?: string; // Extended biography
+  awards?: string[]; // Notable awards and nominations
+  socialMediaFollowing?: string; // Social media metrics
+  marketValue?: string; // Current market positioning
+}
+
 export interface ActorSuggestion {
   characterName: string;
-  primaryChoice: {
-    actorName: string;
-    bio: string;
-    fitAnalysis: string;
-    chemistryFactor: string;
-    recentWork: string[];
-    fitScore: number; // 1-100
-    availability: string;
-    estimatedFee: string;
-    profileImageUrl?: string;
-  };
-  alternatives: Array<{
-    actorName: string;
-    age: number;
-    strengthsForRole: string;
-    potentialChemistry: string;
-    notableWork: string[];
-    fitScore: number;
-    availability: string;
-    estimatedFee: string;
-    profileImageUrl?: string;
-  }>;
+  suggestedActors: ActorProfile[]; // Changed from primaryChoice + alternatives to array
 }
 
 export interface CastingAnalysis {
@@ -359,26 +360,40 @@ Return as JSON with this exact structure, ensuring ALL characters are included:
   "characterSuggestions": [
     ${prioritizedCharacters.map(char => `{
       "characterName": "${char.name}",
-      "primaryChoice": {
-        "actorName": "[Actor Name for ${char.name}]",
-        "bio": "Brief bio about their career and acting style",
-        "fitAnalysis": "Why this actor suits ${char.name}",
-        "chemistryFactor": "How they work with other characters",
-        "recentWork": ["Recent work 1", "Recent work 2", "Recent work 3"],
-        "fitScore": [score 1-100],
-        "availability": "Available [year]",
-        "estimatedFee": "$[amount]"
-      },
-      "alternatives": [
+      "suggestedActors": [
+        {
+          "actorName": "[Actor Name for ${char.name}]",
+          "age": [age],
+          "bio": "Brief bio about their career and acting style",
+          "fitAnalysis": "Why this actor suits ${char.name}",
+          "chemistryFactor": "How they work with other characters",
+          "recentWork": ["Recent work 1", "Recent work 2", "Recent work 3"],
+          "fitScore": [score 1-100],
+          "availability": "Available [year]",
+          "estimatedFee": "$[amount]",
+          "controversyLevel": "low|medium|high",
+          "fanRating": [rating 1-10],
+          "detailedBio": "Extended biography with career highlights",
+          "awards": ["Notable award 1", "Notable award 2"],
+          "socialMediaFollowing": "X million followers",
+          "marketValue": "Current market positioning"
+        },
         {
           "actorName": "[Alternative actor name]",
           "age": [age],
+          "bio": "Brief bio about their career",
           "strengthsForRole": "Strengths for ${char.name}",
           "potentialChemistry": "Chemistry with ensemble",
-          "notableWork": ["Notable work 1", "Notable work 2"],
+          "recentWork": ["Notable work 1", "Notable work 2"],
           "fitScore": [score],
           "availability": "Available",
-          "estimatedFee": "$[amount]"
+          "estimatedFee": "$[amount]",
+          "controversyLevel": "low|medium|high",
+          "fanRating": [rating 1-10],
+          "detailedBio": "Extended biography",
+          "awards": ["Award 1", "Award 2"],
+          "socialMediaFollowing": "X million followers",
+          "marketValue": "Market positioning"
         }
       ]
     }`).join(',\n    ')}
