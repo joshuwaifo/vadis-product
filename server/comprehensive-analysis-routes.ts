@@ -588,6 +588,23 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
         'gpt-4o'
       );
 
+      // Fetch actor profile image from TMDB
+      const { tmdbService } = await import('./tmdb-service');
+      if (tmdbService) {
+        try {
+          console.log(`Fetching profile image for actor: ${suggestedActor}`);
+          const profileImageUrl = await tmdbService.getActorProfileImage(suggestedActor);
+          if (profileImageUrl) {
+            analysis.profileImageUrl = profileImageUrl;
+            console.log(`Profile image found for ${suggestedActor}: ${profileImageUrl}`);
+          } else {
+            console.log(`No profile image found for ${suggestedActor}`);
+          }
+        } catch (imageError) {
+          console.warn(`Failed to fetch profile image for ${suggestedActor}:`, imageError);
+        }
+      }
+
       res.json({
         success: true,
         analysis,
