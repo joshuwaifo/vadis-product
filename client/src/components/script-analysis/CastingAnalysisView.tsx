@@ -90,6 +90,35 @@ export default function CastingAnalysisView({ castingData, projectId, onRefresh 
   const [currentCharacterForSuggestion, setCurrentCharacterForSuggestion] = useState<{name: string, description: string} | null>(null);
   const { toast } = useToast();
 
+  // Create dynamic ensemble chemistry based on selected actors
+  const getEnsembleChemistryWithSelections = () => {
+    if (!castingData.ensembleChemistry) return castingData.ensembleChemistry;
+
+    const updatedRelationships = castingData.ensembleChemistry.keyRelationships.map(relationship => {
+      const updatedPrimaryActors = relationship.characters.map(characterName => {
+        const selectedActor = selectedActors[characterName];
+        if (selectedActor) {
+          return selectedActor.actorName;
+        }
+        // Fall back to original suggestion if no selection made
+        const originalSuggestion = castingData.characterSuggestions.find(
+          cs => cs.characterName === characterName
+        );
+        return originalSuggestion?.suggestedActors[0]?.actorName || characterName;
+      });
+
+      return {
+        ...relationship,
+        primaryActors: updatedPrimaryActors
+      };
+    });
+
+    return {
+      ...castingData.ensembleChemistry,
+      keyRelationships: updatedRelationships
+    };
+  };
+
   // Initialize selections from casting data user selections
   useEffect(() => {
     if (castingData.userSelections) {
@@ -159,6 +188,43 @@ export default function CastingAnalysisView({ castingData, projectId, onRefresh 
       description: characterData?.description || `Character: ${characterName}`
     });
     setShowUserSuggestionModal(true);
+  };
+
+  const handleUpdateEnsembleAnalysis = async () => {
+    try {
+      // Create updated casting data with selected actors
+      const selectedActorsList = Object.entries(selectedActors).map(([characterName, actor]) => ({
+        characterName,
+        selectedActor: actor.actorName
+      }));
+
+      // Call API to generate new ensemble chemistry analysis with selected actors
+      const response = await apiRequest(`/api/script-analysis/update_ensemble_chemistry`, 'POST', {
+        projectId,
+        selectedActors: selectedActorsList,
+        scriptTitle: castingData.scriptTitle,
+        characterSuggestions: castingData.characterSuggestions
+      });
+
+      if (response.success) {
+        // Refresh the casting analysis data
+        queryClient.invalidateQueries({ 
+          queryKey: [`/api/projects/${projectId}/casting/analysis`] 
+        });
+        
+        toast({
+          title: "Ensemble Analysis Updated",
+          description: "Chemistry analysis updated based on your selected actors"
+        });
+      }
+    } catch (error) {
+      console.error('Error updating ensemble analysis:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update ensemble analysis. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleAddUserSuggestion = (actor: ActorProfile) => {
@@ -464,13 +530,18 @@ export default function CastingAnalysisView({ castingData, projectId, onRefresh 
                   Key Character Relationships
                 </h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {(castingData.ensembleChemistry?.keyRelationships || []).map((rel, index) => (
+                  {(getEnsembleChemistryWithSelections()?.keyRelationships || []).map((rel, index) => (
                     <Card key={index} className="p-4 border border-gray-200 dark:border-gray-700">
                       <div className="space-y-2">
                         <div className="flex items-center space-x-2">
                           <Badge variant="outline" className="text-xs">
                             {rel.relationshipType}
                           </Badge>
+                          {rel.characters.some(char => selectedActors[char]) && (
+                            <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 text-xs">
+                              Updated Cast
+                            </Badge>
+                          )}
                         </div>
                         <h5 className="font-medium text-sm">
                           {rel.characters.join(' & ')}
@@ -489,9 +560,22 @@ export default function CastingAnalysisView({ castingData, projectId, onRefresh 
 
               {/* Overall Synergy */}
               <div className="border-t pt-6">
-                <h4 className="font-semibold text-gray-900 dark:text-white mb-3">
-                  Overall Ensemble Synergy
-                </h4>
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="font-semibold text-gray-900 dark:text-white">
+                    Overall Ensemble Synergy
+                  </h4>
+                  {Object.keys(selectedActors).length > 0 && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleUpdateEnsembleAnalysis}
+                      className="text-xs"
+                    >
+                      <Shuffle className="w-3 h-3 mr-1" />
+                      Update Analysis
+                    </Button>
+                  )}
+                </div>
                 <div className="space-y-4">
                   <p className="text-gray-700 dark:text-gray-300">
                     {castingData.ensembleChemistry?.overallSynergy || 'No ensemble analysis available'}

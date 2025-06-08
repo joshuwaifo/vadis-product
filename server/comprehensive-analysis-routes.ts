@@ -846,4 +846,83 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
     }
   });
 
+  // Update Ensemble Chemistry Analysis with Selected Actors
+  app.post('/api/script-analysis/update_ensemble_chemistry', async (req: Request, res: Response) => {
+    try {
+      const { projectId, selectedActors, scriptTitle, characterSuggestions } = req.body;
+      
+      // Get existing casting analysis
+      const existingCasting = await db.select().from(actorSuggestions).where(eq(actorSuggestions.projectId, parseInt(projectId)));
+      
+      if (!existingCasting.length) {
+        return res.status(404).json({ error: 'No casting analysis found for this project' });
+      }
+
+      // Create updated character suggestions with selected actors
+      const updatedCharacterSuggestions = characterSuggestions.map((charSuggestion: any) => {
+        const selectedActor = selectedActors.find((sel: any) => sel.characterName === charSuggestion.characterName);
+        
+        if (selectedActor) {
+          // Move selected actor to the front of the suggestions
+          const selectedActorData = charSuggestion.suggestedActors.find((actor: any) => actor.actorName === selectedActor.selectedActor);
+          if (selectedActorData) {
+            const otherActors = charSuggestion.suggestedActors.filter((actor: any) => actor.actorName !== selectedActor.selectedActor);
+            return {
+              ...charSuggestion,
+              suggestedActors: [selectedActorData, ...otherActors]
+            };
+          }
+        }
+        
+        return charSuggestion;
+      });
+
+      // Generate new ensemble chemistry analysis with selected actors
+      const characters = await db.select().from(characters).where(eq(characters.projectId, parseInt(projectId)));
+      
+      // Create casting analysis with selected actors prioritized
+      const castingAnalysis = await suggestActors(
+        characters,
+        `Updated casting analysis for ${scriptTitle} with user-selected actors: ${selectedActors.map((s: any) => `${s.characterName}: ${s.selectedActor}`).join(', ')}`
+      );
+
+      // Update the database with new ensemble chemistry
+      const castingData = {
+        scriptTitle,
+        characterSuggestions: updatedCharacterSuggestions,
+        ensembleChemistry: castingAnalysis.ensembleChemistry,
+        userSelections: selectedActors.reduce((acc: any, sel: any) => {
+          acc[sel.characterName] = {
+            selectedActor: sel.selectedActor,
+            reason: 'User selected',
+            isLocked: true
+          };
+          return acc;
+        }, {})
+      };
+
+      // Update existing casting suggestions with new ensemble chemistry
+      await db
+        .update(actorSuggestions)
+        .set({
+          castingData: JSON.stringify(castingData),
+          updatedAt: new Date()
+        })
+        .where(eq(actorSuggestions.projectId, parseInt(projectId)));
+
+      res.json({
+        success: true,
+        ensembleChemistry: castingAnalysis.ensembleChemistry,
+        message: 'Ensemble chemistry analysis updated with selected actors'
+      });
+
+    } catch (error) {
+      console.error('Update ensemble chemistry error:', error);
+      res.status(500).json({ 
+        success: false,
+        error: 'Failed to update ensemble chemistry analysis' 
+      });
+    }
+  });
+
 }
