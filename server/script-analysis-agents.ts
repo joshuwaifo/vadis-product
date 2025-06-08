@@ -62,6 +62,7 @@ export interface ActorSuggestion {
     fitScore: number; // 1-100
     availability: string;
     estimatedFee: string;
+    profileImageUrl?: string;
   };
   alternatives: Array<{
     actorName: string;
@@ -72,6 +73,7 @@ export interface ActorSuggestion {
     fitScore: number;
     availability: string;
     estimatedFee: string;
+    profileImageUrl?: string;
   }>;
 }
 

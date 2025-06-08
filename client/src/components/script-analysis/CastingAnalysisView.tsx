@@ -313,15 +313,28 @@ export default function CastingAnalysisView({ castingData, projectId, onRefresh 
                       {character.alternatives.map((alt, altIndex) => (
                         <Card key={altIndex} className="p-3 border border-gray-200 dark:border-gray-700">
                           <div className="space-y-2">
-                            <div className="flex items-center justify-between">
-                              <h6 className="font-medium text-sm">{alt.actorName}</h6>
-                              <Badge variant="outline" className="text-xs">
-                                {alt.fitScore}%
-                              </Badge>
+                            <div className="flex items-start space-x-2">
+                              <img
+                                src={alt.profileImageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(alt.actorName)}&size=80&background=6366f1&color=ffffff&bold=true`}
+                                alt={alt.actorName}
+                                className="w-12 h-12 rounded-full object-cover border border-gray-200 dark:border-gray-600 flex-shrink-0"
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(alt.actorName)}&size=80&background=6366f1&color=ffffff&bold=true`;
+                                }}
+                              />
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center justify-between">
+                                  <h6 className="font-medium text-sm truncate">{alt.actorName}</h6>
+                                  <Badge variant="outline" className="text-xs ml-2">
+                                    {alt.fitScore}%
+                                  </Badge>
+                                </div>
+                                <p className="text-xs text-gray-600 dark:text-gray-400">
+                                  Age: {alt.age}
+                                </p>
+                              </div>
                             </div>
-                            <p className="text-xs text-gray-600 dark:text-gray-400">
-                              Age: {alt.age}
-                            </p>
                             <p className="text-xs text-gray-600 dark:text-gray-400">
                               {alt.strengthsForRole}
                             </p>
