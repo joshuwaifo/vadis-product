@@ -70,6 +70,14 @@ interface CastingAnalysisViewProps {
 }
 
 export default function CastingAnalysisView({ castingData, projectId, onRefresh }: CastingAnalysisViewProps) {
+  // Early return if no casting data
+  if (!castingData || !castingData.characterSuggestions) {
+    return (
+      <div className="p-6 text-center">
+        <p className="text-gray-500 dark:text-gray-400">No casting data available</p>
+      </div>
+    );
+  }
   const [selectedActor, setSelectedActor] = useState<ActorProfile | null>(null);
   const [selectedCharacter, setSelectedCharacter] = useState<string>('');
   const [selectedActors, setSelectedActors] = useState<Record<string, ActorProfile>>({});
@@ -114,16 +122,13 @@ export default function CastingAnalysisView({ castingData, projectId, onRefresh 
   const handleSelectActor = async (characterName: string, actor: ActorProfile) => {
     try {
       // Save selection to database
-      await apiRequest(`/api/projects/${projectId}/casting/select`, {
-        method: 'POST',
-        body: {
-          characterName,
-          actorName: actor.actorName,
-          fitScore: actor.fitScore,
-          reasoning: actor.fitAnalysis,
-          availability: actor.availability,
-          estimatedFee: actor.estimatedFee
-        }
+      await apiRequest(`/api/projects/${projectId}/casting/select`, 'POST', {
+        characterName,
+        actorName: actor.actorName,
+        fitScore: actor.fitScore,
+        reasoning: actor.fitAnalysis,
+        availability: actor.availability,
+        estimatedFee: actor.estimatedFee
       });
 
       // Update local state
@@ -337,7 +342,7 @@ export default function CastingAnalysisView({ castingData, projectId, onRefresh 
               <Users className="w-5 h-5 text-blue-500" />
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Characters</p>
-                <p className="text-2xl font-bold">{castingData.characterSuggestions.length}</p>
+                <p className="text-2xl font-bold">{castingData?.characterSuggestions?.length || 0}</p>
               </div>
             </div>
           </CardContent>
@@ -362,11 +367,11 @@ export default function CastingAnalysisView({ castingData, projectId, onRefresh 
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Avg Fit Score</p>
                 <p className="text-2xl font-bold">
-                  {Math.round(
+                  {castingData.characterSuggestions.length > 0 ? Math.round(
                     castingData.characterSuggestions.reduce((acc, char) => 
-                      acc + (char.suggestedActors[0]?.fitScore || 0), 0
+                      acc + (char.suggestedActors?.[0]?.fitScore || 0), 0
                     ) / castingData.characterSuggestions.length
-                  )}%
+                  ) : 0}%
                 </p>
               </div>
             </div>
@@ -408,7 +413,7 @@ export default function CastingAnalysisView({ castingData, projectId, onRefresh 
                     </Badge>
                   ) : (
                     <Badge variant="outline" className="mt-1">
-                      {character.suggestedActors.length} Options Available
+                      {character.suggestedActors?.length || 0} Options Available
                     </Badge>
                   )}
                 </div>
@@ -424,7 +429,7 @@ export default function CastingAnalysisView({ castingData, projectId, onRefresh 
 
               {/* Side-by-side Actor Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {character.suggestedActors.map((actor, actorIndex) => (
+                {(character.suggestedActors || []).map((actor, actorIndex) => (
                   <ActorCard
                     key={actorIndex}
                     actor={actor}
@@ -457,7 +462,7 @@ export default function CastingAnalysisView({ castingData, projectId, onRefresh 
                   Key Character Relationships
                 </h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {castingData.ensembleChemistry.keyRelationships.map((rel, index) => (
+                  {(castingData.ensembleChemistry?.keyRelationships || []).map((rel, index) => (
                     <Card key={index} className="p-4 border border-gray-200 dark:border-gray-700">
                       <div className="space-y-2">
                         <div className="flex items-center space-x-2">
