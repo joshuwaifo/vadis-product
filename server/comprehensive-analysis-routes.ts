@@ -851,46 +851,22 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
     try {
       const { projectId, selectedActors, scriptTitle, characterSuggestions } = req.body;
       
-      // Get existing casting analysis
-      const existingCasting = await db.select().from(actorSuggestions).where(eq(actorSuggestions.projectId, parseInt(projectId)));
+      // Get existing casting analysis from the correct table
+      const analysisResult = await pool.query(`
+        SELECT analysis_data 
+        FROM casting_analysis 
+        WHERE project_id = $1
+      `, [parseInt(projectId)]);
       
-      if (!existingCasting.length) {
+      if (analysisResult.rows.length === 0) {
         return res.status(404).json({ error: 'No casting analysis found for this project' });
       }
 
-      // Create updated character suggestions with selected actors
-      const updatedCharacterSuggestions = characterSuggestions.map((charSuggestion: any) => {
-        const selectedActor = selectedActors.find((sel: any) => sel.characterName === charSuggestion.characterName);
-        
-        if (selectedActor) {
-          // Move selected actor to the front of the suggestions
-          const selectedActorData = charSuggestion.suggestedActors.find((actor: any) => actor.actorName === selectedActor.selectedActor);
-          if (selectedActorData) {
-            const otherActors = charSuggestion.suggestedActors.filter((actor: any) => actor.actorName !== selectedActor.selectedActor);
-            return {
-              ...charSuggestion,
-              suggestedActors: [selectedActorData, ...otherActors]
-            };
-          }
-        }
-        
-        return charSuggestion;
-      });
+      const existingCastingData = analysisResult.rows[0].analysis_data;
 
-      // Generate new ensemble chemistry analysis with selected actors
-      const characters = await db.select().from(characters).where(eq(characters.projectId, parseInt(projectId)));
-      
-      // Create casting analysis with selected actors prioritized
-      const castingAnalysis = await suggestActors(
-        characters,
-        `Updated casting analysis for ${scriptTitle} with user-selected actors: ${selectedActors.map((s: any) => `${s.characterName}: ${s.selectedActor}`).join(', ')}`
-      );
-
-      // Update the database with new ensemble chemistry
-      const castingData = {
-        scriptTitle,
-        characterSuggestions: updatedCharacterSuggestions,
-        ensembleChemistry: castingAnalysis.ensembleChemistry,
+      // Update user selections in the database
+      const updatedCastingData = {
+        ...existingCastingData,
         userSelections: selectedActors.reduce((acc: any, sel: any) => {
           acc[sel.characterName] = {
             selectedActor: sel.selectedActor,
@@ -898,21 +874,18 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
             isLocked: true
           };
           return acc;
-        }, {})
+        }, existingCastingData.userSelections || {})
       };
 
-      // Update existing casting suggestions with new ensemble chemistry
-      await db
-        .update(actorSuggestions)
-        .set({
-          castingData: JSON.stringify(castingData),
-          updatedAt: new Date()
-        })
-        .where(eq(actorSuggestions.projectId, parseInt(projectId)));
+      // Update existing casting analysis with user selections
+      await pool.query(`
+        UPDATE casting_analysis 
+        SET analysis_data = $1, updated_at = NOW()
+        WHERE project_id = $2
+      `, [JSON.stringify(updatedCastingData), parseInt(projectId)]);
 
       res.json({
         success: true,
-        ensembleChemistry: castingAnalysis.ensembleChemistry,
         message: 'Ensemble chemistry analysis updated with selected actors'
       });
 
