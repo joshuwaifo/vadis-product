@@ -107,9 +107,29 @@ export default function CastingAnalysisView({ castingData, projectId, onRefresh 
         return originalSuggestion?.suggestedActors[0]?.actorName || characterName;
       });
 
+      // Update chemistry analysis text to reflect selected actors
+      let updatedChemistryAnalysis = relationship.chemistryAnalysis;
+      relationship.characters.forEach(characterName => {
+        const selectedActor = selectedActors[characterName];
+        if (selectedActor) {
+          // Find original suggested actor for this character
+          const originalSuggestion = castingData.characterSuggestions.find(
+            cs => cs.characterName === characterName
+          );
+          const originalActor = originalSuggestion?.suggestedActors[0]?.actorName;
+          
+          if (originalActor) {
+            // Replace original actor name with selected actor name in chemistry analysis
+            const regex = new RegExp(originalActor.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+            updatedChemistryAnalysis = updatedChemistryAnalysis.replace(regex, selectedActor.actorName);
+          }
+        }
+      });
+
       return {
         ...relationship,
-        primaryActors: updatedPrimaryActors
+        primaryActors: updatedPrimaryActors,
+        chemistryAnalysis: updatedChemistryAnalysis
       };
     });
 
