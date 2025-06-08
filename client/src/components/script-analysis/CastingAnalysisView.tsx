@@ -492,14 +492,14 @@ export default function CastingAnalysisView({ castingData, projectId, onRefresh 
                 </h4>
                 <div className="space-y-4">
                   <p className="text-gray-700 dark:text-gray-300">
-                    {castingData.ensembleChemistry.overallSynergy}
+                    {castingData.ensembleChemistry?.overallSynergy || 'No ensemble analysis available'}
                   </p>
                   <div>
                     <h5 className="font-medium text-gray-900 dark:text-white mb-2">
                       Casting Rationale
                     </h5>
                     <p className="text-gray-600 dark:text-gray-400">
-                      {castingData.ensembleChemistry.castingRationale}
+                      {castingData.ensembleChemistry?.castingRationale || 'No casting rationale available'}
                     </p>
                   </div>
                 </div>
