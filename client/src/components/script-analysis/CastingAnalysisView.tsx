@@ -61,6 +61,11 @@ interface CastingAnalysisData {
     overallSynergy: string;
     castingRationale: string;
   };
+  userSelections?: Record<string, {
+    selectedActor: string;
+    reason?: string;
+    isLocked?: boolean;
+  }>;
 }
 
 interface CastingAnalysisViewProps {
@@ -85,39 +90,31 @@ export default function CastingAnalysisView({ castingData, projectId, onRefresh 
   const [currentCharacterForSuggestion, setCurrentCharacterForSuggestion] = useState<{name: string, description: string} | null>(null);
   const { toast } = useToast();
 
-  // Load existing casting selections on component mount
+  // Initialize selections from casting data user selections
   useEffect(() => {
-    const loadCastingSelections = async () => {
-      try {
-        const response = await fetch(`/api/projects/${projectId}/casting`);
-        if (response.ok) {
-          const castingSelections = await response.json();
-          const selectionsMap: Record<string, ActorProfile> = {};
+    if (castingData.userSelections) {
+      const selectionsMap: Record<string, ActorProfile> = {};
+      
+      Object.entries(castingData.userSelections).forEach(([characterName, selection]) => {
+        // Find the actor details from the character suggestions
+        const characterSuggestion = castingData.characterSuggestions.find(
+          cs => cs.characterName === characterName
+        );
+        
+        if (characterSuggestion) {
+          const selectedActorProfile = characterSuggestion.suggestedActors.find(
+            actor => actor.actorName === selection.selectedActor
+          );
           
-          castingSelections.forEach((selection: any) => {
-            selectionsMap[selection.characterName] = {
-              actorName: selection.actorName,
-              age: 0, // Default values since database doesn't store all actor details
-              bio: '',
-              fitAnalysis: selection.reasoning,
-              chemistryFactor: '',
-              fitScore: selection.fitScore,
-              availability: selection.availability,
-              estimatedFee: selection.estimatedFee,
-              controversyLevel: 'low' as const,
-              fanRating: 0
-            };
-          });
-          
-          setSelectedActors(selectionsMap);
+          if (selectedActorProfile) {
+            selectionsMap[characterName] = selectedActorProfile;
+          }
         }
-      } catch (error) {
-        console.error('Error loading casting selections:', error);
-      }
-    };
-
-    loadCastingSelections();
-  }, [projectId]);
+      });
+      
+      setSelectedActors(selectionsMap);
+    }
+  }, [castingData]);
 
   const handleSelectActor = async (characterName: string, actor: ActorProfile) => {
     try {
