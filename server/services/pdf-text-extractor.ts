@@ -8,12 +8,118 @@ import { extractPDFTextPaginated } from './paginated-pdf-extractor';
 
 interface PDFExtractionResult {
   text: string;
+  pageCount: number;
   method: 'pdf-parse' | 'gemini-ai' | 'fallback';
   success: boolean;
 }
 
 /**
- * Extract text from PDF buffer using multiple methods
+ * Extract text and page count from PDF buffer using multiple methods
+ */
+export async function extractTextAndPageCount(pdfBuffer: Buffer): Promise<PDFExtractionResult> {
+  console.log(`Starting PDF extraction from buffer (${pdfBuffer.length} bytes)`);
+  
+  // First try to get page count using pdf-parse
+  let pageCount = 0;
+  try {
+    const pdfParse = (await import('pdf-parse')).default;
+    const pdfData = await pdfParse(pdfBuffer);
+    pageCount = pdfData.numpages || 0;
+    console.log(`PDF contains ${pageCount} pages`);
+    
+    // If pdf-parse also gives us good text content, use it
+    if (pdfData.text && pdfData.text.length > 10000) {
+      console.log(`pdf-parse extracted ${pdfData.text.length} characters from ${pageCount} pages`);
+      return {
+        text: pdfData.text,
+        pageCount: pageCount,
+        method: 'pdf-parse',
+        success: true
+      };
+    }
+  } catch (error) {
+    console.log('pdf-parse page count extraction failed, estimating from file size');
+    pageCount = Math.floor(pdfBuffer.length / 2000); // Fallback estimation
+  }
+
+  // Try other extraction methods for text content while preserving page count
+  try {
+    console.log('Attempting paginated PDF extraction for complete content capture...');
+    const paginatedText = await extractPDFTextPaginated(pdfBuffer);
+    
+    if (paginatedText && paginatedText.length > 50000) {
+      console.log(`Paginated extraction successful: ${paginatedText.length} characters`);
+      return {
+        text: paginatedText,
+        pageCount: pageCount,
+        method: 'gemini-ai',
+        success: true
+      };
+    }
+  } catch (error) {
+    console.error('Paginated extraction failed:', error.message);
+  }
+
+  // Fallback to single-pass Gemini AI extraction
+  try {
+    if (!process.env.GEMINI_API_KEY) {
+      throw new Error('GEMINI_API_KEY not available');
+    }
+    
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-1.5-flash",
+      generationConfig: {
+        maxOutputTokens: 8192,
+        temperature: 0.1
+      }
+    });
+    
+    const base64Data = pdfBuffer.toString('base64');
+    
+    const prompt = `Extract ALL text content from this ${pageCount}-page screenplay PDF. This is a professional film script that must be digitized completely.
+
+CRITICAL REQUIREMENTS:
+- Extract EVERY SINGLE WORD from all ${pageCount} pages
+- Include ALL scene headers, character names, dialogue, and action lines
+- Do NOT summarize or paraphrase - extract verbatim text
+- Do NOT skip any pages or scenes
+- Output the complete raw screenplay text (expect 150,000+ characters)
+
+This is a full-length feature screenplay. Extract the complete text now:`;
+    
+    const result = await model.generateContent([
+      {
+        inlineData: {
+          data: base64Data,
+          mimeType: "application/pdf"
+        }
+      },
+      prompt
+    ]);
+    
+    const response = await result.response;
+    const extractedText = response.text();
+    
+    if (extractedText && extractedText.length > 10000) {
+      console.log(`Single-pass Gemini extraction: ${extractedText.length} characters`);
+      return {
+        text: extractedText,
+        pageCount: pageCount,
+        method: 'gemini-ai',
+        success: true
+      };
+    }
+  } catch (error) {
+    console.error('Single-pass Gemini extraction failed:', error.message);
+  }
+  
+  // Final fallback error
+  throw new Error('Unable to extract text from PDF using any available method');
+}
+
+/**
+ * Extract text from PDF buffer using multiple methods (legacy function)
  */
 export async function extractTextFromPDF(pdfBuffer: Buffer): Promise<string> {
   console.log(`Starting PDF text extraction from buffer (${pdfBuffer.length} bytes)`);

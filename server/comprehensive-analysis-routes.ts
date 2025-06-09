@@ -179,11 +179,19 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
             
             if (pdfData) {
               console.log(`Attempting extraction from stored PDF data`);
-              const { extractTextFromPDF } = await import('./services/pdf-text-extractor');
+              const { extractTextAndPageCount } = await import('./services/pdf-text-extractor');
               const pdfBuffer = Buffer.from(pdfData, 'base64');
               
-              extractedText = await extractTextFromPDF(pdfBuffer);
-              console.log(`Extracted ${extractedText?.length || 0} characters from stored PDF`);
+              const extractionResult = await extractTextAndPageCount(pdfBuffer);
+              extractedText = extractionResult.text;
+              const actualPageCount = extractionResult.pageCount;
+              
+              console.log(`Extracted ${extractedText?.length || 0} characters from ${actualPageCount} pages`);
+              
+              // Update project with actual page count
+              await db.update(projects)
+                .set({ pageCount: actualPageCount })
+                .where(eq(projects.id, parseInt(projectId)));
             }
           }
           
@@ -267,10 +275,15 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
       
       console.log(`Enhanced scene extractor found ${analysisResult.totalScenes} scenes from script analysis`);
       
-      // Calculate estimated page count from script content (250 words per page standard)
-      const wordCount = scriptContent.split(/\s+/).length;
-      const estimatedPages = Math.ceil(wordCount / 250);
-      console.log(`Estimated ${estimatedPages} pages from ${wordCount} words`);
+      // Get actual page count from database (stored during PDF extraction)
+      const updatedProject = await db
+        .select()
+        .from(projects)
+        .where(eq(projects.id, parseInt(projectId)))
+        .limit(1);
+      
+      const actualPageCount = updatedProject[0]?.pageCount || Math.ceil(scriptContent.split(/\s+/).length / 250);
+      console.log(`Using ${actualPageCount} pages for estimated duration`);
       
       // Convert to the expected format
       const extractedScenes = analysisResult.scenes.map(scene => ({
