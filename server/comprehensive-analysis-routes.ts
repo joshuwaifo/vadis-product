@@ -1000,9 +1000,13 @@ Respond in JSON format with this structure:
   // AI Product Placement - Generate visualization
   app.post('/api/script-analysis/generate_placement_visualization', async (req: Request, res: Response) => {
     try {
-      const { sceneBreakdownId, productId, projectId } = req.body;
+      const { sceneBreakdownId, productId } = req.body;
       
-      // Get the scene breakdown
+      if (!sceneBreakdownId || !productId) {
+        return res.status(400).json({ error: 'Scene breakdown ID and product ID are required' });
+      }
+
+      // Get scene breakdown details
       const sceneBreakdown = await db
         .select()
         .from(sceneBreakdowns)
@@ -1021,15 +1025,18 @@ Respond in JSON format with this structure:
         return res.status(404).json({ error: 'Product not found' });
       }
 
-      const visualization = await generateProductPlacementVisualization(sceneBreakdown[0], product);
-      
+      const visualization = await generateProductPlacementVisualization(
+        sceneBreakdown[0],
+        product
+      );
+
       res.json({
         success: true,
         visualization
       });
 
     } catch (error) {
-      console.error('Placement visualization error:', error);
+      console.error('Visualization generation error:', error);
       res.status(500).json({ error: 'Failed to generate placement visualization' });
     }
   });
