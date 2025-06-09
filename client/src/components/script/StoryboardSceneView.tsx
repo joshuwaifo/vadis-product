@@ -277,11 +277,6 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle, pag
                             : `Scene ${scene.sceneNumber}`
                           }
                         </div>
-                        <div className={`text-xs mt-1 ${
-                          selectedScene?.id === scene.id ? 'text-blue-200' : 'text-gray-500'
-                        }`}>
-                          {scene.duration}min
-                        </div>
                       </div>
                     </CardContent>
                   </Card>
