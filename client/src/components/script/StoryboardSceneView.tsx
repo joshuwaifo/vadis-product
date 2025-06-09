@@ -151,13 +151,6 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle }: S
                     <Badge className="bg-blue-600 text-white text-sm sm:text-lg px-3 py-1 sm:px-4 sm:py-2 w-fit">
                       Scene {selectedScene.sceneNumber}
                     </Badge>
-                    <div className="flex items-center gap-2 text-gray-300 text-sm sm:text-base flex-wrap">
-                      <MapPin className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
-                      <span className="truncate">{selectedScene.location || 'Location TBD'}</span>
-                      <span className="hidden sm:inline">•</span>
-                      <Clock className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
-                      <span>{selectedScene.timeOfDay || 'Time TBD'}</span>
-                    </div>
                   </div>
                   <div className="flex items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-400">
                     <span>Pages {selectedScene.pageStart}-{selectedScene.pageEnd}</span>
@@ -167,16 +160,8 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle }: S
                 </div>
 
                 <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-2 sm:mb-3">
-                  {selectedScene.location && selectedScene.timeOfDay 
-                    ? `${selectedScene.location} - ${selectedScene.timeOfDay}`
-                    : selectedScene.location || selectedScene.timeOfDay || `Scene ${selectedScene.sceneNumber}`
-                  }
+                  {selectedScene.description || `Scene ${selectedScene.sceneNumber}`}
                 </h2>
-                {selectedScene.description && (
-                  <p className="text-sm sm:text-lg lg:text-xl text-gray-300 leading-relaxed">
-                    {selectedScene.description}
-                  </p>
-                )}
               </div>
 
               {/* Scene Content */}
@@ -282,15 +267,13 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle }: S
                         }`}>
                           {scene.sceneNumber}
                         </div>
-                        <div className={`text-xs mb-1 sm:mb-2 truncate ${
+                        <div className={`text-xs mb-1 sm:mb-2 truncate leading-tight ${
                           selectedScene?.id === scene.id ? 'text-blue-100' : 'text-gray-400'
                         }`}>
-                          {scene.location || 'Location TBD'}
-                        </div>
-                        <div className={`text-xs truncate ${
-                          selectedScene?.id === scene.id ? 'text-blue-200' : 'text-gray-500'
-                        }`}>
-                          {scene.timeOfDay || 'Time TBD'}
+                          {scene.description ? 
+                            scene.description.slice(0, 30) + (scene.description.length > 30 ? '...' : '') 
+                            : `Scene ${scene.sceneNumber}`
+                          }
                         </div>
                         <div className={`text-xs mt-1 ${
                           selectedScene?.id === scene.id ? 'text-blue-200' : 'text-gray-500'
