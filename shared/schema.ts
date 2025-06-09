@@ -126,6 +126,19 @@ export const characters = pgTable("characters", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+export const sceneBreakdowns = pgTable("scene_breakdowns", {
+  id: serial("id").primaryKey(),
+  projectId: integer("project_id").references(() => projects.id).notNull(),
+  title: text("title").notNull(),
+  sceneRange: text("scene_range").notNull(),
+  startScene: integer("start_scene").notNull(),
+  endScene: integer("end_scene").notNull(),
+  summary: text("summary"),
+  mainCharacters: text("main_characters").array(),
+  keyLocations: text("key_locations").array(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export const characterRelationships = pgTable("character_relationships", {
   id: serial("id").primaryKey(),
   projectId: integer("project_id").references(() => projects.id).notNull(),
@@ -363,6 +376,11 @@ export const insertSceneVariationSchema = createInsertSchema(sceneVariations).om
   id: true,
   createdAt: true,
   updatedAt: true,
+});
+
+export const insertSceneBreakdownSchema = createInsertSchema(sceneBreakdowns).omit({
+  id: true,
+  createdAt: true,
 });
 
 export const insertCharacterRelationshipSchema = createInsertSchema(characterRelationships).omit({

@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { extractScenes, analyzeCharacters, suggestActors, analyzeVFXNeeds, generateProductPlacement, suggestLocations, generateFinancialPlan, generateProjectSummary } from "./script-analysis-agents";
 import { db, pool } from "./db";
-import { projects, scenes, characters, actorSuggestions, vfxNeeds, productPlacements, locationSuggestions, financialPlans } from "@shared/schema";
+import { projects, scenes, characters, actorSuggestions, vfxNeeds, productPlacements, locationSuggestions, financialPlans, sceneBreakdowns } from "@shared/schema";
 import { eq, and } from "drizzle-orm";
 
 /**
@@ -348,6 +348,61 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
     }
   });
 
+  // Get stored scene breakdown
+  app.get('/api/projects/:projectId/scene-breakdown', async (req: Request, res: Response) => {
+    try {
+      const { projectId } = req.params;
+      
+      if (!projectId) {
+        return res.status(400).json({ error: 'Project ID is required' });
+      }
+
+      // Get stored scene breakdown from database
+      const storedBreakdown = await db
+        .select()
+        .from(sceneBreakdowns)
+        .where(eq(sceneBreakdowns.projectId, parseInt(projectId)))
+        .orderBy(sceneBreakdowns.startScene);
+
+      if (storedBreakdown.length > 0) {
+        // Return stored breakdown data
+        const segments = storedBreakdown.map(breakdown => ({
+          title: breakdown.title,
+          sceneRange: breakdown.sceneRange,
+          startScene: breakdown.startScene,
+          endScene: breakdown.endScene,
+          summary: breakdown.summary,
+          mainCharacters: breakdown.mainCharacters || [],
+          keyLocations: breakdown.keyLocations || []
+        }));
+
+        return res.json({
+          success: true,
+          projectId: parseInt(projectId),
+          segments,
+          totalSegments: segments.length,
+          cached: true
+        });
+      }
+
+      // No stored data found
+      res.json({
+        success: true,
+        projectId: parseInt(projectId),
+        segments: [],
+        totalSegments: 0,
+        cached: false
+      });
+
+    } catch (error) {
+      console.error('Scene breakdown retrieval error:', error);
+      res.status(500).json({ 
+        error: 'Failed to retrieve scene breakdown',
+        details: error.message 
+      });
+    }
+  });
+
   // Scene breakdown - groups consecutive scenes into narrative segments
   app.post('/api/script-analysis/scene_breakdown', async (req: Request, res: Response) => {
     try {
@@ -462,6 +517,34 @@ Respond in JSON format with this structure:
       });
 
       const analysis = JSON.parse(response.choices[0].message.content);
+      
+      // Save scene breakdown results to database
+      try {
+        // First, clear any existing scene breakdown data for this project
+        await db
+          .delete(sceneBreakdowns)
+          .where(eq(sceneBreakdowns.projectId, parseInt(projectId)));
+
+        // Insert new scene breakdown data
+        if (analysis.segments && analysis.segments.length > 0) {
+          const breakdownData = analysis.segments.map((segment: any) => ({
+            projectId: parseInt(projectId),
+            title: segment.title,
+            sceneRange: segment.sceneRange,
+            startScene: segment.startScene,
+            endScene: segment.endScene,
+            summary: segment.summary,
+            mainCharacters: segment.mainCharacters || [],
+            keyLocations: segment.keyLocations || []
+          }));
+
+          await db.insert(sceneBreakdowns).values(breakdownData);
+          console.log(`Saved ${analysis.segments.length} scene breakdown segments to database`);
+        }
+      } catch (dbError) {
+        console.error('Error saving scene breakdown to database:', dbError);
+        // Continue with response even if DB save fails
+      }
       
       res.json({
         success: true,
