@@ -301,12 +301,15 @@ export default function ProjectInfoStep({ projectId, onNext, onSave, isLoading }
                   <FileText className="w-8 h-8 text-green-600" />
                   <div>
                     <p className="font-medium text-green-800">{uploadedFile.name}</p>
-                    {uploadedFile.size ? (
+                    {uploadedFile.size && uploadedFile.size > 1024 ? (
                       <p className="text-sm text-green-600">
-                        {(uploadedFile.size / 1024 / 1024).toFixed(2)} MB
+                        {uploadedFile.size > 1024 * 1024 
+                          ? `${(uploadedFile.size / 1024 / 1024).toFixed(2)} MB`
+                          : `${(uploadedFile.size / 1024).toFixed(0)} KB`
+                        }
                       </p>
                     ) : (
-                      <p className="text-sm text-green-600">Previously uploaded</p>
+                      <p className="text-sm text-green-600">Script file uploaded</p>
                     )}
                   </div>
                 </div>
