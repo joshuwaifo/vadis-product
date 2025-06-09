@@ -371,11 +371,11 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
 For each segment, provide:
 - A compelling, evocative title that captures the essence of that narrative beat
 - The scene range (e.g., "Scenes 1-6") 
-- A detailed, rich summary that explains what happens, the emotional arc, key plot developments, character motivations, and dramatic tension
+- A detailed, immersive description written as direct storytelling - describe what happens, the emotional stakes, character actions and motivations, dramatic tension, and plot developments as if recounting the events. Avoid meta-narrative phrases like "The story begins", "The narrative shifts", or "This segment shows". Write as if you're telling someone what actually happens in the story.
 - The main characters actively involved in this segment
 - The key locations where significant action takes place
 
-Focus on creating segments that represent meaningful story beats - opening setup, inciting incidents, rising action, climaxes, falling action, etc. The summary should be comprehensive enough to understand the narrative significance and emotional journey of each segment.
+Focus on creating segments that represent meaningful story beats - opening setup, inciting incidents, rising action, climaxes, falling action, etc. Write the summary in an engaging, direct style that captures the dramatic events and emotional journey.
 
 Scenes data:
 ${JSON.stringify(scenesData, null, 2)}
@@ -388,7 +388,7 @@ Respond in JSON format with this structure:
       "sceneRange": "Scenes X-Y",
       "startScene": X,
       "endScene": Y,
-      "summary": "Detailed, rich summary explaining what happens, emotional arc, plot developments, character motivations, dramatic tension, and narrative significance",
+      "summary": "Direct, immersive storytelling description of what happens - the events, character actions, emotional stakes, dramatic tension, and plot developments without meta-narrative language",
       "mainCharacters": ["Character1", "Character2"],
       "keyLocations": ["Location1", "Location2"]
     }

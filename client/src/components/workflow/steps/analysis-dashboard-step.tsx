@@ -603,7 +603,6 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
                           </div>
                           
                           <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 mb-4">
-                            <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-2">Summary</h4>
                             <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
                               {segment.summary}
                             </p>
