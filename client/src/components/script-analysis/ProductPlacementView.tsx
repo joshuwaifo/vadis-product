@@ -89,10 +89,19 @@ export default function ProductPlacementView({ projectId }: ProductPlacementView
     enabled: !!projectId
   });
 
-  // Fetch matching products for selected segment
-  const { data: matchingProducts } = useQuery({
-    queryKey: [`/api/script-analysis/matching_products/${selectedSegment?.id}`],
-    enabled: !!selectedSegment?.id
+  // Fetch product placement suggestions for selected segment
+  const { data: productPlacements } = useQuery({
+    queryKey: [`/api/script-analysis/product-placements/${projectId}`],
+    queryFn: async () => {
+      const response = await fetch('/api/script-analysis/product_placement', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ projectId })
+      });
+      if (!response.ok) throw new Error('Failed to fetch product placements');
+      return response.json();
+    },
+    enabled: !!projectId
   });
 
   // Generate visualization mutation
@@ -357,54 +366,89 @@ export default function ProductPlacementView({ projectId }: ProductPlacementView
               return null;
             })()}
 
-            {/* Matching Products */}
-            {matchingProducts && matchingProducts.products && matchingProducts.products.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Package className="h-5 w-5" />
-                    Suggested Brand Products
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {matchingProducts.products.map((product: MockBrandProduct) => (
-                      <Card key={product.id} className="cursor-pointer hover:shadow-md transition-shadow">
-                        <CardContent className="p-4">
-                          <div className="aspect-video bg-gray-100 dark:bg-gray-800 rounded-lg mb-3 flex items-center justify-center">
-                            <Package className="h-8 w-8 text-gray-400" />
-                          </div>
-                          
-                          <h4 className="font-medium text-sm mb-1">{product.name}</h4>
-                          <p className="text-xs text-muted-foreground mb-2">{product.brand}</p>
-                          <p className="text-xs text-muted-foreground mb-3 line-clamp-2">
-                            {product.description}
-                          </p>
-                          
-                          <div className="flex items-center justify-between">
-                            <Badge variant="outline" className="text-xs">
-                              {product.category}
-                            </Badge>
-                            <Button 
-                              size="sm" 
-                              onClick={() => handleProductSelect(product)}
-                              disabled={generateVisualizationMutation.isPending}
-                              className="text-xs"
-                            >
-                              {generateVisualizationMutation.isPending ? (
-                                <div className="animate-spin rounded-full h-3 w-3 border-b border-white mr-1" />
-                              ) : (
-                                <Wand2 className="h-3 w-3 mr-1" />
-                              )}
-                              Generate
-                            </Button>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+            {/* Brand Product Suggestions */}
+            {selectedSegment && productPlacements && productPlacements.productPlacements && (
+              (() => {
+                const scenePlacements = productPlacements.productPlacements.filter((placement: any) => 
+                  placement.sceneId === selectedSegment.id.toString()
+                );
+                
+                if (scenePlacements.length === 0) return null;
+
+                return (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Package className="h-5 w-5" />
+                        AI-Generated Brand Suggestions
+                      </CardTitle>
+                      <p className="text-sm text-muted-foreground">
+                        Click any brand to generate an AI visualization
+                      </p>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {scenePlacements.map((placement: any, index: number) => (
+                          <Card key={`${placement.sceneId}-${index}`} className="cursor-pointer hover:shadow-md transition-shadow">
+                            <CardContent className="p-4">
+                              <div className="aspect-video bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950 dark:to-purple-950 rounded-lg mb-3 flex items-center justify-center">
+                                <div className="text-center">
+                                  <Package className="h-8 w-8 text-blue-600 mx-auto mb-2" />
+                                  <p className="text-xs font-medium text-blue-700 dark:text-blue-300">{placement.brand}</p>
+                                </div>
+                              </div>
+                              
+                              <h4 className="font-medium text-sm mb-1">{placement.product}</h4>
+                              <p className="text-xs text-muted-foreground mb-2">{placement.brand}</p>
+                              <p className="text-xs text-muted-foreground mb-3 line-clamp-2">
+                                {placement.placement}
+                              </p>
+                              
+                              <div className="space-y-2">
+                                <div className="flex items-center justify-between">
+                                  <Badge variant="outline" className="text-xs capitalize">
+                                    {placement.visibility}
+                                  </Badge>
+                                  <span className="text-xs font-medium text-green-600">
+                                    ${placement.estimatedValue?.toLocaleString()}
+                                  </span>
+                                </div>
+                                
+                                <Button 
+                                  size="sm" 
+                                  onClick={() => handleProductSelect({
+                                    id: `${placement.brand}-${placement.product}`.toLowerCase().replace(/\s+/g, '-'),
+                                    name: placement.product,
+                                    brand: placement.brand,
+                                    category: placement.visibility,
+                                    description: placement.placement,
+                                    imageUrl: '',
+                                    placementStyle: placement.visibility as 'subtle' | 'featured' | 'hero'
+                                  })}
+                                  disabled={generateVisualizationMutation.isPending}
+                                  className="w-full text-xs"
+                                >
+                                  {generateVisualizationMutation.isPending ? (
+                                    <>
+                                      <div className="animate-spin rounded-full h-3 w-3 border-b border-white mr-1" />
+                                      Generating...
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Wand2 className="h-3 w-3 mr-1" />
+                                      Generate AI Visualization
+                                    </>
+                                  )}
+                                </Button>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })()
             )}
 
             {/* Generated Visualization */}
