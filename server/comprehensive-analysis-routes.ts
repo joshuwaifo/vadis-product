@@ -267,6 +267,11 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
       
       console.log(`Enhanced scene extractor found ${analysisResult.totalScenes} scenes from script analysis`);
       
+      // Calculate estimated page count from script content (250 words per page standard)
+      const wordCount = scriptContent.split(/\s+/).length;
+      const estimatedPages = Math.ceil(wordCount / 250);
+      console.log(`Estimated ${estimatedPages} pages from ${wordCount} words`);
+      
       // Convert to the expected format
       const extractedScenes = analysisResult.scenes.map(scene => ({
         id: `scene-${scene.sceneNumber}`,
@@ -313,7 +318,7 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
         success: true,
         scenes: savedScenes,
         totalScenes: savedScenes.length,
-        estimatedDuration: savedScenes.reduce((total, scene) => total + (scene.duration || 0), 0)
+        estimatedDuration: estimatedPages // Use calculated page count as estimated minutes
       });
 
     } catch (error) {

@@ -164,13 +164,16 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
           ? { ...task, status: 'completed' as const, completedAt: new Date() }
           : task
       ));
+      // Calculate estimated page count from script content (standard screenplay: ~250 words per page)
+      const estimatedPages = project?.scriptContent ? Math.ceil(project.scriptContent.split(/\s+/).length / 250) : existingScenes.length;
+      
       setAnalysisResults(prev => ({
         ...prev,
         scene_extraction: {
           success: true,
           scenes: existingScenes,
           totalScenes: existingScenes.length,
-          estimatedDuration: existingScenes.length // Use scene count as estimated minutes
+          estimatedDuration: estimatedPages // Use estimated page count as minutes
         }
       }));
     }
@@ -479,7 +482,7 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
                   <div className="text-sm text-muted-foreground">Total Scenes</div>
                 </div>
                 <div className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950/30 dark:to-green-900/30 rounded-xl p-4">
-                  <div className="text-3xl font-bold text-green-600 dark:text-green-400">{results.scenes?.length || results.totalScenes || 0}</div>
+                  <div className="text-3xl font-bold text-green-600 dark:text-green-400">{results.estimatedDuration || (project?.scriptContent ? Math.ceil(project.scriptContent.split(/\s+/).length / 250) : 0)}</div>
                   <div className="text-sm text-muted-foreground">Est. Minutes</div>
                 </div>
                 <div className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950/30 dark:to-purple-900/30 rounded-xl p-4">
