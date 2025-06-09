@@ -170,7 +170,7 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
           success: true,
           scenes: existingScenes,
           totalScenes: existingScenes.length,
-          estimatedDuration: existingScenes.reduce((total: number, scene: any) => total + (scene.duration || 0), 0)
+          estimatedDuration: existingScenes.length // Use scene count as estimated minutes
         }
       }));
     }
