@@ -592,8 +592,8 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
                 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {results.segments.map((segment: any, index: number) => (
-                    <Card key={index} className="group hover:shadow-lg transition-all duration-200 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600">
-                      <CardContent className="p-0">
+                    <Card key={index} className="group hover:shadow-lg transition-all duration-200 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 flex flex-col h-full">
+                      <CardContent className="p-0 flex flex-col h-full">
                         {/* Header Section */}
                         <div className="p-6 pb-0">
                           <div className="flex items-start justify-between mb-4">
@@ -622,8 +622,8 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
                           </div>
                         </div>
                         
-                        {/* Characters and Locations */}
-                        <div className="px-6 pb-4">
+                        {/* Characters and Locations - Flex grow to push footer down */}
+                        <div className="px-6 pb-4 flex-grow">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-3">
                               <div className="flex items-center gap-2">
@@ -663,8 +663,8 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
                           </div>
                         </div>
                         
-                        {/* Footer */}
-                        <div className="px-6 py-4 bg-gray-50/50 dark:bg-gray-800/50 border-t border-gray-100 dark:border-gray-700">
+                        {/* Footer - Always at bottom */}
+                        <div className="mt-auto px-6 py-4 bg-gray-50/50 dark:bg-gray-800/50 border-t border-gray-100 dark:border-gray-700">
                           <div className="flex items-center justify-between">
                             <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">
                               Scenes {segment.startScene} - {segment.endScene}
