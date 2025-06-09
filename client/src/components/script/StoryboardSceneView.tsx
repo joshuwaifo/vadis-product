@@ -28,9 +28,10 @@ interface StoryboardSceneViewProps {
   scenes: Scene[];
   onClose: () => void;
   projectTitle: string;
+  pageCount?: number;
 }
 
-export default function StoryboardSceneView({ scenes, onClose, projectTitle }: StoryboardSceneViewProps) {
+export default function StoryboardSceneView({ scenes, onClose, projectTitle, pageCount }: StoryboardSceneViewProps) {
   const [selectedScene, setSelectedScene] = useState<Scene | null>(scenes[0] || null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -68,8 +69,9 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle }: S
     setSelectedScene(scenes[nextIndex]);
   };
 
-  const totalDuration = scenes.reduce((sum, scene) => sum + scene.duration, 0);
-  const estimatedRuntime = Math.round(totalDuration);
+  // Use actual PDF page count for estimated runtime (1 page = 1 minute industry standard)
+  // Fall back to scene duration sum if pageCount is not available
+  const estimatedRuntime = pageCount || Math.round(scenes.reduce((sum, scene) => sum + scene.duration, 0));
 
   return (
     <div className="fixed inset-0 bg-black z-50 flex flex-col overflow-hidden">

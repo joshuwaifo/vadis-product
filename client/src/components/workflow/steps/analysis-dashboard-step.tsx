@@ -767,6 +767,7 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
         scenes={analysisResults.scene_extraction.scenes}
         onClose={() => setShowStoryboard(false)}
         projectTitle={project?.title || 'Script Analysis'}
+        pageCount={project?.pageCount}
       />
     );
   }
