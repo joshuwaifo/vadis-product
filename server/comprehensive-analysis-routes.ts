@@ -384,16 +384,48 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
         duration: scene.duration
       }));
 
-      const prompt = `Analyze the following scenes and group consecutive scenes into logical narrative segments. Each segment should represent a cohesive story beat or sequence that forms a complete narrative unit.
+      // Pre-analyze locations to help with grouping
+      const locationAnalysis = scenesData.reduce((acc, scene, index) => {
+        const prevScene = index > 0 ? scenesData[index - 1] : null;
+        const nextScene = index < scenesData.length - 1 ? scenesData[index + 1] : null;
+        
+        acc.push({
+          sceneNumber: scene.sceneNumber,
+          location: scene.location,
+          isLocationChange: prevScene ? scene.location !== prevScene.location : true,
+          nextLocationChange: nextScene ? scene.location !== nextScene.location : true
+        });
+        
+        return acc;
+      }, [] as any[]);
 
-For each segment, provide:
-- A compelling, evocative title that captures the essence of that narrative beat
-- The scene range (e.g., "Scenes 1-6") 
-- A detailed, immersive description written as direct storytelling - describe what happens, the emotional stakes, character actions and motivations, dramatic tension, and plot developments as if recounting the events. Avoid meta-narrative phrases like "The story begins", "The narrative shifts", or "This segment shows". Write as if you're telling someone what actually happens in the story.
-- The main characters actively involved in this segment
-- The key locations where significant action takes place
+      const prompt = `Analyze the following scenes and group consecutive scenes into logical narrative segments based on LOCATION CONTINUITY and natural story flow.
 
-Focus on creating segments that represent meaningful story beats - opening setup, inciting incidents, rising action, climaxes, falling action, etc. Write the summary in an engaging, direct style that captures the dramatic events and emotional journey.
+CRITICAL GROUPING RULES:
+1. LOCATION PRIORITY: Group consecutive scenes in the same location together
+2. LOCATION TRANSITIONS: Start a new segment when location significantly changes
+3. GRANULAR SEGMENTATION: Aim for 35-45 segments total (roughly 4-6 scenes per segment for ${scenesData.length} scenes)
+4. MINIMUM SEGMENTS: Never create fewer than 25 segments
+5. SMALL SEGMENTS OK: Segments can be 1-3 scenes if location/context warrants
+
+LOCATION GROUPING LOGIC:
+- Same exact location = same segment
+- Related locations (e.g., different rooms in same building) = same segment  
+- Significant location changes (building to building, interior to exterior, different settings) = new segment
+- Time of day changes within same location = consider new segment
+- Character group changes = consider new segment boundary
+
+For each segment provide:
+- Title: Compelling, evocative title capturing the story beat
+- Scene range: "Scenes X-Y" format
+- Summary: Direct storytelling description of events, character actions, emotional stakes, dramatic tension
+- Main characters: Primary characters active in this segment  
+- Key locations: Primary location(s) where action occurs
+
+CREATE MORE SEGMENTS RATHER THAN FEWER. Target 35-45 segments minimum.
+
+Location Analysis (to help with grouping):
+${JSON.stringify(locationAnalysis, null, 2)}
 
 Scenes data:
 ${JSON.stringify(scenesData, null, 2)}
