@@ -473,7 +473,15 @@ LOCATION GROUPING LOGIC:
 For each segment provide:
 - Title: Compelling, evocative title capturing the story beat
 - Scene range: "Scenes X-Y" format
-- Summary: Direct storytelling description of events, character actions, emotional stakes, dramatic tension
+- Summary: DETAILED, comprehensive storytelling description (minimum 150-250 words) covering:
+  * What exactly happens in this segment (specific events, actions, dialogue themes)
+  * Character motivations, emotions, and development
+  * Dramatic tension, conflict, and stakes
+  * Visual elements, atmosphere, and tone
+  * How this segment advances the overall plot
+  * Key story beats and turning points
+  * Subtext and underlying themes
+  Write as if describing the segment to someone who hasn't read the script - be thorough and vivid
 - Main characters: Primary characters active in this segment  
 - Key locations: Primary location(s) where action occurs
 

@@ -618,7 +618,7 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
                         
                         {/* Summary Section */}
                         <div className="px-6 pb-4">
-                          <div className="bg-gradient-to-br from-slate-50 to-gray-50 dark:from-slate-800/50 dark:to-gray-800/50 rounded-xl p-5 border border-slate-200/50 dark:border-slate-700/50 h-32">
+                          <div className="bg-gradient-to-br from-slate-50 to-gray-50 dark:from-slate-800/50 dark:to-gray-800/50 rounded-xl p-5 border border-slate-200/50 dark:border-slate-700/50 h-48">
                             <div className="h-full overflow-y-auto">
                               <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-medium">
                                 {segment.summary}
