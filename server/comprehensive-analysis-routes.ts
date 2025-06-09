@@ -1054,30 +1054,46 @@ Respond in JSON format with this structure:
 
       const productPlacementOpportunities = await generateProductPlacement(projectScenes, scriptContent);
       
-      // Save product placement opportunities
+      // Save product placement opportunities using raw SQL for better compatibility
       const savedPlacements = await Promise.all(
         productPlacementOpportunities.map(async (placement) => {
-          const [saved] = await db
-            .insert(productPlacements)
-            .values({
-              projectId: parseInt(projectId),
-              sceneId: parseInt(placement.sceneId),
-              brand: placement.brand,
-              product: placement.product,
-              placement: placement.placement,
-              naturalness: placement.naturalness,
-              visibility: placement.visibility,
-              estimatedValue: placement.estimatedValue
-            })
-            .returning();
-          return saved;
+          // Find the actual scene ID from the database that matches the AI-generated scene reference
+          const sceneMatch = projectScenes.find(scene => 
+            scene.id.toString() === placement.sceneId || 
+            scene.sceneNumber.toString() === placement.sceneId
+          );
+          
+          if (!sceneMatch) {
+            console.warn(`No matching scene found for sceneId: ${placement.sceneId}`);
+            return null;
+          }
+
+          const result = await pool.query(`
+            INSERT INTO product_placements (project_id, scene_id, brand, product, placement, naturalness, visibility, estimated_value)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+            RETURNING *
+          `, [
+            parseInt(projectId),
+            sceneMatch.id,
+            placement.brand,
+            placement.product,
+            placement.placement,
+            placement.naturalness,
+            placement.visibility,
+            placement.estimatedValue
+          ]);
+          
+          return result.rows[0];
         })
       );
 
+      // Filter out null results
+      const validPlacements = savedPlacements.filter(placement => placement !== null);
+
       res.json({
         success: true,
-        productPlacements: savedPlacements,
-        totalEstimatedValue: savedPlacements.reduce((total, placement) => total + (placement.estimatedValue || 0), 0)
+        productPlacements: validPlacements,
+        totalEstimatedValue: validPlacements.reduce((total, placement) => total + (placement.estimated_value || 0), 0)
       });
 
     } catch (error) {

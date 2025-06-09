@@ -583,6 +583,7 @@ export async function analyzeVFXNeeds(
  */
 export async function generateProductPlacement(
   scenes: Scene[],
+  scriptContent: string,
   provider: AIProvider = 'gemini-1.5-flash'
 ): Promise<ProductPlacement[]> {
   const prompt = `
