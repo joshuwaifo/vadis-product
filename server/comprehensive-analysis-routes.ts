@@ -1065,8 +1065,11 @@ Respond in JSON format with this structure:
           
           if (!sceneMatch) {
             console.warn(`No matching scene found for sceneId: ${placement.sceneId}`);
+            console.warn(`Available scene IDs: ${projectScenes.map(s => s.id).join(', ')}`);
             return null;
           }
+
+          console.log(`Inserting placement: ${placement.brand} - ${placement.product} for scene ${sceneMatch.id}`);
 
           const result = await pool.query(`
             INSERT INTO product_placements (project_id, scene_id, brand, product, placement, naturalness, visibility, estimated_value)
