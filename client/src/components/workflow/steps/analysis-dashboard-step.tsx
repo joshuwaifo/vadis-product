@@ -631,7 +631,7 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
                                   <Users className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                                 </div>
                                 <h5 className="font-semibold text-gray-900 dark:text-gray-100 text-sm">
-                                  Main Characters
+                                  Main Characters ({segment.mainCharacters?.length || 0})
                                 </h5>
                               </div>
                               <div className="flex flex-wrap gap-1.5">
@@ -649,7 +649,7 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
                                   <MapPin className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                                 </div>
                                 <h5 className="font-semibold text-gray-900 dark:text-gray-100 text-sm">
-                                  Key Locations
+                                  Key Locations ({segment.keyLocations?.length || 0})
                                 </h5>
                               </div>
                               <div className="flex flex-wrap gap-1.5">
