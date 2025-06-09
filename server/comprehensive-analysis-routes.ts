@@ -1237,4 +1237,39 @@ Respond in JSON format with this structure:
     }
   });
 
+  /**
+   * Get stored product placements for a project
+   */
+  app.get('/api/projects/:projectId/product-placements', async (req: Request, res: Response) => {
+    try {
+      const projectId = parseInt(req.params.projectId);
+
+      if (!projectId) {
+        return res.status(400).json({ 
+          success: false, 
+          error: 'Valid project ID is required' 
+        });
+      }
+
+      // Get product placements from database
+      const productPlacements = await db
+        .select()
+        .from(productPlacements as any)
+        .where(eq((productPlacements as any).projectId, projectId));
+
+      res.json({
+        success: true,
+        productPlacements: productPlacements,
+        totalEstimatedValue: productPlacements.reduce((sum, placement) => sum + (placement.estimatedValue || 0), 0)
+      });
+
+    } catch (error) {
+      console.error('Error fetching product placements:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: 'Failed to fetch product placements' 
+      });
+    }
+  });
+
 }

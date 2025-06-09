@@ -89,15 +89,11 @@ export default function ProductPlacementView({ projectId }: ProductPlacementView
     enabled: !!projectId
   });
 
-  // Fetch product placement suggestions for selected segment
+  // Fetch existing product placement data from database
   const { data: productPlacements } = useQuery({
-    queryKey: [`/api/script-analysis/product-placements/${projectId}`],
+    queryKey: [`/api/projects/${projectId}/product-placements`],
     queryFn: async () => {
-      const response = await fetch('/api/script-analysis/product_placement', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ projectId })
-      });
+      const response = await fetch(`/api/projects/${projectId}/product-placements`);
       if (!response.ok) throw new Error('Failed to fetch product placements');
       return response.json();
     },
