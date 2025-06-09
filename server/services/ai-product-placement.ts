@@ -142,11 +142,11 @@ PRODUCT CATEGORIES: TECHNOLOGY, SPORTS, BEVERAGE, AUTOMOTIVE, ELECTRONICS, LUXUR
 
 SCENE SEGMENTS:
 ${sceneBreakdowns.map((segment, index) => `
-Segment ${index + 1}: ${segment.title}
-Range: ${segment.sceneRange}
-Summary: ${segment.summary}
-Characters: ${segment.mainCharacters?.join(', ') || 'Not specified'}
-Locations: ${segment.keyLocations?.join(', ') || 'Not specified'}
+Segment ${index + 1}: ${segment.title || `Scenes ${segment.startScene || 1}-${segment.endScene || 1}`}
+Range: ${segment.sceneRange || `Scenes ${segment.startScene || 1}-${segment.endScene || 1}`}
+Summary: ${segment.summary || segment.narrative || 'No summary available'}
+Characters: ${segment.mainCharacters?.join(', ') || segment.characters?.join(', ') || 'Not specified'}
+Locations: ${segment.keyLocations?.join(', ') || segment.locations?.join(', ') || 'Not specified'}
 `).join('\n')}
 
 Return a JSON object with this structure:
@@ -180,14 +180,14 @@ Only include the top 3-5 most suitable scenes. Return ONLY the JSON object.`;
     // Map the response to include full scene breakdown data
     const brandableScenes: BrandableScene[] = parsedResponse.brandableScenes
       .map((scene: any) => {
-        const sceneBreakdown = sceneBreakdowns[scene.sceneBreakdownId];
+        const sceneBreakdown = sceneBreakdowns.find(sb => sb.id === scene.sceneBreakdownId) || sceneBreakdowns[scene.sceneBreakdownId];
         if (!sceneBreakdown) return null;
 
         return {
           sceneBreakdownId: scene.sceneBreakdownId,
-          title: sceneBreakdown.title,
-          sceneRange: sceneBreakdown.sceneRange,
-          summary: sceneBreakdown.summary,
+          title: sceneBreakdown.title || `Scenes ${sceneBreakdown.startScene || 1}-${sceneBreakdown.endScene || 1}`,
+          sceneRange: sceneBreakdown.sceneRange || `Scenes ${sceneBreakdown.startScene || 1}-${sceneBreakdown.endScene || 1}`,
+          summary: sceneBreakdown.summary || sceneBreakdown.narrative || 'No summary available',
           brandabilityScore: scene.brandabilityScore,
           brandabilityReason: scene.brandabilityReason,
           suggestedCategories: scene.suggestedCategories || [],

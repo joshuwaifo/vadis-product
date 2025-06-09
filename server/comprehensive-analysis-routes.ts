@@ -949,19 +949,19 @@ Respond in JSON format with this structure:
       const { projectId } = req.body;
       
       // Get scene breakdowns for this project
-      const sceneBreakdowns = await db
+      const projectSceneBreakdowns = await db
         .select()
         .from(sceneBreakdowns)
         .where(eq(sceneBreakdowns.projectId, parseInt(projectId)));
 
-      if (sceneBreakdowns.length === 0) {
+      if (!projectSceneBreakdowns || projectSceneBreakdowns.length === 0) {
         return res.status(400).json({ 
           error: 'No scene breakdowns found. Please run scene breakdown analysis first.' 
         });
       }
 
       const { identifyBrandableScenes } = await import('./services/ai-product-placement');
-      const brandableScenes = await identifyBrandableScenes(sceneBreakdowns);
+      const brandableScenes = await identifyBrandableScenes(projectSceneBreakdowns);
       
       res.json({
         success: true,
