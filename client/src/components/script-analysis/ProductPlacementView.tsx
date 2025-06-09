@@ -63,6 +63,7 @@ export default function ProductPlacementView({ projectId }: ProductPlacementView
   const [selectedSegment, setSelectedSegment] = useState<SceneBreakdownSegment | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<MockBrandProduct | null>(null);
   const [showProductModal, setShowProductModal] = useState(false);
+  const [generatedVisualization, setGeneratedVisualization] = useState<any>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -106,10 +107,20 @@ export default function ProductPlacementView({ projectId }: ProductPlacementView
       return response.json();
     },
     onSuccess: (data) => {
-      toast({
-        title: "Visualization Generated",
-        description: "AI product placement visualization has been created successfully."
-      });
+      if (data.success && data.visualization) {
+        setGeneratedVisualization({
+          ...data.visualization,
+          productName: selectedProduct?.name,
+          brandName: selectedProduct?.brand,
+          estimatedValue: 25000,
+          integrationType: selectedProduct?.placementStyle || 'subtle',
+          rewrittenDescription: data.visualization.description
+        });
+        toast({
+          title: "Visualization Generated",
+          description: "AI product placement visualization has been created successfully."
+        });
+      }
       setShowProductModal(false);
     },
     onError: (error) => {
@@ -391,6 +402,60 @@ export default function ProductPlacementView({ projectId }: ProductPlacementView
                         </CardContent>
                       </Card>
                     ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Generated Visualization */}
+            {generatedVisualization && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Wand2 className="h-5 w-5" />
+                    AI-Generated Product Placement Visualization
+                  </CardTitle>
+                  <p className="text-sm text-muted-foreground">
+                    {generatedVisualization.rewrittenDescription}
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="relative">
+                      <img
+                        src={generatedVisualization.imageUrl}
+                        alt={`Product placement visualization for ${generatedVisualization.productName}`}
+                        className="w-full rounded-lg shadow-md"
+                        onLoad={() => {
+                          // Image loaded successfully
+                        }}
+                        onError={() => {
+                          // Handle image load error
+                        }}
+                      />
+                    </div>
+                    
+                    <div className="bg-muted/50 rounded-lg p-4">
+                      <h4 className="font-medium mb-2">Placement Details</h4>
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <p className="text-muted-foreground">Product</p>
+                          <p className="font-medium">{generatedVisualization.productName}</p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground">Brand</p>
+                          <p className="font-medium">{generatedVisualization.brandName}</p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground">Integration Type</p>
+                          <p className="font-medium capitalize">{generatedVisualization.integrationType}</p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground">Estimated Value</p>
+                          <p className="font-medium">${generatedVisualization.estimatedValue?.toLocaleString()}</p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
