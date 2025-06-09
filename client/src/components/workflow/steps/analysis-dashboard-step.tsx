@@ -776,6 +776,13 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
             )}
           </div>
         );
+
+      case 'product_placement':
+        return (
+          <div className="space-y-6">
+            <ProductPlacementView projectId={workflow?.projectId || project?.id || 0} />
+          </div>
+        );
       
       default:
         return (
