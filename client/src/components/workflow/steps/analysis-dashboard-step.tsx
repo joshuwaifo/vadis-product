@@ -318,6 +318,18 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
       // Auto-select the completed task to show results
       setSelectedTask(taskId);
       
+      // Invalidate relevant query caches based on task type
+      if (taskId === 'scene_extraction') {
+        queryClient.invalidateQueries({ queryKey: [`/api/projects/${workflow?.projectId}/scenes`] });
+      } else if (taskId === 'character_analysis') {
+        queryClient.invalidateQueries({ queryKey: [`/api/projects/${workflow?.projectId}/characters`] });
+      } else if (taskId === 'casting_suggestions') {
+        queryClient.invalidateQueries({ queryKey: [`/api/projects/${workflow?.projectId}/casting`] });
+        queryClient.invalidateQueries({ queryKey: [`/api/projects/${workflow?.projectId}/casting/analysis`] });
+      } else if (taskId === 'scene_breakdown') {
+        queryClient.invalidateQueries({ queryKey: [`/api/projects/${workflow?.projectId}/scene-breakdown`] });
+      }
+      
       toast({
         title: "Analysis Complete",
         description: `${tasks.find(t => t.id === taskId)?.title} has been completed successfully.`
@@ -724,9 +736,18 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
       case 'casting_suggestions':
         return (
           <div className="space-y-6">
-            {castingAnalysis ? (
+            {castingAnalysis && castingAnalysis.scriptTitle ? (
               <CastingAnalysisView
                 castingData={castingAnalysis}
+                projectId={workflow?.projectId || project?.id}
+                onRefresh={() => {
+                  queryClient.invalidateQueries({ queryKey: [`/api/projects/${workflow?.projectId}/casting/analysis`] });
+                  runAnalysis('casting_suggestions');
+                }}
+              />
+            ) : analysisResults.casting_suggestions ? (
+              <CastingAnalysisView
+                castingData={analysisResults.casting_suggestions.castingAnalysis}
                 projectId={workflow?.projectId || project?.id}
                 onRefresh={() => {
                   queryClient.invalidateQueries({ queryKey: [`/api/projects/${workflow?.projectId}/casting/analysis`] });
@@ -740,6 +761,16 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
                 <p className="text-muted-foreground">
                   Run character analysis first to generate casting suggestions.
                 </p>
+                <Button 
+                  onClick={() => {
+                    queryClient.invalidateQueries({ queryKey: [`/api/projects/${workflow?.projectId}/casting/analysis`] });
+                    window.location.reload();
+                  }}
+                  variant="outline"
+                  className="mt-4"
+                >
+                  Refresh Data
+                </Button>
               </div>
             )}
           </div>
