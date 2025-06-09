@@ -39,10 +39,6 @@ function Router() {
       <Route path="/dashboard/script-generation-workflow" component={ScriptGenerationWorkflow} />
       <Route path="/dashboard/script-generator" component={ScriptGenerator} />
       <Route path="/dashboard/production/script-generation-workflow" component={ScriptGenerationWorkflow} />
-      <Route path="/dashboards/production" component={ProductionDashboard} />
-      <Route path="/dashboards/brand" component={BrandDashboard} />
-      <Route path="/dashboards/investor" component={InvestorDashboard} />
-      <Route path="/dashboards/creator" component={CreatorDashboard} />
       <Route path="/production/dashboard" component={ProductionDashboard} />
       <Route path="/brand/dashboard" component={BrandDashboard} />
       <Route path="/investor/dashboard" component={InvestorDashboard} />

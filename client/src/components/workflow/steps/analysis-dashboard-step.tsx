@@ -762,8 +762,6 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
 
   // Show storyboard view if enabled
   if (showStoryboard && selectedTask === 'scene_extraction' && analysisResults.scene_extraction?.scenes) {
-    console.log('AnalysisDashboard - project data:', project);
-    console.log('AnalysisDashboard - pageCount being passed:', project?.pageCount);
     return (
       <StoryboardSceneView
         scenes={analysisResults.scene_extraction.scenes}

@@ -71,10 +71,7 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle, pag
 
   // Use actual PDF page count for estimated runtime (1 page = 1 minute industry standard)
   // Fall back to scene duration sum if pageCount is not available
-  console.log('StoryboardSceneView - pageCount:', pageCount, 'scenes.length:', scenes.length);
-  const scenesDurationSum = Math.round(scenes.reduce((sum, scene) => sum + scene.duration, 0));
-  console.log('StoryboardSceneView - scenesDurationSum:', scenesDurationSum);
-  const estimatedRuntime = pageCount || scenesDurationSum;
+  const estimatedRuntime = pageCount || Math.round(scenes.reduce((sum, scene) => sum + scene.duration, 0));
 
   return (
     <div className="fixed inset-0 bg-black z-50 flex flex-col overflow-hidden">
