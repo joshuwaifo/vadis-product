@@ -30,7 +30,7 @@ interface AnalysisTask {
 const ANALYSIS_TASKS: AnalysisTask[] = [
   {
     id: 'scene_extraction',
-    title: 'Scene Extraction',
+    title: 'Storyboard',
     description: 'Extract and analyze individual scenes from the script',
     status: 'not_started',
     icon: Film,
