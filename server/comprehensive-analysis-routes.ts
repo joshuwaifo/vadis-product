@@ -1061,7 +1061,7 @@ Respond in JSON format with this structure:
             .insert(productPlacements)
             .values({
               projectId: parseInt(projectId),
-              sceneId: placement.sceneId,
+              sceneId: parseInt(placement.sceneId),
               brand: placement.brand,
               product: placement.product,
               placement: placement.placement,
@@ -1251,16 +1251,17 @@ Respond in JSON format with this structure:
         });
       }
 
-      // Get product placements from database
-      const productPlacements = await db
-        .select()
-        .from(productPlacements as any)
-        .where(eq((productPlacements as any).projectId, projectId));
+      // Get product placements from database using raw SQL query
+      const result = await pool.query(`
+        SELECT * FROM product_placements WHERE project_id = $1
+      `, [projectId]);
+
+      const productPlacementResults = result.rows;
 
       res.json({
         success: true,
-        productPlacements: productPlacements,
-        totalEstimatedValue: productPlacements.reduce((sum, placement) => sum + (placement.estimatedValue || 0), 0)
+        productPlacements: productPlacementResults,
+        totalEstimatedValue: productPlacementResults.reduce((sum: number, placement: any) => sum + (placement.estimated_value || 0), 0)
       });
 
     } catch (error) {
