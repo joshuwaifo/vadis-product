@@ -330,6 +330,105 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
     }
   });
 
+  // Scene breakdown - groups consecutive scenes into narrative segments
+  app.post('/api/script-analysis/scene_breakdown', async (req: Request, res: Response) => {
+    try {
+      const { projectId } = req.body;
+      
+      if (!projectId) {
+        return res.status(400).json({ error: 'Project ID is required' });
+      }
+
+      // Get existing scenes from database
+      const existingScenes = await db
+        .select()
+        .from(scenes)
+        .where(eq(scenes.projectId, parseInt(projectId)))
+        .orderBy(scenes.sceneNumber);
+
+      if (!existingScenes.length) {
+        return res.status(400).json({ 
+          error: 'No scenes found. Please run Scene Extraction first.' 
+        });
+      }
+
+      // Use OpenAI to analyze and group scenes into narrative segments
+      const OpenAI = (await import('openai')).default;
+      const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+      const scenesData = existingScenes.map(scene => ({
+        sceneNumber: scene.sceneNumber,
+        location: scene.location,
+        timeOfDay: scene.timeOfDay,
+        description: scene.description,
+        plotSummary: scene.plotSummary,
+        characters: scene.characters,
+        duration: scene.duration
+      }));
+
+      const prompt = `Analyze the following scenes and group consecutive scenes into logical narrative segments. Each segment should represent a cohesive story beat or sequence.
+
+For each segment, provide:
+- A compelling title that captures the essence of that narrative beat
+- The scene range (e.g., "Scenes 1-6")
+- A brief summary of what happens in this segment
+- The main characters involved
+- The total estimated duration
+
+Scenes data:
+${JSON.stringify(scenesData, null, 2)}
+
+Respond in JSON format with this structure:
+{
+  "segments": [
+    {
+      "title": "Compelling segment title",
+      "sceneRange": "Scenes X-Y",
+      "startScene": X,
+      "endScene": Y,
+      "summary": "Brief summary of this narrative segment",
+      "mainCharacters": ["Character1", "Character2"],
+      "totalDuration": minutes,
+      "keyLocations": ["Location1", "Location2"]
+    }
+  ]
+}`;
+
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+        messages: [
+          {
+            role: "system",
+            content: "You are an expert script analyst specializing in narrative structure and story segmentation. Analyze scenes and group them into logical narrative beats."
+          },
+          {
+            role: "user",
+            content: prompt
+          }
+        ],
+        response_format: { type: "json_object" },
+        temperature: 0.3
+      });
+
+      const analysis = JSON.parse(response.choices[0].message.content);
+      
+      res.json({
+        success: true,
+        projectId: parseInt(projectId),
+        segments: analysis.segments,
+        totalSegments: analysis.segments.length,
+        totalScenes: existingScenes.length
+      });
+
+    } catch (error) {
+      console.error('Scene breakdown error:', error);
+      res.status(500).json({ 
+        error: 'Failed to analyze scene breakdown',
+        details: error.message 
+      });
+    }
+  });
+
   // Character analysis
   app.post('/api/script-analysis/character_analysis', async (req: Request, res: Response) => {
     try {
