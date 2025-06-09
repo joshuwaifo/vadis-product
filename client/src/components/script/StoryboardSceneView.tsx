@@ -153,10 +153,10 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle }: S
                     </Badge>
                     <div className="flex items-center gap-2 text-gray-300 text-sm sm:text-base flex-wrap">
                       <MapPin className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
-                      <span className="truncate">{selectedScene.location}</span>
+                      <span className="truncate">{selectedScene.location || 'Location TBD'}</span>
                       <span className="hidden sm:inline">•</span>
                       <Clock className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
-                      <span>{selectedScene.timeOfDay}</span>
+                      <span>{selectedScene.timeOfDay || 'Time TBD'}</span>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-400">
@@ -167,11 +167,16 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle }: S
                 </div>
 
                 <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-2 sm:mb-3">
-                  {selectedScene.location} - {selectedScene.timeOfDay}
+                  {selectedScene.location && selectedScene.timeOfDay 
+                    ? `${selectedScene.location} - ${selectedScene.timeOfDay}`
+                    : selectedScene.location || selectedScene.timeOfDay || `Scene ${selectedScene.sceneNumber}`
+                  }
                 </h2>
-                <p className="text-sm sm:text-lg lg:text-xl text-gray-300 leading-relaxed">
-                  {selectedScene.description}
-                </p>
+                {selectedScene.description && (
+                  <p className="text-sm sm:text-lg lg:text-xl text-gray-300 leading-relaxed">
+                    {selectedScene.description}
+                  </p>
+                )}
               </div>
 
               {/* Scene Content */}
@@ -280,12 +285,12 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle }: S
                         <div className={`text-xs mb-1 sm:mb-2 truncate ${
                           selectedScene?.id === scene.id ? 'text-blue-100' : 'text-gray-400'
                         }`}>
-                          {scene.location}
+                          {scene.location || 'Location TBD'}
                         </div>
                         <div className={`text-xs truncate ${
                           selectedScene?.id === scene.id ? 'text-blue-200' : 'text-gray-500'
                         }`}>
-                          {scene.timeOfDay}
+                          {scene.timeOfDay || 'Time TBD'}
                         </div>
                         <div className={`text-xs mt-1 ${
                           selectedScene?.id === scene.id ? 'text-blue-200' : 'text-gray-500'
