@@ -331,7 +331,7 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
         success: true,
         scenes: savedScenes,
         totalScenes: savedScenes.length,
-        estimatedDuration: estimatedPages // Use calculated page count as estimated minutes
+        estimatedDuration: actualPageCount // Use actual PDF page count as estimated minutes
       });
 
     } catch (error) {

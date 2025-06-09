@@ -164,8 +164,8 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
           ? { ...task, status: 'completed' as const, completedAt: new Date() }
           : task
       ));
-      // Calculate estimated page count from script content (standard screenplay: ~250 words per page)
-      const estimatedPages = project?.scriptContent ? Math.ceil(project.scriptContent.split(/\s+/).length / 250) : existingScenes.length;
+      // Use actual page count from database, fallback to word-based estimation
+      const actualPageCount = project?.pageCount || (project?.scriptContent ? Math.ceil(project.scriptContent.split(/\s+/).length / 250) : existingScenes.length);
       
       setAnalysisResults(prev => ({
         ...prev,
@@ -173,7 +173,7 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
           success: true,
           scenes: existingScenes,
           totalScenes: existingScenes.length,
-          estimatedDuration: estimatedPages // Use estimated page count as minutes
+          estimatedDuration: actualPageCount // Use actual PDF page count as minutes
         }
       }));
     }
