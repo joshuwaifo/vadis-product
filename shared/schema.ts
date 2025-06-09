@@ -68,7 +68,6 @@ export const projects = pgTable("projects", {
   pdfFileData: text("pdf_file_data"), // Base64 encoded PDF data
   pdfFileSize: integer("pdf_file_size"), // PDF file size in bytes
   pdfMimeType: text("pdf_mime_type"), // PDF MIME type
-  pageCount: integer("page_count"), // Number of pages in the PDF
   status: text("status").default("draft"), // draft, in_progress, completed, published
   workflowStatus: text("workflow_status").default("project_info"), // project_info, script_analysis, review_results, finalize_project
   isPublished: boolean("is_published").default(false),
