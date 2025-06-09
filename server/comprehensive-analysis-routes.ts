@@ -1006,27 +1006,47 @@ Respond in JSON format with this structure:
         return res.status(400).json({ error: 'Scene breakdown ID and product ID are required' });
       }
 
-      // Get scene breakdown details
-      const sceneBreakdown = await db
-        .select()
-        .from(sceneBreakdowns)
-        .where(eq(sceneBreakdowns.id, parseInt(sceneBreakdownId)))
-        .limit(1);
+      // Get scene breakdown details using raw SQL
+      console.log('Looking for scene breakdown with ID:', sceneBreakdownId);
+      const sceneBreakdownResult = await pool.query(`
+        SELECT * FROM scene_breakdowns WHERE id = $1 LIMIT 1
+      `, [parseInt(sceneBreakdownId)]);
 
-      if (sceneBreakdown.length === 0) {
+      if (sceneBreakdownResult.rows.length === 0) {
         return res.status(404).json({ error: 'Scene breakdown not found' });
       }
-
-      const { generateProductPlacementVisualization, getAllMockProducts } = await import('./services/ai-product-placement');
-      const allProducts = getAllMockProducts();
-      const product = allProducts.find(p => p.id === productId);
       
-      if (!product) {
-        return res.status(404).json({ error: 'Product not found' });
+      const sceneBreakdown = sceneBreakdownResult.rows[0];
+
+      // Get the actual product placement from database
+      console.log('Looking for product placement with ID:', productId);
+      const placementResult = await pool.query(`
+        SELECT * FROM product_placements WHERE id = $1
+      `, [parseInt(productId)]);
+      
+      console.log('Product placement query result:', placementResult.rows);
+      
+      if (placementResult.rows.length === 0) {
+        return res.status(404).json({ error: 'Product placement not found' });
       }
+      
+      const placement = placementResult.rows[0];
+      
+      // Create a product object compatible with the visualization function
+      const product = {
+        id: placement.id.toString(),
+        name: placement.product,
+        brand: placement.brand,
+        category: placement.visibility,
+        description: placement.placement,
+        imageUrl: "https://via.placeholder.com/400x300?text=" + encodeURIComponent(placement.brand),
+        placementStyle: placement.visibility
+      };
+      
+      const { generateProductPlacementVisualization } = await import('./services/ai-product-placement');
 
       const visualization = await generateProductPlacementVisualization(
-        sceneBreakdown[0],
+        sceneBreakdown,
         product
       );
 
