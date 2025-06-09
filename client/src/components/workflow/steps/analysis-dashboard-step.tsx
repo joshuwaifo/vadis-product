@@ -593,9 +593,9 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
                   </Badge>
                 </div>
                 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                   {results.segments.map((segment: any, index: number) => (
-                    <Card key={index} className="group hover:shadow-lg transition-all duration-200 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 flex flex-col h-full">
+                    <Card key={index} className="group hover:shadow-lg transition-all duration-200 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 flex flex-col">
                       <CardContent className="p-0 flex flex-col h-full">
                         {/* Header Section */}
                         <div className="p-6 pb-0">
@@ -616,14 +616,12 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
                           </div>
                         </div>
                         
-                        {/* Summary Section */}
+                        {/* Summary Section - Expanded */}
                         <div className="px-6 pb-4">
-                          <div className="bg-gradient-to-br from-slate-50 to-gray-50 dark:from-slate-800/50 dark:to-gray-800/50 rounded-xl p-5 border border-slate-200/50 dark:border-slate-700/50 h-32">
-                            <div className="h-full overflow-y-auto">
-                              <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-medium">
-                                {segment.summary}
-                              </p>
-                            </div>
+                          <div className="bg-gradient-to-br from-slate-50 to-gray-50 dark:from-slate-800/50 dark:to-gray-800/50 rounded-xl p-5 border border-slate-200/50 dark:border-slate-700/50 min-h-24">
+                            <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-medium">
+                              {segment.summary}
+                            </p>
                           </div>
                         </div>
                         
