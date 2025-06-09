@@ -36,7 +36,6 @@ const ANALYSIS_TASKS: AnalysisTask[] = [
     icon: Film,
     estimatedTime: '2-3 min'
   },
-
   {
     id: 'character_analysis',
     title: 'Character Analysis',
@@ -54,12 +53,12 @@ const ANALYSIS_TASKS: AnalysisTask[] = [
     estimatedTime: '4-5 min'
   },
   {
-    id: 'location_analysis',
-    title: 'Location Analysis',
-    description: 'Identify and suggest filming locations',
+    id: 'product_placement',
+    title: 'Product Placement',
+    description: 'Identify opportunities for brand partnerships',
     status: 'not_started',
-    icon: MapPin,
-    estimatedTime: '3-4 min'
+    icon: Package,
+    estimatedTime: '2-3 min'
   },
   {
     id: 'vfx_analysis',
@@ -70,16 +69,16 @@ const ANALYSIS_TASKS: AnalysisTask[] = [
     estimatedTime: '4-5 min'
   },
   {
-    id: 'product_placement',
-    title: 'Product Placement',
-    description: 'Identify opportunities for brand partnerships',
+    id: 'location_analysis',
+    title: 'Location Analysis',
+    description: 'Identify and suggest filming locations',
     status: 'not_started',
-    icon: Package,
-    estimatedTime: '2-3 min'
+    icon: MapPin,
+    estimatedTime: '3-4 min'
   },
   {
     id: 'financial_planning',
-    title: 'Financial Planning',
+    title: 'Financial Analysis',
     description: 'Generate budget estimates and financial projections',
     status: 'not_started',
     icon: DollarSign,
