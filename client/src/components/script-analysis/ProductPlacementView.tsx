@@ -366,7 +366,7 @@ export default function ProductPlacementView({ projectId }: ProductPlacementView
             {selectedSegment && productPlacements && productPlacements.productPlacements && (
               (() => {
                 const scenePlacements = productPlacements.productPlacements.filter((placement: any) => 
-                  placement.sceneId === selectedSegment.id.toString()
+                  placement.scene_id === selectedSegment?.id || placement.sceneId === selectedSegment?.id
                 );
                 
                 if (scenePlacements.length === 0) return null;
@@ -385,7 +385,7 @@ export default function ProductPlacementView({ projectId }: ProductPlacementView
                     <CardContent>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {scenePlacements.map((placement: any, index: number) => (
-                          <Card key={`${placement.sceneId}-${index}`} className="cursor-pointer hover:shadow-md transition-shadow">
+                          <Card key={`${placement.id || placement.scene_id}-${index}`} className="cursor-pointer hover:shadow-md transition-shadow">
                             <CardContent className="p-4">
                               <div className="aspect-video bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950 dark:to-purple-950 rounded-lg mb-3 flex items-center justify-center">
                                 <div className="text-center">

@@ -1060,7 +1060,8 @@ Respond in JSON format with this structure:
           // Find the actual scene ID from the database that matches the AI-generated scene reference
           const sceneMatch = projectScenes.find(scene => 
             scene.id.toString() === placement.sceneId || 
-            scene.sceneNumber.toString() === placement.sceneId
+            scene.sceneNumber.toString() === placement.sceneId ||
+            scene.id === parseInt(placement.sceneId)
           );
           
           if (!sceneMatch) {
