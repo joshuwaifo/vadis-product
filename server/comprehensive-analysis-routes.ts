@@ -366,14 +366,16 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
         duration: scene.duration
       }));
 
-      const prompt = `Analyze the following scenes and group consecutive scenes into logical narrative segments. Each segment should represent a cohesive story beat or sequence.
+      const prompt = `Analyze the following scenes and group consecutive scenes into logical narrative segments. Each segment should represent a cohesive story beat or sequence that forms a complete narrative unit.
 
 For each segment, provide:
-- A compelling title that captures the essence of that narrative beat
-- The scene range (e.g., "Scenes 1-6")
-- A brief summary of what happens in this segment
-- The main characters involved
-- The total estimated duration
+- A compelling, evocative title that captures the essence of that narrative beat
+- The scene range (e.g., "Scenes 1-6") 
+- A detailed, rich summary that explains what happens, the emotional arc, key plot developments, character motivations, and dramatic tension
+- The main characters actively involved in this segment
+- The key locations where significant action takes place
+
+Focus on creating segments that represent meaningful story beats - opening setup, inciting incidents, rising action, climaxes, falling action, etc. The summary should be comprehensive enough to understand the narrative significance and emotional journey of each segment.
 
 Scenes data:
 ${JSON.stringify(scenesData, null, 2)}
@@ -382,13 +384,12 @@ Respond in JSON format with this structure:
 {
   "segments": [
     {
-      "title": "Compelling segment title",
+      "title": "Compelling and evocative segment title",
       "sceneRange": "Scenes X-Y",
       "startScene": X,
       "endScene": Y,
-      "summary": "Brief summary of this narrative segment",
+      "summary": "Detailed, rich summary explaining what happens, emotional arc, plot developments, character motivations, dramatic tension, and narrative significance",
       "mainCharacters": ["Character1", "Character2"],
-      "totalDuration": minutes,
       "keyLocations": ["Location1", "Location2"]
     }
   ]

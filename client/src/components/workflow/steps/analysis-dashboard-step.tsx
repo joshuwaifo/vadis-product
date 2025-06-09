@@ -590,50 +590,64 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
                   </Badge>
                 </div>
                 
-                <div className="space-y-4">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   {results.segments.map((segment: any, index: number) => (
                     <Card key={index} className="hover:shadow-md transition-shadow border border-gray-200 dark:border-gray-700">
                       <CardContent className="p-6">
-                        <div className="flex items-start justify-between mb-4">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-2">
-                              <Badge variant="default" className="bg-orange-500 text-white">
-                                {segment.sceneRange}
-                              </Badge>
-                              <h3 className="text-lg font-semibold">{segment.title}</h3>
-                            </div>
-                            <p className="text-muted-foreground mb-3">{segment.summary}</p>
-                            
-                            <div className="grid grid-cols-2 gap-4 text-sm">
-                              <div>
-                                <span className="font-medium text-gray-700 dark:text-gray-300">Main Characters:</span>
-                                <div className="flex flex-wrap gap-1 mt-1">
-                                  {segment.mainCharacters?.map((character: string, i: number) => (
-                                    <Badge key={i} variant="outline" className="text-xs">
-                                      {character}
-                                    </Badge>
-                                  )) || <span className="text-muted-foreground">None specified</span>}
-                                </div>
-                              </div>
-                              <div>
-                                <span className="font-medium text-gray-700 dark:text-gray-300">Key Locations:</span>
-                                <div className="flex flex-wrap gap-1 mt-1">
-                                  {segment.keyLocations?.map((location: string, i: number) => (
-                                    <Badge key={i} variant="outline" className="text-xs bg-blue-50 text-blue-700 dark:bg-blue-950/30 dark:text-blue-400">
-                                      <MapPin className="h-3 w-3 mr-1" />
-                                      {location}
-                                    </Badge>
-                                  )) || <span className="text-muted-foreground">None specified</span>}
-                                </div>
-                              </div>
-                            </div>
+                        <div className="mb-4">
+                          <div className="flex items-center gap-3 mb-3">
+                            <Badge variant="default" className="bg-orange-500 text-white">
+                              {segment.sceneRange}
+                            </Badge>
+                            <h3 className="text-lg font-semibold flex-1">{segment.title}</h3>
                           </div>
                           
-                          <div className="ml-4 text-center">
-                            <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                              {segment.totalDuration || 0}
+                          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 mb-4">
+                            <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-2">Summary</h4>
+                            <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                              {segment.summary}
+                            </p>
+                          </div>
+                          
+                          <div className="space-y-3">
+                            <div>
+                              <h5 className="font-medium text-gray-900 dark:text-gray-100 mb-2 flex items-center gap-2">
+                                <Users className="h-4 w-4 text-blue-600" />
+                                Main Characters
+                              </h5>
+                              <div className="flex flex-wrap gap-1">
+                                {segment.mainCharacters?.map((character: string, i: number) => (
+                                  <Badge key={i} variant="outline" className="text-xs bg-blue-50 text-blue-700 dark:bg-blue-950/30 dark:text-blue-400">
+                                    {character}
+                                  </Badge>
+                                )) || <span className="text-sm text-muted-foreground">None specified</span>}
+                              </div>
                             </div>
-                            <div className="text-xs text-muted-foreground">minutes</div>
+                            
+                            <div>
+                              <h5 className="font-medium text-gray-900 dark:text-gray-100 mb-2 flex items-center gap-2">
+                                <MapPin className="h-4 w-4 text-green-600" />
+                                Key Locations
+                              </h5>
+                              <div className="flex flex-wrap gap-1">
+                                {segment.keyLocations?.map((location: string, i: number) => (
+                                  <Badge key={i} variant="outline" className="text-xs bg-green-50 text-green-700 dark:bg-green-950/30 dark:text-green-400">
+                                    {location}
+                                  </Badge>
+                                )) || <span className="text-sm text-muted-foreground">None specified</span>}
+                              </div>
+                            </div>
+                            
+                            <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
+                              <div className="flex items-center justify-between text-sm">
+                                <span className="text-muted-foreground">
+                                  Scenes {segment.startScene} - {segment.endScene}
+                                </span>
+                                <span className="font-medium text-gray-900 dark:text-gray-100">
+                                  {segment.endScene - segment.startScene + 1} scenes
+                                </span>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </CardContent>
