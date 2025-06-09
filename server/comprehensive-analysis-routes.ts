@@ -943,7 +943,98 @@ Respond in JSON format with this structure:
     }
   });
 
-  // Brand Marketplace - Product Placement
+  // AI Product Placement - Identify brandable scenes
+  app.post('/api/script-analysis/identify_brandable_scenes', async (req: Request, res: Response) => {
+    try {
+      const { projectId } = req.body;
+      
+      // Get scene breakdowns for this project
+      const sceneBreakdowns = await db
+        .select()
+        .from(sceneBreakdowns)
+        .where(eq(sceneBreakdowns.projectId, parseInt(projectId)));
+
+      if (sceneBreakdowns.length === 0) {
+        return res.status(400).json({ 
+          error: 'No scene breakdowns found. Please run scene breakdown analysis first.' 
+        });
+      }
+
+      const { identifyBrandableScenes } = await import('./services/ai-product-placement');
+      const brandableScenes = await identifyBrandableScenes(sceneBreakdowns);
+      
+      res.json({
+        success: true,
+        brandableScenes,
+        totalScenes: brandableScenes.length
+      });
+
+    } catch (error) {
+      console.error('Brandable scenes analysis error:', error);
+      res.status(500).json({ error: 'Failed to identify brandable scenes' });
+    }
+  });
+
+  // AI Product Placement - Get matching products for scene
+  app.get('/api/script-analysis/matching_products/:sceneId', async (req: Request, res: Response) => {
+    try {
+      const { sceneId } = req.params;
+      const { categories } = req.query;
+      
+      const { getMatchingProducts } = await import('./services/ai-product-placement');
+      const suggestedCategories = categories ? (categories as string).split(',') : [];
+      const matchingProducts = getMatchingProducts(suggestedCategories);
+      
+      res.json({
+        success: true,
+        products: matchingProducts,
+        totalProducts: matchingProducts.length
+      });
+
+    } catch (error) {
+      console.error('Product matching error:', error);
+      res.status(500).json({ error: 'Failed to get matching products' });
+    }
+  });
+
+  // AI Product Placement - Generate visualization
+  app.post('/api/script-analysis/generate_placement_visualization', async (req: Request, res: Response) => {
+    try {
+      const { sceneBreakdownId, productId, projectId } = req.body;
+      
+      // Get the scene breakdown
+      const sceneBreakdown = await db
+        .select()
+        .from(sceneBreakdowns)
+        .where(eq(sceneBreakdowns.id, parseInt(sceneBreakdownId)))
+        .limit(1);
+
+      if (sceneBreakdown.length === 0) {
+        return res.status(404).json({ error: 'Scene breakdown not found' });
+      }
+
+      const { generateProductPlacementVisualization, getAllMockProducts } = await import('./services/ai-product-placement');
+      const allProducts = getAllMockProducts();
+      const product = allProducts.find(p => p.id === productId);
+      
+      if (!product) {
+        return res.status(404).json({ error: 'Product not found' });
+      }
+
+      const visualization = await generateProductPlacementVisualization(sceneBreakdown[0], product);
+      
+      res.json({
+        success: true,
+        visualization
+      });
+
+    } catch (error) {
+      console.error('Placement visualization error:', error);
+      res.status(500).json({ error: 'Failed to generate placement visualization' });
+    }
+  });
+
+  // Brand Marketplace - Product Placement (Legacy route for backward compatibility)
   app.post('/api/script-analysis/product_placement', async (req: Request, res: Response) => {
     try {
       const { projectId, scriptContent } = req.body;
