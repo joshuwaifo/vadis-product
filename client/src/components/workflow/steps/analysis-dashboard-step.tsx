@@ -590,60 +590,87 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
                   </Badge>
                 </div>
                 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {results.segments.map((segment: any, index: number) => (
-                    <Card key={index} className="hover:shadow-md transition-shadow border border-gray-200 dark:border-gray-700">
-                      <CardContent className="p-6">
-                        <div className="flex items-center gap-3 mb-3">
-                          <Badge variant="default" className="bg-orange-500 text-white">
-                            {segment.sceneRange}
-                          </Badge>
-                          <h3 className="text-lg font-semibold flex-1">{segment.title}</h3>
-                        </div>
-                        
-                        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 mb-4">
-                          <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-                            {segment.summary}
-                          </p>
-                        </div>
-                        
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <h5 className="font-medium text-gray-900 dark:text-gray-100 mb-2 flex items-center gap-2">
-                              <Users className="h-4 w-4 text-blue-600" />
-                              Main Characters
-                            </h5>
-                            <div className="flex flex-wrap gap-1">
-                              {segment.mainCharacters?.map((character: string, i: number) => (
-                                <Badge key={i} variant="outline" className="text-xs bg-blue-50 text-blue-700 dark:bg-blue-950/30 dark:text-blue-400">
-                                  {character}
+                    <Card key={index} className="group hover:shadow-lg transition-all duration-200 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600">
+                      <CardContent className="p-0">
+                        {/* Header Section */}
+                        <div className="p-6 pb-0">
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-3 mb-2">
+                                <Badge variant="secondary" className="text-xs font-medium bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 px-2 py-1">
+                                  {segment.sceneRange}
                                 </Badge>
-                              )) || <span className="text-sm text-muted-foreground">None specified</span>}
-                            </div>
-                          </div>
-                          
-                          <div>
-                            <h5 className="font-medium text-gray-900 dark:text-gray-100 mb-2 flex items-center gap-2">
-                              <MapPin className="h-4 w-4 text-green-600" />
-                              Key Locations
-                            </h5>
-                            <div className="flex flex-wrap gap-1">
-                              {segment.keyLocations?.map((location: string, i: number) => (
-                                <Badge key={i} variant="outline" className="text-xs bg-green-50 text-green-700 dark:bg-green-950/30 dark:text-green-400">
-                                  {location}
-                                </Badge>
-                              )) || <span className="text-sm text-muted-foreground">None specified</span>}
+                                <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                                  {segment.endScene - segment.startScene + 1} scenes
+                                </span>
+                              </div>
+                              <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 leading-tight">
+                                {segment.title}
+                              </h3>
                             </div>
                           </div>
                         </div>
                         
-                        <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-muted-foreground">
+                        {/* Summary Section */}
+                        <div className="px-6 pb-4">
+                          <div className="bg-gradient-to-br from-slate-50 to-gray-50 dark:from-slate-800/50 dark:to-gray-800/50 rounded-xl p-5 border border-slate-200/50 dark:border-slate-700/50">
+                            <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-medium">
+                              {segment.summary}
+                            </p>
+                          </div>
+                        </div>
+                        
+                        {/* Characters and Locations */}
+                        <div className="px-6 pb-4">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-3">
+                              <div className="flex items-center gap-2">
+                                <div className="p-1.5 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                                  <Users className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                                </div>
+                                <h5 className="font-semibold text-gray-900 dark:text-gray-100 text-sm">
+                                  Main Characters
+                                </h5>
+                              </div>
+                              <div className="flex flex-wrap gap-1.5">
+                                {segment.mainCharacters?.map((character: string, i: number) => (
+                                  <Badge key={i} variant="outline" className="text-xs bg-blue-50/80 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-800 px-2.5 py-1 font-medium">
+                                    {character}
+                                  </Badge>
+                                )) || <span className="text-sm text-muted-foreground italic">None specified</span>}
+                              </div>
+                            </div>
+                            
+                            <div className="space-y-3">
+                              <div className="flex items-center gap-2">
+                                <div className="p-1.5 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg">
+                                  <MapPin className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                                </div>
+                                <h5 className="font-semibold text-gray-900 dark:text-gray-100 text-sm">
+                                  Key Locations
+                                </h5>
+                              </div>
+                              <div className="flex flex-wrap gap-1.5">
+                                {segment.keyLocations?.map((location: string, i: number) => (
+                                  <Badge key={i} variant="outline" className="text-xs bg-emerald-50/80 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-800 px-2.5 py-1 font-medium">
+                                    {location}
+                                  </Badge>
+                                )) || <span className="text-sm text-muted-foreground italic">None specified</span>}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Footer */}
+                        <div className="px-6 py-4 bg-gray-50/50 dark:bg-gray-800/50 border-t border-gray-100 dark:border-gray-700">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">
                               Scenes {segment.startScene} - {segment.endScene}
                             </span>
-                            <span className="font-medium text-gray-900 dark:text-gray-100">
-                              {segment.endScene - segment.startScene + 1} scenes
+                            <span className="text-xs text-gray-600 dark:text-gray-300 font-semibold">
+                              Segment {index + 1}
                             </span>
                           </div>
                         </div>
