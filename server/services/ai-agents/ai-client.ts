@@ -234,11 +234,20 @@ export function sanitizeText(text: string): string {
  */
 export function extractJsonFromText(text: string): any {
   try {
-    // Try to extract just the JSON part using regex
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    const jsonStr = jsonMatch ? jsonMatch[0] : text;
+    // Remove markdown code blocks more aggressively
+    let cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
     
-    return JSON.parse(jsonStr);
+    // Find the first [ or { and the last ] or }
+    const startMatch = cleanText.search(/[\{\[]/);
+    const endMatch = cleanText.lastIndexOf(cleanText.includes('[') ? ']' : '}');
+    
+    if (startMatch !== -1 && endMatch !== -1) {
+      const jsonStr = cleanText.substring(startMatch, endMatch + 1);
+      return JSON.parse(jsonStr);
+    }
+    
+    // Fallback to original text
+    return JSON.parse(cleanText);
   } catch (error) {
     console.error("[AI Client] Error parsing JSON response:", error);
     console.error("[AI Client] Raw text:", text);

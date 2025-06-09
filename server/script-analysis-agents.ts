@@ -589,6 +589,8 @@ export async function generateProductPlacement(
   const prompt = `
     Analyze these scenes for natural product placement opportunities.
     Focus on placements that feel organic and don't disrupt the story.
+    
+    Script Context: ${scriptContent}
 
     Scenes:
     ${JSON.stringify(scenes.map(s => ({ id: s.id, location: s.location, description: s.description })), null, 2)}
