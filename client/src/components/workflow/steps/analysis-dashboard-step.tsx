@@ -318,8 +318,11 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
         // Automatically start storyboard generation in the background
         if (workflow?.projectId && data?.scenes?.length > 0) {
           console.log('Starting automatic storyboard generation after scene extraction');
-          apiRequest(`/api/projects/${workflow.projectId}/storyboard/generate`, {
-            method: 'POST'
+          fetch(`/api/projects/${workflow.projectId}/storyboard/generate`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            }
           }).catch(error => {
             console.error('Failed to start automatic storyboard generation:', error);
           });
