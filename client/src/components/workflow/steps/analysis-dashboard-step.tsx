@@ -480,32 +480,18 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
       case 'scene_extraction':
         return (
           <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div className="grid grid-cols-3 gap-6 text-center flex-1">
-                <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/30 dark:to-blue-900/30 rounded-xl p-4">
-                  <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">{results.totalScenes || 0}</div>
-                  <div className="text-sm text-muted-foreground">Total Scenes</div>
-                </div>
-                <div className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950/30 dark:to-green-900/30 rounded-xl p-4">
-                  <div className="text-3xl font-bold text-green-600 dark:text-green-400">{results.estimatedDuration || (project?.scriptContent ? Math.ceil(project.scriptContent.split(/\s+/).length / 250) : 0)}</div>
-                  <div className="text-sm text-muted-foreground">Est. Minutes</div>
-                </div>
-                <div className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950/30 dark:to-purple-900/30 rounded-xl p-4">
-                  <div className="text-3xl font-bold text-purple-600 dark:text-purple-400">{results.scenes?.length || 0}</div>
-                  <div className="text-sm text-muted-foreground">Extracted</div>
-                </div>
-              </div>
-              
-              {results.scenes && results.scenes.length > 0 && (
+            {/* Storyboard View Button */}
+            {results.scenes && results.scenes.length > 0 && (
+              <div className="flex justify-center mb-6">
                 <Button 
                   onClick={() => setShowStoryboard(true)}
-                  className="ml-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-3"
+                  className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-3"
                 >
                   <Maximize2 className="h-4 w-4 mr-2" />
                   Storyboard View
                 </Button>
-              )}
-            </div>
+              </div>
+            )}
 
             {results.scenes && results.scenes.length > 0 && (
               <div className="space-y-4">
