@@ -91,31 +91,29 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle, pag
     }
   });
 
-  // Track background generation progress
-  const [backgroundGeneration, setBackgroundGeneration] = useState({
-    isGenerating: false,
-    completed: 0,
-    total: scenes.length,
-    currentScene: ''
+  // Get all storyboard images for the project to track progress
+  const { data: allStoryboardData } = useQuery({
+    queryKey: ['/api/projects', projectId, 'storyboard'],
+    enabled: !!projectId,
+    refetchInterval: 3000, // Poll every 3 seconds for new images
   });
 
-  // Get existing storyboard images for the project to check completion status
-  const { data: existingImages } = useQuery({
-    queryKey: ['project-storyboard', projectId],
-    queryFn: async () => {
-      if (!projectId) return [];
-      const response = await fetch(`/api/projects/${projectId}/storyboard`);
-      if (!response.ok) return [];
-      const data = await response.json();
-      return data.storyboardImages || [];
-    },
-    enabled: !!projectId
-  });
+  // Calculate generation progress
+  const storyboardImages = allStoryboardData?.storyboardImages || [];
+  const completedScenes = storyboardImages.length;
+  const totalScenes = scenes.length;
+  const generationProgress = totalScenes > 0 ? Math.round((completedScenes / totalScenes) * 100) : 0;
+  const isGenerating = completedScenes < totalScenes;
+
+  // Find existing storyboard image for current scene
+  const currentSceneImage = storyboardImages.find(img => 
+    img.sceneId === parseInt(selectedScene?.id || '0')
+  );
 
   // Start background generation when component mounts if projectId is available
   useEffect(() => {
-    if (projectId && scenes.length > 0 && existingImages !== undefined) {
-      const existingCount = existingImages.length;
+    if (projectId && scenes.length > 0 && storyboardImages !== undefined) {
+      const existingCount = storyboardImages.length;
       
       // Only start generation if we don't have all images
       if (existingCount < scenes.length) {

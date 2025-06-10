@@ -227,12 +227,16 @@ Style: Professional film storyboard, cinematic lighting, movie production qualit
           break; // Success, exit retry loop
         } catch (error: any) {
           retries++;
+          console.log(`[Storyboard] API error for scene ${sceneId}, retry ${retries}/${maxRetries}:`, error.status, error.message);
+          
           if (retries >= maxRetries) {
-            throw error; // Final retry failed
+            // If all retries failed, log the error but don't stop the entire generation process
+            console.log(`[Storyboard] Skipping scene ${sceneId} after ${maxRetries} failed attempts due to API errors`);
+            throw error;
           }
           
-          // Exponential backoff: 2s, 4s, 8s
-          const delay = Math.pow(2, retries) * 1000;
+          // Longer exponential backoff for API server errors: 5s, 10s, 20s
+          const delay = Math.pow(2, retries) * 2500;
           console.log(`[Storyboard] Retry ${retries}/${maxRetries} for scene ${sceneId} after ${delay}ms delay`);
           await new Promise(resolve => setTimeout(resolve, delay));
         }
@@ -315,20 +319,38 @@ Style: Professional film storyboard, cinematic lighting, movie production qualit
     console.log(`[Storyboard] Generating ${scenesToGenerate.length} new images`);
 
     // Process scenes one at a time for better quality control and API stability
+    let consecutiveFailures = 0;
+    const maxConsecutiveFailures = 5;
+    
     for (let i = 0; i < scenesToGenerate.length; i++) {
       const scene = scenesToGenerate[i];
+      
+      // Circuit breaker: pause if too many consecutive failures
+      if (consecutiveFailures >= maxConsecutiveFailures) {
+        console.log(`[Storyboard] Pausing generation due to ${consecutiveFailures} consecutive API failures. Waiting 30 seconds...`);
+        await new Promise(resolve => setTimeout(resolve, 30000)); // 30 second pause
+        consecutiveFailures = 0; // Reset counter after pause
+      }
+      
       try {
         console.log(`[Storyboard] Generating image for scene ${scene.sceneNumber} (${i + 1}/${scenesToGenerate.length})`);
         await this.generateSceneStoryboard(scene.id);
         console.log(`[Storyboard] Completed image for scene ${scene.sceneNumber}`);
+        consecutiveFailures = 0; // Reset on success
         
         // Small delay between requests to respect API limits
         if (i + 1 < scenesToGenerate.length) {
           await new Promise(resolve => setTimeout(resolve, 2000)); // 2 second delay between images
         }
-      } catch (error) {
-        console.error(`[Storyboard] Failed to generate image for scene ${scene.sceneNumber}:`, error);
+      } catch (error: any) {
+        consecutiveFailures++;
+        console.error(`[Storyboard] Failed to generate image for scene ${scene.sceneNumber} (failure ${consecutiveFailures}):`, error?.status || 'unknown', error?.message || error);
+        
         // Continue with next scene even if one fails
+        // Longer delay after failures to give API time to recover
+        if (i + 1 < scenesToGenerate.length) {
+          await new Promise(resolve => setTimeout(resolve, 5000)); // 5 second delay after failures
+        }
       }
     }
 
