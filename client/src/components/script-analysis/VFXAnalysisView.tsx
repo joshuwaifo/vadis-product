@@ -48,9 +48,9 @@ export default function VFXAnalysisView({ projectId, onClose }: VFXAnalysisViewP
 
   // Fetch scenes
   const { data: scenes, isLoading: scenesLoading } = useQuery({
-    queryKey: ['/api/scenes', projectId],
+    queryKey: ['/api/projects', projectId, 'scenes'],
     queryFn: async () => {
-      const response = await fetch(`/api/scenes/${projectId}`);
+      const response = await fetch(`/api/projects/${projectId}/scenes`);
       if (!response.ok) {
         throw new Error('Failed to fetch scenes');
       }
