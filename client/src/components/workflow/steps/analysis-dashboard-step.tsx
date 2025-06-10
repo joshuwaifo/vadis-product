@@ -578,13 +578,6 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
       case 'scene_breakdown':
         return (
           <div className="space-y-6">
-            <div className="mb-6">
-              <div className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-950/30 dark:to-orange-900/30 rounded-xl p-6 text-center max-w-sm mx-auto">
-                <div className="text-4xl font-bold text-orange-600 dark:text-orange-400 mb-2">{results.totalSegments || 0}</div>
-                <div className="text-sm text-muted-foreground">Narrative Segments</div>
-              </div>
-            </div>
-
             {results.segments && results.segments.length > 0 && (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
