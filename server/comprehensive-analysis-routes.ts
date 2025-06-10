@@ -159,7 +159,30 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
         return res.status(400).json({ error: 'Project ID is required' });
       }
 
-      // Get project and script content from database
+      // First check if scenes already exist in the database
+      const existingScenes = await db
+        .select()
+        .from(scenes)
+        .where(eq(scenes.projectId, parseInt(projectId)))
+        .orderBy(scenes.sceneNumber);
+
+      if (existingScenes.length > 0) {
+        console.log(`Found ${existingScenes.length} existing scenes, returning cached data`);
+        
+        // Get project for page count
+        const project = await db.select().from(projects).where(eq(projects.id, parseInt(projectId))).limit(1);
+        const actualPageCount = project[0]?.pageCount || existingScenes.length;
+        
+        return res.json({
+          success: true,
+          scenes: existingScenes,
+          totalScenes: existingScenes.length,
+          estimatedDuration: actualPageCount,
+          cached: true
+        });
+      }
+
+      // Get project and script content from database for new extraction
       const project = await db.select().from(projects).where(eq(projects.id, parseInt(projectId))).limit(1);
       if (!project.length || !project[0].scriptContent) {
         return res.status(400).json({ error: 'Project not found or no script content available' });
