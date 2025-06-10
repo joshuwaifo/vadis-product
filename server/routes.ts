@@ -617,10 +617,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   registerWorkflowRoutes(app);
   registerComprehensiveAnalysisRoutes(app);
   registerScriptGenerationRoutes(app);
-  
-  // Register script optimization routes for Storyboard workflow efficiency
-  const { registerScriptOptimizationRoutes } = await import('./script-optimization-routes');
-  registerScriptOptimizationRoutes(app);
 
   const httpServer = createServer(app);
 

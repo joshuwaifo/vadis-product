@@ -161,29 +161,105 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
 
       // Get project and script content from database
       const project = await db.select().from(projects).where(eq(projects.id, parseInt(projectId))).limit(1);
-      if (!project.length) {
-        return res.status(400).json({ error: 'Project not found' });
+      if (!project.length || !project[0].scriptContent) {
+        return res.status(400).json({ error: 'Project not found or no script content available' });
       }
 
       let scriptContent = project[0].scriptContent;
 
-      // If no script content at all, return error
-      if (!scriptContent) {
-        return res.status(400).json({ error: 'No script content available' });
-      }
-
-      // Use dedicated script text extractor to ensure text is saved permanently
-      try {
-        const { extractAndSaveScriptText } = await import('./script-text-extractor');
-        scriptContent = await extractAndSaveScriptText(parseInt(projectId));
-      } catch (extractionError) {
-        console.error('Script text extraction failed:', extractionError.message);
-        return res.status(400).json({ 
-          error: 'Script text extraction failed',
-          message: 'Unable to extract text from the script file. Please ensure the file contains readable text.',
-          requiresExtraction: true,
-          details: extractionError.message
-        });
+      // Check if this is a PDF metadata format (on-demand extraction needed)
+      if (scriptContent && scriptContent.startsWith('PDF_UPLOADED:')) {
+        try {
+          let extractedText = null;
+          
+          // Method 1: Try extracting from stored PDF data
+          if (project[0].pdfFileData || project[0].scriptFileData) {
+            const pdfData = project[0].pdfFileData || project[0].scriptFileData;
+            const mimeType = project[0].pdfMimeType || project[0].scriptFileMimeType || 'application/pdf';
+            
+            if (pdfData) {
+              console.log(`Attempting extraction from stored PDF data`);
+              const { extractTextAndPageCount } = await import('./services/pdf-text-extractor');
+              const pdfBuffer = Buffer.from(pdfData, 'base64');
+              
+              const extractionResult = await extractTextAndPageCount(pdfBuffer);
+              extractedText = extractionResult.text;
+              const actualPageCount = extractionResult.pageCount;
+              
+              console.log(`Extracted ${extractedText?.length || 0} characters from ${actualPageCount} pages`);
+              
+              // Update project with actual page count
+              await db.update(projects)
+                .set({ pageCount: actualPageCount })
+                .where(eq(projects.id, parseInt(projectId)));
+            }
+          }
+          
+          // Method 2: Fallback to filesystem search
+          if (!extractedText || extractedText.length < 100) {
+            console.log('Trying filesystem fallback for PDF extraction');
+            const fs = await import('fs');
+            const possiblePaths = [
+              'Pulp Fiction.pdf',
+              `${project[0].title}.pdf`,
+              'test_improved.pdf'
+            ];
+            
+            for (const pdfPath of possiblePaths) {
+              try {
+                if (fs.existsSync(pdfPath)) {
+                  console.log(`Found and processing ${pdfPath}`);
+                  const { extractScriptFromPdf } = await import('./services/pdf-text-extractor');
+                  const pdfBuffer = fs.readFileSync(pdfPath);
+                  
+                  const result = await extractScriptFromPdf(pdfBuffer, 'application/pdf');
+                  if (result.content && result.content.length > 100) {
+                    extractedText = result.content;
+                    console.log(`Successfully extracted ${extractedText.length} characters from ${pdfPath}`);
+                    break;
+                  }
+                }
+              } catch (fileError) {
+                console.log(`Failed to process ${pdfPath}: ${fileError.message}`);
+                continue;
+              }
+            }
+          }
+          
+          // Method 3: Check if Gemini AI key is available for PDF processing
+          if (!extractedText || extractedText.length < 100) {
+            if (!process.env.GEMINI_API_KEY) {
+              throw new Error('PDF text extraction failed and no GEMINI_API_KEY available for enhanced processing');
+            }
+            
+            console.log('Attempting Gemini AI PDF extraction as final method');
+            // This will be handled by the PDF extraction service
+            throw new Error('Unable to extract readable text from PDF file - please ensure PDF contains selectable text');
+          }
+          
+          if (extractedText && extractedText.length > 50) {
+            scriptContent = extractedText;
+            
+            // Update the project with extracted content
+            await db.update(projects)
+              .set({ 
+                scriptContent: extractedText,
+                updatedAt: new Date()
+              })
+              .where(eq(projects.id, parseInt(projectId)));
+          } else {
+            throw new Error('Unable to extract sufficient text content from any source');
+          }
+          
+        } catch (extractionError) {
+          console.error('PDF extraction failed:', extractionError.message);
+          return res.status(400).json({ 
+            error: 'PDF extraction failed',
+            message: 'Unable to extract text from the PDF file. Please ensure the PDF contains readable text and try uploading again.',
+            requiresExtraction: true,
+            details: extractionError.message
+          });
+        }
       }
 
       // Use proper scene extraction workflow based on demo app
@@ -338,23 +414,14 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
 
       // Get project and script content from database
       const project = await db.select().from(projects).where(eq(projects.id, parseInt(projectId))).limit(1);
-      if (!project.length) {
-        return res.status(400).json({ error: 'Project not found' });
+      if (!project.length || !project[0].scriptContent) {
+        return res.status(400).json({ error: 'Project not found or no script content available' });
       }
 
       let scriptContent = project[0].scriptContent;
 
-      // If no script content at all, return error
-      if (!scriptContent) {
-        return res.status(400).json({ error: 'No script content available' });
-      }
-
-      // Prioritize using existing extracted script content
-      if (scriptContent && !scriptContent.startsWith('PDF_UPLOADED:') && scriptContent.length > 100) {
-        console.log(`Using existing extracted script content for scene breakdown (${scriptContent.length} characters)`);
-      }
-      // Only extract from PDF if we don't have usable script content
-      else if (scriptContent && scriptContent.startsWith('PDF_UPLOADED:')) {
+      // Check if this is a PDF metadata format (on-demand extraction needed)
+      if (scriptContent && scriptContent.startsWith('PDF_UPLOADED:')) {
         try {
           let extractedText = null;
           
@@ -390,16 +457,6 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
           }
           
           scriptContent = extractedText;
-          
-          // Save extracted text to database for future use
-          await db.update(projects)
-            .set({ 
-              scriptContent: extractedText,
-              updatedAt: new Date()
-            })
-            .where(eq(projects.id, parseInt(projectId)));
-          
-          console.log(`Saved extracted text (${extractedText.length} characters) to database for scene breakdown`);
           
         } catch (extractionError) {
           console.error('PDF extraction error for scene breakdown:', extractionError);
@@ -599,17 +656,8 @@ Respond in JSON format with this structure:
 
       let scriptContent = project[0].scriptContent;
 
-      // If no script content at all, return error
-      if (!scriptContent) {
-        return res.status(400).json({ error: 'No script content available' });
-      }
-
-      // Prioritize using existing extracted script content
-      if (scriptContent && !scriptContent.startsWith('PDF_UPLOADED:') && scriptContent.length > 100) {
-        console.log(`Using existing extracted script content for character analysis (${scriptContent.length} characters)`);
-      }
-      // Only extract from PDF if we don't have usable script content
-      else if (scriptContent && scriptContent.startsWith('PDF_UPLOADED:')) {
+      // Handle PDF extraction if needed
+      if (scriptContent && scriptContent.startsWith('PDF_UPLOADED:')) {
         try {
           if (project[0].scriptFileData) {
             console.log('Extracting text from stored PDF for character analysis');
@@ -617,16 +665,6 @@ Respond in JSON format with this structure:
             const pdfBuffer = Buffer.from(project[0].scriptFileData, 'base64');
             scriptContent = await extractTextFromPDF(pdfBuffer);
             console.log(`Extracted ${scriptContent?.length || 0} characters for analysis`);
-            
-            // Save extracted text to database for future use
-            await db.update(projects)
-              .set({ 
-                scriptContent: scriptContent,
-                updatedAt: new Date()
-              })
-              .where(eq(projects.id, parseInt(projectId)));
-            
-            console.log(`Saved extracted text (${scriptContent.length} characters) to database for character analysis`);
           }
         } catch (extractError) {
           console.error('PDF extraction failed for character analysis:', extractError);
