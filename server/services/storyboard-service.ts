@@ -240,12 +240,15 @@ Style: Professional film storyboard, cinematic lighting, movie production qualit
         throw new Error("No image URL returned from Imagen-4");
       }
 
+      console.log(`[Storyboard] Received image URL from Imagen-4:`, imageUrl);
+      console.log(`[Storyboard] Image URL type:`, typeof imageUrl);
+
       // Save storyboard image to database
       const [savedImage] = await db
         .insert(storyboardImages)
         .values({
           sceneId,
-          imageUrl,
+          imageUrl: String(imageUrl), // Ensure it's stored as a string
           prompt: storyboardPrompt,
           charactersPresent: scene.characters
         })

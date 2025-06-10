@@ -50,14 +50,26 @@ export class ImagenGenerator {
 
       const output = await this.replicate.run("google/imagen-4", { input });
       
+      console.log("[Imagen] Raw output from Imagen-4:", JSON.stringify(output));
+      console.log("[Imagen] Output type:", typeof output);
+      
       // Replicate returns the image URL as a string
-      const imageUrl = typeof output === 'string' ? output : (output as any)?.[0] || output;
-
-      if (!imageUrl) {
-        throw new Error("No image URL returned from Imagen-4");
+      let imageUrl: string;
+      if (typeof output === 'string') {
+        imageUrl = output;
+      } else if (Array.isArray(output) && output.length > 0) {
+        imageUrl = output[0];
+      } else if (output && typeof output === 'object' && 'url' in output) {
+        imageUrl = (output as any).url;
+      } else {
+        imageUrl = String(output);
       }
 
-      console.log("[Imagen] Successfully generated image");
+      if (!imageUrl || imageUrl === '{}' || imageUrl === 'null' || imageUrl === 'undefined') {
+        throw new Error("No valid image URL returned from Imagen-4");
+      }
+
+      console.log("[Imagen] Successfully generated image, URL:", imageUrl);
       return imageUrl;
 
     } catch (error: any) {
