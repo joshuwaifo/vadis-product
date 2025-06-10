@@ -37,20 +37,41 @@ export async function extractAndSaveScriptText(projectId: number): Promise<strin
         const result = await extractTextAndPageCount(pdfBuffer);
         extractedText = result.text;
         
-        console.log(`Extracted ${extractedText.length} characters from PDF`);
-        
-        // Save to database immediately
-        await db.update(projects)
-          .set({ 
-            scriptContent: extractedText,
-            pageCount: result.pageCount,
-            updatedAt: new Date()
-          })
-          .where(eq(projects.id, projectId));
-        
-        console.log(`Successfully saved extracted text to database for project ${projectId}`);
-        
-        return extractedText;
+        if (extractedText && extractedText.length > 100) {
+          console.log(`Extracted ${extractedText.length} characters from PDF`);
+          
+          // Save to database immediately with transaction
+          try {
+            await db.update(projects)
+              .set({ 
+                scriptContent: extractedText,
+                pageCount: result.pageCount,
+                updatedAt: new Date()
+              })
+              .where(eq(projects.id, projectId));
+            
+            console.log(`Successfully saved extracted text to database for project ${projectId}`);
+            
+            // Verify the save worked
+            const verification = await db.select({ scriptContent: projects.scriptContent })
+              .from(projects)
+              .where(eq(projects.id, projectId))
+              .limit(1);
+            
+            if (verification[0]?.scriptContent && !verification[0].scriptContent.startsWith('PDF_UPLOADED:')) {
+              console.log(`Verification successful: Text saved to database`);
+              return extractedText;
+            } else {
+              console.error(`Verification failed: Database still contains PDF reference`);
+              throw new Error('Database save verification failed');
+            }
+          } catch (dbError) {
+            console.error('Database save failed:', dbError);
+            throw new Error('Failed to save extracted text to database');
+          }
+        } else {
+          throw new Error('Extracted text is too short or empty');
+        }
       }
     } catch (error) {
       console.error('PDF extraction failed:', error);
