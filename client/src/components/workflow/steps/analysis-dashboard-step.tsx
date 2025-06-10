@@ -30,12 +30,20 @@ interface AnalysisTask {
 
 const ANALYSIS_TASKS: AnalysisTask[] = [
   {
-    id: 'scene_extraction',
-    title: 'Scene Extraction',
-    description: 'Extract scenes and create breakdown with storyboard',
+    id: 'scene_breakdown',
+    title: 'Scene Breakdown',
+    description: 'Group consecutive scenes into narrative segments',
     status: 'not_started',
     icon: Layers,
     estimatedTime: '3-4 min'
+  },
+  {
+    id: 'scene_extraction',
+    title: 'Storyboard',
+    description: 'Extract and analyze individual scenes from the script',
+    status: 'not_started',
+    icon: Film,
+    estimatedTime: '2-3 min'
   },
   {
     id: 'vfx_analysis',
@@ -100,7 +108,6 @@ interface AnalysisDashboardStepProps {
 export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: AnalysisDashboardStepProps) {
   const [tasks, setTasks] = useState<AnalysisTask[]>([...ANALYSIS_TASKS]);
   const [selectedTask, setSelectedTask] = useState<string | null>(null);
-  const [sceneExtractionSubView, setSceneExtractionSubView] = useState<'scene_breakdown' | 'storyboard'>('scene_breakdown');
   const [analysisResults, setAnalysisResults] = useState<Record<string, any>>({});
   const [showStoryboard, setShowStoryboard] = useState(false);
   const { toast } = useToast();
