@@ -54,7 +54,7 @@ export default function VFXAnalysisView({ projectId, onClose }: VFXAnalysisViewP
       if (!response.ok) {
         throw new Error('Failed to fetch scenes');
       }
-      return response.json() as Scene[];
+      return response.json();
     },
   });
 

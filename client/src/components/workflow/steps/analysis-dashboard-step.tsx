@@ -741,6 +741,14 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
             <ProductPlacementView projectId={workflow?.projectId || project?.id || 0} />
           </div>
         );
+
+      case 'vfx_analysis':
+        return (
+          <VFXAnalysisView
+            projectId={workflow?.projectId || project?.id || 0}
+            onClose={() => setSelectedTask(null)}
+          />
+        );
       
       default:
         return (
