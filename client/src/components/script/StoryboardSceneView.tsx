@@ -312,25 +312,11 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle, pag
                   <div className="flex items-center gap-3 mb-3">
                     <Camera className="h-4 w-4 text-blue-400" />
                     <h3 className="text-sm sm:text-base font-semibold text-white">Storyboard Frame</h3>
-                    {!storyboardImage && !imageLoading && (
-                      <Button
-                        size="sm"
-                        onClick={() => selectedScene && generateImageMutation.mutate(selectedScene.id)}
-                        disabled={generateImageMutation.isPending}
-                        className="bg-blue-600 hover:bg-blue-700 text-white"
-                      >
-                        {generateImageMutation.isPending ? (
-                          <>
-                            <Loader2 className="h-3 w-3 mr-1 animate-spin" />
-                            Generating...
-                          </>
-                        ) : (
-                          <>
-                            <ImageIcon className="h-3 w-3 mr-1" />
-                            Generate Image
-                          </>
-                        )}
-                      </Button>
+                    {backgroundGeneration.isGenerating && (
+                      <div className="flex items-center gap-2 text-xs text-blue-400">
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                        <span>AI generating images...</span>
+                      </div>
                     )}
                   </div>
 
@@ -379,12 +365,21 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle, pag
                       </div>
                     )}
 
-                    {!storyboardImage && !imageLoading && !generateImageMutation.isPending && (
+                    {!storyboardImage && !imageLoading && (
                       <div className="aspect-video bg-gray-800 rounded-lg flex items-center justify-center border border-gray-700 border-dashed">
                         <div className="text-center text-gray-400">
                           <ImageIcon className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                          <p className="text-sm font-medium mb-1">No storyboard image</p>
-                          <p className="text-xs">Click "Generate Image" to create a visual representation</p>
+                          {backgroundGeneration.isGenerating ? (
+                            <>
+                              <p className="text-sm font-medium mb-1">Storyboard generating...</p>
+                              <p className="text-xs">AI is creating visual representations for all scenes</p>
+                            </>
+                          ) : (
+                            <>
+                              <p className="text-sm font-medium mb-1">No storyboard image</p>
+                              <p className="text-xs">Images will generate automatically after scene extraction</p>
+                            </>
+                          )}
                         </div>
                       </div>
                     )}

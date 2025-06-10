@@ -314,6 +314,16 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
       // Invalidate relevant query caches based on task type
       if (taskId === 'scene_extraction') {
         queryClient.invalidateQueries({ queryKey: [`/api/projects/${workflow?.projectId}/scenes`] });
+        
+        // Automatically start storyboard generation in the background
+        if (workflow?.projectId && data?.scenes?.length > 0) {
+          console.log('Starting automatic storyboard generation after scene extraction');
+          apiRequest(`/api/projects/${workflow.projectId}/storyboard/generate`, {
+            method: 'POST'
+          }).catch(error => {
+            console.error('Failed to start automatic storyboard generation:', error);
+          });
+        }
       } else if (taskId === 'character_analysis') {
         queryClient.invalidateQueries({ queryKey: [`/api/projects/${workflow?.projectId}/characters`] });
       } else if (taskId === 'casting_suggestions') {
