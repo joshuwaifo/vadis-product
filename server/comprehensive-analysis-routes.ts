@@ -494,6 +494,17 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
           
           scriptContent = extractedText;
           
+          // Update the project with extracted content and page count
+          await db.update(projects)
+            .set({ 
+              scriptContent: extractedText,
+              pageCount: extractionResult.pageCount,
+              updatedAt: new Date()
+            })
+            .where(eq(projects.id, parseInt(projectId)));
+            
+          console.log(`Saved extracted script content (${extractedText.length} characters) to database`);
+          
         } catch (extractionError) {
           console.error('PDF extraction error for scene breakdown:', extractionError);
           return res.status(400).json({ 
