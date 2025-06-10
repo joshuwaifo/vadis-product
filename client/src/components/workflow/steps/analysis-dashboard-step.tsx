@@ -600,14 +600,14 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
                     <div className="col-span-6">
                       <h5 className="font-semibold text-gray-900 dark:text-gray-100 text-sm">Narrative Segment</h5>
                     </div>
-                    <div className="col-span-3">
-                      <div className="flex items-center gap-2">
+                    <div className="col-span-3 text-center">
+                      <div className="flex items-center justify-center gap-2">
                         <MapPin className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                         <h5 className="font-semibold text-gray-900 dark:text-gray-100 text-sm">Key Locations</h5>
                       </div>
                     </div>
-                    <div className="col-span-3">
-                      <div className="flex items-center gap-2">
+                    <div className="col-span-3 text-center">
+                      <div className="flex items-center justify-center gap-2">
                         <Users className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                         <h5 className="font-semibold text-gray-900 dark:text-gray-100 text-sm">Main Characters</h5>
                       </div>
@@ -638,24 +638,24 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
                       </div>
 
                       {/* Locations Column */}
-                      <div className="col-span-3">
-                        <div className="space-y-2">
+                      <div className="col-span-3 flex flex-col items-center justify-start">
+                        <div className="space-y-2 w-full max-w-xs">
                           {segment.keyLocations?.map((location: string, i: number) => (
-                            <Badge key={i} variant="outline" className="block text-xs bg-emerald-50/80 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-800 px-2.5 py-1.5 font-medium text-center">
+                            <Badge key={i} variant="outline" className="block text-xs bg-emerald-50/80 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-800 px-2.5 py-1.5 font-medium text-center w-full">
                               {location}
                             </Badge>
-                          )) || <span className="text-sm text-muted-foreground italic">None specified</span>}
+                          )) || <span className="text-sm text-muted-foreground italic text-center">None specified</span>}
                         </div>
                       </div>
 
                       {/* Characters Column */}
-                      <div className="col-span-3">
-                        <div className="space-y-2">
+                      <div className="col-span-3 flex flex-col items-center justify-start">
+                        <div className="space-y-2 w-full max-w-xs">
                           {segment.mainCharacters?.map((character: string, i: number) => (
-                            <Badge key={i} variant="outline" className="block text-xs bg-blue-50/80 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-800 px-2.5 py-1.5 font-medium text-center">
+                            <Badge key={i} variant="outline" className="block text-xs bg-blue-50/80 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-800 px-2.5 py-1.5 font-medium text-center w-full">
                               {character}
                             </Badge>
-                          )) || <span className="text-sm text-muted-foreground italic">None specified</span>}
+                          )) || <span className="text-sm text-muted-foreground italic text-center">None specified</span>}
                         </div>
                       </div>
                     </div>
