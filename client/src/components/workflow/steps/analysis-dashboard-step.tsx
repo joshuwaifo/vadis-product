@@ -30,6 +30,14 @@ interface AnalysisTask {
 
 const ANALYSIS_TASKS: AnalysisTask[] = [
   {
+    id: 'scene_breakdown',
+    title: 'Scene Breakdown',
+    description: 'Group consecutive scenes into narrative segments',
+    status: 'not_started',
+    icon: Layers,
+    estimatedTime: '3-4 min'
+  },
+  {
     id: 'scene_extraction',
     title: 'Storyboard',
     description: 'Extract and analyze individual scenes from the script',
@@ -38,12 +46,20 @@ const ANALYSIS_TASKS: AnalysisTask[] = [
     estimatedTime: '2-3 min'
   },
   {
-    id: 'scene_breakdown',
-    title: 'Scene Breakdown',
-    description: 'Group consecutive scenes into narrative segments',
+    id: 'vfx_analysis',
+    title: 'VFX Analysis',
+    description: 'Identify visual effects requirements and complexity',
     status: 'not_started',
-    icon: Layers,
-    estimatedTime: '3-4 min'
+    icon: Zap,
+    estimatedTime: '4-5 min'
+  },
+  {
+    id: 'product_placement',
+    title: 'Product Placement',
+    description: 'Identify opportunities for brand partnerships',
+    status: 'not_started',
+    icon: Package,
+    estimatedTime: '2-3 min'
   },
   {
     id: 'character_analysis',
@@ -60,30 +76,6 @@ const ANALYSIS_TASKS: AnalysisTask[] = [
     status: 'not_started',
     icon: Star,
     estimatedTime: '4-5 min'
-  },
-  {
-    id: 'product_placement',
-    title: 'Product Placement',
-    description: 'Identify opportunities for brand partnerships',
-    status: 'not_started',
-    icon: Package,
-    estimatedTime: '2-3 min'
-  },
-  {
-    id: 'vfx_analysis',
-    title: 'VFX Analysis',
-    description: 'Identify visual effects requirements and complexity',
-    status: 'not_started',
-    icon: Zap,
-    estimatedTime: '4-5 min'
-  },
-  {
-    id: 'location_analysis',
-    title: 'Location Analysis',
-    description: 'Identify and suggest filming locations',
-    status: 'not_started',
-    icon: MapPin,
-    estimatedTime: '3-4 min'
   },
   {
     id: 'financial_planning',
