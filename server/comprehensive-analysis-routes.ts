@@ -161,14 +161,23 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
 
       // Get project and script content from database
       const project = await db.select().from(projects).where(eq(projects.id, parseInt(projectId))).limit(1);
-      if (!project.length || !project[0].scriptContent) {
-        return res.status(400).json({ error: 'Project not found or no script content available' });
+      if (!project.length) {
+        return res.status(400).json({ error: 'Project not found' });
       }
 
       let scriptContent = project[0].scriptContent;
 
-      // Check if this is a PDF metadata format (on-demand extraction needed)
-      if (scriptContent && scriptContent.startsWith('PDF_UPLOADED:')) {
+      // If no script content at all, return error
+      if (!scriptContent) {
+        return res.status(400).json({ error: 'No script content available' });
+      }
+
+      // Prioritize using existing extracted script content
+      if (scriptContent && !scriptContent.startsWith('PDF_UPLOADED:') && scriptContent.length > 100) {
+        console.log(`Using existing extracted script content (${scriptContent.length} characters)`);
+      }
+      // Only extract from PDF if we don't have usable script content
+      else if (scriptContent && scriptContent.startsWith('PDF_UPLOADED:')) {
         try {
           let extractedText = null;
           
@@ -414,14 +423,23 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
 
       // Get project and script content from database
       const project = await db.select().from(projects).where(eq(projects.id, parseInt(projectId))).limit(1);
-      if (!project.length || !project[0].scriptContent) {
-        return res.status(400).json({ error: 'Project not found or no script content available' });
+      if (!project.length) {
+        return res.status(400).json({ error: 'Project not found' });
       }
 
       let scriptContent = project[0].scriptContent;
 
-      // Check if this is a PDF metadata format (on-demand extraction needed)
-      if (scriptContent && scriptContent.startsWith('PDF_UPLOADED:')) {
+      // If no script content at all, return error
+      if (!scriptContent) {
+        return res.status(400).json({ error: 'No script content available' });
+      }
+
+      // Prioritize using existing extracted script content
+      if (scriptContent && !scriptContent.startsWith('PDF_UPLOADED:') && scriptContent.length > 100) {
+        console.log(`Using existing extracted script content for scene breakdown (${scriptContent.length} characters)`);
+      }
+      // Only extract from PDF if we don't have usable script content
+      else if (scriptContent && scriptContent.startsWith('PDF_UPLOADED:')) {
         try {
           let extractedText = null;
           
@@ -656,8 +674,17 @@ Respond in JSON format with this structure:
 
       let scriptContent = project[0].scriptContent;
 
-      // Handle PDF extraction if needed
-      if (scriptContent && scriptContent.startsWith('PDF_UPLOADED:')) {
+      // If no script content at all, return error
+      if (!scriptContent) {
+        return res.status(400).json({ error: 'No script content available' });
+      }
+
+      // Prioritize using existing extracted script content
+      if (scriptContent && !scriptContent.startsWith('PDF_UPLOADED:') && scriptContent.length > 100) {
+        console.log(`Using existing extracted script content for character analysis (${scriptContent.length} characters)`);
+      }
+      // Only extract from PDF if we don't have usable script content
+      else if (scriptContent && scriptContent.startsWith('PDF_UPLOADED:')) {
         try {
           if (project[0].scriptFileData) {
             console.log('Extracting text from stored PDF for character analysis');
