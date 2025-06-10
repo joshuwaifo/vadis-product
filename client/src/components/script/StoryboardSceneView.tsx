@@ -98,7 +98,7 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle, pag
 
   // Get all storyboard images for the project to track progress
   const { data: allStoryboardData } = useQuery({
-    queryKey: ['/api/projects', projectId, 'storyboard'],
+    queryKey: [`/api/projects/${projectId}/storyboard`],
     enabled: !!projectId,
     refetchInterval: 3000, // Poll every 3 seconds for new images
   });
