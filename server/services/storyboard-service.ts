@@ -211,12 +211,32 @@ Style: Professional film storyboard, cinematic lighting, movie production qualit
     try {
       // Generate image using DALL-E 2 for faster generation (2-5 seconds vs 30+ seconds)
       // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-      const response = await openai.images.generate({
-        model: "dall-e-2",
-        prompt: storyboardPrompt,
-        n: 1,
-        size: "1024x1024", // DALL-E 2 supports up to 1024x1024
-      });
+      
+      let response;
+      let retries = 0;
+      const maxRetries = 3;
+      
+      while (retries < maxRetries) {
+        try {
+          response = await openai.images.generate({
+            model: "dall-e-2",
+            prompt: storyboardPrompt,
+            n: 1,
+            size: "1024x1024", // DALL-E 2 supports up to 1024x1024
+          });
+          break; // Success, exit retry loop
+        } catch (error: any) {
+          retries++;
+          if (retries >= maxRetries) {
+            throw error; // Final retry failed
+          }
+          
+          // Exponential backoff: 1s, 2s, 4s
+          const delay = Math.pow(2, retries - 1) * 1000;
+          console.log(`[Storyboard] Retry ${retries}/${maxRetries} for scene ${sceneId} after ${delay}ms delay`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+        }
+      }
 
       const imageUrl = response.data[0].url;
 
@@ -294,28 +314,21 @@ Style: Professional film storyboard, cinematic lighting, movie production qualit
 
     console.log(`[Storyboard] Generating ${scenesToGenerate.length} new images`);
 
-    // Process scenes in batches of 3 to balance speed and rate limits (DALL-E 2 is faster)
-    const BATCH_SIZE = 3;
-    for (let i = 0; i < scenesToGenerate.length; i += BATCH_SIZE) {
-      const batch = scenesToGenerate.slice(i, i + BATCH_SIZE);
-      
-      // Generate images in parallel for this batch
-      const batchPromises = batch.map(async (scene) => {
-        try {
-          console.log(`[Storyboard] Generating image for scene ${scene.sceneNumber}`);
-          await this.generateSceneStoryboard(scene.id);
-          console.log(`[Storyboard] Completed image for scene ${scene.sceneNumber}`);
-        } catch (error) {
-          console.error(`[Storyboard] Failed to generate image for scene ${scene.sceneNumber}:`, error);
+    // Process scenes sequentially to avoid OpenAI rate limiting (DALL-E 2 still fast at 2-5 seconds per image)
+    for (let i = 0; i < scenesToGenerate.length; i++) {
+      const scene = scenesToGenerate[i];
+      try {
+        console.log(`[Storyboard] Generating image for scene ${scene.sceneNumber} (${i + 1}/${scenesToGenerate.length})`);
+        await this.generateSceneStoryboard(scene.id);
+        console.log(`[Storyboard] Completed image for scene ${scene.sceneNumber}`);
+        
+        // Small delay between requests to respect API limits
+        if (i + 1 < scenesToGenerate.length) {
+          await new Promise(resolve => setTimeout(resolve, 200));
         }
-      });
-
-      // Wait for this batch to complete
-      await Promise.all(batchPromises);
-      
-      // Small delay between batches to be respectful to API limits
-      if (i + BATCH_SIZE < scenesToGenerate.length) {
-        await new Promise(resolve => setTimeout(resolve, 500)); // Shorter delay for DALL-E 2
+      } catch (error) {
+        console.error(`[Storyboard] Failed to generate image for scene ${scene.sceneNumber}:`, error);
+        // Continue with next scene even if one fails
       }
     }
 
