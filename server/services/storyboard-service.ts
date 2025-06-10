@@ -27,8 +27,8 @@ export interface StoryboardImage {
   sceneId: number;
   imageUrl: string;
   prompt: string;
-  charactersPresent: string[];
-  generatedAt: Date;
+  charactersPresent: string[] | null;
+  generatedAt: Date | null;
 }
 
 export class StoryboardService {
@@ -190,7 +190,7 @@ LOCATION: ${scene.location}
 TIME: ${scene.timeOfDay}
 
 SCENE CONTENT:
-${scene.content.substring(0, 1000)}
+${scene.content ? scene.content.substring(0, 1000) : 'Scene details to be determined'}
 
 CHARACTER CONSISTENCY (maintain these exact descriptions):
 ${characterDescriptions}
@@ -207,7 +207,7 @@ Style: Professional film storyboard, cinematic lighting, movie production qualit
 
     try {
       // Generate image using Google's Imagen-4 for high-quality storyboard images with retry logic
-      let imageUrl: string;
+      let imageUrl: string | undefined;
       let retries = 0;
       const maxRetries = 3;
       
