@@ -53,7 +53,7 @@ export class ImagenGenerator {
       console.log("[Imagen] Raw output from Imagen-4:", JSON.stringify(output));
       console.log("[Imagen] Output type:", typeof output);
       
-      // Replicate for Imagen-4 returns a single URL string
+      // Imagen-4 returns an object that converts to URL string via toString()
       let imageUrl: string;
       
       if (typeof output === 'string' && output.startsWith('http')) {
@@ -69,18 +69,26 @@ export class ImagenGenerator {
           throw new Error(`Array output contains no valid URLs: ${JSON.stringify(output)}`);
         }
       } else if (output && typeof output === 'object') {
-        // Check for common URL properties
-        const urlFields = ['url', 'image_url', 'output_url', 'result'];
-        let found = false;
-        for (const field of urlFields) {
-          if (field in output && typeof (output as any)[field] === 'string') {
-            imageUrl = (output as any)[field];
-            found = true;
-            break;
+        // Special case: Imagen-4 returns object that converts to URL via toString()
+        const stringUrl = String(output);
+        console.log("[Imagen] String conversion of output:", stringUrl);
+        
+        if (stringUrl && stringUrl.startsWith('http')) {
+          imageUrl = stringUrl;
+        } else {
+          // Check for common URL properties as fallback
+          const urlFields = ['url', 'image_url', 'output_url', 'result'];
+          let found = false;
+          for (const field of urlFields) {
+            if (field in output && typeof (output as any)[field] === 'string') {
+              imageUrl = (output as any)[field];
+              found = true;
+              break;
+            }
           }
-        }
-        if (!found) {
-          throw new Error(`Object output has no valid URL field: ${JSON.stringify(output)}`);
+          if (!found) {
+            throw new Error(`Object output has no valid URL: string="${stringUrl}", fields=${JSON.stringify(Object.keys(output))}`);
+          }
         }
       } else {
         throw new Error(`Unexpected output format: ${typeof output} - ${JSON.stringify(output)}`);
