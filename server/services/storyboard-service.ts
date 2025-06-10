@@ -74,7 +74,7 @@ export class StoryboardService {
     const projectTitle = project[0].title;
 
     // Generate visual descriptions for each character
-    const characterProfiles: CharacterProfile[] = [];
+    const generatedProfiles: CharacterProfile[] = [];
 
     for (const characterName of uniqueCharacters) {
       try {
@@ -127,7 +127,7 @@ Respond in JSON format:
           })
           .returning();
 
-        characterProfiles.push(savedProfile);
+        generatedProfiles.push(savedProfile);
         console.log(`[Storyboard] Generated profile for ${characterName}`);
 
       } catch (error) {
@@ -145,11 +145,11 @@ Respond in JSON format:
           })
           .returning();
 
-        characterProfiles.push(fallbackProfile);
+        generatedProfiles.push(fallbackProfile);
       }
     }
 
-    return characterProfiles;
+    return generatedProfiles;
   }
 
   /**
