@@ -198,10 +198,9 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
           // Method 1: Try extracting from stored PDF data
           if (project[0].pdfFileData || project[0].scriptFileData) {
             const pdfData = project[0].pdfFileData || project[0].scriptFileData;
-            const mimeType = project[0].pdfMimeType || project[0].scriptFileMimeType || 'application/pdf';
             
             if (pdfData) {
-              console.log(`Attempting extraction from stored PDF data`);
+              console.log(`Attempting extraction from stored PDF data for scene extraction`);
               const { extractTextAndPageCount } = await import('./services/pdf-text-extractor');
               const pdfBuffer = Buffer.from(pdfData, 'base64');
               
@@ -209,12 +208,18 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
               extractedText = extractionResult.text;
               const actualPageCount = extractionResult.pageCount;
               
-              console.log(`Extracted ${extractedText?.length || 0} characters from ${actualPageCount} pages`);
+              console.log(`Extracted ${extractedText?.length || 0} characters from ${actualPageCount} pages for scene extraction`);
               
-              // Update project with actual page count
+              // Update project with actual page count and extracted content
               await db.update(projects)
-                .set({ pageCount: actualPageCount })
+                .set({ 
+                  pageCount: actualPageCount,
+                  scriptContent: extractedText,
+                  updatedAt: new Date()
+                })
                 .where(eq(projects.id, parseInt(projectId)));
+              
+              scriptContent = extractedText;
             }
           }
           
@@ -285,16 +290,33 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
         }
       }
 
-      // Use proper scene extraction workflow based on demo app
-      console.log(`Processing script content of ${scriptContent.length} characters`);
+      // Use basic scene parsing directly from script content
+      console.log(`Processing script content of ${scriptContent.length} characters for scene extraction`);
       
       // Clear existing scenes for this project to prevent duplication
       await db.delete(scenes).where(eq(scenes.projectId, parseInt(projectId)));
       console.log(`Cleared existing scenes for project ${projectId}`);
 
-      // Import the enhanced scene extractor for comprehensive processing
-      const { extractScenesWithChunking } = await import('./services/enhanced-scene-extractor');
-      const analysisResult = await extractScenesWithChunking(scriptContent);
+      // Parse script content directly using basic scene parser
+      const basicScenes = parseBasicScenes(scriptContent);
+      console.log(`Basic scene parser found ${basicScenes.length} scenes`);
+      
+      // Create analysis result in expected format
+      const analysisResult = {
+        scenes: basicScenes.map((scene, index) => ({
+          sceneNumber: index + 1,
+          location: scene.location || 'UNSPECIFIED',
+          timeOfDay: scene.timeOfDay || 'UNSPECIFIED',
+          title: scene.description || `Scene ${index + 1}`,
+          plotSummary: scene.content.substring(0, 200) + '...',
+          characters: scene.characters || [],
+          content: scene.content,
+          pageStart: scene.pageStart || Math.floor(index * (project[0]?.pageCount || 100) / basicScenes.length) + 1,
+          pageEnd: scene.pageEnd || Math.floor((index + 1) * (project[0]?.pageCount || 100) / basicScenes.length),
+          duration: scene.duration || Math.max(1, Math.floor(scene.content.split('\n').length / 8))
+        })),
+        totalScenes: basicScenes.length
+      };
       
       console.log(`Enhanced scene extractor found ${analysisResult.totalScenes} scenes from script analysis`);
       
