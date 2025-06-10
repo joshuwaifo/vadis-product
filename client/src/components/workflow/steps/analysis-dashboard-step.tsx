@@ -30,20 +30,12 @@ interface AnalysisTask {
 
 const ANALYSIS_TASKS: AnalysisTask[] = [
   {
-    id: 'scene_breakdown',
-    title: 'Scene Breakdown',
-    description: 'Group consecutive scenes into narrative segments',
+    id: 'scene_extraction_breakdown',
+    title: 'Scene Extraction & Breakdown',
+    description: 'Extract scenes from PDF and create narrative segments',
     status: 'not_started',
     icon: Layers,
-    estimatedTime: '3-4 min'
-  },
-  {
-    id: 'scene_extraction',
-    title: 'Storyboard',
-    description: 'Extract and analyze individual scenes from the script',
-    status: 'not_started',
-    icon: Film,
-    estimatedTime: '2-3 min'
+    estimatedTime: '4-5 min'
   },
   {
     id: 'vfx_analysis',
@@ -312,15 +304,14 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
       setSelectedTask(taskId);
       
       // Invalidate relevant query caches based on task type
-      if (taskId === 'scene_extraction') {
+      if (taskId === 'scene_extraction_breakdown') {
         queryClient.invalidateQueries({ queryKey: [`/api/projects/${workflow?.projectId}/scenes`] });
+        queryClient.invalidateQueries({ queryKey: [`/api/projects/${workflow?.projectId}/scene-breakdown`] });
       } else if (taskId === 'character_analysis') {
         queryClient.invalidateQueries({ queryKey: [`/api/projects/${workflow?.projectId}/characters`] });
       } else if (taskId === 'casting_suggestions') {
         queryClient.invalidateQueries({ queryKey: [`/api/projects/${workflow?.projectId}/casting`] });
         queryClient.invalidateQueries({ queryKey: [`/api/projects/${workflow?.projectId}/casting/analysis`] });
-      } else if (taskId === 'scene_breakdown') {
-        queryClient.invalidateQueries({ queryKey: [`/api/projects/${workflow?.projectId}/scene-breakdown`] });
       }
       
       toast({
@@ -477,29 +468,24 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
 
   const renderTaskResults = (taskId: string, results: any) => {
     switch (taskId) {
-      case 'scene_extraction':
+      case 'scene_extraction_breakdown':
         return (
           <div className="space-y-6">
+            {/* Action buttons at top */}
             <div className="flex items-center justify-between">
-              <div className="grid grid-cols-3 gap-6 text-center flex-1">
-                <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/30 dark:to-blue-900/30 rounded-xl p-4">
-                  <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">{results.totalScenes || 0}</div>
-                  <div className="text-sm text-muted-foreground">Total Scenes</div>
-                </div>
-                <div className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950/30 dark:to-green-900/30 rounded-xl p-4">
-                  <div className="text-3xl font-bold text-green-600 dark:text-green-400">{results.estimatedDuration || (project?.scriptContent ? Math.ceil(project.scriptContent.split(/\s+/).length / 250) : 0)}</div>
-                  <div className="text-sm text-muted-foreground">Est. Minutes</div>
-                </div>
-                <div className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950/30 dark:to-purple-900/30 rounded-xl p-4">
-                  <div className="text-3xl font-bold text-purple-600 dark:text-purple-400">{results.scenes?.length || 0}</div>
-                  <div className="text-sm text-muted-foreground">Extracted</div>
-                </div>
+              <div className="flex items-center gap-4">
+                <h4 className="text-lg font-semibold">Scene Analysis Results</h4>
+                {results.segments && (
+                  <Badge variant="outline" className="text-xs">
+                    {results.segments.length} narrative segments
+                  </Badge>
+                )}
               </div>
               
               {results.scenes && results.scenes.length > 0 && (
                 <Button 
                   onClick={() => setShowStoryboard(true)}
-                  className="ml-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-3"
+                  className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-3"
                 >
                   <Maximize2 className="h-4 w-4 mr-2" />
                   Storyboard View
@@ -507,48 +493,93 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
               )}
             </div>
 
-            {results.scenes && results.scenes.length > 0 && (
+            {/* Scene Breakdown Table */}
+            {results.segments && results.segments.length > 0 && (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h4 className="text-lg font-semibold">Scenes</h4>
+                  <h4 className="text-lg font-semibold">Narrative Segments</h4>
                   <Badge variant="outline" className="text-xs">
-                    {results.scenes.length} total
+                    {results.segments.length} segments
                   </Badge>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-                  {results.scenes
-                    .sort((a: any, b: any) => {
-                      const aNum = parseInt(a.sceneNumber) || 0;
-                      const bNum = parseInt(b.sceneNumber) || 0;
-                      return aNum - bNum;
-                    })
-                    .map((scene: any, index: number) => (
-                    <Card key={index} className="h-48 hover:shadow-md transition-shadow cursor-pointer border border-gray-200 dark:border-gray-700">
-                      <CardContent className="p-4 h-full flex flex-col">
-                        <div className="flex items-center justify-between mb-2">
-                          <Badge variant="outline" className="text-xs px-2 py-1">
-                            {scene.sceneNumber}
+                <div className="space-y-4">
+                  {/* Table Header */}
+                  <div className="grid grid-cols-12 gap-4 px-4 py-3 bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                    <div className="col-span-6">
+                      <h5 className="font-semibold text-gray-900 dark:text-gray-100 text-sm">Narrative Segment</h5>
+                    </div>
+                    <div className="col-span-3 text-center">
+                      <div className="flex items-center justify-center gap-2">
+                        <MapPin className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                        <h5 className="font-semibold text-gray-900 dark:text-gray-100 text-sm">Key Locations</h5>
+                      </div>
+                    </div>
+                    <div className="col-span-3 text-center">
+                      <div className="flex items-center justify-center gap-2">
+                        <Users className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                        <h5 className="font-semibold text-gray-900 dark:text-gray-100 text-sm">Main Characters</h5>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Table Rows */}
+                  {results.segments.map((segment: any, index: number) => (
+                    <div key={index} className="grid grid-cols-12 gap-4 p-4 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all duration-200">
+                      {/* Segment Column (Wide) */}
+                      <div className="col-span-6 space-y-3">
+                        <div className="flex items-center gap-3 mb-2">
+                          <Badge variant="secondary" className="text-xs font-medium bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 px-2 py-1">
+                            {segment.sceneRange}
                           </Badge>
+                          <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                            Segment {index + 1}
+                          </span>
                         </div>
-                        
-                        <h4 className="text-sm font-medium mb-3 line-clamp-2">
-                          {scene.description || `Scene ${scene.sceneNumber}`}
-                        </h4>
-                        
-                        <div className="flex-1 overflow-hidden">
-                          <ScrollArea className="h-32 w-full">
-                            <div className="pr-3">
-                              <p className="text-xs text-muted-foreground leading-relaxed whitespace-pre-wrap">
-                                {scene.plotSummary || 'Plot summary not available'}
-                              </p>
-                            </div>
-                          </ScrollArea>
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 leading-tight mb-3">
+                          {segment.title}
+                        </h3>
+                        <div className="bg-gradient-to-br from-slate-50 to-gray-50 dark:from-slate-800/50 dark:to-gray-800/50 rounded-lg p-4 border border-slate-200/50 dark:border-slate-700/50">
+                          <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                            {segment.summary}
+                          </p>
                         </div>
-                      </CardContent>
-                    </Card>
+                      </div>
+
+                      {/* Locations Column */}
+                      <div className="col-span-3 flex flex-col items-center justify-center">
+                        <div className="space-y-2 w-full max-w-xs">
+                          {segment.keyLocations?.map((location: string, i: number) => (
+                            <Badge key={i} variant="outline" className="block text-xs bg-emerald-50/80 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-800 px-2.5 py-1.5 font-medium text-center w-full">
+                              {location}
+                            </Badge>
+                          )) || <span className="text-sm text-muted-foreground italic text-center">None specified</span>}
+                        </div>
+                      </div>
+
+                      {/* Characters Column */}
+                      <div className="col-span-3 flex flex-col items-center justify-center">
+                        <div className="space-y-2 w-full max-w-xs">
+                          {segment.mainCharacters?.map((character: string, i: number) => (
+                            <Badge key={i} variant="outline" className="block text-xs bg-blue-50/80 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-800 px-2.5 py-1.5 font-medium text-center w-full">
+                              {character}
+                            </Badge>
+                          )) || <span className="text-sm text-muted-foreground italic text-center">None specified</span>}
+                        </div>
+                      </div>
+                    </div>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {(!results.segments || results.segments.length === 0) && (
+              <div className="text-center py-8">
+                <Layers className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-semibold mb-2">No Segments Found</h3>
+                <p className="text-muted-foreground">
+                  The analysis couldn't create narrative segments. Please ensure the script content is properly formatted.
+                </p>
               </div>
             )}
           </div>
