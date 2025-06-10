@@ -206,21 +206,19 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle, pag
                 <div className="text-xs text-gray-400 hidden sm:block">Est. Runtime</div>
                 <div className="text-xs text-gray-400 sm:hidden">Runtime</div>
               </div>
-              {backgroundGeneration.isGenerating && (
+              {isGenerating && (
                 <div className="text-center">
                   <div className="flex items-center gap-2">
                     <Loader2 className="h-3 w-3 text-blue-400 animate-spin" />
                     <span className="text-sm font-bold text-blue-400">
-                      {backgroundGeneration.completed}/{backgroundGeneration.total}
+                      {completedScenes}/{totalScenes}
                     </span>
                   </div>
                   <div className="text-xs text-gray-400 hidden sm:block">AI Generating</div>
                   <div className="text-xs text-gray-400 sm:hidden">AI Gen</div>
-                  {backgroundGeneration.currentScene && (
-                    <div className="text-xs text-blue-300 mt-1 max-w-20 truncate">
-                      {backgroundGeneration.currentScene}
-                    </div>
-                  )}
+                  <div className="text-xs text-blue-300 mt-1">
+                    {generationProgress}% complete
+                  </div>
                 </div>
               )}
             </div>

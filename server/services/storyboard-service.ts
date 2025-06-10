@@ -6,13 +6,10 @@
  * and generating consistent visual representations.
  */
 
-import OpenAI from "openai";
 import { db } from "../db";
 import { projects, scenes, characterProfiles, storyboardImages } from "../../shared/schema";
 import { eq, and, inArray } from "drizzle-orm";
-
-// the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+import { imagenGenerator } from "./imagen-generator";
 
 export interface CharacterProfile {
   id: number;
@@ -209,43 +206,38 @@ VISUAL REQUIREMENTS:
 Style: Professional film storyboard, cinematic lighting, movie production quality`;
 
     try {
-      // Generate image using DALL-E 3 for high-quality storyboard images with retry logic
-      let response;
+      // Generate image using Google's Imagen-4 for high-quality storyboard images with retry logic
+      let imageUrl: string;
       let retries = 0;
       const maxRetries = 3;
       
       while (retries < maxRetries) {
         try {
-          response = await openai.images.generate({
-            model: "dall-e-3",
+          imageUrl = await imagenGenerator.generateImage({
             prompt: storyboardPrompt,
-            n: 1,
-            size: "1024x1024",
-            quality: "standard",
-            style: "natural"
+            aspectRatio: "16:9",
+            safetyFilterLevel: "block_medium_and_above"
           });
           break; // Success, exit retry loop
         } catch (error: any) {
           retries++;
-          console.log(`[Storyboard] API error for scene ${sceneId}, retry ${retries}/${maxRetries}:`, error.status, error.message);
+          console.log(`[Storyboard] Imagen-4 error for scene ${sceneId}, retry ${retries}/${maxRetries}:`, error.message);
           
           if (retries >= maxRetries) {
             // If all retries failed, log the error but don't stop the entire generation process
-            console.log(`[Storyboard] Skipping scene ${sceneId} after ${maxRetries} failed attempts due to API errors`);
+            console.log(`[Storyboard] Skipping scene ${sceneId} after ${maxRetries} failed attempts due to Imagen-4 errors`);
             throw error;
           }
           
-          // Longer exponential backoff for API server errors: 5s, 10s, 20s
-          const delay = Math.pow(2, retries) * 2500;
+          // Exponential backoff for API errors: 3s, 6s, 12s
+          const delay = Math.pow(2, retries) * 1500;
           console.log(`[Storyboard] Retry ${retries}/${maxRetries} for scene ${sceneId} after ${delay}ms delay`);
           await new Promise(resolve => setTimeout(resolve, delay));
         }
       }
 
-      const imageUrl = response?.data[0]?.url;
-
       if (!imageUrl) {
-        throw new Error("No image URL returned from DALL-E 3");
+        throw new Error("No image URL returned from Imagen-4");
       }
 
       // Save storyboard image to database
