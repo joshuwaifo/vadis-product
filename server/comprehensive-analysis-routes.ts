@@ -256,6 +256,8 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
                 updatedAt: new Date()
               })
               .where(eq(projects.id, parseInt(projectId)));
+            
+            console.log(`Saved extracted text (${extractedText.length} characters) to database for project ${projectId}`);
           } else {
             throw new Error('Unable to extract sufficient text content from any source');
           }
@@ -476,6 +478,16 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
           
           scriptContent = extractedText;
           
+          // Save extracted text to database for future use
+          await db.update(projects)
+            .set({ 
+              scriptContent: extractedText,
+              updatedAt: new Date()
+            })
+            .where(eq(projects.id, parseInt(projectId)));
+          
+          console.log(`Saved extracted text (${extractedText.length} characters) to database for scene breakdown`);
+          
         } catch (extractionError) {
           console.error('PDF extraction error for scene breakdown:', extractionError);
           return res.status(400).json({ 
@@ -692,6 +704,16 @@ Respond in JSON format with this structure:
             const pdfBuffer = Buffer.from(project[0].scriptFileData, 'base64');
             scriptContent = await extractTextFromPDF(pdfBuffer);
             console.log(`Extracted ${scriptContent?.length || 0} characters for analysis`);
+            
+            // Save extracted text to database for future use
+            await db.update(projects)
+              .set({ 
+                scriptContent: scriptContent,
+                updatedAt: new Date()
+              })
+              .where(eq(projects.id, parseInt(projectId)));
+            
+            console.log(`Saved extracted text (${scriptContent.length} characters) to database for character analysis`);
           }
         } catch (extractError) {
           console.error('PDF extraction failed for character analysis:', extractError);
