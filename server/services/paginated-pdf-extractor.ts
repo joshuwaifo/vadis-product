@@ -42,15 +42,23 @@ export async function extractPDFTextPaginated(pdfBuffer: Buffer): Promise<string
   
   console.log(`Starting paginated extraction for ${estimatedPages}-page PDF`);
   
-  // Extract in page segments to avoid output length limits
+  // Extract in page segments using parallel processing
   const pageSegments = calculatePageSegments(estimatedPages);
+  console.log(`Processing ${pageSegments.length} segments in parallel for faster extraction`);
+  
+  // Process segments in parallel with controlled concurrency
+  const maxConcurrency = 4; // Process 4 segments simultaneously
   const extractions: PageExtraction[] = [];
   
-  for (const segment of pageSegments) {
-    try {
-      console.log(`Extracting pages ${segment.start}-${segment.end}`);
-      
-      const prompt = `Extract complete text from pages ${segment.start} to ${segment.end} of this screenplay PDF.
+  for (let i = 0; i < pageSegments.length; i += maxConcurrency) {
+    const batch = pageSegments.slice(i, i + maxConcurrency);
+    console.log(`Processing batch ${Math.floor(i / maxConcurrency) + 1}/${Math.ceil(pageSegments.length / maxConcurrency)} (${batch.length} segments)`);
+    
+    const batchPromises = batch.map(async (segment) => {
+      try {
+        console.log(`Extracting pages ${segment.start}-${segment.end}`);
+        
+        const prompt = `Extract complete text from pages ${segment.start} to ${segment.end} of this screenplay PDF.
 
 EXTRACTION REQUIREMENTS:
 - Extract ALL text from pages ${segment.start} through ${segment.end} only
@@ -61,37 +69,56 @@ EXTRACTION REQUIREMENTS:
 
 Extract the complete text from pages ${segment.start}-${segment.end}:`;
 
-      const result = await model.generateContent([
-        {
-          inlineData: {
-            data: base64Data,
-            mimeType: "application/pdf"
-          }
-        },
-        prompt
-      ]);
+        const result = await model.generateContent([
+          {
+            inlineData: {
+              data: base64Data,
+              mimeType: "application/pdf"
+            }
+          },
+          prompt
+        ]);
 
-      const response = await result.response;
-      const extractedText = response.text();
-      
-      if (extractedText && extractedText.length > 100) {
-        extractions.push({
-          pageRange: `${segment.start}-${segment.end}`,
-          content: extractedText,
-          characterCount: extractedText.length
-        });
-        console.log(`Extracted ${extractedText.length} characters from pages ${segment.start}-${segment.end}`);
-      } else {
-        console.log(`Low extraction for pages ${segment.start}-${segment.end}: ${extractedText?.length || 0} characters`);
+        const response = await result.response;
+        const extractedText = response.text();
+        
+        if (extractedText && extractedText.length > 100) {
+          console.log(`Extracted ${extractedText.length} characters from pages ${segment.start}-${segment.end}`);
+          return {
+            pageRange: `${segment.start}-${segment.end}`,
+            content: extractedText,
+            characterCount: extractedText.length,
+            segmentOrder: segment.start // For proper ordering
+          };
+        } else {
+          console.log(`Low extraction for pages ${segment.start}-${segment.end}: ${extractedText?.length || 0} characters`);
+          return null;
+        }
+        
+      } catch (error) {
+        console.error(`Error extracting pages ${segment.start}-${segment.end}:`, error.message);
+        return null;
       }
-      
-      // Small delay to avoid rate limiting
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-    } catch (error) {
-      console.error(`Error extracting pages ${segment.start}-${segment.end}:`, error.message);
+    });
+    
+    // Wait for batch to complete
+    const batchResults = await Promise.all(batchPromises);
+    
+    // Add successful extractions to results
+    batchResults.forEach(result => {
+      if (result) {
+        extractions.push(result);
+      }
+    });
+    
+    // Brief pause between batches to respect rate limits
+    if (i + maxConcurrency < pageSegments.length) {
+      await new Promise(resolve => setTimeout(resolve, 200));
     }
   }
+  
+  // Sort extractions by page order to maintain sequence
+  extractions.sort((a, b) => (a as any).segmentOrder - (b as any).segmentOrder);
   
   // Combine all extracted text
   const combinedText = extractions.map(e => e.content).join('\n\n');
