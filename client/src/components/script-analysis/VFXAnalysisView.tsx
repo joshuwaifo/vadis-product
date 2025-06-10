@@ -399,19 +399,18 @@ export default function VFXAnalysisView({ projectId, onClose }: VFXAnalysisViewP
                         </ScrollArea>
                       </div>
 
-                      {isVfxScene && (
-                        <div className="space-y-2">
-                          <div className="text-xs text-muted-foreground">
-                            Select VFX Quality:
-                          </div>
-                          <div className="flex gap-1">
-                            {(['low', 'medium', 'high'] as const).map((quality) => (
-                              <Button
-                                key={quality}
-                                size="sm"
-                                variant={vfxAnalysis?.selectedQuality === quality ? "default" : "outline"}
-                                className={`text-xs px-2 py-1 h-7 ${
-                                  vfxAnalysis?.selectedQuality === quality 
+                      <div className="space-y-2">
+                        <div className="text-xs text-muted-foreground">
+                          Select VFX Quality:
+                        </div>
+                        <div className="flex gap-1">
+                          {(['low', 'medium', 'high'] as const).map((quality) => (
+                            <Button
+                              key={quality}
+                              size="sm"
+                              variant={vfxAnalysis?.selectedQuality === quality ? "default" : "outline"}
+                              className={`text-xs px-2 py-1 h-7 ${
+                                vfxAnalysis?.selectedQuality === quality 
                                     ? getQualityColor(quality) 
                                     : 'hover:bg-gray-100 dark:hover:bg-gray-800'
                                 }`}
@@ -422,7 +421,6 @@ export default function VFXAnalysisView({ projectId, onClose }: VFXAnalysisViewP
                             ))}
                           </div>
                         </div>
-                      )}
                     </CardContent>
                   </Card>
                 );
