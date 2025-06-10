@@ -337,13 +337,13 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
     } catch (error) {
       console.error('Scene extraction error:', error);
       console.error('Error details:', {
-        message: error.message,
-        stack: error.stack,
-        projectId
+        message: (error as Error).message,
+        stack: (error as Error).stack,
+        projectId: req.body.projectId
       });
       res.status(500).json({ 
         error: 'Failed to extract scenes from script',
-        details: error.message 
+        details: (error as Error).message 
       });
     }
   });
