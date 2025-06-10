@@ -53,23 +53,44 @@ export class ImagenGenerator {
       console.log("[Imagen] Raw output from Imagen-4:", JSON.stringify(output));
       console.log("[Imagen] Output type:", typeof output);
       
-      // Replicate returns the image URL as a string
+      // Replicate for Imagen-4 returns a single URL string
       let imageUrl: string;
-      if (typeof output === 'string') {
+      
+      if (typeof output === 'string' && output.startsWith('http')) {
         imageUrl = output;
-      } else if (Array.isArray(output) && output.length > 0) {
-        imageUrl = output[0];
-      } else if (output && typeof output === 'object' && 'url' in output) {
-        imageUrl = (output as any).url;
+      } else if (Array.isArray(output)) {
+        // Find the first valid URL in the array
+        const validUrl = output.find(item => 
+          typeof item === 'string' && item.startsWith('http')
+        );
+        if (validUrl) {
+          imageUrl = validUrl;
+        } else {
+          throw new Error(`Array output contains no valid URLs: ${JSON.stringify(output)}`);
+        }
+      } else if (output && typeof output === 'object') {
+        // Check for common URL properties
+        const urlFields = ['url', 'image_url', 'output_url', 'result'];
+        let found = false;
+        for (const field of urlFields) {
+          if (field in output && typeof (output as any)[field] === 'string') {
+            imageUrl = (output as any)[field];
+            found = true;
+            break;
+          }
+        }
+        if (!found) {
+          throw new Error(`Object output has no valid URL field: ${JSON.stringify(output)}`);
+        }
       } else {
-        imageUrl = String(output);
+        throw new Error(`Unexpected output format: ${typeof output} - ${JSON.stringify(output)}`);
       }
 
-      if (!imageUrl || imageUrl === '{}' || imageUrl === 'null' || imageUrl === 'undefined') {
-        throw new Error("No valid image URL returned from Imagen-4");
+      if (!imageUrl || !imageUrl.startsWith('http')) {
+        throw new Error(`Invalid image URL format: ${imageUrl}`);
       }
 
-      console.log("[Imagen] Successfully generated image, URL:", imageUrl);
+      console.log("[Imagen] Successfully generated image, URL:", imageUrl.substring(0, 100) + "...");
       return imageUrl;
 
     } catch (error: any) {
