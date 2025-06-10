@@ -209,16 +209,39 @@ VISUAL REQUIREMENTS:
 Style: Professional film storyboard, cinematic lighting, movie production quality`;
 
     try {
-      // Import and use SDXL-style image generator for more reliable results
-      const { sdxlGenerator } = await import('./sdxl-image-generator');
-      const imageUrl = await sdxlGenerator.generateImage({
-        prompt: storyboardPrompt,
-        width: 1024,
-        height: 1024
-      });
+      // Generate image using DALL-E 3 for high-quality storyboard images with retry logic
+      let response;
+      let retries = 0;
+      const maxRetries = 3;
+      
+      while (retries < maxRetries) {
+        try {
+          response = await openai.images.generate({
+            model: "dall-e-3",
+            prompt: storyboardPrompt,
+            n: 1,
+            size: "1024x1024",
+            quality: "standard",
+            style: "natural"
+          });
+          break; // Success, exit retry loop
+        } catch (error: any) {
+          retries++;
+          if (retries >= maxRetries) {
+            throw error; // Final retry failed
+          }
+          
+          // Exponential backoff: 2s, 4s, 8s
+          const delay = Math.pow(2, retries) * 1000;
+          console.log(`[Storyboard] Retry ${retries}/${maxRetries} for scene ${sceneId} after ${delay}ms delay`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+        }
+      }
+
+      const imageUrl = response?.data[0]?.url;
 
       if (!imageUrl) {
-        throw new Error("No image URL returned from OpenAI");
+        throw new Error("No image URL returned from DALL-E 3");
       }
 
       // Save storyboard image to database
@@ -291,28 +314,21 @@ Style: Professional film storyboard, cinematic lighting, movie production qualit
 
     console.log(`[Storyboard] Generating ${scenesToGenerate.length} new images`);
 
-    // Process scenes in parallel batches using SDXL-style generation for better reliability
-    const BATCH_SIZE = 5; // Increase batch size since SDXL is more reliable
-    for (let i = 0; i < scenesToGenerate.length; i += BATCH_SIZE) {
-      const batch = scenesToGenerate.slice(i, i + BATCH_SIZE);
-      
-      // Generate images in parallel for this batch
-      const batchPromises = batch.map(async (scene) => {
-        try {
-          console.log(`[Storyboard] Generating image for scene ${scene.sceneNumber}`);
-          await this.generateSceneStoryboard(scene.id);
-          console.log(`[Storyboard] Completed image for scene ${scene.sceneNumber}`);
-        } catch (error) {
-          console.error(`[Storyboard] Failed to generate image for scene ${scene.sceneNumber}:`, error);
+    // Process scenes one at a time for better quality control and API stability
+    for (let i = 0; i < scenesToGenerate.length; i++) {
+      const scene = scenesToGenerate[i];
+      try {
+        console.log(`[Storyboard] Generating image for scene ${scene.sceneNumber} (${i + 1}/${scenesToGenerate.length})`);
+        await this.generateSceneStoryboard(scene.id);
+        console.log(`[Storyboard] Completed image for scene ${scene.sceneNumber}`);
+        
+        // Small delay between requests to respect API limits
+        if (i + 1 < scenesToGenerate.length) {
+          await new Promise(resolve => setTimeout(resolve, 2000)); // 2 second delay between images
         }
-      });
-
-      // Wait for this batch to complete
-      await Promise.all(batchPromises);
-      
-      // Small delay between batches to be respectful to API limits
-      if (i + BATCH_SIZE < scenesToGenerate.length) {
-        await new Promise(resolve => setTimeout(resolve, 1000)); // 1 second delay between batches
+      } catch (error) {
+        console.error(`[Storyboard] Failed to generate image for scene ${scene.sceneNumber}:`, error);
+        // Continue with next scene even if one fails
       }
     }
 
