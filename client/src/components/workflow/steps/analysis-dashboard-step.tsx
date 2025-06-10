@@ -638,7 +638,7 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
                       </div>
 
                       {/* Locations Column */}
-                      <div className="col-span-3 flex flex-col items-center justify-start">
+                      <div className="col-span-3 flex flex-col items-center justify-center">
                         <div className="space-y-2 w-full max-w-xs">
                           {segment.keyLocations?.map((location: string, i: number) => (
                             <Badge key={i} variant="outline" className="block text-xs bg-emerald-50/80 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-800 px-2.5 py-1.5 font-medium text-center w-full">
@@ -649,7 +649,7 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
                       </div>
 
                       {/* Characters Column */}
-                      <div className="col-span-3 flex flex-col items-center justify-start">
+                      <div className="col-span-3 flex flex-col items-center justify-center">
                         <div className="space-y-2 w-full max-w-xs">
                           {segment.mainCharacters?.map((character: string, i: number) => (
                             <Badge key={i} variant="outline" className="block text-xs bg-blue-50/80 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-800 px-2.5 py-1.5 font-medium text-center w-full">
