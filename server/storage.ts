@@ -18,6 +18,10 @@ import {
   brandUsers,
   financierUsers,
   creatorUsers,
+  vfxNeeds,
+  castingAnalysis,
+  castingSelections,
+  sceneBreakdowns,
   type User, 
   type InsertUser, 
   type ProductionProfile,
@@ -56,7 +60,7 @@ import {
   type CreatorUser
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, sql, and } from "drizzle-orm";
+import { eq, desc, sql, and, exists } from "drizzle-orm";
 
 export interface IStorage {
   // User authentication (legacy)
@@ -738,13 +742,24 @@ export class DatabaseStorage implements IStorage {
       // Delete project history records first
       await db.delete(projectHistory).where(eq(projectHistory.projectId, id));
       
-      // Delete other related records
+      // Delete records that reference scenes first (to avoid foreign key constraint violations)
+      await db.delete(productPlacements).where(eq(productPlacements.projectId, id));
+      await db.delete(locationSuggestions).where(eq(locationSuggestions.projectId, id));
+      
+      // Delete scene variations for scenes belonging to this project
+      const projectScenes = await db.select({ id: scenes.id }).from(scenes).where(eq(scenes.projectId, id));
+      for (const scene of projectScenes) {
+        await db.delete(sceneVariations).where(eq(sceneVariations.sceneId, scene.id));
+      }
+      
+      // Delete other analysis records
+      await db.delete(actorSuggestions).where(eq(actorSuggestions.projectId, id));
+      await db.delete(characterRelationships).where(eq(characterRelationships.projectId, id));
+      
+      // Now delete core records
       await db.delete(scenes).where(eq(scenes.projectId, id));
       await db.delete(characters).where(eq(characters.projectId, id));
       await db.delete(financialPlans).where(eq(financialPlans.projectId, id));
-      
-      // Delete actor suggestions that reference this project
-      await db.delete(actorSuggestions).where(eq(actorSuggestions.projectId, id));
       
       // Finally delete the project
       const result = await db.delete(projects).where(eq(projects.id, id));
