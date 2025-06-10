@@ -436,8 +436,17 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
               
               const extractionResult = await extractTextAndPageCount(pdfBuffer);
               extractedText = extractionResult.text;
+              const actualPageCount = extractionResult.pageCount;
               
-              console.log(`Extracted ${extractedText?.length || 0} characters for scene breakdown`);
+              console.log(`Extracted ${extractedText?.length || 0} characters from ${actualPageCount} pages for scene breakdown`);
+              
+              // Update project with extracted content and page count
+              await db.update(projects)
+                .set({ 
+                  scriptContent: extractedText,
+                  pageCount: actualPageCount 
+                })
+                .where(eq(projects.id, parseInt(projectId)));
             }
           }
           
