@@ -1010,6 +1010,29 @@ Respond in JSON format with this structure:
     }
   });
 
+  // Get existing VFX analysis results
+  app.get('/api/projects/:projectId/vfx-analysis', async (req: Request, res: Response) => {
+    try {
+      const { projectId } = req.params;
+      
+      // Get stored VFX needs for this project
+      const existingVfxNeeds = await db
+        .select()
+        .from(vfxNeeds)
+        .where(eq(vfxNeeds.projectId, parseInt(projectId)));
+
+      res.json({
+        success: true,
+        vfxNeeds: existingVfxNeeds,
+        totalEstimatedCost: existingVfxNeeds.reduce((total, vfx) => total + (vfx.estimatedCost || 0), 0)
+      });
+
+    } catch (error) {
+      console.error('Error fetching VFX analysis:', error);
+      res.status(500).json({ error: 'Failed to fetch VFX analysis' });
+    }
+  });
+
   // VFX Cost Estimation
   app.post('/api/script-analysis/vfx_cost_estimate', async (req: Request, res: Response) => {
     try {

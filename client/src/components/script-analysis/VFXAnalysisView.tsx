@@ -58,24 +58,54 @@ export default function VFXAnalysisView({ projectId, onClose }: VFXAnalysisViewP
     },
   });
 
+  // Fetch existing VFX analysis results
+  const { data: existingVfxData } = useQuery({
+    queryKey: ['/api/projects', projectId, 'vfx-analysis'],
+    queryFn: async () => {
+      const response = await fetch(`/api/projects/${projectId}/vfx-analysis`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch VFX analysis');
+      }
+      return response.json();
+    },
+  });
+
   // Initialize VFX scenes when scenes data is loaded
   useEffect(() => {
     if (scenes && scenes.length > 0 && vfxScenes.length === 0) {
-      // Auto-initialize with scene data, marking scenes with VFX needs
-      const initialVfxScenes: VFXSceneAnalysis[] = scenes.map((scene: any) => {
-        const hasVfx = scene.vfxNeeds && scene.vfxNeeds.length > 0;
-        return {
-          sceneId: scene.id,
-          isVfxScene: hasVfx,
-          vfxDescription: hasVfx ? scene.vfxNeeds.join(', ') : '',
-          selectedQuality: null
-        };
-      });
-      
-      setVfxScenes(initialVfxScenes);
-      setAnalysisComplete(true); // Always show the grid when scenes are loaded
+      // Use existing VFX analysis results if available
+      if (existingVfxData && existingVfxData.vfxNeeds && existingVfxData.vfxNeeds.length > 0) {
+        const vfxAnalysisResults: VFXSceneAnalysis[] = scenes.map((scene: any) => {
+          const vfxData = existingVfxData.vfxNeeds.find((vfx: any) => vfx.sceneId === scene.id);
+          const hasVfx = vfxData && vfxData.estimatedCost > 0;
+          
+          return {
+            sceneId: scene.id,
+            isVfxScene: hasVfx,
+            vfxDescription: hasVfx ? vfxData.description || vfxData.vfxType || '' : '',
+            selectedQuality: null
+          };
+        });
+        
+        setVfxScenes(vfxAnalysisResults);
+        setAnalysisComplete(true);
+      } else {
+        // Fallback to basic initialization
+        const initialVfxScenes: VFXSceneAnalysis[] = scenes.map((scene: any) => {
+          const hasVfx = scene.vfxNeeds && scene.vfxNeeds.length > 0;
+          return {
+            sceneId: scene.id,
+            isVfxScene: hasVfx,
+            vfxDescription: hasVfx ? scene.vfxNeeds.join(', ') : '',
+            selectedQuality: null
+          };
+        });
+        
+        setVfxScenes(initialVfxScenes);
+        setAnalysisComplete(true);
+      }
     }
-  }, [scenes, vfxScenes.length]);
+  }, [scenes, existingVfxData, vfxScenes.length]);
 
   // VFX analysis mutation
   const vfxAnalysisMutation = useMutation({
@@ -92,14 +122,17 @@ export default function VFXAnalysisView({ projectId, onClose }: VFXAnalysisViewP
       return response.json();
     },
     onSuccess: (data) => {
-      // Process VFX analysis results
-      if (scenes) {
+      // Process VFX analysis results from API response
+      if (data && data.vfxNeeds && scenes) {
         const vfxAnalysisResults: VFXSceneAnalysis[] = scenes.map(scene => {
-          const hasVfx = scene.vfxNeeds && scene.vfxNeeds.length > 0;
+          // Find VFX analysis for this scene from API response
+          const vfxData = data.vfxNeeds.find((vfx: any) => vfx.sceneId === scene.id);
+          const hasVfx = vfxData && vfxData.estimatedCost > 0;
+          
           return {
             sceneId: scene.id,
             isVfxScene: hasVfx,
-            vfxDescription: hasVfx ? scene.vfxNeeds.join(', ') : '',
+            vfxDescription: hasVfx ? vfxData.description || vfxData.vfxType || '' : '',
             selectedQuality: null
           };
         });
@@ -107,9 +140,10 @@ export default function VFXAnalysisView({ projectId, onClose }: VFXAnalysisViewP
         setVfxScenes(vfxAnalysisResults);
         setAnalysisComplete(true);
         
+        const vfxCount = vfxAnalysisResults.filter(s => s.isVfxScene).length;
         toast({
           title: "VFX Analysis Complete",
-          description: `Identified ${vfxAnalysisResults.filter(s => s.isVfxScene).length} scenes requiring VFX work.`
+          description: `Identified ${vfxCount} scenes requiring VFX work.`
         });
       }
     },
