@@ -38,7 +38,14 @@ export async function extractAndSaveScriptText(projectId: number): Promise<strin
       const pdfBuffer = Buffer.from(projectData.pdfFileData, 'base64');
       
       console.log(`Starting PDF extraction for buffer of ${pdfBuffer.length} bytes`);
-      const result = await extractTextAndPageCount(pdfBuffer);
+      
+      // Use a timeout to prevent hanging extractions
+      const extractionPromise = extractTextAndPageCount(pdfBuffer);
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('PDF extraction timeout')), 60000)
+      );
+      
+      const result = await Promise.race([extractionPromise, timeoutPromise]);
       console.log(`PDF extraction completed. Text length: ${result.text?.length || 0}, Pages: ${result.pageCount}`);
       
       if (result.text && result.text.length > 100) {
