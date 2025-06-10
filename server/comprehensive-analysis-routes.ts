@@ -182,54 +182,9 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
         });
       }
 
-      // Check if we have already extracted script content (from scene breakdown)
-      const projectData = await db.select().from(projects).where(eq(projects.id, parseInt(projectId))).limit(1);
-      if (!projectData.length) {
-        return res.status(404).json({ error: 'Project not found' });
-      }
-
-      let extractedContent = projectData[0].scriptContent;
-
-      // If we have already extracted text content, use it directly without re-processing PDF
-      if (extractedContent && !extractedContent.startsWith('PDF_UPLOADED:')) {
-        console.log(`Using already-extracted script content (${extractedContent.length} characters) for scene extraction`);
-        
-        // Use lightweight scene extraction from the already-extracted text
-        const lightweightScenes = parseBasicScenes(extractedContent);
-        
-        // Save scenes to database for future use
-        const scenesToSave = lightweightScenes.map((scene, index) => ({
-          projectId: parseInt(projectId),
-          sceneNumber: index + 1,
-          location: scene.location || 'UNSPECIFIED',
-          timeOfDay: scene.timeOfDay || null,
-          description: scene.description || null,
-          plotSummary: scene.content ? scene.content.substring(0, 200) + '...' : null,
-          characters: scene.characters || [],
-          content: scene.content || null,
-          pageStart: scene.pageStart || null,
-          pageEnd: scene.pageEnd || null,
-          duration: scene.duration || null,
-          vfxNeeds: [],
-          productPlacementOpportunities: []
-        }));
-
-        if (scenesToSave.length > 0) {
-          await db.insert(scenes).values(scenesToSave);
-          console.log(`Saved ${scenesToSave.length} scenes to database from extracted content`);
-        }
-
-        return res.json({
-          success: true,
-          scenes: scenesToSave,
-          totalScenes: scenesToSave.length,
-          estimatedDuration: project[0].pageCount || scenesToSave.length,
-          fromExtractedContent: true
-        });
-      }
-
-      // Continue with PDF extraction for new projects
-      if (!project[0].scriptContent) {
+      // Get project and script content from database
+      const project = await db.select().from(projects).where(eq(projects.id, parseInt(projectId))).limit(1);
+      if (!project.length || !project[0].scriptContent) {
         return res.status(400).json({ error: 'Project not found or no script content available' });
       }
 
@@ -539,11 +494,10 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
           
           scriptContent = extractedText;
           
-          // Update the project with extracted content and page count
+          // Update the project with extracted content 
           await db.update(projects)
             .set({ 
               scriptContent: extractedText,
-              pageCount: extractionResult.pageCount,
               updatedAt: new Date()
             })
             .where(eq(projects.id, parseInt(projectId)));
