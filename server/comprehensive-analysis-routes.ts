@@ -412,32 +412,90 @@ export function registerComprehensiveAnalysisRoutes(app: any) {
         return res.status(400).json({ error: 'Project ID is required' });
       }
 
-      // Get existing scenes from database
+      // Get project and script content from database
+      const project = await db.select().from(projects).where(eq(projects.id, parseInt(projectId))).limit(1);
+      if (!project.length || !project[0].scriptContent) {
+        return res.status(400).json({ error: 'Project not found or no script content available' });
+      }
+
+      let scriptContent = project[0].scriptContent;
+
+      // Check if this is a PDF metadata format (on-demand extraction needed)
+      if (scriptContent && scriptContent.startsWith('PDF_UPLOADED:')) {
+        try {
+          let extractedText = null;
+          
+          // Method 1: Try extracting from stored PDF data
+          if (project[0].pdfFileData || project[0].scriptFileData) {
+            const pdfData = project[0].pdfFileData || project[0].scriptFileData;
+            
+            if (pdfData) {
+              console.log(`Attempting extraction from stored PDF data for scene breakdown`);
+              const { extractTextAndPageCount } = await import('./services/pdf-text-extractor');
+              const pdfBuffer = Buffer.from(pdfData, 'base64');
+              
+              const extractionResult = await extractTextAndPageCount(pdfBuffer);
+              extractedText = extractionResult.text;
+              
+              console.log(`Extracted ${extractedText?.length || 0} characters for scene breakdown`);
+            }
+          }
+          
+          if (!extractedText || extractedText.length < 100) {
+            return res.status(400).json({ 
+              error: 'Unable to extract text from PDF for scene breakdown analysis' 
+            });
+          }
+          
+          scriptContent = extractedText;
+          
+        } catch (extractionError) {
+          console.error('PDF extraction error for scene breakdown:', extractionError);
+          return res.status(400).json({ 
+            error: 'Failed to extract script content from PDF for analysis' 
+          });
+        }
+      }
+
+      // Check for existing scenes first, fallback to script content analysis
       const existingScenes = await db
         .select()
         .from(scenes)
         .where(eq(scenes.projectId, parseInt(projectId)))
         .orderBy(scenes.sceneNumber);
 
-      if (!existingScenes.length) {
-        return res.status(400).json({ 
-          error: 'No scenes found. Please run Scene Extraction first.' 
-        });
+      let scenesData;
+      
+      if (existingScenes.length > 0) {
+        // Use existing extracted scenes if available
+        scenesData = existingScenes.map(scene => ({
+          sceneNumber: scene.sceneNumber,
+          location: scene.location,
+          timeOfDay: scene.timeOfDay,
+          description: scene.description,
+          plotSummary: scene.plotSummary,
+          characters: scene.characters,
+          duration: scene.duration,
+          content: scene.content
+        }));
+      } else {
+        // Parse script content directly for scene breakdown
+        const basicScenes = parseBasicScenes(scriptContent);
+        scenesData = basicScenes.map((scene, index) => ({
+          sceneNumber: index + 1,
+          location: scene.location || 'UNSPECIFIED',
+          timeOfDay: scene.timeOfDay || 'UNSPECIFIED',
+          description: scene.description || `Scene ${index + 1}`,
+          plotSummary: scene.content.substring(0, 200) + '...',
+          characters: scene.characters || [],
+          duration: scene.duration || 1,
+          content: scene.content
+        }));
       }
 
       // Use OpenAI to analyze and group scenes into narrative segments
       const OpenAI = (await import('openai')).default;
       const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
-      const scenesData = existingScenes.map(scene => ({
-        sceneNumber: scene.sceneNumber,
-        location: scene.location,
-        timeOfDay: scene.timeOfDay,
-        description: scene.description,
-        plotSummary: scene.plotSummary,
-        characters: scene.characters,
-        duration: scene.duration
-      }));
 
       // Pre-analyze locations to help with grouping
       const locationAnalysis = scenesData.reduce((acc, scene, index) => {
