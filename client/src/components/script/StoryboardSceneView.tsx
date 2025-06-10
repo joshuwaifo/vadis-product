@@ -46,6 +46,11 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle, pag
   const [selectedScene, setSelectedScene] = useState<Scene | null>(scenes[0] || null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [backgroundGeneration, setBackgroundGeneration] = useState({
+    isGenerating: false,
+    completed: 0,
+    currentScene: ''
+  });
   const queryClient = useQueryClient();
 
   // Get storyboard image for the selected scene
@@ -99,14 +104,14 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle, pag
   });
 
   // Calculate generation progress
-  const storyboardImages = allStoryboardData?.storyboardImages || [];
+  const storyboardImages = (allStoryboardData as any)?.storyboardImages || [];
   const completedScenes = storyboardImages.length;
   const totalScenes = scenes.length;
   const generationProgress = totalScenes > 0 ? Math.round((completedScenes / totalScenes) * 100) : 0;
   const isGenerating = completedScenes < totalScenes;
 
   // Find existing storyboard image for current scene
-  const currentSceneImage = storyboardImages.find(img => 
+  const currentSceneImage = storyboardImages.find((img: any) => 
     img.sceneId === parseInt(selectedScene?.id || '0')
   );
 
@@ -143,7 +148,7 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle, pag
         }));
       }
     }
-  }, [projectId, scenes.length, existingImages?.length]);
+  }, [projectId, scenes.length, storyboardImages?.length]);
 
   // Auto-play functionality
   useEffect(() => {
