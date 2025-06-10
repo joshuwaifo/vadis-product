@@ -58,6 +58,25 @@ export default function VFXAnalysisView({ projectId, onClose }: VFXAnalysisViewP
     },
   });
 
+  // Initialize VFX scenes when scenes data is loaded
+  useEffect(() => {
+    if (scenes && scenes.length > 0 && vfxScenes.length === 0) {
+      // Auto-initialize with scene data, marking scenes with VFX needs
+      const initialVfxScenes: VFXSceneAnalysis[] = scenes.map((scene: any) => {
+        const hasVfx = scene.vfxNeeds && scene.vfxNeeds.length > 0;
+        return {
+          sceneId: scene.id,
+          isVfxScene: hasVfx,
+          vfxDescription: hasVfx ? scene.vfxNeeds.join(', ') : '',
+          selectedQuality: null
+        };
+      });
+      
+      setVfxScenes(initialVfxScenes);
+      setAnalysisComplete(true); // Always show the grid when scenes are loaded
+    }
+  }, [scenes, vfxScenes.length]);
+
   // VFX analysis mutation
   const vfxAnalysisMutation = useMutation({
     mutationFn: async () => {
