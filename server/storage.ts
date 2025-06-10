@@ -13,7 +13,6 @@ import {
   productPlacements,
   locationSuggestions,
   financialPlans,
-  sceneVariations,
   productionUsers,
   brandUsers,
   financierUsers,
@@ -48,8 +47,7 @@ import {
   type InsertLocationSuggestion,
   type FinancialPlan,
   type InsertFinancialPlan,
-  type SceneVariation,
-  type InsertSceneVariation,
+
   type UserRole,
   type ProductionUser,
   projectHistory,
@@ -745,16 +743,13 @@ export class DatabaseStorage implements IStorage {
       // Delete records that reference scenes first (to avoid foreign key constraint violations)
       await db.delete(productPlacements).where(eq(productPlacements.projectId, id));
       await db.delete(locationSuggestions).where(eq(locationSuggestions.projectId, id));
-      
-      // Delete scene variations for scenes belonging to this project
-      const projectScenes = await db.select({ id: scenes.id }).from(scenes).where(eq(scenes.projectId, id));
-      for (const scene of projectScenes) {
-        await db.delete(sceneVariations).where(eq(sceneVariations.sceneId, scene.id));
-      }
+      await db.delete(vfxNeeds).where(eq(vfxNeeds.projectId, id));
       
       // Delete other analysis records
+      await db.delete(castingAnalysis).where(eq(castingAnalysis.projectId, id));
+      await db.delete(castingSelections).where(eq(castingSelections.projectId, id));
       await db.delete(actorSuggestions).where(eq(actorSuggestions.projectId, id));
-      await db.delete(characterRelationships).where(eq(characterRelationships.projectId, id));
+      await db.delete(sceneBreakdowns).where(eq(sceneBreakdowns.projectId, id));
       
       // Now delete core records
       await db.delete(scenes).where(eq(scenes.projectId, id));
