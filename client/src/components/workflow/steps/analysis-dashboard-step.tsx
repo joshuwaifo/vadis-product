@@ -751,6 +751,7 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
         onClose={() => setShowStoryboard(false)}
         projectTitle={project?.title || 'Script Analysis'}
         pageCount={project?.pageCount}
+        projectId={workflow?.projectId}
       />
     );
   }

@@ -19,6 +19,7 @@ import { registerScriptAnalysisRoutes } from "./script-analysis-routes";
 import { registerWorkflowRoutes } from "./workflow-routes";
 import { registerComprehensiveAnalysisRoutes } from "./comprehensive-analysis-routes";
 import { registerScriptGenerationRoutes } from "./script-generation-routes";
+import { registerStoryboardRoutes } from "./storyboard-routes";
 
 // Simple authentication middleware
 function requireAuth(req: any, res: any, next: any) {
@@ -617,6 +618,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   registerWorkflowRoutes(app);
   registerComprehensiveAnalysisRoutes(app);
   registerScriptGenerationRoutes(app);
+  registerStoryboardRoutes(app);
 
   const httpServer = createServer(app);
 

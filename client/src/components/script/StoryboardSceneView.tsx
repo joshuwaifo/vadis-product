@@ -4,9 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   Play, Pause, SkipForward, SkipBack, Maximize2, 
-  Clock, MapPin, Users, Camera, X, Info
+  Clock, MapPin, Users, Camera, X, Info, Image as ImageIcon, Loader2
 } from 'lucide-react';
 
 interface Scene {
@@ -29,12 +30,51 @@ interface StoryboardSceneViewProps {
   onClose: () => void;
   projectTitle: string;
   pageCount?: number;
+  projectId?: number;
 }
 
-export default function StoryboardSceneView({ scenes, onClose, projectTitle, pageCount }: StoryboardSceneViewProps) {
+interface StoryboardImage {
+  id: number;
+  sceneId: number;
+  imageUrl: string;
+  prompt: string;
+  charactersPresent: string[];
+  generatedAt: Date;
+}
+
+export default function StoryboardSceneView({ scenes, onClose, projectTitle, pageCount, projectId }: StoryboardSceneViewProps) {
   const [selectedScene, setSelectedScene] = useState<Scene | null>(scenes[0] || null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const queryClient = useQueryClient();
+
+  // Get storyboard image for the selected scene
+  const { data: storyboardImage, isLoading: imageLoading } = useQuery({
+    queryKey: ['storyboard', selectedScene?.id],
+    queryFn: async () => {
+      if (!selectedScene) return null;
+      const response = await fetch(`/api/scenes/${selectedScene.id}/storyboard`);
+      if (response.status === 404) return null; // No image exists yet
+      if (!response.ok) throw new Error('Failed to fetch storyboard image');
+      const data = await response.json();
+      return data.storyboardImage as StoryboardImage;
+    },
+    enabled: !!selectedScene
+  });
+
+  // Generate storyboard image mutation
+  const generateImageMutation = useMutation({
+    mutationFn: async (sceneId: string) => {
+      const response = await fetch(`/api/scenes/${sceneId}/storyboard`, {
+        method: 'POST'
+      });
+      if (!response.ok) throw new Error('Failed to generate storyboard image');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['storyboard', selectedScene?.id] });
+    }
+  });
 
   // Auto-play functionality
   useEffect(() => {
@@ -167,14 +207,111 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle, pag
               </div>
 
               {/* Scene Content */}
-              <div className="flex-1 bg-gray-900/50 rounded-xl p-3 sm:p-6 border border-gray-800 min-h-0">
-                <ScrollArea className="h-full">
-                  <div className="prose prose-invert max-w-none">
-                    <div className="whitespace-pre-wrap text-gray-200 text-xs sm:text-sm lg:text-lg leading-6 sm:leading-7 lg:leading-8 font-mono">
-                      {selectedScene.content}
+              <div className="flex-1 bg-gray-900/50 rounded-xl p-3 sm:p-6 border border-gray-800 min-h-0 flex flex-col gap-4 sm:gap-6">
+                {/* Script Content */}
+                <div className="flex-1 min-h-0">
+                  <ScrollArea className="h-full">
+                    <div className="prose prose-invert max-w-none">
+                      <div className="whitespace-pre-wrap text-gray-200 text-xs sm:text-sm lg:text-lg leading-6 sm:leading-7 lg:leading-8 font-mono">
+                        {selectedScene.content}
+                      </div>
                     </div>
+                  </ScrollArea>
+                </div>
+
+                {/* Storyboard Image Section */}
+                <div className="flex-shrink-0">
+                  <div className="flex items-center gap-3 mb-3">
+                    <Camera className="h-4 w-4 text-blue-400" />
+                    <h3 className="text-sm sm:text-base font-semibold text-white">Storyboard Frame</h3>
+                    {!storyboardImage && !imageLoading && (
+                      <Button
+                        size="sm"
+                        onClick={() => selectedScene && generateImageMutation.mutate(selectedScene.id)}
+                        disabled={generateImageMutation.isPending}
+                        className="bg-blue-600 hover:bg-blue-700 text-white"
+                      >
+                        {generateImageMutation.isPending ? (
+                          <>
+                            <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                            Generating...
+                          </>
+                        ) : (
+                          <>
+                            <ImageIcon className="h-3 w-3 mr-1" />
+                            Generate Image
+                          </>
+                        )}
+                      </Button>
+                    )}
                   </div>
-                </ScrollArea>
+
+                  {/* Image Display Area */}
+                  <div className="relative">
+                    {imageLoading && (
+                      <div className="aspect-video bg-gray-800 rounded-lg flex items-center justify-center border border-gray-700">
+                        <div className="text-center text-gray-400">
+                          <Loader2 className="h-8 w-8 mx-auto mb-2 animate-spin" />
+                          <p className="text-sm">Loading storyboard...</p>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {storyboardImage && (
+                      <div className="space-y-3">
+                        <div className="relative">
+                          <img
+                            src={storyboardImage.imageUrl}
+                            alt={`Storyboard for Scene ${selectedScene?.sceneNumber}`}
+                            className="w-full aspect-video object-cover rounded-lg border border-gray-700"
+                            onError={(e) => {
+                              console.error('Failed to load storyboard image');
+                              e.currentTarget.style.display = 'none';
+                            }}
+                          />
+                          {/* Character tags overlay */}
+                          {storyboardImage.charactersPresent && storyboardImage.charactersPresent.length > 0 && (
+                            <div className="absolute bottom-2 left-2 flex flex-wrap gap-1">
+                              {storyboardImage.charactersPresent.map((character, idx) => (
+                                <Badge key={idx} variant="secondary" className="text-xs bg-black/60 text-white border-gray-600">
+                                  {character}
+                                </Badge>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        
+                        {/* Image metadata */}
+                        <div className="text-xs text-gray-400 space-y-1">
+                          <p><span className="text-gray-300">Generated:</span> {new Date(storyboardImage.generatedAt).toLocaleString()}</p>
+                          {storyboardImage.charactersPresent && storyboardImage.charactersPresent.length > 0 && (
+                            <p><span className="text-gray-300">Characters:</span> {storyboardImage.charactersPresent.join(', ')}</p>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {!storyboardImage && !imageLoading && !generateImageMutation.isPending && (
+                      <div className="aspect-video bg-gray-800 rounded-lg flex items-center justify-center border border-gray-700 border-dashed">
+                        <div className="text-center text-gray-400">
+                          <ImageIcon className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                          <p className="text-sm font-medium mb-1">No storyboard image</p>
+                          <p className="text-xs">Click "Generate Image" to create a visual representation</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {generateImageMutation.isPending && (
+                      <div className="aspect-video bg-gray-800 rounded-lg flex items-center justify-center border border-gray-700">
+                        <div className="text-center text-gray-400">
+                          <Loader2 className="h-12 w-12 mx-auto mb-3 animate-spin" />
+                          <p className="text-sm font-medium mb-1">Generating storyboard frame...</p>
+                          <p className="text-xs">Creating character-consistent visualization</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
 
               {/* Scene Metadata */}
