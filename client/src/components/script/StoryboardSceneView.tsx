@@ -126,6 +126,17 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle, pag
           currentScene: scenes[existingCount]?.description || `Scene ${scenes[existingCount]?.sceneNumber}`
         }));
         generateAllImagesMutation.mutate(projectId);
+        
+        // Set up polling to refresh images as they become available
+        const pollForNewImages = () => {
+          queryClient.invalidateQueries({ queryKey: ['project-storyboard', projectId] });
+          queryClient.invalidateQueries({ queryKey: ['scene-storyboard'] });
+        };
+        
+        const pollInterval = setInterval(pollForNewImages, 2000); // Poll every 2 seconds
+        
+        // Clear interval when component unmounts or generation completes
+        return () => clearInterval(pollInterval);
       } else {
         setBackgroundGeneration(prev => ({
           ...prev,
@@ -205,8 +216,13 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle, pag
                       {backgroundGeneration.completed}/{backgroundGeneration.total}
                     </span>
                   </div>
-                  <div className="text-xs text-gray-400 hidden sm:block">Generating Images</div>
-                  <div className="text-xs text-gray-400 sm:hidden">Images</div>
+                  <div className="text-xs text-gray-400 hidden sm:block">AI Generating</div>
+                  <div className="text-xs text-gray-400 sm:hidden">AI Gen</div>
+                  {backgroundGeneration.currentScene && (
+                    <div className="text-xs text-blue-300 mt-1 max-w-20 truncate">
+                      {backgroundGeneration.currentScene}
+                    </div>
+                  )}
                 </div>
               )}
             </div>
