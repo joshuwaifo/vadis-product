@@ -1010,6 +1010,71 @@ Respond in JSON format with this structure:
     }
   });
 
+  // VFX Cost Estimation
+  app.post('/api/script-analysis/vfx_cost_estimate', async (req: Request, res: Response) => {
+    try {
+      const { projectId, selectedScenes } = req.body;
+      
+      if (!projectId || !selectedScenes || selectedScenes.length === 0) {
+        return res.status(400).json({ error: 'Project ID and selected scenes are required' });
+      }
+
+      let totalCost = 0;
+      const costBreakdown = [];
+
+      for (const selectedScene of selectedScenes) {
+        const { sceneId, quality, vfxDescription } = selectedScene;
+        
+        // Get base cost estimates by quality
+        let baseCost = 0;
+        switch (quality) {
+          case 'low':
+            baseCost = Math.floor(Math.random() * 10000) + 5000; // $5k-$15k
+            break;
+          case 'medium':
+            baseCost = Math.floor(Math.random() * 55000) + 20000; // $20k-$75k
+            break;
+          case 'high':
+            baseCost = Math.floor(Math.random() * 400000) + 100000; // $100k-$500k
+            break;
+          default:
+            baseCost = 10000;
+        }
+
+        // Add complexity multiplier based on VFX description
+        const complexityKeywords = ['explosion', 'magic', 'transformation', 'superhero', 'space', 'alien', 'robot', 'monster'];
+        const hasComplexKeywords = complexityKeywords.some(keyword => 
+          vfxDescription.toLowerCase().includes(keyword)
+        );
+        
+        if (hasComplexKeywords) {
+          baseCost *= 1.5;
+        }
+
+        const sceneCost = Math.floor(baseCost);
+        totalCost += sceneCost;
+        
+        costBreakdown.push({
+          sceneId,
+          quality,
+          cost: sceneCost,
+          description: vfxDescription
+        });
+      }
+
+      res.json({
+        success: true,
+        totalCost: Math.floor(totalCost),
+        costBreakdown,
+        selectedScenesCount: selectedScenes.length
+      });
+
+    } catch (error) {
+      console.error('VFX cost estimation error:', error);
+      res.status(500).json({ error: 'Failed to estimate VFX costs' });
+    }
+  });
+
   // AI Product Placement - Identify brandable scenes
   app.post('/api/script-analysis/identify_brandable_scenes', async (req: Request, res: Response) => {
     try {

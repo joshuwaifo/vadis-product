@@ -16,6 +16,7 @@ import StoryboardSceneView from '@/components/script/StoryboardSceneView';
 import CharacterAnalysisView from '@/components/script-analysis/CharacterAnalysisView';
 import CastingAnalysisView from '@/components/script-analysis/CastingAnalysisView';
 import ProductPlacementView from '@/components/script-analysis/ProductPlacementView';
+import VFXAnalysisView from '@/components/script-analysis/VFXAnalysisView';
 
 // Define types directly in this file since the server types are not accessible from client
 interface AnalysisTask {
