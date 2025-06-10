@@ -318,6 +318,28 @@ export const sceneVariations = pgTable("scene_variations", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Character profiles for consistent visual representation in storyboards
+export const characterProfiles = pgTable("character_profiles", {
+  id: serial("id").primaryKey(),
+  projectId: integer("project_id").notNull().references(() => projects.id, { onDelete: "cascade" }),
+  characterName: text("character_name").notNull(),
+  physicalDescription: text("physical_description").notNull(),
+  costumeDescription: text("costume_description").notNull(),
+  visualStyle: text("visual_style").notNull(),
+  referenceImageUrl: text("reference_image_url"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Storyboard images with character consistency
+export const storyboardImages = pgTable("storyboard_images", {
+  id: serial("id").primaryKey(),
+  sceneId: integer("scene_id").notNull().references(() => scenes.id, { onDelete: "cascade" }),
+  imageUrl: text("image_url").notNull(),
+  prompt: text("prompt").notNull(),
+  charactersPresent: text("characters_present").array(),
+  generatedAt: timestamp("generated_at").defaultNow(),
+});
+
 
 
 // Zod schemas for validation
@@ -376,6 +398,16 @@ export const insertSceneVariationSchema = createInsertSchema(sceneVariations).om
   id: true,
   createdAt: true,
   updatedAt: true,
+});
+
+export const insertCharacterProfileSchema = createInsertSchema(characterProfiles).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertStoryboardImageSchema = createInsertSchema(storyboardImages).omit({
+  id: true,
+  generatedAt: true,
 });
 
 export const insertSceneBreakdownSchema = createInsertSchema(sceneBreakdowns).omit({
