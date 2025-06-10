@@ -76,6 +76,66 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle, pag
     }
   });
 
+  // Auto-generate all storyboard images in background when component mounts
+  const generateAllImagesMutation = useMutation({
+    mutationFn: async (projectId: number) => {
+      const response = await fetch(`/api/projects/${projectId}/storyboard/generate`, {
+        method: 'POST'
+      });
+      if (!response.ok) throw new Error('Failed to generate project storyboard');
+      return response.json();
+    },
+    onSuccess: () => {
+      // Invalidate all storyboard queries to refresh the UI
+      queryClient.invalidateQueries({ queryKey: ['storyboard'] });
+    }
+  });
+
+  // Track background generation progress
+  const [backgroundGeneration, setBackgroundGeneration] = useState({
+    isGenerating: false,
+    completed: 0,
+    total: scenes.length,
+    currentScene: ''
+  });
+
+  // Get existing storyboard images for the project to check completion status
+  const { data: existingImages } = useQuery({
+    queryKey: ['project-storyboard', projectId],
+    queryFn: async () => {
+      if (!projectId) return [];
+      const response = await fetch(`/api/projects/${projectId}/storyboard`);
+      if (!response.ok) return [];
+      const data = await response.json();
+      return data.storyboardImages || [];
+    },
+    enabled: !!projectId
+  });
+
+  // Start background generation when component mounts if projectId is available
+  useEffect(() => {
+    if (projectId && scenes.length > 0 && existingImages !== undefined) {
+      const existingCount = existingImages.length;
+      
+      // Only start generation if we don't have all images
+      if (existingCount < scenes.length) {
+        setBackgroundGeneration(prev => ({
+          ...prev,
+          isGenerating: true,
+          completed: existingCount,
+          currentScene: scenes[existingCount]?.description || `Scene ${scenes[existingCount]?.sceneNumber}`
+        }));
+        generateAllImagesMutation.mutate(projectId);
+      } else {
+        setBackgroundGeneration(prev => ({
+          ...prev,
+          isGenerating: false,
+          completed: existingCount
+        }));
+      }
+    }
+  }, [projectId, scenes.length, existingImages?.length]);
+
   // Auto-play functionality
   useEffect(() => {
     if (isPlaying && scenes.length > 0) {
@@ -137,6 +197,18 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle, pag
                 <div className="text-xs text-gray-400 hidden sm:block">Est. Runtime</div>
                 <div className="text-xs text-gray-400 sm:hidden">Runtime</div>
               </div>
+              {backgroundGeneration.isGenerating && (
+                <div className="text-center">
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="h-3 w-3 text-blue-400 animate-spin" />
+                    <span className="text-sm font-bold text-blue-400">
+                      {backgroundGeneration.completed}/{backgroundGeneration.total}
+                    </span>
+                  </div>
+                  <div className="text-xs text-gray-400 hidden sm:block">Generating Images</div>
+                  <div className="text-xs text-gray-400 sm:hidden">Images</div>
+                </div>
+              )}
             </div>
           </div>
 
