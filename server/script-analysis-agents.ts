@@ -539,87 +539,77 @@ Focus on realistic, current information about the actor. If the actor is not wel
  */
 export async function analyzeVFXNeeds(
   scenes: Scene[],
-  provider: AIProvider = 'gpt-4o'
+  provider: AIProvider = 'gemini-1.5-flash'
 ): Promise<VFXNeed[]> {
-  console.log(`Starting comprehensive VFX analysis for ${scenes.length} scenes`);
+  console.log(`Starting individual scene VFX analysis for ${scenes.length} scenes using ${provider}`);
   
-  // Process scenes in batches to ensure comprehensive analysis
-  const batchSize = 25; // Optimal batch size for thorough analysis
   const allVfxNeeds: VFXNeed[] = [];
   
-  for (let i = 0; i < scenes.length; i += batchSize) {
-    const batch = scenes.slice(i, i + batchSize);
-    const batchNumber = Math.floor(i/batchSize) + 1;
-    const totalBatches = Math.ceil(scenes.length/batchSize);
-    
-    console.log(`Processing VFX batch ${batchNumber}/${totalBatches} (scenes ${i + 1}-${Math.min(i + batchSize, scenes.length)})`);
+  // Process each scene individually for maximum accuracy
+  for (let i = 0; i < scenes.length; i++) {
+    const scene = scenes[i];
+    console.log(`Analyzing scene ${i + 1}/${scenes.length}: Scene ${scene.sceneNumber} (ID: ${scene.id})`);
     
     const prompt = `
-      You are an expert VFX supervisor analyzing a screenplay for visual effects requirements. 
-      Examine EVERY scene in this batch carefully and identify ALL that require VFX work.
+      You are an expert VFX supervisor analyzing a single scene from a screenplay.
+      Determine if this scene requires visual effects work.
 
-      Look for scenes containing:
-      - Supernatural or fantasy elements (magic, ghosts, mythical creatures)
-      - Sci-fi elements (aliens, spaceships, futuristic technology)
-      - Impossible or dangerous actions (explosions, vehicle crashes, falls)
-      - Environmental effects (storms, natural disasters, fire)
-      - Creature work (dinosaurs, monsters, talking animals)
-      - Digital environments or matte paintings
+      Look for:
+      - Supernatural/fantasy elements (magic, ghosts, creatures)
+      - Sci-fi elements (aliens, spaceships, technology)
+      - Dangerous actions (explosions, crashes, falls)
+      - Environmental effects (storms, fire, disasters)
+      - Digital environments or enhancements
       - Wire removal or digital doubles
-      - Period-specific elements requiring digital recreation
-      - Crowd multiplication or digital extras
-      - Blood, gore, or injury effects
-      - Architectural or landscape modifications
-      - Time manipulation or speed effects
+      - Blood/gore effects
+      - Impossible physics or actions
+      - Digital crowd work
+      - Time manipulation effects
 
-      Be comprehensive - identify ALL scenes needing VFX, not just obvious ones.
+      Scene to analyze:
+      - ID: ${scene.id}
+      - Scene Number: ${scene.sceneNumber}
+      - Location: ${scene.location}
+      - Description: ${scene.description}
+      - Content: ${scene.content}
 
-      Scenes to analyze (batch ${batchNumber} of ${totalBatches}):
-      ${JSON.stringify(batch.map(s => ({ 
-        id: s.id, 
-        sceneNumber: s.sceneNumber,
-        location: s.location,
-        description: s.description, 
-        content: s.content 
-      })), null, 2)}
+      If this scene requires VFX work, respond with JSON:
+      {
+        "sceneId": "${scene.id}",
+        "sceneDescription": "Brief summary of the scene",
+        "vfxType": "Specific VFX category needed",
+        "complexity": "low|medium|high|extreme",
+        "estimatedCost": 50000,
+        "description": "Detailed explanation of VFX requirements",
+        "referenceImages": ["Relevant visual references"]
+      }
 
-      Return as JSON array:
-      [
-        {
-          "sceneId": "scene_X",
-          "sceneDescription": "Brief scene summary",
-          "vfxType": "Specific VFX category",
-          "complexity": "low|medium|high|extreme",
-          "estimatedCost": 50000,
-          "description": "Detailed VFX requirements",
-          "referenceImages": ["Visual references"]
-        }
-      ]
-
-      Include ALL scenes requiring VFX work. Return empty array if none need VFX.
+      If NO VFX work is needed, respond with: {"no_vfx": true}
     `;
 
     try {
       const response = await generateContent(provider, prompt, {
         responseFormat: 'json',
-        maxTokens: 4000
+        maxTokens: 1000
       });
 
-      const batchResults = extractJsonFromText(response) || [];
-      console.log(`Batch ${batchNumber} identified ${batchResults.length} VFX scenes`);
-      allVfxNeeds.push(...batchResults);
+      const result = extractJsonFromText(response);
+      if (result && !result.no_vfx && result.sceneId) {
+        console.log(`Scene ${scene.sceneNumber} requires VFX: ${result.vfxType} ($${result.estimatedCost})`);
+        allVfxNeeds.push(result);
+      }
       
-      // Brief delay between batches to avoid rate limiting
-      if (i + batchSize < scenes.length) {
-        await new Promise(resolve => setTimeout(resolve, 1000));
+      // Brief delay between scenes to avoid rate limiting
+      if (i < scenes.length - 1) {
+        await new Promise(resolve => setTimeout(resolve, 100));
       }
     } catch (error) {
-      console.error(`Error analyzing VFX batch ${batchNumber}:`, error);
-      // Continue with other batches even if one fails
+      console.error(`Error analyzing scene ${scene.sceneNumber}:`, error);
+      // Continue with next scene
     }
   }
   
-  console.log(`Comprehensive VFX analysis complete: Found ${allVfxNeeds.length} total VFX scenes`);
+  console.log(`Individual scene VFX analysis complete: Found ${allVfxNeeds.length} total VFX scenes`);
   return allVfxNeeds;
 }
 
