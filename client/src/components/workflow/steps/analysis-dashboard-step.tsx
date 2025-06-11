@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
-import StoryboardSceneView from '@/components/script/StoryboardSceneView';
+import SceneAnalysisView from '@/components/script-analysis/SceneAnalysisView';
 import CharacterAnalysisView from '@/components/script-analysis/CharacterAnalysisView';
 import CastingAnalysisView from '@/components/script-analysis/CastingAnalysisView';
 import ProductPlacementView from '@/components/script-analysis/ProductPlacementView';
@@ -31,20 +31,12 @@ interface AnalysisTask {
 
 const ANALYSIS_TASKS: AnalysisTask[] = [
   {
-    id: 'scene_breakdown',
-    title: 'Scene Breakdown',
-    description: 'Group consecutive scenes into narrative segments',
-    status: 'not_started',
-    icon: Layers,
-    estimatedTime: '3-4 min'
-  },
-  {
-    id: 'scene_extraction',
-    title: 'Storyboard',
-    description: 'Extract and analyze individual scenes from the script',
+    id: 'scene_analysis',
+    title: 'Scene Analysis',
+    description: 'Extract scenes and create narrative breakdown with storyboard visualization',
     status: 'not_started',
     icon: Film,
-    estimatedTime: '2-3 min'
+    estimatedTime: '4-5 min'
   },
   {
     id: 'vfx_analysis',
@@ -313,12 +305,13 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
       setSelectedTask(taskId);
       
       // Invalidate relevant query caches based on task type
-      if (taskId === 'scene_extraction') {
+      if (taskId === 'scene_analysis') {
         queryClient.invalidateQueries({ queryKey: [`/api/projects/${workflow?.projectId}/scenes`] });
+        queryClient.invalidateQueries({ queryKey: [`/api/projects/${workflow?.projectId}/scene-breakdown`] });
         
         // Automatically start storyboard generation in the background
         if (workflow?.projectId && data?.scenes?.length > 0) {
-          console.log('Starting automatic storyboard generation after scene extraction');
+          console.log('Starting automatic storyboard generation after scene analysis');
           fetch(`/api/projects/${workflow.projectId}/storyboard/generate`, {
             method: 'POST',
             headers: {
@@ -491,67 +484,12 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
 
   const renderTaskResults = (taskId: string, results: any) => {
     switch (taskId) {
-      case 'scene_extraction':
+      case 'scene_analysis':
         return (
-          <div className="space-y-6">
-            {/* Storyboard View Button */}
-            {results.scenes && results.scenes.length > 0 && (
-              <div className="flex justify-center mb-6">
-                <Button 
-                  onClick={() => setShowStoryboard(true)}
-                  className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-3"
-                >
-                  <Maximize2 className="h-4 w-4 mr-2" />
-                  Storyboard View
-                </Button>
-              </div>
-            )}
-
-            {results.scenes && results.scenes.length > 0 && (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h4 className="text-lg font-semibold">Scenes</h4>
-                  <Badge variant="outline" className="text-xs">
-                    {results.scenes.length} total
-                  </Badge>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-                  {results.scenes
-                    .sort((a: any, b: any) => {
-                      const aNum = parseInt(a.sceneNumber) || 0;
-                      const bNum = parseInt(b.sceneNumber) || 0;
-                      return aNum - bNum;
-                    })
-                    .map((scene: any, index: number) => (
-                    <Card key={index} className="h-48 hover:shadow-md transition-shadow cursor-pointer border border-gray-200 dark:border-gray-700">
-                      <CardContent className="p-4 h-full flex flex-col">
-                        <div className="flex items-center justify-between mb-2">
-                          <Badge variant="outline" className="text-xs px-2 py-1">
-                            {scene.sceneNumber}
-                          </Badge>
-                        </div>
-                        
-                        <h4 className="text-sm font-medium mb-3 line-clamp-2">
-                          {scene.description || `Scene ${scene.sceneNumber}`}
-                        </h4>
-                        
-                        <div className="flex-1 overflow-hidden">
-                          <ScrollArea className="h-32 w-full">
-                            <div className="pr-3">
-                              <p className="text-xs text-muted-foreground leading-relaxed whitespace-pre-wrap">
-                                {scene.plotSummary || 'Plot summary not available'}
-                              </p>
-                            </div>
-                          </ScrollArea>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
+          <SceneAnalysisView
+            projectId={workflow?.projectId || project?.id}
+            projectTitle={project?.title || 'Unknown Project'}
+          />
         );
 
       case 'character_analysis':

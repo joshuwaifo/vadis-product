@@ -313,7 +313,7 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle, pag
                   <div className="flex items-center gap-3 mb-3">
                     <Camera className="h-4 w-4 text-blue-400" />
                     <h3 className="text-sm sm:text-base font-semibold text-white">Storyboard Frame</h3>
-                    {backgroundGeneration.isGenerating && (
+                    {isGenerating && (
                       <div className="flex items-center gap-2 text-xs text-blue-400">
                         <Loader2 className="h-3 w-3 animate-spin" />
                         <span>AI generating images...</span>
