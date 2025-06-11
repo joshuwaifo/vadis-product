@@ -53,10 +53,12 @@ export default function SceneAnalysisView({ projectId, projectTitle, onClose }: 
   const [selectedSegment, setSelectedSegment] = useState<SceneSegment | null>(null);
 
   // Fetch scenes data
-  const { data: scenes = [], isLoading: scenesLoading } = useQuery({
+  const { data: scenesData, isLoading: scenesLoading } = useQuery({
     queryKey: [`/api/projects/${projectId}/scenes`],
     enabled: !!projectId
   });
+
+  const scenes: Scene[] = Array.isArray(scenesData) ? scenesData : [];
 
   // Fetch scene breakdown data
   const { data: sceneBreakdown, isLoading: breakdownLoading } = useQuery({
@@ -70,7 +72,7 @@ export default function SceneAnalysisView({ projectId, projectTitle, onClose }: 
     enabled: !!projectId
   });
 
-  const segments: SceneSegment[] = sceneBreakdown?.segments || [];
+  const segments: SceneSegment[] = Array.isArray(sceneBreakdown?.segments) ? sceneBreakdown.segments : [];
 
   const handleStoryboardView = () => {
     setShowStoryboardView(true);
