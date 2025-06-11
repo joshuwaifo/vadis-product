@@ -47,6 +47,14 @@ const ANALYSIS_TASKS: AnalysisTask[] = [
     estimatedTime: '3-4 min'
   },
   {
+    id: 'vfx_analysis',
+    title: 'VFX Analysis',
+    description: 'Identify visual effects requirements and complexity',
+    status: 'not_started',
+    icon: Zap,
+    estimatedTime: '4-5 min'
+  },
+  {
     id: 'character_analysis',
     title: 'Character Analysis',
     description: 'Analyze characters and their relationships',
@@ -63,20 +71,12 @@ const ANALYSIS_TASKS: AnalysisTask[] = [
     estimatedTime: '4-5 min'
   },
   {
-    id: 'product_placement',
-    title: 'Product Placement',
-    description: 'Identify opportunities for brand partnerships',
+    id: 'location_suggestions',
+    title: 'Location Suggestions',
+    description: 'Identify optimal filming locations and logistics',
     status: 'not_started',
-    icon: Package,
-    estimatedTime: '2-3 min'
-  },
-  {
-    id: 'vfx_analysis',
-    title: 'VFX Analysis',
-    description: 'Identify visual effects requirements and complexity',
-    status: 'not_started',
-    icon: Zap,
-    estimatedTime: '4-5 min'
+    icon: MapPin,
+    estimatedTime: '3-4 min'
   },
   {
     id: 'financial_planning',
