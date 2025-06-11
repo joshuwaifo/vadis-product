@@ -289,16 +289,42 @@ export function extractJsonFromText(text: string): any {
     console.error("[AI Client] Error parsing JSON response:", error);
     console.error("[AI Client] Raw text:", text);
     
-    // Last resort: try to extract a valid object manually and wrap in array
+    // Last resort: try to extract VFX analysis from nested structure
     try {
-      const match = text.match(/\{[^{}]*"sceneId"[^{}]*\}/);
-      if (match) {
-        console.log("[AI Client] Attempting manual object extraction");
-        const obj = JSON.parse(match[0]);
-        return [obj];
+      // Check for vfxAnalysis wrapper - handle nested objects properly
+      const vfxRegex = /"vfxAnalysis":\s*\[([\s\S]*?)\]/;
+      const vfxMatch = text.match(vfxRegex);
+      if (vfxMatch && vfxMatch[1]) {
+        console.log("[AI Client] Extracting from vfxAnalysis wrapper");
+        const arrayContent = `[${vfxMatch[1]}]`;
+        try {
+          return JSON.parse(arrayContent);
+        } catch (nestedError) {
+          // If direct parsing fails, try to fix common issues
+          const fixedContent = arrayContent
+            .replace(/,(\s*[}\]])/g, '$1') // Remove trailing commas
+            .replace(/(\w+):/g, '"$1":'); // Add quotes around keys
+          return JSON.parse(fixedContent);
+        }
+      }
+      
+      // Try to extract all scene objects individually and combine them
+      const sceneMatches = text.match(/\{[^{}]*"sceneId"[^{}]*\}/g);
+      if (sceneMatches && sceneMatches.length > 0) {
+        console.log(`[AI Client] Found ${sceneMatches.length} scene objects manually`);
+        const parsedScenes = [];
+        for (const match of sceneMatches) {
+          try {
+            const obj = JSON.parse(match);
+            parsedScenes.push(obj);
+          } catch (parseError) {
+            console.warn("[AI Client] Failed to parse individual scene:", match);
+          }
+        }
+        return parsedScenes;
       }
     } catch (manualError) {
-      // Ignore manual extraction error
+      console.error("[AI Client] Manual extraction failed:", manualError);
     }
     
     return null;

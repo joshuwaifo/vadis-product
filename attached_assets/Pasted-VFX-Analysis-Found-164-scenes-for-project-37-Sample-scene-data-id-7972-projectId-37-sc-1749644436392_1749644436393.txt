@@ -1,0 +1,73 @@
+VFX Analysis: Found 164 scenes for project 37
+Sample scene data: {
+  id: 7972,
+  projectId: 37,
+  sceneNumber: 1,
+  location: 'UNSPECIFIED',
+  timeOfDay: 'UNSPECIFIED',
+  description: 'ON COMPUTER SCREEN - NIGHT',
+  plotSummary: 'A phone conversation between Cypher and Trinity is overheard while data races across a computer screen.  The camera moves closer to the screen as a phone number is identified.',
+  characters: [],
+  content: 'A phone conversation between Cypher and Trinity is overheard while data races across a computer screen.  The camera moves closer to the screen as a phone number is identified.',
+  pageStart: 1,
+  pageEnd: 1,
+  duration: 2,
+  vfxNeeds: [],
+  productPlacementOpportunities: [],
+  createdAt: 2025-06-11T10:50:12.686Z
+}
+Converted scenes for AI analysis: 164
+[AI Client] Trying to wrap single object in array due to parse error
+[AI Client] Error parsing JSON response: SyntaxError: Expected ',' or '}' after property value in JSON at position 2136
+    at JSON.parse (<anonymous>)
+    at extractJsonFromText (/home/runner/workspace/server/services/ai-agents/ai-client.ts:257:29)
+    at analyzeVFXNeeds (/home/runner/workspace/server/script-analysis-agents.ts:595:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async <anonymous> (/home/runner/workspace/server/comprehensive-analysis-routes.ts:1000:31)
+[AI Client] Raw text: 
+{
+  "vfxAnalysis": [
+    {
+      "sceneId": "scene_11",
+      "sceneDescription": "Trinity crashes through the window and falls down a stairwell, but survives.",
+      "vfxType": "Compositing, Wire Removal",
+      "complexity": "medium",
+      "estimatedCost": 75000,
+      "description": "This scene requires compositing to simulate Trinity crashing through the window and falling down the stairwell. Wire removal will be necessary to ensure the safety of the actor during filming.",
+      "referenceImages": ["The Matrix (1999) - Trinity's escape scenes"]
+    },
+    {
+      "sceneId": "scene_12",
+      "sceneDescription": "Trinity races towards a phone booth as a garbage truck tries to run her over.",
+      "vfxType": "Compositing, Digital Doubles, Destruction Simulation",
+      "complexity": "high",
+      "estimatedCost": 120000,
+      "description": "This scene involves a dangerous action sequence where a garbage truck collides with a phone booth. Digital doubles and destruction simulation will be required to safely depict the crash and impact.",
+      "referenceImages": ["The Matrix (1999) - Phone booth scene"]
+    },
+    {
+      "sceneId": "scene_10",
+      "sceneDescription": "Trinity jumps from a rooftop into a window.",
+      "vfxType": "Wire Removal, Compositing",
+      "complexity": "medium",
+      "estimatedCost": 70000,
+      "description": "Trinity's jump will require wire removal to ensure actor safety and compositing to blend the action seamlessly with the environment.",
+      "referenceImages": ["The Matrix (1999) - Rooftop chase scenes"]
+    },
+    {
+      "sceneId": "scene_13",
+      "sceneDescription": "The camera is sucked into the phone's mouthpiece and emerges from a computer screen.",
+      "vfxType": "Digital Environment, Compositing",
+      "complexity": "high",
+      "estimatedCost": 100000,
+      "description": "This scene involves a complex transition effect where the camera moves through the phone's mouthpiece into a computer screen. Digital environment creation and compositing will be necessary.",
+      "referenceImages": ["The Matrix (1999) - Digital transitions"]
+    }
+  ]
+}
+[AI Client] Attempting manual object extraction
+VFX Analysis Results: Found 1 VFX requirements
+VFX 1: Scene scene_11 - Compositing, Wire Removal (medium) - $75000
+12:19:54 PM [express] POST /api/script-analysis/vfx_analysis 200 in 15295ms :: {"success":true,"vfxNe…
+12:19:54 PM [express] GET /api/projects/37/scenes 304 in 147ms :: [{"id":7972,"projectId":37,"sceneNu…
+12:19:55 PM [express] GET /api/projects/37/vfx-analysis 200 in 75ms :: {"success":true,"vfxNeeds":[{"…
