@@ -336,8 +336,8 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle, pag
                       <div className="aspect-video bg-gray-800 rounded-lg flex items-center justify-center border border-gray-700">
                         <div className="text-center text-gray-400">
                           <Loader2 className="h-12 w-12 mx-auto mb-3 animate-spin" />
-                          <p className="text-sm font-medium mb-1">Generating storyboard frame...</p>
-                          <p className="text-xs">Creating character-consistent visualization</p>
+                          <p className="text-sm font-medium mb-1">Generating Ghibli-style storyboard...</p>
+                          <p className="text-xs">AI refining prompt with Gemini, then creating art with Imagen 4</p>
                         </div>
                       </div>
                     )}

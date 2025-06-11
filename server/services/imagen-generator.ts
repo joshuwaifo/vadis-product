@@ -140,3 +140,14 @@ export class ImagenGenerator {
 }
 
 export const imagenGenerator = new ImagenGenerator();
+
+/**
+ * Generate Ghibli-style storyboard image
+ */
+export async function generateImagenStoryboard(prompt: string): Promise<string> {
+  return await imagenGenerator.generateImage({
+    prompt,
+    aspectRatio: "16:9",
+    safetyFilterLevel: "block_medium_and_above"
+  });
+}

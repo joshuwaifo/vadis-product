@@ -601,6 +601,80 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Ghibli-style storyboard generation with Gemini + Imagen 4
+  app.post("/api/scenes/:sceneId/storyboard-ghibli", async (req, res) => {
+    try {
+      if (!req.session.user) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const sceneId = parseInt(req.params.sceneId);
+      const { projectId, style } = req.body;
+
+      // Get scene data
+      const scene = await storage.getSceneById(sceneId);
+      if (!scene) {
+        return res.status(404).json({ error: "Scene not found" });
+      }
+
+      // Get project characters for context
+      const characters = await storage.getCharactersByProject(projectId);
+
+      // Create Gemini prompt refinement request
+      const prompt = `You are a Studio Ghibli storyboard artist. Create a detailed visual prompt for Imagen 4 based on this scene:
+
+Scene: ${scene.description}
+Location: ${scene.location}
+Time of Day: ${scene.timeOfDay}
+Characters Present: ${scene.characters?.join(', ') || 'None specified'}
+Scene Content: ${scene.content}
+
+Available Characters:
+${characters.map(char => `- ${char.name}: ${char.description}`).join('\n')}
+
+Create a vivid, Studio Ghibli-style visual description that includes:
+- Art style: Hand-drawn animation, soft watercolor backgrounds, detailed character expressions
+- Lighting: Natural, warm lighting appropriate for ${scene.timeOfDay}
+- Composition: Cinematic framing that captures the emotional tone
+- Character details: Authentic Ghibli character design if characters are present
+- Environmental details: Rich, detailed backgrounds in Miyazaki's style
+
+Format as a single detailed prompt for image generation, focusing on visual elements only. Style must be strictly Studio Ghibli aesthetic - never photorealistic.`;
+
+      // Use Gemini to refine the prompt
+      const { GoogleGenerativeAI } = require('@google/generative-ai');
+      const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
+      
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const result = await model.generateContent(prompt);
+      const refinedPrompt = result.response.text();
+
+      // Generate image using the existing imagen generator service
+      const { generateImagenStoryboard } = require('./services/imagen-generator');
+      const ghibliPrompt = `${refinedPrompt}. Studio Ghibli art style, hand-drawn animation, soft watercolor backgrounds, detailed character expressions, cinematic composition, warm natural lighting, authentic Miyazaki aesthetic. NOT photorealistic, NOT CGI, NOT 3D render.`;
+      
+      const imageUrl = await generateImagenStoryboard(ghibliPrompt);
+
+      // Save to storage
+      const storyboardImage = await storage.createStoryboardImage({
+        sceneId,
+        imageUrl,
+        prompt: refinedPrompt,
+        charactersPresent: scene.characters || [],
+        generatedAt: new Date()
+      });
+
+      res.json({
+        success: true,
+        storyboardImage
+      });
+
+    } catch (error) {
+      console.error("Error generating Ghibli storyboard:", error);
+      res.status(500).json({ error: "Failed to generate storyboard image" });
+    }
+  });
+
   // Project History API endpoints
   app.get("/api/projects/:id/history", requireAuth, async (req, res) => {
     try {
