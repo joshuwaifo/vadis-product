@@ -20,7 +20,6 @@ import { registerWorkflowRoutes } from "./workflow-routes";
 import { registerComprehensiveAnalysisRoutes } from "./comprehensive-analysis-routes";
 import { registerScriptGenerationRoutes } from "./script-generation-routes";
 import { registerStoryboardRoutes } from "./storyboard-routes";
-import { registerVFXVideoRoutes } from "./vfx-video-routes";
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { generateImagenStoryboard } from './services/imagen-generator.js';
 
@@ -837,7 +836,6 @@ Format as a single detailed prompt for image generation, focusing on visual elem
   registerScriptAnalysisRoutes(app);
   registerWorkflowRoutes(app);
   registerComprehensiveAnalysisRoutes(app);
-  registerVFXVideoRoutes(app);
   registerScriptGenerationRoutes(app);
   registerStoryboardRoutes(app);
 
