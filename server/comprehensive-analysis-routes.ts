@@ -968,7 +968,7 @@ Respond in JSON format with this structure:
   // VFX Requirements Analysis
   app.post('/api/script-analysis/vfx_analysis', async (req: Request, res: Response) => {
     try {
-      const { projectId, scriptContent } = req.body;
+      const { projectId } = req.body;
       
       // Get existing scenes for this project
       const projectScenes = await db
@@ -976,7 +976,33 @@ Respond in JSON format with this structure:
         .from(scenes)
         .where(eq(scenes.projectId, parseInt(projectId)));
 
-      const vfxRequirements = await analyzeVFXNeeds(projectScenes, scriptContent);
+      console.log(`VFX Analysis: Found ${projectScenes.length} scenes for project ${projectId}`);
+      console.log('Sample scene data:', projectScenes[0]);
+
+      // Convert database scenes to Scene format for the AI analysis
+      const scenesForAnalysis = projectScenes.map(scene => ({
+        id: scene.id.toString(), // Convert number to string for Scene interface
+        sceneNumber: scene.sceneNumber,
+        location: scene.location,
+        timeOfDay: scene.timeOfDay || '',
+        description: scene.description || '',
+        characters: scene.characters || [],
+        content: scene.content || '',
+        pageStart: scene.pageStart || 0,
+        pageEnd: scene.pageEnd || 0,
+        duration: 0, // Default duration
+        vfxNeeds: scene.vfxNeeds || [],
+        productPlacementOpportunities: []
+      }));
+
+      console.log('Converted scenes for AI analysis:', scenesForAnalysis.length);
+
+      const vfxRequirements = await analyzeVFXNeeds(scenesForAnalysis);
+      
+      console.log(`VFX Analysis Results: Found ${vfxRequirements.length} VFX requirements`);
+      vfxRequirements.forEach((vfx, index) => {
+        console.log(`VFX ${index + 1}: Scene ${vfx.sceneId} - ${vfx.vfxType} (${vfx.complexity}) - $${vfx.estimatedCost}`);
+      });
       
       // Save VFX needs
       const savedVFX = await Promise.all(
@@ -985,7 +1011,7 @@ Respond in JSON format with this structure:
             .insert(vfxNeeds)
             .values({
               projectId: parseInt(projectId),
-              sceneId: vfx.sceneId,
+              sceneId: parseInt(vfx.sceneId), // Convert string back to number for database
               sceneDescription: vfx.sceneDescription,
               vfxType: vfx.vfxType,
               complexity: vfx.complexity,
