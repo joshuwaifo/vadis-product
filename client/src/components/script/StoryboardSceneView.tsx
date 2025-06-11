@@ -46,11 +46,7 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle, pag
   const [selectedScene, setSelectedScene] = useState<Scene | null>(scenes[0] || null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [backgroundGeneration, setBackgroundGeneration] = useState({
-    isGenerating: false,
-    completed: 0,
-    currentScene: ''
-  });
+
   const queryClient = useQueryClient();
 
   // Get storyboard image for the selected scene
@@ -67,11 +63,18 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle, pag
     enabled: !!selectedScene
   });
 
-  // Generate storyboard image mutation
+  // Generate storyboard image mutation with Gemini refinement and Imagen 4
   const generateImageMutation = useMutation({
     mutationFn: async (sceneId: string) => {
-      const response = await fetch(`/api/scenes/${sceneId}/storyboard`, {
-        method: 'POST'
+      const response = await fetch(`/api/scenes/${sceneId}/storyboard-ghibli`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          projectId,
+          style: 'ghibli'
+        })
       });
       if (!response.ok) throw new Error('Failed to generate storyboard image');
       return response.json();
@@ -81,74 +84,20 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle, pag
     }
   });
 
-  // Auto-generate all storyboard images in background when component mounts
-  const generateAllImagesMutation = useMutation({
-    mutationFn: async (projectId: number) => {
-      const response = await fetch(`/api/projects/${projectId}/storyboard/generate`, {
-        method: 'POST'
-      });
-      if (!response.ok) throw new Error('Failed to generate project storyboard');
-      return response.json();
-    },
-    onSuccess: () => {
-      // Invalidate all storyboard queries to refresh the UI
-      queryClient.invalidateQueries({ queryKey: ['storyboard'] });
-    }
-  });
 
-  // Get all storyboard images for the project to track progress
+
+  // Get all storyboard images for the project
   const { data: allStoryboardData } = useQuery({
     queryKey: [`/api/projects/${projectId}/storyboard`],
     enabled: !!projectId,
-    refetchInterval: 3000, // Poll every 3 seconds for new images
   });
 
   // Calculate generation progress
   const storyboardImages = (allStoryboardData as any)?.storyboardImages || [];
   const completedScenes = storyboardImages.length;
   const totalScenes = scenes.length;
-  const generationProgress = totalScenes > 0 ? Math.round((completedScenes / totalScenes) * 100) : 0;
-  const isGenerating = completedScenes < totalScenes;
 
-  // Find existing storyboard image for current scene
-  const currentSceneImage = storyboardImages.find((img: any) => 
-    img.sceneId === parseInt(selectedScene?.id || '0')
-  );
 
-  // Start background generation when component mounts if projectId is available
-  useEffect(() => {
-    if (projectId && scenes.length > 0 && storyboardImages !== undefined) {
-      const existingCount = storyboardImages.length;
-      
-      // Only start generation if we don't have all images
-      if (existingCount < scenes.length) {
-        setBackgroundGeneration(prev => ({
-          ...prev,
-          isGenerating: true,
-          completed: existingCount,
-          currentScene: scenes[existingCount]?.description || `Scene ${scenes[existingCount]?.sceneNumber}`
-        }));
-        generateAllImagesMutation.mutate(projectId);
-        
-        // Set up polling to refresh images as they become available
-        const pollForNewImages = () => {
-          queryClient.invalidateQueries({ queryKey: ['project-storyboard', projectId] });
-          queryClient.invalidateQueries({ queryKey: ['scene-storyboard'] });
-        };
-        
-        const pollInterval = setInterval(pollForNewImages, 2000); // Poll every 2 seconds
-        
-        // Clear interval when component unmounts or generation completes
-        return () => clearInterval(pollInterval);
-      } else {
-        setBackgroundGeneration(prev => ({
-          ...prev,
-          isGenerating: false,
-          completed: existingCount
-        }));
-      }
-    }
-  }, [projectId, scenes.length, storyboardImages?.length]);
 
   // Auto-play functionality
   useEffect(() => {
@@ -211,21 +160,12 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle, pag
                 <div className="text-xs text-gray-400 hidden sm:block">Est. Runtime</div>
                 <div className="text-xs text-gray-400 sm:hidden">Runtime</div>
               </div>
-              {isGenerating && (
-                <div className="text-center">
-                  <div className="flex items-center gap-2">
-                    <Loader2 className="h-3 w-3 text-blue-400 animate-spin" />
-                    <span className="text-sm font-bold text-blue-400">
-                      {completedScenes}/{totalScenes}
-                    </span>
-                  </div>
-                  <div className="text-xs text-gray-400 hidden sm:block">AI Generating</div>
-                  <div className="text-xs text-gray-400 sm:hidden">AI Gen</div>
-                  <div className="text-xs text-blue-300 mt-1">
-                    {generationProgress}% complete
-                  </div>
+              <div className="text-center">
+                <div className="text-sm font-bold text-blue-400">
+                  {completedScenes}/{totalScenes}
                 </div>
-              )}
+                <div className="text-xs text-gray-400">Generated</div>
+              </div>
             </div>
           </div>
 
@@ -310,14 +250,30 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle, pag
 
                 {/* Storyboard Image Section */}
                 <div className="flex-shrink-0">
-                  <div className="flex items-center gap-3 mb-3">
-                    <Camera className="h-4 w-4 text-blue-400" />
-                    <h3 className="text-sm sm:text-base font-semibold text-white">Storyboard Frame</h3>
-                    {backgroundGeneration.isGenerating && (
-                      <div className="flex items-center gap-2 text-xs text-blue-400">
-                        <Loader2 className="h-3 w-3 animate-spin" />
-                        <span>AI generating images...</span>
-                      </div>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <Camera className="h-4 w-4 text-blue-400" />
+                      <h3 className="text-sm sm:text-base font-semibold text-white">Storyboard Frame</h3>
+                    </div>
+                    {!storyboardImage && !imageLoading && (
+                      <Button
+                        size="sm"
+                        onClick={() => selectedScene && generateImageMutation.mutate(selectedScene.id)}
+                        disabled={generateImageMutation.isPending}
+                        className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
+                      >
+                        {generateImageMutation.isPending ? (
+                          <>
+                            <Loader2 className="h-3 w-3 animate-spin mr-1" />
+                            Generating...
+                          </>
+                        ) : (
+                          <>
+                            <ImageIcon className="h-3 w-3 mr-1" />
+                            Generate Ghibli Art
+                          </>
+                        )}
+                      </Button>
                     )}
                   </div>
 
@@ -366,21 +322,12 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle, pag
                       </div>
                     )}
 
-                    {!storyboardImage && !imageLoading && (
+                    {!storyboardImage && !imageLoading && !generateImageMutation.isPending && (
                       <div className="aspect-video bg-gray-800 rounded-lg flex items-center justify-center border border-gray-700 border-dashed">
                         <div className="text-center text-gray-400">
                           <ImageIcon className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                          {backgroundGeneration.isGenerating ? (
-                            <>
-                              <p className="text-sm font-medium mb-1">Storyboard generating...</p>
-                              <p className="text-xs">AI is creating visual representations for all scenes</p>
-                            </>
-                          ) : (
-                            <>
-                              <p className="text-sm font-medium mb-1">No storyboard image</p>
-                              <p className="text-xs">Images will generate automatically after scene extraction</p>
-                            </>
-                          )}
+                          <p className="text-sm font-medium mb-1">No storyboard image</p>
+                          <p className="text-xs">Click "Generate Ghibli Art" to create a visual representation</p>
                         </div>
                       </div>
                     )}
