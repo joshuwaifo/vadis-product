@@ -72,9 +72,10 @@ export default function VFXAnalysisView({ projectId, onClose }: VFXAnalysisViewP
 
   // Initialize VFX scenes when scenes data is loaded
   useEffect(() => {
-    if (scenes && scenes.length > 0 && vfxScenes.length === 0) {
+    if (scenes && scenes.length > 0) {
       // Use existing VFX analysis results if available
       if (existingVfxData && existingVfxData.vfxNeeds && existingVfxData.vfxNeeds.length > 0) {
+        console.log("Loading existing VFX data:", existingVfxData.vfxNeeds);
         const vfxAnalysisResults: VFXSceneAnalysis[] = scenes.map((scene: any) => {
           const vfxData = existingVfxData.vfxNeeds.find((vfx: any) => vfx.sceneId === scene.id);
           const hasVfx = vfxData && vfxData.estimatedCost > 0;
@@ -105,7 +106,7 @@ export default function VFXAnalysisView({ projectId, onClose }: VFXAnalysisViewP
         setAnalysisComplete(true);
       }
     }
-  }, [scenes, existingVfxData, vfxScenes.length]);
+  }, [scenes, existingVfxData]);
 
   // VFX analysis mutation
   const vfxAnalysisMutation = useMutation({
