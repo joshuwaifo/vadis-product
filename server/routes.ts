@@ -20,6 +20,8 @@ import { registerWorkflowRoutes } from "./workflow-routes";
 import { registerComprehensiveAnalysisRoutes } from "./comprehensive-analysis-routes";
 import { registerScriptGenerationRoutes } from "./script-generation-routes";
 import { registerStoryboardRoutes } from "./storyboard-routes";
+import { GoogleGenerativeAI } from '@google/generative-ai';
+import { generateImagenStoryboard } from './services/imagen-generator.js';
 
 // Simple authentication middleware
 function requireAuth(req: any, res: any, next: any) {
@@ -740,15 +742,11 @@ Create a vivid visual description that includes:
 Format as a single detailed prompt for image generation, focusing on visual elements only. The style must be strictly ${style} aesthetic.`;
 
       // Use Gemini to refine the prompt
-      const { GoogleGenerativeAI } = require('@google/generative-ai');
-      const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
+      const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || process.env.GOOGLE_GEMINI_API_KEY);
       
       const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
       const result = await model.generateContent(prompt);
       const refinedPrompt = result.response.text();
-
-      // Generate image using the existing imagen generator service
-      const { generateImagenStoryboard } = require('./services/imagen-generator');
       const styledPrompt = `${refinedPrompt}. ${styleInstructions[style] || style}`;
       
       const imageUrl = await generateImagenStoryboard(styledPrompt);
