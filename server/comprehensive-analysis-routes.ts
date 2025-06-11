@@ -1011,7 +1011,7 @@ Respond in JSON format with this structure:
             .insert(vfxNeeds)
             .values({
               projectId: parseInt(projectId),
-              sceneId: parseInt(vfx.sceneId), // Convert string back to number for database
+              sceneId: vfx.sceneId.includes('scene_') ? parseInt(vfx.sceneId.replace('scene_', '')) : parseInt(vfx.sceneId),
               sceneDescription: vfx.sceneDescription,
               vfxType: vfx.vfxType,
               complexity: vfx.complexity,

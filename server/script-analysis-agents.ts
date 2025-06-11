@@ -561,8 +561,8 @@ export async function analyzeVFXNeeds(
 
     Be thorough but realistic - only identify scenes that truly need VFX work, not basic practical effects.
 
-    Scenes to analyze:
-    ${JSON.stringify(scenes.map(s => ({ 
+    Scenes to analyze (showing first 10 scenes for processing efficiency):
+    ${JSON.stringify(scenes.slice(0, 10).map(s => ({ 
       id: s.id, 
       sceneNumber: s.sceneNumber,
       location: s.location,

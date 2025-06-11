@@ -237,20 +237,70 @@ export function extractJsonFromText(text: string): any {
     // Remove markdown code blocks more aggressively
     let cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
     
+    // Remove any leading/trailing non-JSON text
+    cleanText = cleanText.replace(/^[^{\[]*/, '').replace(/[^}\]]*$/, '');
+    
     // Find the first [ or { and the last ] or }
     const startMatch = cleanText.search(/[\{\[]/);
     const endMatch = cleanText.lastIndexOf(cleanText.includes('[') ? ']' : '}');
     
     if (startMatch !== -1 && endMatch !== -1) {
-      const jsonStr = cleanText.substring(startMatch, endMatch + 1);
-      return JSON.parse(jsonStr);
+      let jsonStr = cleanText.substring(startMatch, endMatch + 1);
+      
+      // Try to fix common JSON formatting issues
+      jsonStr = jsonStr
+        .replace(/,\s*}/g, '}')  // Remove trailing commas before }
+        .replace(/,\s*]/g, ']')  // Remove trailing commas before ]
+        .replace(/(\w+):/g, '"$1":'); // Add quotes around unquoted keys if needed
+      
+      try {
+        const parsed = JSON.parse(jsonStr);
+        
+        // If we got a single object but expected an array, wrap it in an array
+        if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+          console.log("[AI Client] Converting single object to array");
+          return [parsed];
+        }
+        
+        return parsed;
+      } catch (innerError) {
+        console.log("[AI Client] Trying to wrap single object in array due to parse error");
+        // If JSON parsing fails, try wrapping in array brackets
+        try {
+          const arrayStr = `[${jsonStr}]`;
+          return JSON.parse(arrayStr);
+        } catch (arrayError) {
+          throw innerError; // Throw original error
+        }
+      }
     }
     
     // Fallback to original text
-    return JSON.parse(cleanText);
+    const parsed = JSON.parse(cleanText);
+    
+    // If we got a single object but expected an array, wrap it in an array
+    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+      console.log("[AI Client] Converting single object to array (fallback)");
+      return [parsed];
+    }
+    
+    return parsed;
   } catch (error) {
     console.error("[AI Client] Error parsing JSON response:", error);
     console.error("[AI Client] Raw text:", text);
+    
+    // Last resort: try to extract a valid object manually and wrap in array
+    try {
+      const match = text.match(/\{[^{}]*"sceneId"[^{}]*\}/);
+      if (match) {
+        console.log("[AI Client] Attempting manual object extraction");
+        const obj = JSON.parse(match[0]);
+        return [obj];
+      }
+    } catch (manualError) {
+      // Ignore manual extraction error
+    }
+    
     return null;
   }
 }
