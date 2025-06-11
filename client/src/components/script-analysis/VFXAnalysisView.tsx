@@ -4,8 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Zap, Star, DollarSign, Loader2, CheckCircle, X } from 'lucide-react';
+import { Zap, Star, DollarSign, Loader2, CheckCircle, X, Play, Video, Eye } from 'lucide-react';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 
@@ -34,6 +35,22 @@ interface VFXSceneAnalysis {
   selectedQuality: 'low' | 'medium' | 'high' | null;
 }
 
+interface StoryboardImage {
+  id: number;
+  sceneId: number;
+  imageUrl: string;
+  prompt: string;
+  charactersPresent: string[] | null;
+  generatedAt: Date | null;
+}
+
+interface VFXConcept {
+  sceneId: number;
+  videoUrl: string;
+  status: 'generating' | 'completed' | 'failed';
+  predictionId?: string;
+}
+
 interface VFXAnalysisViewProps {
   projectId: number;
   onClose: () => void;
@@ -43,6 +60,13 @@ export default function VFXAnalysisView({ projectId, onClose }: VFXAnalysisViewP
   const [vfxScenes, setVfxScenes] = useState<VFXSceneAnalysis[]>([]);
   const [analysisComplete, setAnalysisComplete] = useState(false);
   const [totalCostEstimate, setTotalCostEstimate] = useState<number | null>(null);
+  const [selectedSceneId, setSelectedSceneId] = useState<number | null>(null);
+  const [vfxConcepts, setVfxConcepts] = useState<VFXConcept[]>([]);
+  const [videoDialog, setVideoDialog] = useState<{ open: boolean; videoUrl: string; sceneId: number | null }>({
+    open: false,
+    videoUrl: '',
+    sceneId: null
+  });
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -68,6 +92,12 @@ export default function VFXAnalysisView({ projectId, onClose }: VFXAnalysisViewP
       }
       return response.json();
     },
+  });
+
+  // Fetch storyboard images for the project
+  const { data: storyboardData } = useQuery({
+    queryKey: [`/api/projects/${projectId}/storyboard`],
+    enabled: !!projectId,
   });
 
   // Initialize VFX scenes when scenes data is loaded
@@ -197,6 +227,48 @@ export default function VFXAnalysisView({ projectId, onClose }: VFXAnalysisViewP
     }
   });
 
+  // VFX concept video generation mutation
+  const generateVfxConceptMutation = useMutation({
+    mutationFn: async ({ sceneId, quality }: { sceneId: number; quality: 'low' | 'medium' | 'high' }) => {
+      const response = await apiRequest(`/api/vfx/generate-concept`, 'POST', {
+        sceneId,
+        projectId,
+        quality
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Failed to generate VFX concept');
+      }
+      
+      return response.json();
+    },
+    onSuccess: (data, variables) => {
+      const { sceneId } = variables;
+      setVfxConcepts(prev => [
+        ...prev.filter(c => c.sceneId !== sceneId),
+        {
+          sceneId,
+          videoUrl: '',
+          status: 'generating' as const,
+          predictionId: data.predictionId
+        }
+      ]);
+      
+      toast({
+        title: "VFX Concept Generation Started",
+        description: "The video concept is being generated. This may take a few minutes."
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Generation Failed",
+        description: error instanceof Error ? error.message : "Failed to start video generation",
+        variant: "destructive"
+      });
+    }
+  });
+
   const handleQualitySelect = (sceneId: number, quality: 'low' | 'medium' | 'high') => {
     setVfxScenes(prev => 
       prev.map(scene => 
@@ -226,6 +298,46 @@ export default function VFXAnalysisView({ projectId, onClose }: VFXAnalysisViewP
       case 'high': return 'bg-red-500 hover:bg-red-600';
     }
   };
+
+  const getStoryboardImage = (sceneId: number): StoryboardImage | null => {
+    if (!storyboardData?.storyboardImages) return null;
+    return storyboardData.storyboardImages.find((img: StoryboardImage) => img.sceneId === sceneId) || null;
+  };
+
+  const getVfxConcept = (sceneId: number): VFXConcept | null => {
+    return vfxConcepts.find(concept => concept.sceneId === sceneId) || null;
+  };
+
+  const handleGenerateVfxConcept = (sceneId: number) => {
+    const vfxScene = vfxScenes.find(s => s.sceneId === sceneId);
+    if (!vfxScene?.selectedQuality) {
+      toast({
+        title: "Quality Required",
+        description: "Please select a VFX quality level first.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    generateVfxConceptMutation.mutate({
+      sceneId,
+      quality: vfxScene.selectedQuality
+    });
+  };
+
+  const handleViewConcept = (sceneId: number) => {
+    const concept = getVfxConcept(sceneId);
+    if (concept?.videoUrl && concept.status === 'completed') {
+      setVideoDialog({
+        open: true,
+        videoUrl: concept.videoUrl,
+        sceneId
+      });
+    }
+  };
+
+  const vfxScenesOnly = vfxScenes.filter(scene => scene.isVfxScene);
+  const selectedScene = selectedSceneId ? scenes?.find((s: any) => s.id === selectedSceneId) : null;
 
   if (scenesLoading) {
     return (
