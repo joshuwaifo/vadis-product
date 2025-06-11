@@ -336,7 +336,7 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle, pag
                   {/* Image Display Area */}
                   <div className="relative">
                     {imageLoading && (
-                      <div className="aspect-video bg-gray-800 rounded-lg flex items-center justify-center border border-gray-700">
+                      <div className="w-full max-w-2xl mx-auto aspect-video bg-gray-800 rounded-lg flex items-center justify-center border border-gray-700">
                         <div className="text-center text-gray-400">
                           <Loader2 className="h-8 w-8 mx-auto mb-2 animate-spin" />
                           <p className="text-sm">Loading storyboard...</p>
@@ -346,11 +346,11 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle, pag
                     
                     {storyboardImage && (
                       <div className="space-y-3">
-                        <div className="relative">
+                        <div className="relative w-full max-w-2xl mx-auto">
                           <img
                             src={storyboardImage.imageUrl}
                             alt={`Storyboard for Scene ${selectedScene?.sceneNumber}`}
-                            className="w-full aspect-video object-cover rounded-lg border border-gray-700"
+                            className="w-full h-auto max-h-[50vh] object-contain rounded-lg border border-gray-700 bg-gray-900"
                             onError={(e) => {
                               console.error('Failed to load storyboard image');
                               e.currentTarget.style.display = 'none';
