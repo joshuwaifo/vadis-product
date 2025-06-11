@@ -708,25 +708,50 @@ Format as a single detailed prompt for image generation, focusing on visual elem
       // Get project characters for context
       const characters = await storage.getCharactersByProject(projectId);
       
-      // Get or create character profiles for visual consistency
-      const existingProfiles = await storage.getCharacterProfiles(projectId);
-      let characterProfiles = existingProfiles;
+      // Get previous storyboard images for character reference
+      const allScenes = await storage.getScenesByProject(projectId);
+      const previousStoryboards = [];
       
-      // If this is the first scene with characters, create profiles
-      if (scene.characters && scene.characters.length > 0 && existingProfiles.length === 0) {
-        // Extract character descriptions from the first scene
+      for (const prevScene of allScenes) {
+        if (prevScene.sceneNumber < scene.sceneNumber) {
+          try {
+            const storyboard = await storage.getStoryboardImage(prevScene.id);
+            if (storyboard) {
+              previousStoryboards.push({
+                sceneNumber: prevScene.sceneNumber,
+                characters: prevScene.characters || [],
+                imageUrl: storyboard.imageUrl,
+                description: prevScene.description
+              });
+            }
+          } catch (error) {
+            // Skip if storyboard doesn't exist
+            continue;
+          }
+        }
+      }
+      
+      // Build character continuity references
+      const characterReferences = {};
+      if (scene.characters) {
         for (const characterName of scene.characters) {
           const character = characters.find(c => c.name === characterName);
-          if (character) {
-            const profile = await storage.createCharacterProfile({
-              projectId,
-              characterName: character.name,
-              physicalDescription: character.description || `Main character named ${character.name}`,
-              costumeDescription: `Appropriate attire for the scene context`,
-              visualStyle: style,
-              referenceImageUrl: null
-            });
-            characterProfiles.push(profile);
+          const previousAppearance = previousStoryboards.find(sb => 
+            sb.characters.includes(characterName)
+          );
+          
+          if (character && previousAppearance) {
+            characterReferences[characterName] = {
+              description: character.description || `Character named ${characterName}`,
+              previousImageUrl: previousAppearance.imageUrl,
+              previousSceneContext: previousAppearance.description
+            };
+          } else if (character) {
+            characterReferences[characterName] = {
+              description: character.description || `Character named ${characterName}`,
+              previousImageUrl: null,
+              previousSceneContext: null
+            };
           }
         }
       }
@@ -743,6 +768,19 @@ Format as a single detailed prompt for image generation, focusing on visual elem
         vintage: "Classic Hollywood golden age style, vintage film aesthetic, warm color grading, classic cinematography, nostalgic lighting, retro composition."
       };
 
+      // Build character continuity information
+      let characterContinuityInfo = '';
+      if (Object.keys(characterReferences).length > 0) {
+        characterContinuityInfo = '\n\nCHARACTER CONTINUITY (maintain consistent appearance):';
+        for (const [name, ref] of Object.entries(characterReferences)) {
+          characterContinuityInfo += `\n- ${name}: ${ref.description}`;
+          if (ref.previousImageUrl) {
+            characterContinuityInfo += ` (Previous appearance: consistent with established visual from scene ${previousStoryboards.find(sb => sb.characters.includes(name))?.sceneNumber})`;
+          }
+        }
+        characterContinuityInfo += '\nIMPORTANT: Characters must maintain consistent physical features, facial characteristics, hair, and clothing style across all scenes.';
+      }
+
       // Create Gemini prompt refinement request
       const prompt = `You are a professional storyboard artist specializing in ${style} style. Create a detailed visual prompt for Imagen 4 based on this scene:
 
@@ -753,16 +791,16 @@ Characters Present: ${scene.characters?.join(', ') || 'None specified'}
 Scene Content: ${scene.content}
 
 Available Characters:
-${characters.map(char => `- ${char.name}: ${char.description}`).join('\n')}
+${characters.map(char => `- ${char.name}: ${char.description}`).join('\n')}${characterContinuityInfo}
 
 Create a vivid visual description that includes:
 - Art style: ${styleInstructions[style] || style}
 - Lighting: Appropriate lighting for ${scene.timeOfDay} in ${style} style
 - Composition: Cinematic framing that captures the emotional tone
-- Character details: Character design appropriate for ${style} style if characters are present
+- Character details: Character design appropriate for ${style} style with consistent visual appearance if characters appeared in previous scenes
 - Environmental details: Rich, detailed backgrounds in ${style} aesthetic
 
-Format as a single detailed prompt for image generation, focusing on visual elements only. The style must be strictly ${style} aesthetic.`;
+Format as a single detailed prompt for image generation, focusing on visual elements only. The style must be strictly ${style} aesthetic. Ensure character visual consistency across scenes.`;
 
       // Use Gemini to refine the prompt
       const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || process.env.GOOGLE_GEMINI_API_KEY);
