@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   Play, Pause, SkipForward, SkipBack, Maximize2, 
@@ -42,10 +43,23 @@ interface StoryboardImage {
   generatedAt: Date;
 }
 
+// Available art styles for storyboard generation
+const ART_STYLES = [
+  { id: 'ghibli', name: 'Studio Ghibli', description: 'Dreamy, hand-drawn animation style' },
+  { id: 'realistic', name: 'Realistic', description: 'Photorealistic cinematic style' },
+  { id: 'comic', name: 'Comic Book', description: 'Bold comic book illustration style' },
+  { id: 'noir', name: 'Film Noir', description: 'Dark, high-contrast black and white style' },
+  { id: 'watercolor', name: 'Watercolor', description: 'Soft, artistic watercolor painting style' },
+  { id: 'sketch', name: 'Pencil Sketch', description: 'Hand-drawn pencil sketch style' },
+  { id: 'cyberpunk', name: 'Cyberpunk', description: 'Futuristic neon-lit digital art style' },
+  { id: 'vintage', name: 'Vintage Film', description: 'Classic Hollywood golden age style' }
+];
+
 export default function StoryboardSceneView({ scenes, onClose, projectTitle, pageCount, projectId }: StoryboardSceneViewProps) {
   const [selectedScene, setSelectedScene] = useState<Scene | null>(scenes[0] || null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [selectedStyle, setSelectedStyle] = useState<string>('ghibli');
 
   const queryClient = useQueryClient();
 
@@ -63,17 +77,17 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle, pag
     enabled: !!selectedScene
   });
 
-  // Generate storyboard image mutation with Gemini refinement and Imagen 4
+  // Generate storyboard image mutation with style selection and Gemini refinement
   const generateImageMutation = useMutation({
-    mutationFn: async (sceneId: string) => {
-      const response = await fetch(`/api/scenes/${sceneId}/storyboard-ghibli`, {
+    mutationFn: async ({ sceneId, style }: { sceneId: string, style: string }) => {
+      const response = await fetch(`/api/scenes/${sceneId}/generate-storyboard`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           projectId,
-          style: 'ghibli'
+          style
         })
       });
       if (!response.ok) throw new Error('Failed to generate storyboard image');
@@ -256,24 +270,42 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle, pag
                       <h3 className="text-sm sm:text-base font-semibold text-white">Storyboard Frame</h3>
                     </div>
                     {!storyboardImage && !imageLoading && (
-                      <Button
-                        size="sm"
-                        onClick={() => selectedScene && generateImageMutation.mutate(selectedScene.id)}
-                        disabled={generateImageMutation.isPending}
-                        className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
-                      >
-                        {generateImageMutation.isPending ? (
-                          <>
-                            <Loader2 className="h-3 w-3 animate-spin mr-1" />
-                            Generating...
-                          </>
-                        ) : (
-                          <>
-                            <ImageIcon className="h-3 w-3 mr-1" />
-                            Generate Ghibli Art
-                          </>
-                        )}
-                      </Button>
+                      <div className="flex items-center gap-2">
+                        <Select value={selectedStyle} onValueChange={setSelectedStyle}>
+                          <SelectTrigger className="w-40 h-8 bg-gray-800 border-gray-600 text-white text-xs">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent className="bg-gray-800 border-gray-600">
+                            {ART_STYLES.map((style) => (
+                              <SelectItem 
+                                key={style.id} 
+                                value={style.id}
+                                className="text-white hover:bg-gray-700 focus:bg-gray-700"
+                              >
+                                {style.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <Button
+                          size="sm"
+                          onClick={() => selectedScene && generateImageMutation.mutate({ sceneId: selectedScene.id, style: selectedStyle })}
+                          disabled={generateImageMutation.isPending}
+                          className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
+                        >
+                          {generateImageMutation.isPending ? (
+                            <>
+                              <Loader2 className="h-3 w-3 animate-spin mr-1" />
+                              Generating...
+                            </>
+                          ) : (
+                            <>
+                              <ImageIcon className="h-3 w-3 mr-1" />
+                              Generate Art
+                            </>
+                          )}
+                        </Button>
+                      </div>
                     )}
                   </div>
 
@@ -327,7 +359,14 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle, pag
                         <div className="text-center text-gray-400">
                           <ImageIcon className="h-12 w-12 mx-auto mb-3 opacity-50" />
                           <p className="text-sm font-medium mb-1">No storyboard image</p>
-                          <p className="text-xs">Click "Generate Ghibli Art" to create a visual representation</p>
+                          <p className="text-xs">
+                            Select a style and click "Generate Art" to create a visual representation
+                          </p>
+                          {selectedStyle && (
+                            <p className="text-xs mt-2 text-blue-400">
+                              Current style: {ART_STYLES.find(s => s.id === selectedStyle)?.name}
+                            </p>
+                          )}
                         </div>
                       </div>
                     )}
@@ -336,7 +375,9 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle, pag
                       <div className="aspect-video bg-gray-800 rounded-lg flex items-center justify-center border border-gray-700">
                         <div className="text-center text-gray-400">
                           <Loader2 className="h-12 w-12 mx-auto mb-3 animate-spin" />
-                          <p className="text-sm font-medium mb-1">Generating Ghibli-style storyboard...</p>
+                          <p className="text-sm font-medium mb-1">
+                            Generating {ART_STYLES.find(s => s.id === selectedStyle)?.name || 'Custom'} storyboard...
+                          </p>
                           <p className="text-xs">AI refining prompt with Gemini, then creating art with Imagen 4</p>
                         </div>
                       </div>

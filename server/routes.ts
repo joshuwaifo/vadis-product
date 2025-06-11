@@ -687,6 +687,92 @@ Format as a single detailed prompt for image generation, focusing on visual elem
     }
   });
 
+  // Flexible storyboard generation with style selection and Gemini refinement
+  app.post("/api/scenes/:sceneId/generate-storyboard", async (req, res) => {
+    try {
+      if (!req.session.user) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const sceneId = parseInt(req.params.sceneId);
+      const { projectId, style } = req.body;
+
+      // Get scene data
+      const scene = await storage.getSceneById(sceneId);
+      if (!scene) {
+        return res.status(404).json({ error: "Scene not found" });
+      }
+
+      // Get project characters for context
+      const characters = await storage.getCharactersByProject(projectId);
+
+      // Style-specific prompt instructions
+      const styleInstructions = {
+        ghibli: "Studio Ghibli art style, hand-drawn animation, soft watercolor backgrounds, detailed character expressions, cinematic composition, warm natural lighting, authentic Miyazaki aesthetic. NOT photorealistic, NOT CGI, NOT 3D render.",
+        realistic: "Photorealistic cinematic style, professional film quality, natural lighting, detailed textures, high-resolution photography aesthetic, dramatic composition.",
+        comic: "Bold comic book illustration style, vibrant colors, dynamic panel composition, cel-shaded characters, dramatic shadows and highlights, graphic novel aesthetic.",
+        noir: "Film noir style, high-contrast black and white photography, dramatic shadows, moody lighting, classic 1940s cinematography, chiaroscuro lighting.",
+        watercolor: "Soft watercolor painting style, flowing brushstrokes, gentle color blending, artistic paper texture, delicate transparency effects, impressionistic details.",
+        sketch: "Hand-drawn pencil sketch style, detailed line work, crosshatching shading, artistic graphite textures, traditional drawing techniques.",
+        cyberpunk: "Futuristic cyberpunk style, neon lighting, digital art aesthetic, high-tech environments, glowing elements, dystopian atmosphere, sci-fi composition.",
+        vintage: "Classic Hollywood golden age style, vintage film aesthetic, warm color grading, classic cinematography, nostalgic lighting, retro composition."
+      };
+
+      // Create Gemini prompt refinement request
+      const prompt = `You are a professional storyboard artist specializing in ${style} style. Create a detailed visual prompt for Imagen 4 based on this scene:
+
+Scene: ${scene.description}
+Location: ${scene.location}
+Time of Day: ${scene.timeOfDay}
+Characters Present: ${scene.characters?.join(', ') || 'None specified'}
+Scene Content: ${scene.content}
+
+Available Characters:
+${characters.map(char => `- ${char.name}: ${char.description}`).join('\n')}
+
+Create a vivid visual description that includes:
+- Art style: ${styleInstructions[style] || style}
+- Lighting: Appropriate lighting for ${scene.timeOfDay} in ${style} style
+- Composition: Cinematic framing that captures the emotional tone
+- Character details: Character design appropriate for ${style} style if characters are present
+- Environmental details: Rich, detailed backgrounds in ${style} aesthetic
+
+Format as a single detailed prompt for image generation, focusing on visual elements only. The style must be strictly ${style} aesthetic.`;
+
+      // Use Gemini to refine the prompt
+      const { GoogleGenerativeAI } = require('@google/generative-ai');
+      const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
+      
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const result = await model.generateContent(prompt);
+      const refinedPrompt = result.response.text();
+
+      // Generate image using the existing imagen generator service
+      const { generateImagenStoryboard } = require('./services/imagen-generator');
+      const styledPrompt = `${refinedPrompt}. ${styleInstructions[style] || style}`;
+      
+      const imageUrl = await generateImagenStoryboard(styledPrompt);
+
+      // Save to storage
+      const storyboardImage = await storage.createStoryboardImage({
+        sceneId,
+        imageUrl,
+        prompt: refinedPrompt,
+        charactersPresent: scene.characters || [],
+        generatedAt: new Date()
+      });
+
+      res.json({
+        success: true,
+        storyboardImage
+      });
+
+    } catch (error) {
+      console.error("Error generating styled storyboard:", error);
+      res.status(500).json({ error: "Failed to generate storyboard image" });
+    }
+  });
+
   // Register script analysis routes
   registerScriptAnalysisRoutes(app);
   registerWorkflowRoutes(app);
