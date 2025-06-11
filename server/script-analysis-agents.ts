@@ -535,34 +535,55 @@ Focus on realistic, current information about the actor. If the actor is not wel
 }
 
 /**
- * Analyze VFX needs
+ * Analyze VFX needs using GPT-4o for superior scene identification
  */
 export async function analyzeVFXNeeds(
   scenes: Scene[],
-  provider: AIProvider = 'gemini-1.5-pro'
+  provider: AIProvider = 'gpt-4o'
 ): Promise<VFXNeed[]> {
   const prompt = `
-    Analyze these scenes for VFX requirements. Identify:
-    - Type of VFX needed (CGI, practical effects, compositing, etc.)
-    - Complexity level
-    - Estimated cost
-    - Detailed description
+    You are an expert VFX supervisor analyzing a screenplay for visual effects requirements. 
+    Carefully examine each scene and identify those that require VFX work.
 
-    Scenes:
-    ${JSON.stringify(scenes.map(s => ({ id: s.id, description: s.description, content: s.content })), null, 2)}
+    Look for scenes that contain:
+    - Supernatural or fantasy elements (magic, ghosts, mythical creatures)
+    - Sci-fi elements (aliens, spaceships, futuristic technology)
+    - Impossible or dangerous actions (explosions, vehicle crashes, falls)
+    - Environmental effects (storms, natural disasters, fire)
+    - Creature work (dinosaurs, monsters, talking animals)
+    - Digital environments or matte paintings
+    - Wire removal or digital doubles
+    - Period-specific elements requiring digital recreation
+    - Crowd multiplication or digital extras
+    - Blood, gore, or injury effects
+    - Architectural or landscape modifications
+    - Time manipulation or speed effects
 
-    Return as JSON array:
+    Be thorough but realistic - only identify scenes that truly need VFX work, not basic practical effects.
+
+    Scenes to analyze:
+    ${JSON.stringify(scenes.map(s => ({ 
+      id: s.id, 
+      sceneNumber: s.sceneNumber,
+      location: s.location,
+      description: s.description, 
+      content: s.content 
+    })), null, 2)}
+
+    Return as JSON array with detailed analysis:
     [
       {
         "sceneId": "scene_1",
-        "sceneDescription": "Brief description",
-        "vfxType": "CGI Environment",
-        "complexity": "high",
-        "estimatedCost": 150000,
-        "description": "Detailed VFX requirements",
-        "referenceImages": ["style references or mood boards"]
+        "sceneDescription": "Brief scene summary",
+        "vfxType": "Specific VFX category (e.g., 'CGI Creature', 'Digital Environment', 'Compositing')",
+        "complexity": "low|medium|high|extreme",
+        "estimatedCost": 50000,
+        "description": "Detailed description of VFX requirements and approach",
+        "referenceImages": ["Suggested visual references or similar films"]
       }
     ]
+
+    Only include scenes that genuinely require VFX work. If no scenes need VFX, return an empty array.
   `;
 
   try {
@@ -574,7 +595,7 @@ export async function analyzeVFXNeeds(
     return extractJsonFromText(response) || [];
   } catch (error) {
     console.error('Error analyzing VFX needs:', error);
-    throw new Error('Failed to analyze VFX needs');
+    throw new Error('Failed to analyze VFX needs');  
   }
 }
 
