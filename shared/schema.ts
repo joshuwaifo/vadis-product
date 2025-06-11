@@ -492,6 +492,8 @@ export type InsertFinancialPlan = z.infer<typeof insertFinancialPlanSchema>;
 export type FinancialPlan = typeof financialPlans.$inferSelect;
 export type InsertSceneVariation = z.infer<typeof insertSceneVariationSchema>;
 export type SceneVariation = typeof sceneVariations.$inferSelect;
+export type InsertStoryboardImage = z.infer<typeof insertStoryboardImageSchema>;
+export type StoryboardImage = typeof storyboardImages.$inferSelect;
 
 // Project history/activity log table
 export const projectHistory = pgTable("project_history", {

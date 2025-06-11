@@ -55,7 +55,10 @@ import {
   type InsertProjectHistory,
   type BrandUser,
   type FinancierUser,
-  type CreatorUser
+  type CreatorUser,
+  storyboardImages,
+  type StoryboardImage,
+  type InsertStoryboardImage
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, sql, and, exists } from "drizzle-orm";
@@ -146,6 +149,11 @@ export interface IStorage {
   // Project History
   createProjectHistory(history: InsertProjectHistory): Promise<ProjectHistory>;
   getProjectHistory(projectId: number): Promise<ProjectHistory[]>;
+  
+  // Storyboard Images
+  createStoryboardImage(storyboardImage: InsertStoryboardImage): Promise<StoryboardImage>;
+  getStoryboardImage(sceneId: number): Promise<StoryboardImage | undefined>;
+  getSceneById(sceneId: number): Promise<Scene | undefined>;
 }
 
 // DEPRECATED: MemStorage class - kept for testing purposes only
@@ -1147,6 +1155,46 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error('Error getting project history:', error);
       return [];
+    }
+  }
+
+  // Storyboard Images
+  async createStoryboardImage(storyboardImage: InsertStoryboardImage): Promise<StoryboardImage> {
+    try {
+      const result = await db
+        .insert(storyboardImages)
+        .values(storyboardImage)
+        .returning();
+      return result[0];
+    } catch (error) {
+      console.error('Error creating storyboard image:', error);
+      throw error;
+    }
+  }
+
+  async getStoryboardImage(sceneId: number): Promise<StoryboardImage | undefined> {
+    try {
+      const result = await db
+        .select()
+        .from(storyboardImages)
+        .where(eq(storyboardImages.sceneId, sceneId));
+      return result[0] || undefined;
+    } catch (error) {
+      console.error('Error getting storyboard image:', error);
+      return undefined;
+    }
+  }
+
+  async getSceneById(sceneId: number): Promise<Scene | undefined> {
+    try {
+      const result = await db
+        .select()
+        .from(scenes)
+        .where(eq(scenes.id, sceneId));
+      return result[0] || undefined;
+    } catch (error) {
+      console.error('Error getting scene by ID:', error);
+      return undefined;
     }
   }
 }
