@@ -46,11 +46,8 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle, pag
   const [selectedScene, setSelectedScene] = useState<Scene | null>(scenes[0] || null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [backgroundGeneration, setBackgroundGeneration] = useState({
-    isGenerating: false,
-    completed: 0,
-    currentScene: ''
-  });
+  const [viewMode, setViewMode] = useState<'shots' | 'scenes'>('shots');
+  const [sceneBreakdown, setSceneBreakdown] = useState<any>(null);
   const queryClient = useQueryClient();
 
   // Get storyboard image for the selected scene
@@ -115,40 +112,7 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle, pag
     img.sceneId === parseInt(selectedScene?.id || '0')
   );
 
-  // Start background generation when component mounts if projectId is available
-  useEffect(() => {
-    if (projectId && scenes.length > 0 && storyboardImages !== undefined) {
-      const existingCount = storyboardImages.length;
-      
-      // Only start generation if we don't have all images
-      if (existingCount < scenes.length) {
-        setBackgroundGeneration(prev => ({
-          ...prev,
-          isGenerating: true,
-          completed: existingCount,
-          currentScene: scenes[existingCount]?.description || `Scene ${scenes[existingCount]?.sceneNumber}`
-        }));
-        generateAllImagesMutation.mutate(projectId);
-        
-        // Set up polling to refresh images as they become available
-        const pollForNewImages = () => {
-          queryClient.invalidateQueries({ queryKey: ['project-storyboard', projectId] });
-          queryClient.invalidateQueries({ queryKey: ['scene-storyboard'] });
-        };
-        
-        const pollInterval = setInterval(pollForNewImages, 2000); // Poll every 2 seconds
-        
-        // Clear interval when component unmounts or generation completes
-        return () => clearInterval(pollInterval);
-      } else {
-        setBackgroundGeneration(prev => ({
-          ...prev,
-          isGenerating: false,
-          completed: existingCount
-        }));
-      }
-    }
-  }, [projectId, scenes.length, storyboardImages?.length]);
+  // Remove automatic generation - users will manually trigger image generation per scene
 
   // Auto-play functionality
   useEffect(() => {
