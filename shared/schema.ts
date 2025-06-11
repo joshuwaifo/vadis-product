@@ -246,6 +246,8 @@ export const financialPlans = pgTable("financial_plans", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+
+
 // Products table for brands/agencies
 export const products = pgTable("products", {
   id: serial("id").primaryKey(),

@@ -707,6 +707,29 @@ Format as a single detailed prompt for image generation, focusing on visual elem
 
       // Get project characters for context
       const characters = await storage.getCharactersByProject(projectId);
+      
+      // Get or create character profiles for visual consistency
+      const existingProfiles = await storage.getCharacterProfiles(projectId);
+      let characterProfiles = existingProfiles;
+      
+      // If this is the first scene with characters, create profiles
+      if (scene.characters && scene.characters.length > 0 && existingProfiles.length === 0) {
+        // Extract character descriptions from the first scene
+        for (const characterName of scene.characters) {
+          const character = characters.find(c => c.name === characterName);
+          if (character) {
+            const profile = await storage.createCharacterProfile({
+              projectId,
+              characterName: character.name,
+              physicalDescription: character.description || `Main character named ${character.name}`,
+              costumeDescription: `Appropriate attire for the scene context`,
+              visualStyle: style,
+              referenceImageUrl: null
+            });
+            characterProfiles.push(profile);
+          }
+        }
+      }
 
       // Style-specific prompt instructions
       const styleInstructions = {
