@@ -449,142 +449,224 @@ export default function VFXAnalysisView({ projectId, onClose }: VFXAnalysisViewP
         <>
           <div className="mb-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">Scene Analysis Results</h3>
+              <h3 className="text-lg font-semibold">VFX Scene Analysis</h3>
               <div className="flex items-center gap-4">
-                <Badge variant="secondary">
-                  {scenes.length} total scenes
-                </Badge>
                 <Badge variant="outline" className="text-blue-600 border-blue-200">
-                  {vfxScenes.filter(s => s.isVfxScene).length} VFX scenes
+                  {vfxScenesOnly.length} VFX scenes
                 </Badge>
                 {getSelectedScenesCount() > 0 && (
                   <Badge variant="outline" className="text-green-600 border-green-200">
-                    {getSelectedScenesCount()} selected
+                    {getSelectedScenesCount()} with quality selected
                   </Badge>
                 )}
               </div>
             </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-              {scenes.sort((a, b) => a.sceneNumber - b.sceneNumber).map((scene) => {
-                const vfxAnalysis = vfxScenes.find(v => v.sceneId === scene.id);
-                const isVfxScene = vfxAnalysis?.isVfxScene || false;
-                
-                return (
-                  <Card 
-                    key={scene.id} 
-                    className={`h-64 hover:shadow-md transition-shadow border ${
-                      isVfxScene 
-                        ? 'border-blue-200 dark:border-blue-700 bg-blue-50/30 dark:bg-blue-900/10' 
-                        : 'border-gray-200 dark:border-gray-700'
-                    } relative`}
-                  >
-                    {isVfxScene && (
-                      <div className="absolute top-2 right-2 z-10">
-                        <div className="bg-blue-500 text-white rounded-full p-1">
-                          <Star className="h-4 w-4 fill-current" />
-                        </div>
-                      </div>
-                    )}
-                    
-                    <CardContent className="p-4 h-full flex flex-col">
-                      <div className="flex items-center justify-between mb-2">
-                        <Badge variant="outline" className="text-xs px-2 py-1">
-                          Scene {scene.sceneNumber}
-                        </Badge>
-                        {isVfxScene && (
-                          <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300">
-                            VFX
-                          </Badge>
-                        )}
-                      </div>
-                      
-                      <h4 className="text-sm font-medium mb-2 line-clamp-1">
-                        {scene.description || `Scene ${scene.sceneNumber}`}
-                      </h4>
-                      
-                      <div className="flex-1 overflow-hidden mb-4">
-                        <ScrollArea className="h-16">
-                          <p className="text-xs text-muted-foreground leading-relaxed pr-2">
-                            {scene.plotSummary || 'Plot summary not available'}
-                          </p>
-                        </ScrollArea>
-                      </div>
-
-                      <div className="space-y-2">
-                        <div className="text-xs text-muted-foreground">
-                          Select VFX Quality:
-                        </div>
-                        <div className="flex gap-1">
-                          {(['low', 'medium', 'high'] as const).map((quality) => (
-                            <Button
-                              key={quality}
-                              size="sm"
-                              variant={vfxAnalysis?.selectedQuality === quality ? "default" : "outline"}
-                              className={`text-xs px-2 py-1 h-7 ${
-                                vfxAnalysis?.selectedQuality === quality 
-                                    ? getQualityColor(quality) 
-                                    : 'hover:bg-gray-100 dark:hover:bg-gray-800'
-                                }`}
-                                onClick={() => handleQualitySelect(scene.id, quality)}
-                              >
-                                {quality.charAt(0).toUpperCase() + quality.slice(1)}
-                              </Button>
-                            ))}
-                          </div>
-                        </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
           </div>
 
-          {getSelectedScenesCount() > 0 && (
-            <div className="mt-6">
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="text-lg font-semibold mb-2">Cost Estimation</h3>
-                      <p className="text-muted-foreground">
-                        Get AI-powered cost estimates for your selected VFX scenes ({getSelectedScenesCount()} scenes selected)
-                      </p>
-                      {totalCostEstimate && (
-                        <div className="mt-4 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                          <div className="flex items-center gap-2">
-                            <DollarSign className="h-5 w-5 text-green-600" />
-                            <span className="text-lg font-bold text-green-700 dark:text-green-400">
-                              Total Estimated Cost: ${totalCostEstimate.toLocaleString()}
-                            </span>
-                          </div>
-                        </div>
-                      )}
+          {/* New Layout: Left Panel List + Right Panel Image */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[600px]">
+            {/* Left Panel - Scene List */}
+            <div className="space-y-2">
+              <h4 className="font-medium text-sm text-muted-foreground mb-3">
+                Scenes with VFX Requirements
+              </h4>
+              <ScrollArea className="h-full pr-4">
+                <div className="space-y-3">
+                  {vfxScenesOnly.length === 0 ? (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <Zap className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                      <p>No VFX scenes identified</p>
                     </div>
-                    <Button 
-                      onClick={calculateCost}
-                      disabled={costEstimationMutation.isPending}
-                      className="bg-blue-600 hover:bg-blue-700"
-                    >
-                      {costEstimationMutation.isPending ? (
-                        <>
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                          Calculating...
-                        </>
-                      ) : (
-                        <>
-                          <DollarSign className="h-4 w-4 mr-2" />
-                          Calculate Cost
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+                  ) : (
+                    vfxScenesOnly.map((vfxScene) => {
+                      const scene = scenes?.find((s: any) => s.id === vfxScene.sceneId);
+                      if (!scene) return null;
+                      
+                      const isSelected = selectedSceneId === scene.id;
+                      const concept = getVfxConcept(scene.id);
+                      
+                      return (
+                        <Card 
+                          key={scene.id}
+                          className={`cursor-pointer transition-all hover:shadow-md ${
+                            isSelected 
+                              ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' 
+                              : 'border-gray-200 hover:border-gray-300'
+                          }`}
+                          onClick={() => setSelectedSceneId(scene.id)}
+                        >
+                          <CardContent className="p-4">
+                            <div className="flex items-start justify-between mb-2">
+                              <div>
+                                <Badge variant="outline" className="text-xs mb-1">
+                                  Scene {scene.sceneNumber}
+                                </Badge>
+                                <h5 className="font-medium text-sm">
+                                  {scene.location} - {scene.timeOfDay}
+                                </h5>
+                              </div>
+                              {concept?.status === 'completed' && (
+                                <Badge variant="secondary" className="bg-green-100 text-green-700">
+                                  <CheckCircle className="h-3 w-3 mr-1" />
+                                  Ready
+                                </Badge>
+                              )}
+                            </div>
+                            
+                            <p className="text-xs text-muted-foreground mb-3 line-clamp-2">
+                              {vfxScene.vfxDescription}
+                            </p>
+                            
+                            {/* VFX Quality Selection */}
+                            <div className="space-y-2">
+                              <div className="text-xs text-muted-foreground">
+                                Select VFX Quality:
+                              </div>
+                              <div className="flex gap-1">
+                                {(['low', 'medium', 'high'] as const).map((quality) => (
+                                  <Button
+                                    key={quality}
+                                    size="sm"
+                                    variant={vfxScene.selectedQuality === quality ? "default" : "outline"}
+                                    className={`text-xs px-2 py-1 h-6 ${
+                                      vfxScene.selectedQuality === quality 
+                                        ? getQualityColor(quality) 
+                                        : 'hover:bg-gray-100 dark:hover:bg-gray-800'
+                                    }`}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleQualitySelect(scene.id, quality);
+                                    }}
+                                  >
+                                    {quality.charAt(0).toUpperCase() + quality.slice(1)}
+                                  </Button>
+                                ))}
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      );
+                    })
+                  )}
+                </div>
+              </ScrollArea>
             </div>
-          )}
+
+            {/* Right Panel - Image Display */}
+            <div className="space-y-4">
+              <h4 className="font-medium text-sm text-muted-foreground">
+                Storyboard & VFX Concept
+              </h4>
+              
+              {selectedScene ? (
+                <div className="space-y-4">
+                  <Card>
+                    <CardContent className="p-4">
+                      <div className="mb-3">
+                        <h5 className="font-medium">
+                          Scene {selectedScene.sceneNumber}: {selectedScene.location}
+                        </h5>
+                        <p className="text-sm text-muted-foreground">
+                          {selectedScene.description}
+                        </p>
+                      </div>
+                      
+                      {/* Storyboard Image */}
+                      <div className="aspect-video bg-gray-100 dark:bg-gray-800 rounded-lg mb-4 overflow-hidden">
+                        {(() => {
+                          const storyboardImage = getStoryboardImage(selectedScene.id);
+                          return storyboardImage ? (
+                            <img 
+                              src={storyboardImage.imageUrl} 
+                              alt={`Scene ${selectedScene.sceneNumber} storyboard`}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                              <div className="text-center">
+                                <Video className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                                <p className="text-sm">No storyboard image</p>
+                              </div>
+                            </div>
+                          );
+                        })()}
+                      </div>
+                      
+                      {/* Generate VFX Concept Button */}
+                      <div className="space-y-2">
+                        {(() => {
+                          const concept = getVfxConcept(selectedScene.id);
+                          const vfxScene = vfxScenesOnly.find(s => s.sceneId === selectedScene.id);
+                          
+                          if (concept?.status === 'generating') {
+                            return (
+                              <Button disabled className="w-full">
+                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                Generating VFX Concept...
+                              </Button>
+                            );
+                          }
+                          
+                          if (concept?.status === 'completed') {
+                            return (
+                              <Button 
+                                onClick={() => handleViewConcept(selectedScene.id)}
+                                className="w-full bg-green-600 hover:bg-green-700"
+                              >
+                                <Eye className="h-4 w-4 mr-2" />
+                                View Concept
+                              </Button>
+                            );
+                          }
+                          
+                          return (
+                            <Button 
+                              onClick={() => handleGenerateVfxConcept(selectedScene.id)}
+                              disabled={!vfxScene?.selectedQuality || generateVfxConceptMutation.isPending}
+                              className="w-full"
+                            >
+                              <Play className="h-4 w-4 mr-2" />
+                              Generate VFX Concept
+                            </Button>
+                          );
+                        })()}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              ) : (
+                <Card className="h-64">
+                  <CardContent className="p-4 h-full flex items-center justify-center text-muted-foreground">
+                    <div className="text-center">
+                      <Zap className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                      <p>Select a scene to view storyboard and generate VFX concepts</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          </div>
         </>
       )}
+
+      {/* Video Dialog */}
+      <Dialog open={videoDialog.open} onOpenChange={(open) => setVideoDialog(prev => ({ ...prev, open }))}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>VFX Concept Video</DialogTitle>
+          </DialogHeader>
+          <div className="aspect-video bg-black rounded-lg overflow-hidden">
+            {videoDialog.videoUrl && (
+              <video 
+                src={videoDialog.videoUrl} 
+                controls 
+                className="w-full h-full"
+                autoPlay
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
