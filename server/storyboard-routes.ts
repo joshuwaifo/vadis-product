@@ -110,6 +110,36 @@ export function registerStoryboardRoutes(app: Express) {
   });
 
   /**
+   * Generate Ghibli-style storyboard image for a specific scene
+   */
+  app.post('/api/scenes/:sceneId/generate-ghibli-storyboard', requireAuth, async (req: Request, res: Response) => {
+    try {
+      const sceneId = parseInt(req.params.sceneId);
+      
+      if (isNaN(sceneId)) {
+        return res.status(400).json({ error: "Invalid scene ID" });
+      }
+
+      console.log(`[Storyboard API] Generating Ghibli-style storyboard for scene ${sceneId}`);
+      
+      const storyboardImage = await storyboardService.generateSceneStoryboard(sceneId);
+      
+      res.json({
+        success: true,
+        storyboardImage,
+        message: "Ghibli-style storyboard image generated successfully"
+      });
+
+    } catch (error) {
+      console.error("[Storyboard API] Error generating Ghibli storyboard:", error);
+      res.status(500).json({
+        error: "Failed to generate Ghibli storyboard image",
+        details: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
+  /**
    * Generate storyboard for entire project
    */
   app.post('/api/projects/:projectId/storyboard/generate', requireAuth, async (req: Request, res: Response) => {
