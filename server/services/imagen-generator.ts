@@ -34,7 +34,7 @@ export class ImagenGenerator {
     const {
       prompt,
       aspectRatio = "16:9",
-      safetyFilterLevel = "block_medium_and_above",
+      safetyFilterLevel = "block_few",
       seed
     } = options;
 
@@ -142,12 +142,12 @@ export class ImagenGenerator {
 export const imagenGenerator = new ImagenGenerator();
 
 /**
- * Generate Ghibli-style storyboard image
+ * Generate storyboard image with permissive content filtering for creative content
  */
 export async function generateImagenStoryboard(prompt: string): Promise<string> {
   return await imagenGenerator.generateImage({
     prompt,
     aspectRatio: "16:9",
-    safetyFilterLevel: "block_medium_and_above"
+    safetyFilterLevel: "block_few"
   });
 }
