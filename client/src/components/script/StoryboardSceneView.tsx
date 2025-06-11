@@ -249,9 +249,9 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle, pag
                 </h2>
               </div>
 
-              {/* Scene Content - Vertical layout */}
+              {/* Scene Content */}
               <div className="flex-1 bg-gray-900/50 rounded-xl p-3 sm:p-6 border border-gray-800 min-h-0 flex flex-col gap-4 sm:gap-6">
-                {/* Script Content - Top section */}
+                {/* Script Content - Always visible */}
                 <div className="flex-1 min-h-[200px]">
                   <div className="mb-3">
                     <div className="flex items-center gap-2 mb-2">
@@ -286,7 +286,7 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle, pag
                   </ScrollArea>
                 </div>
 
-                {/* Storyboard Image Section - Bottom section */}
+                {/* Storyboard Image Section */}
                 <div className="flex-shrink-0">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-3">
@@ -333,10 +333,10 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle, pag
                     )}
                   </div>
 
-                  {/* Image Display Area - Square format */}
-                  <div className="relative max-w-md mx-auto">
+                  {/* Image Display Area */}
+                  <div className="relative">
                     {imageLoading && (
-                      <div className="w-full aspect-square bg-gray-800 rounded-lg flex items-center justify-center border border-gray-700">
+                      <div className="aspect-video bg-gray-800 rounded-lg flex items-center justify-center border border-gray-700">
                         <div className="text-center text-gray-400">
                           <Loader2 className="h-8 w-8 mx-auto mb-2 animate-spin" />
                           <p className="text-sm">Loading storyboard...</p>
@@ -350,7 +350,7 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle, pag
                           <img
                             src={storyboardImage.imageUrl}
                             alt={`Storyboard for Scene ${selectedScene?.sceneNumber}`}
-                            className="w-full aspect-square object-cover rounded-lg border border-gray-700 bg-gray-900"
+                            className="w-full aspect-video object-cover rounded-lg border border-gray-700"
                             onError={(e) => {
                               console.error('Failed to load storyboard image');
                               e.currentTarget.style.display = 'none';
@@ -379,7 +379,7 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle, pag
                     )}
 
                     {!storyboardImage && !imageLoading && !generateImageMutation.isPending && (
-                      <div className="w-full aspect-square bg-gray-800 rounded-lg flex items-center justify-center border border-gray-700 border-dashed">
+                      <div className="aspect-video bg-gray-800 rounded-lg flex items-center justify-center border border-gray-700 border-dashed">
                         <div className="text-center text-gray-400">
                           <ImageIcon className="h-12 w-12 mx-auto mb-3 opacity-50" />
                           <p className="text-sm font-medium mb-1">No storyboard image</p>
@@ -396,7 +396,7 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle, pag
                     )}
 
                     {generateImageMutation.isPending && (
-                      <div className="w-full aspect-square bg-gray-800 rounded-lg flex items-center justify-center border border-gray-700">
+                      <div className="aspect-video bg-gray-800 rounded-lg flex items-center justify-center border border-gray-700">
                         <div className="text-center text-gray-400">
                           <Loader2 className="h-12 w-12 mx-auto mb-3 animate-spin" />
                           <p className="text-sm font-medium mb-1">
