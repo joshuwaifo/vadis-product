@@ -251,11 +251,35 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle, pag
 
               {/* Scene Content */}
               <div className="flex-1 bg-gray-900/50 rounded-xl p-3 sm:p-6 border border-gray-800 min-h-0 flex flex-col gap-4 sm:gap-6">
-                {/* Script Content */}
-                <div className="flex-1 min-h-0">
+                {/* Script Content - Always visible */}
+                <div className="flex-1 min-h-[200px]">
+                  <div className="mb-3">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Info className="h-4 w-4 text-blue-400" />
+                      <h3 className="text-sm font-semibold text-white">Scene Details</h3>
+                    </div>
+                    <div className="space-y-2 text-xs sm:text-sm text-gray-300">
+                      <div className="flex flex-wrap gap-4">
+                        <div className="flex items-center gap-2">
+                          <MapPin className="h-3 w-3 text-gray-400" />
+                          <span>{selectedScene.location}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Clock className="h-3 w-3 text-gray-400" />
+                          <span>{selectedScene.timeOfDay}</span>
+                        </div>
+                        {selectedScene.characters && selectedScene.characters.length > 0 && (
+                          <div className="flex items-center gap-2">
+                            <Users className="h-3 w-3 text-gray-400" />
+                            <span>{selectedScene.characters.join(', ')}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                   <ScrollArea className="h-full">
                     <div className="prose prose-invert max-w-none">
-                      <div className="whitespace-pre-wrap text-gray-200 text-xs sm:text-sm lg:text-lg leading-6 sm:leading-7 lg:leading-8 font-mono">
+                      <div className="whitespace-pre-wrap text-gray-200 text-xs sm:text-sm lg:text-base leading-relaxed font-mono">
                         {selectedScene.content}
                       </div>
                     </div>
