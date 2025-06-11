@@ -1006,28 +1006,46 @@ Respond in JSON format with this structure:
       
       // Save VFX needs
       const savedVFX = await Promise.all(
-        vfxRequirements.map(async (vfx) => {
+        vfxRequirements.filter(vfx => vfx && vfx.sceneId).map(async (vfx) => {
+          // Extract scene number from sceneId
+          let sceneNumber;
+          if (typeof vfx.sceneId === 'string' && vfx.sceneId.includes('scene_')) {
+            sceneNumber = parseInt(vfx.sceneId.replace('scene_', ''));
+          } else {
+            sceneNumber = parseInt(vfx.sceneId);
+          }
+          
+          // Find the actual scene ID from database
+          const matchingScene = projectScenes.find((s: any) => s.sceneNumber === sceneNumber);
+          
+          if (!matchingScene) {
+            console.warn(`No matching scene found for scene number ${sceneNumber}`);
+            return null;
+          }
+          
           const [saved] = await db
             .insert(vfxNeeds)
             .values({
               projectId: parseInt(projectId),
-              sceneId: vfx.sceneId.includes('scene_') ? parseInt(vfx.sceneId.replace('scene_', '')) : parseInt(vfx.sceneId),
-              sceneDescription: vfx.sceneDescription,
-              vfxType: vfx.vfxType,
-              complexity: vfx.complexity,
-              estimatedCost: vfx.estimatedCost,
-              description: vfx.description,
-              referenceImages: vfx.referenceImages
+              sceneId: matchingScene.id,
+              vfxType: vfx.vfxType || 'Unknown',
+              complexity: vfx.complexity || 'medium',
+              estimatedCost: vfx.estimatedCost || 0,
+              description: vfx.description || '',
+              referenceImages: vfx.referenceImages || []
             })
             .returning();
           return saved;
         })
       );
+      
+      // Filter out null results
+      const validSavedVFX = savedVFX.filter((vfx): vfx is NonNullable<typeof vfx> => vfx !== null);
 
       res.json({
         success: true,
-        vfxNeeds: savedVFX,
-        totalEstimatedCost: savedVFX.reduce((total, vfx) => total + (vfx.estimatedCost || 0), 0)
+        vfxNeeds: validSavedVFX,
+        totalEstimatedCost: validSavedVFX.reduce((total, vfx) => total + (vfx.estimatedCost || 0), 0)
       });
 
     } catch (error) {
