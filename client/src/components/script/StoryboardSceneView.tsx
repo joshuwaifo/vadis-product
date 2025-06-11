@@ -260,14 +260,18 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle, pag
                     </div>
                     <div className="space-y-2 text-xs sm:text-sm text-gray-300">
                       <div className="flex flex-wrap gap-4">
-                        <div className="flex items-center gap-2">
-                          <MapPin className="h-3 w-3 text-gray-400" />
-                          <span>{selectedScene.location}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Clock className="h-3 w-3 text-gray-400" />
-                          <span>{selectedScene.timeOfDay}</span>
-                        </div>
+                        {selectedScene.location && (
+                          <div className="flex items-center gap-2">
+                            <MapPin className="h-3 w-3 text-gray-400" />
+                            <span>{selectedScene.location}</span>
+                          </div>
+                        )}
+                        {selectedScene.timeOfDay && (
+                          <div className="flex items-center gap-2">
+                            <Clock className="h-3 w-3 text-gray-400" />
+                            <span>{selectedScene.timeOfDay}</span>
+                          </div>
+                        )}
                         {selectedScene.characters && selectedScene.characters.length > 0 && (
                           <div className="flex items-center gap-2">
                             <Users className="h-3 w-3 text-gray-400" />
