@@ -1,8 +1,71 @@
 import { Request, Response } from "express";
-import { extractScenes, analyzeCharacters, suggestActors, analyzeVFXNeeds, generateProductPlacement, suggestLocations, generateFinancialPlan, generateProjectSummary } from "./script-analysis-agents";
+import { extractScenes, analyzeCharacters, suggestActors, analyzeVFXNeeds, generateProductPlacement, suggestLocations, generateFinancialPlan, generateProjectSummary, Scene } from "./script-analysis-agents";
 import { db, pool } from "./db";
-import { projects, scenes, characters, actorSuggestions, vfxNeeds, productPlacements, locationSuggestions, financialPlans, sceneBreakdowns } from "@shared/schema";
+import { projects, scenes as sceneExtractions, characters, actorSuggestions, vfxNeeds, productPlacements, locationSuggestions, financialPlans, sceneBreakdowns } from "@shared/schema";
 import { eq, and } from "drizzle-orm";
+import { generateContent } from "./services/ai-agents/ai-client";
+
+/**
+ * Generate scene breakdown from extracted scenes
+ */
+async function generateSceneBreakdownFromScenes(scenes: Scene[]) {
+  if (!scenes || scenes.length === 0) {
+    return null;
+  }
+
+  const prompt = `Analyze these screenplay scenes and group them into narrative segments that represent logical story beats and dramatic units.
+
+SCENES TO ANALYZE:
+${scenes.map((scene, index) => `
+Scene ${scene.sceneNumber}: ${scene.location} - ${scene.timeOfDay}
+Characters: ${scene.characters?.join(', ') || 'None specified'}
+Description: ${scene.description || 'No description'}
+Content Preview: ${scene.content?.substring(0, 200) || 'No content'}...
+Duration: ${scene.duration} minutes
+Pages: ${scene.pageStart}-${scene.pageEnd}
+`).join('\n')}
+
+Group these scenes into 4-8 narrative segments that represent natural story progression. Each segment should contain multiple scenes that belong together thematically and dramatically.
+
+Respond in JSON format with this structure:
+{
+  "segments": [
+    {
+      "title": "Compelling and evocative segment title",
+      "sceneRange": "Scenes X-Y",
+      "startScene": X,
+      "endScene": Y,
+      "summary": "Direct, immersive storytelling description of what happens - the events, character actions, emotional stakes, dramatic tension, and plot developments without meta-narrative language",
+      "mainCharacters": ["Character1", "Character2"],
+      "keyLocations": ["Location1", "Location2"]
+    }
+  ]
+}`;
+
+  try {
+    const response = await generateContent('gpt-4o', prompt, {
+      responseFormat: 'json',
+      maxTokens: 2000
+    });
+
+    const analysis = JSON.parse(response);
+    
+    if (!analysis.segments || !Array.isArray(analysis.segments)) {
+      console.error('Invalid scene breakdown response format');
+      return null;
+    }
+
+    return {
+      segments: analysis.segments,
+      totalSegments: analysis.segments.length,
+      totalScenes: scenes.length
+    };
+
+  } catch (error) {
+    console.error('Scene breakdown generation error:', error);
+    return null;
+  }
+}
 
 /**
  * Basic scene parser as fallback when AI is unavailable
@@ -151,6 +214,120 @@ function parseBasicScenes(scriptContent: string) {
 export function registerComprehensiveAnalysisRoutes(app: any) {
   
   // Scene extraction and breakdown
+  app.post('/api/script-analysis/scene_analysis', async (req: Request, res: Response) => {
+    try {
+      const { projectId } = req.body;
+      
+      if (!projectId) {
+        return res.status(400).json({ 
+          success: false, 
+          error: 'Project ID is required' 
+        });
+      }
+
+      console.log('Starting combined scene analysis for project:', projectId);
+
+      // Get project and script content
+      const project = await db.select().from(projects).where(eq(projects.id, projectId)).limit(1);
+      
+      if (!project || project.length === 0) {
+        return res.status(404).json({ 
+          success: false, 
+          error: 'Project not found' 
+        });
+      }
+
+      const projectData = project[0];
+      const scriptContent = projectData.scriptContent;
+
+      if (!scriptContent) {
+        return res.status(400).json({ 
+          success: false, 
+          error: 'No script content found for this project' 
+        });
+      }
+
+      // Step 1: Extract scenes
+      console.log('Extracting scenes...');
+      const scenes = await extractScenes(scriptContent, projectData.title || 'Untitled Project');
+      
+      if (!scenes || scenes.length === 0) {
+        return res.status(400).json({ 
+          success: false, 
+          error: 'Failed to extract scenes from script' 
+        });
+      }
+
+      console.log(`Extracted ${scenes.length} scenes`);
+
+      // Clear existing scenes and insert new ones
+      await db.delete(sceneExtractions).where(eq(sceneExtractions.projectId, projectId));
+      
+      const sceneInserts = scenes.map(scene => ({
+        projectId,
+        sceneNumber: scene.sceneNumber,
+        location: scene.location,
+        timeOfDay: scene.timeOfDay,
+        description: scene.description,
+        characters: scene.characters,
+        content: scene.content,
+        pageStart: scene.pageStart,
+        pageEnd: scene.pageEnd,
+        duration: scene.duration,
+        vfxNeeds: scene.vfxNeeds,
+        productPlacementOpportunities: scene.productPlacementOpportunities
+      }));
+
+      await db.insert(sceneExtractions).values(sceneInserts);
+
+      // Step 2: Create scene breakdown using extracted scenes
+      console.log('Creating scene breakdown...');
+      const sceneBreakdownResult = await generateSceneBreakdownFromScenes(scenes);
+      
+      if (!sceneBreakdownResult || !sceneBreakdownResult.segments) {
+        console.warn('Scene breakdown generation failed, continuing with just scenes');
+      } else {
+        console.log(`Generated ${sceneBreakdownResult.segments.length} narrative segments`);
+        
+        // Store scene breakdown results
+        await db.delete(sceneBreakdowns).where(eq(sceneBreakdowns.projectId, projectId));
+        
+        // Insert each segment as a separate row
+        const breakdownInserts = sceneBreakdownResult.segments.map((segment: any) => ({
+          projectId,
+          title: segment.title,
+          sceneRange: segment.sceneRange,
+          startScene: segment.startScene,
+          endScene: segment.endScene,
+          summary: segment.summary,
+          mainCharacters: segment.mainCharacters || [],
+          keyLocations: segment.keyLocations || []
+        }));
+
+        await db.insert(sceneBreakdowns).values(breakdownInserts);
+      }
+
+      // Return combined results
+      const response = {
+        success: true,
+        scenes: scenes,
+        sceneBreakdown: sceneBreakdownResult || null,
+        totalScenes: scenes.length,
+        message: `Successfully analyzed ${scenes.length} scenes${sceneBreakdownResult ? ` and created ${sceneBreakdownResult.segments.length} narrative segments` : ''}`
+      };
+
+      console.log('Scene analysis completed successfully');
+      res.json(response);
+
+    } catch (error) {
+      console.error('Scene analysis error:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Failed to analyze scenes'
+      });
+    }
+  });
+
   app.post('/api/script-analysis/scene_extraction', async (req: Request, res: Response) => {
     try {
       const { projectId } = req.body;

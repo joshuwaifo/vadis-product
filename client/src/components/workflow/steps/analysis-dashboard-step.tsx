@@ -236,23 +236,24 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
   }, [castingAnalysis]);
 
   useEffect(() => {
-    if (existingSceneBreakdown?.segments?.length > 0) {
+    if ((existingScenes?.length > 0) || (existingSceneBreakdown?.segments?.length > 0)) {
       setTasks(prev => prev.map(task => 
-        task.id === 'scene_breakdown' 
+        task.id === 'scene_analysis' 
           ? { ...task, status: 'completed' as const, completedAt: new Date() }
           : task
       ));
       setAnalysisResults(prev => ({
         ...prev,
-        scene_breakdown: {
+        scene_analysis: {
           success: true,
-          segments: existingSceneBreakdown.segments,
-          totalSegments: existingSceneBreakdown.segments.length,
-          totalScenes: existingSceneBreakdown.totalScenes
+          scenes: existingScenes || [],
+          segments: existingSceneBreakdown?.segments || [],
+          totalSegments: existingSceneBreakdown?.segments?.length || 0,
+          totalScenes: existingScenes?.length || 0
         }
       }));
     }
-  }, [existingSceneBreakdown]);
+  }, [existingScenes, existingSceneBreakdown]);
 
   const analysisInProgress = tasks.some(task => task.status === 'in_progress');
 
@@ -513,99 +514,7 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
           </div>
         );
 
-      case 'scene_breakdown':
-        return (
-          <div className="space-y-6">
-            {results.segments && results.segments.length > 0 && (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h4 className="text-lg font-semibold">Narrative Segments</h4>
-                  <Badge variant="outline" className="text-xs">
-                    {results.segments.length} segments
-                  </Badge>
-                </div>
-                
-                <div className="space-y-4">
-                  {/* Table Header */}
-                  <div className="grid grid-cols-12 gap-4 px-4 py-3 bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-                    <div className="col-span-6">
-                      <h5 className="font-semibold text-gray-900 dark:text-gray-100 text-sm">Narrative Segment</h5>
-                    </div>
-                    <div className="col-span-3 text-center">
-                      <div className="flex items-center justify-center gap-2">
-                        <MapPin className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                        <h5 className="font-semibold text-gray-900 dark:text-gray-100 text-sm">Key Locations</h5>
-                      </div>
-                    </div>
-                    <div className="col-span-3 text-center">
-                      <div className="flex items-center justify-center gap-2">
-                        <Users className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                        <h5 className="font-semibold text-gray-900 dark:text-gray-100 text-sm">Main Characters</h5>
-                      </div>
-                    </div>
-                  </div>
 
-                  {/* Table Rows */}
-                  {results.segments.map((segment: any, index: number) => (
-                    <div key={index} className="grid grid-cols-12 gap-4 p-4 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all duration-200">
-                      {/* Segment Column (Wide) */}
-                      <div className="col-span-6 space-y-3">
-                        <div className="flex items-center gap-3 mb-2">
-                          <Badge variant="secondary" className="text-xs font-medium bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 px-2 py-1">
-                            {segment.sceneRange}
-                          </Badge>
-                          <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-                            Segment {index + 1}
-                          </span>
-                        </div>
-                        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 leading-tight mb-3">
-                          {segment.title}
-                        </h3>
-                        <div className="bg-gradient-to-br from-slate-50 to-gray-50 dark:from-slate-800/50 dark:to-gray-800/50 rounded-lg p-4 border border-slate-200/50 dark:border-slate-700/50">
-                          <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-                            {segment.summary}
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Locations Column */}
-                      <div className="col-span-3 flex flex-col items-center justify-center">
-                        <div className="space-y-2 w-full max-w-xs">
-                          {segment.keyLocations?.map((location: string, i: number) => (
-                            <Badge key={i} variant="outline" className="block text-xs bg-emerald-50/80 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-800 px-2.5 py-1.5 font-medium text-center w-full">
-                              {location}
-                            </Badge>
-                          )) || <span className="text-sm text-muted-foreground italic text-center">None specified</span>}
-                        </div>
-                      </div>
-
-                      {/* Characters Column */}
-                      <div className="col-span-3 flex flex-col items-center justify-center">
-                        <div className="space-y-2 w-full max-w-xs">
-                          {segment.mainCharacters?.map((character: string, i: number) => (
-                            <Badge key={i} variant="outline" className="block text-xs bg-blue-50/80 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-800 px-2.5 py-1.5 font-medium text-center w-full">
-                              {character}
-                            </Badge>
-                          )) || <span className="text-sm text-muted-foreground italic text-center">None specified</span>}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {(!results.segments || results.segments.length === 0) && (
-              <div className="text-center py-8">
-                <Layers className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">No Segments Found</h3>
-                <p className="text-muted-foreground">
-                  The analysis couldn't create narrative segments. Please ensure Scene Extraction has been completed first.
-                </p>
-              </div>
-            )}
-          </div>
-        );
 
       case 'storyboard_view':
         return (
