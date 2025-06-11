@@ -249,10 +249,10 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle, pag
                 </h2>
               </div>
 
-              {/* Scene Content - Flex layout for better space management */}
-              <div className="flex-1 bg-gray-900/50 rounded-xl p-3 sm:p-6 border border-gray-800 min-h-0 flex flex-col lg:flex-row gap-4 sm:gap-6">
-                {/* Script Content - Left side */}
-                <div className="flex-1 min-h-[200px] lg:min-h-0">
+              {/* Scene Content - Vertical layout */}
+              <div className="flex-1 bg-gray-900/50 rounded-xl p-3 sm:p-6 border border-gray-800 min-h-0 flex flex-col gap-4 sm:gap-6">
+                {/* Script Content - Top section */}
+                <div className="flex-1 min-h-[200px]">
                   <div className="mb-3">
                     <div className="flex items-center gap-2 mb-2">
                       <Info className="h-4 w-4 text-blue-400" />
@@ -286,8 +286,8 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle, pag
                   </ScrollArea>
                 </div>
 
-                {/* Storyboard Image Section - Right side */}
-                <div className="flex-1 min-h-[300px] lg:min-h-0 flex flex-col">
+                {/* Storyboard Image Section - Bottom section */}
+                <div className="flex-shrink-0">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-3">
                       <Camera className="h-4 w-4 text-blue-400" />
@@ -333,10 +333,10 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle, pag
                     )}
                   </div>
 
-                  {/* Image Display Area - Fixed sizing */}
-                  <div className="relative flex-1 overflow-hidden">
+                  {/* Image Display Area - Square format */}
+                  <div className="relative max-w-md mx-auto">
                     {imageLoading && (
-                      <div className="w-full max-w-full bg-gray-800 rounded-lg flex items-center justify-center border border-gray-700" style={{ aspectRatio: '16/9' }}>
+                      <div className="w-full aspect-square bg-gray-800 rounded-lg flex items-center justify-center border border-gray-700">
                         <div className="text-center text-gray-400">
                           <Loader2 className="h-8 w-8 mx-auto mb-2 animate-spin" />
                           <p className="text-sm">Loading storyboard...</p>
@@ -345,12 +345,12 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle, pag
                     )}
                     
                     {storyboardImage && (
-                      <div className="space-y-3 h-full flex flex-col">
-                        <div className="relative flex-1 overflow-hidden">
+                      <div className="space-y-3">
+                        <div className="relative">
                           <img
                             src={storyboardImage.imageUrl}
                             alt={`Storyboard for Scene ${selectedScene?.sceneNumber}`}
-                            className="w-full h-full max-h-full object-contain rounded-lg border border-gray-700 bg-gray-900"
+                            className="w-full aspect-square object-cover rounded-lg border border-gray-700 bg-gray-900"
                             onError={(e) => {
                               console.error('Failed to load storyboard image');
                               e.currentTarget.style.display = 'none';
@@ -369,7 +369,7 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle, pag
                         </div>
                         
                         {/* Image metadata */}
-                        <div className="text-xs text-gray-400 space-y-1 flex-shrink-0">
+                        <div className="text-xs text-gray-400 space-y-1">
                           <p><span className="text-gray-300">Generated:</span> {new Date(storyboardImage.generatedAt).toLocaleString()}</p>
                           {storyboardImage.charactersPresent && storyboardImage.charactersPresent.length > 0 && (
                             <p><span className="text-gray-300">Characters:</span> {storyboardImage.charactersPresent.join(', ')}</p>
@@ -379,7 +379,7 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle, pag
                     )}
 
                     {!storyboardImage && !imageLoading && !generateImageMutation.isPending && (
-                      <div className="w-full bg-gray-800 rounded-lg flex items-center justify-center border border-gray-700 border-dashed" style={{ aspectRatio: '16/9' }}>
+                      <div className="w-full aspect-square bg-gray-800 rounded-lg flex items-center justify-center border border-gray-700 border-dashed">
                         <div className="text-center text-gray-400">
                           <ImageIcon className="h-12 w-12 mx-auto mb-3 opacity-50" />
                           <p className="text-sm font-medium mb-1">No storyboard image</p>
@@ -396,7 +396,7 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle, pag
                     )}
 
                     {generateImageMutation.isPending && (
-                      <div className="w-full bg-gray-800 rounded-lg flex items-center justify-center border border-gray-700" style={{ aspectRatio: '16/9' }}>
+                      <div className="w-full aspect-square bg-gray-800 rounded-lg flex items-center justify-center border border-gray-700">
                         <div className="text-center text-gray-400">
                           <Loader2 className="h-12 w-12 mx-auto mb-3 animate-spin" />
                           <p className="text-sm font-medium mb-1">
