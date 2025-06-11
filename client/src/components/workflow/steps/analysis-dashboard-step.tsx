@@ -71,14 +71,6 @@ const ANALYSIS_TASKS: AnalysisTask[] = [
     estimatedTime: '2-3 min'
   },
   {
-    id: 'location_analysis',
-    title: 'Location Suggestions',
-    description: 'AI-powered filming location recommendations',
-    status: 'not_started',
-    icon: MapPin,
-    estimatedTime: '3-4 min'
-  },
-  {
     id: 'vfx_analysis',
     title: 'VFX Analysis',
     description: 'Identify visual effects requirements and complexity',
@@ -747,89 +739,6 @@ export default function AnalysisDashboardStep({ workflow, onNext, onPrevious }: 
         return (
           <div className="space-y-6">
             <ProductPlacementView projectId={workflow?.projectId || project?.id || 0} />
-          </div>
-        );
-
-      case 'location_analysis':
-        return (
-          <div className="space-y-6">
-            {results.locationSuggestions && results.locationSuggestions.length > 0 ? (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h4 className="text-lg font-semibold">Location Suggestions</h4>
-                  <Badge variant="outline" className="text-xs">
-                    {results.locationSuggestions.length} locations analyzed
-                  </Badge>
-                </div>
-                
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {results.locationSuggestions.map((location: any, index: number) => (
-                    <Card key={index} className="border border-gray-200 dark:border-gray-700">
-                      <CardHeader className="pb-3">
-                        <div className="flex items-center justify-between">
-                          <CardTitle className="text-base font-semibold flex items-center gap-2">
-                            <MapPin className="h-4 w-4 text-blue-600" />
-                            {location.locationType || 'Location Type'}
-                          </CardTitle>
-                          <Badge variant="secondary" className="text-xs">
-                            Scene {location.sceneId}
-                          </Badge>
-                        </div>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        {location.suggestions && location.suggestions.map((suggestion: any, suggIndex: number) => (
-                          <div key={suggIndex} className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg space-y-3">
-                            <div className="flex items-center justify-between">
-                              <h5 className="font-medium text-sm">{suggestion.location}</h5>
-                              <div className="flex items-center gap-2">
-                                {suggestion.taxIncentive && (
-                                  <Badge variant="outline" className="text-xs bg-green-50 text-green-700">
-                                    {suggestion.taxIncentive}% tax incentive
-                                  </Badge>
-                                )}
-                              </div>
-                            </div>
-                            
-                            <div className="grid grid-cols-2 gap-4 text-xs">
-                              <div>
-                                <span className="font-medium text-gray-600 dark:text-gray-400">Location:</span>
-                                <p>{suggestion.city}, {suggestion.state}</p>
-                              </div>
-                              <div>
-                                <span className="font-medium text-gray-600 dark:text-gray-400">Cost:</span>
-                                <p>${suggestion.estimatedCost?.toLocaleString() || 'TBD'}</p>
-                              </div>
-                            </div>
-                            
-                            {suggestion.logistics && (
-                              <div className="text-xs">
-                                <span className="font-medium text-gray-600 dark:text-gray-400">Logistics:</span>
-                                <p className="mt-1 text-gray-700 dark:text-gray-300">{suggestion.logistics}</p>
-                              </div>
-                            )}
-                            
-                            {suggestion.weatherConsiderations && (
-                              <div className="text-xs">
-                                <span className="font-medium text-gray-600 dark:text-gray-400">Weather:</span>
-                                <p className="mt-1 text-gray-700 dark:text-gray-300">{suggestion.weatherConsiderations}</p>
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <div className="text-center py-8">
-                <MapPin className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">No Location Suggestions Available</h3>
-                <p className="text-muted-foreground">
-                  Run scene extraction first to generate location recommendations.
-                </p>
-              </div>
-            )}
           </div>
         );
 
