@@ -249,10 +249,10 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle, pag
                 </h2>
               </div>
 
-              {/* Scene Content */}
-              <div className="flex-1 bg-gray-900/50 rounded-xl p-3 sm:p-6 border border-gray-800 min-h-0 flex flex-col gap-4 sm:gap-6">
-                {/* Script Content - Always visible */}
-                <div className="flex-1 min-h-[200px]">
+              {/* Two-Pane Layout */}
+              <div className="flex-1 flex flex-col gap-3 sm:gap-4 min-h-0">
+                {/* Top Pane - Scene Text */}
+                <div className="bg-gray-900/50 rounded-xl p-3 sm:p-4 border border-gray-800 flex-shrink-0 max-h-[40vh]">
                   <div className="mb-3">
                     <div className="flex items-center gap-2 mb-2">
                       <Info className="h-4 w-4 text-blue-400" />
@@ -279,16 +279,16 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle, pag
                   </div>
                   <ScrollArea className="h-full">
                     <div className="prose prose-invert max-w-none">
-                      <div className="whitespace-pre-wrap text-gray-200 text-xs sm:text-sm lg:text-base leading-relaxed font-mono">
+                      <div className="whitespace-pre-wrap text-gray-200 text-xs sm:text-sm leading-relaxed font-mono">
                         {selectedScene.content}
                       </div>
                     </div>
                   </ScrollArea>
                 </div>
 
-                {/* Storyboard Image Section */}
-                <div className="flex-shrink-0">
-                  <div className="flex items-center justify-between mb-3">
+                {/* Bottom Pane - Storyboard Frame */}
+                <div className="flex-1 bg-gray-900/50 rounded-xl p-3 sm:p-4 border border-gray-800 min-h-0 flex flex-col">
+                  <div className="flex items-center justify-between mb-3 flex-shrink-0">
                     <div className="flex items-center gap-3">
                       <Camera className="h-4 w-4 text-blue-400" />
                       <h3 className="text-sm sm:text-base font-semibold text-white">Storyboard Frame</h3>
@@ -333,10 +333,10 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle, pag
                     )}
                   </div>
 
-                  {/* Image Display Area */}
-                  <div className="relative">
+                  {/* Centered Image Display Area */}
+                  <div className="flex-1 flex items-center justify-center p-2">
                     {imageLoading && (
-                      <div className="w-full max-w-2xl mx-auto aspect-video bg-gray-800 rounded-lg flex items-center justify-center border border-gray-700">
+                      <div className="w-full h-full flex items-center justify-center bg-gray-800 rounded-lg border border-gray-700">
                         <div className="text-center text-gray-400">
                           <Loader2 className="h-8 w-8 mx-auto mb-2 animate-spin" />
                           <p className="text-sm">Loading storyboard...</p>
@@ -345,12 +345,12 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle, pag
                     )}
                     
                     {storyboardImage && (
-                      <div className="space-y-3">
-                        <div className="relative w-full max-w-2xl mx-auto">
+                      <div className="w-full h-full flex items-center justify-center">
+                        <div className="relative max-w-full max-h-full">
                           <img
                             src={storyboardImage.imageUrl}
                             alt={`Storyboard for Scene ${selectedScene?.sceneNumber}`}
-                            className="w-full h-auto max-h-[50vh] object-contain rounded-lg border border-gray-700 bg-gray-900"
+                            className="max-w-full max-h-full object-contain rounded-lg border border-gray-700 bg-gray-900"
                             onError={(e) => {
                               console.error('Failed to load storyboard image');
                               e.currentTarget.style.display = 'none';
@@ -367,46 +367,32 @@ export default function StoryboardSceneView({ scenes, onClose, projectTitle, pag
                             </div>
                           )}
                         </div>
-                        
-                        {/* Image metadata */}
-                        <div className="text-xs text-gray-400 space-y-1">
-                          <p><span className="text-gray-300">Generated:</span> {new Date(storyboardImage.generatedAt).toLocaleString()}</p>
-                          {storyboardImage.charactersPresent && storyboardImage.charactersPresent.length > 0 && (
-                            <p><span className="text-gray-300">Characters:</span> {storyboardImage.charactersPresent.join(', ')}</p>
-                          )}
-                        </div>
                       </div>
                     )}
 
-                    {!storyboardImage && !imageLoading && !generateImageMutation.isPending && (
-                      <div className="aspect-video bg-gray-800 rounded-lg flex items-center justify-center border border-gray-700 border-dashed">
+                    {!storyboardImage && !imageLoading && (
+                      <div className="w-full h-full flex items-center justify-center bg-gray-800/30 rounded-lg border-2 border-dashed border-gray-600">
                         <div className="text-center text-gray-400">
-                          <ImageIcon className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                          <p className="text-sm font-medium mb-1">No storyboard image</p>
-                          <p className="text-xs">
-                            Select a style and click "Generate Art" to create a visual representation
-                          </p>
-                          {selectedStyle && (
-                            <p className="text-xs mt-2 text-blue-400">
-                              Current style: {ART_STYLES.find(s => s.id === selectedStyle)?.name}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                    {generateImageMutation.isPending && (
-                      <div className="aspect-video bg-gray-800 rounded-lg flex items-center justify-center border border-gray-700">
-                        <div className="text-center text-gray-400">
-                          <Loader2 className="h-12 w-12 mx-auto mb-3 animate-spin" />
-                          <p className="text-sm font-medium mb-1">
-                            Generating {ART_STYLES.find(s => s.id === selectedStyle)?.name || 'Custom'} storyboard...
-                          </p>
-                          <p className="text-xs">AI refining prompt with Gemini, then creating art with Imagen 4</p>
+                          <ImageIcon className="h-12 w-12 mx-auto mb-4 text-gray-500" />
+                          <p className="text-lg font-medium mb-2">No storyboard image</p>
+                          <p className="text-sm">Select a style and click "Generate Art" to create a visual representation</p>
+                          <p className="text-xs mt-2 text-blue-400">Current Style: Studio Ghibli</p>
                         </div>
                       </div>
                     )}
                   </div>
+
+                  {/* Image Metadata - Only show if image exists */}
+                  {storyboardImage && (
+                    <div className="flex-shrink-0 mt-3 pt-3 border-t border-gray-700">
+                      <div className="text-xs text-gray-400 space-y-1">
+                        <p><span className="text-gray-300">Generated:</span> {new Date(storyboardImage.generatedAt).toLocaleString()}</p>
+                        {storyboardImage.charactersPresent && storyboardImage.charactersPresent.length > 0 && (
+                          <p><span className="text-gray-300">Characters:</span> {storyboardImage.charactersPresent.join(', ')}</p>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
